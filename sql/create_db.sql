@@ -1,4 +1,4 @@
 -- CREATE DATABASE --
 create database Scopes;
-use database Scopes;
-source tables/create_tables.sql
+use Scopes;
+source create_tables.sql

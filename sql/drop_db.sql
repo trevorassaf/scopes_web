@@ -1,3 +1,3 @@
 -- DROP DATABASE --
-source tables/drop_tables.sql
+source drop_tables.sql
 drop database Scopes;
