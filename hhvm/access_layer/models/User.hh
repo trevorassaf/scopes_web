@@ -8,7 +8,7 @@ class User {
       private string $lastName,
       private Email $email,
       private string $passwordHash,
-      private Timestamp $timeJoined
+      private DateTime $timeJoined
   ) {}
 
   public function getFirstName(): string {
@@ -27,7 +27,7 @@ class User {
     return $this->passwordHash;
   }
 
-  public function getTimeJoined(): Timestamp {
+  public function getTimeJoined(): DateTime {
     return $this->timeJoined;
   }
 }

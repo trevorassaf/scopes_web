@@ -5,7 +5,7 @@ class Order {
   public function __construct(
       private UnsignedInt $id,
       private UnsignedInt $scopesCount,
-      private Timestamp $startTime,
+      private DateTime $startTime,
       private UnsignedInt $reservedMinutesCount 
   ) {}
 
@@ -13,7 +13,7 @@ class Order {
     return $this->scopesCount;
   }
 
-  public function getStartTime(): Timestamp {
+  public function getStartTime(): DateTime {
     return $this->startTime;
   }
   
