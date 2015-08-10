@@ -1,6 +1,6 @@
 <?hh
 
-class Order {
+class Order implements Model {
   
   public function __construct(
       private UnsignedInt $id,
@@ -8,6 +8,10 @@ class Order {
       private DateTime $startTime,
       private UnsignedInt $reservedMinutesCount 
   ) {}
+
+  public function getId(): UnsignedInt {
+    return $this->id;
+  }
 
   public function getScopesCount(): UnsignedInt {
     return $this->scopesCount;

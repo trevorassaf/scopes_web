@@ -1,6 +1,6 @@
 <?hh
 
-class User {
+class User implements Model {
 
   public function __construct(
       private UnsignedInt $id,
@@ -10,6 +10,10 @@ class User {
       private string $passwordHash,
       private DateTime $timeJoined
   ) {}
+
+  public function getId(): UnsignedInt {
+    return $this->id;
+  }
 
   public function getFirstName(): string {
     return $this->firstName;
