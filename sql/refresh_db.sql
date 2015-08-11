@@ -1,0 +1,3 @@
+-- REFRESH SCOPES DATABASE --
+DROP DATABASE IF EXISTS Scopes;
+source create_db.sql
