@@ -29,7 +29,7 @@ class Email {
     // Loop through remaining email string and make sure no other '@'
     // characters appear and make sure that at least one '.' character appears
     for ($i = $username_token_idx + 1; $i < $address_len; ++$i) {
-      $curr_char = susbtr($address, $i, 1);
+      $curr_char = substr($address, $i, 1);
       if ($curr_char == self::EMAIL_USERNAME_TOKEN) {
         throw new Exception(
             "Email address ({$address}) may contain at most one '"

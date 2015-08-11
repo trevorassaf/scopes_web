@@ -1,6 +1,6 @@
 <?hh // strict
 
-class UserOrderEdgeInsert {
+class OrderInsert {
 
   public function __construct(
       private AsyncMysqlConnection $asyncMysqlConnection,
@@ -59,11 +59,11 @@ class UserOrderEdgeInsert {
         . $this->ordersTable->getScopesCountKey() . ", "
         . $this->ordersTable->getStartTimeKey() . ", "
         . $this->ordersTable->getReservedMinutesCountKey()
-      . ") VALUES ("
-        . $scopes_count->getNumber() . ", "
-        . $start_time->format("Y-m-d H:i:s") . ", "
+      . ") VALUES ('"
+        . $scopes_count->getNumber() . "', '"
+        . $start_time->format("Y-m-d H:i:s") . "', '"
         . $reserved_minutes_count->getNumber()
-      . ")";
+      . "')";
   }
 
   private function createInsertUserOrderEdgeQuery(
@@ -73,10 +73,10 @@ class UserOrderEdgeInsert {
     return 
       "INSERT INTO " . $this->userOrderEdgesTable->getTableName() . "("
         . $this->userOrderEdgesTable->getUserIdKey() . ", "
-        . $this->userOrderEdgesTable->getOrderIdKey() . ", "
-      . ") VALUES ("
-        . $user->getId()->getNumber() . ", "
+        . $this->userOrderEdgesTable->getOrderIdKey()
+      . ") VALUES ('"
+        . $user->getId()->getNumber() . "', '"
         . $order->getId()->getNumber()
-      . ")";
+      . "')";
   }
 }

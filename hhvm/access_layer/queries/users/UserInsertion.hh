@@ -34,13 +34,12 @@ class UserInsertion {
   ): string {
     return 
       "INSERT INTO " . $this->usersTable->getTableName() . " ("
-        . $this->usersTable->getIdKey() . ", "
         . $this->usersTable->getFirstNameKey() . ", "
         . $this->usersTable->getLastNameKey() . ", "
         . $this->usersTable->getEmailKey() . ", "
         . $this->usersTable->getPasswordHashKey() . ", "
         . $this->usersTable->getTimeJoinedKey() 
-      . ") VALUES ("
+      . ") VALUES ('"
         . $first_name . "', '"
         . $last_name . "', '"
         . $email->toString() . "', '"
