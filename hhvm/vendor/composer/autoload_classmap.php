@@ -11,6 +11,7 @@ return array(
     'Email' => $baseDir . '/utils/data_types/Email.hh',
     'Model' => $baseDir . '/access_layer/models/Model.hh',
     'Order' => $baseDir . '/access_layer/models/Order.hh',
+    'OrdersTable' => $baseDir . '/access_layer/tables/OrdersTable.hh',
     'Table' => $baseDir . '/access_layer/tables/Table.hh',
     'UnsignedInt' => $baseDir . '/utils/data_types/UnsignedInt.hh',
     'User' => $baseDir . '/access_layer/models/User.hh',
@@ -18,5 +19,6 @@ return array(
     'UserInsertion' => $baseDir . '/access_layer/queries/users/UserInsertion.hh',
     'UserPrivilege' => $baseDir . '/access_layer/models/UserPrivilege.hh',
     'UserPrivilegeType' => $baseDir . '/access_layer/models/UserPrivilege.hh',
+    'UserPrivilegesTable' => $baseDir . '/access_layer/tables/UserPrivilegesTable.hh',
     'UsersTable' => $baseDir . '/access_layer/tables/UsersTable.hh',
 );
