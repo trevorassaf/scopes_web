@@ -7,9 +7,9 @@ class UserPrivilegeInsert {
       private UserPrivilegesTable $userPrivilegesTable
   ) {}
 
-  public async function insert(): Awaitable<UserPrivilege> {
+  public async function insert(UserPrivilegeType $type): Awaitable<UserPrivilege> {
     $insert_result = await $this->asyncMysqlConnection->query(
-      $this->createQuery()
+      $this->createQuery($type)
     ); 
 
     $insert_result_list = $insert_result->mapRowsTyped();
@@ -20,9 +20,12 @@ class UserPrivilegeInsert {
     );
   }
 
-  private function createQuery(): string {
+  private function createQuery(UserPrivilegeType $type): string {
     return "INSERT INTO "
       . $this->userPrivilegesTable->getTableName()
-      . " VALUES ()";
+      . " VALUES (" . $this->userPrivilegesTable->getIdKey()
+      . ") ("
+      . UserPrivilegeType::assert($type)
+      . "')";
   }
 }

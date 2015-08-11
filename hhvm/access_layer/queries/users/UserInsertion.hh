@@ -13,8 +13,8 @@ class UserInsertion {
       Email $email,
       string $password_hash,
       DateTime $time_joined
-  ): Awaitable<void> {
-    await $this->asyncMysqlConnection->query(
+  ): Awaitable<User> {
+    $insert_result = await $this->asyncMysqlConnection->query(
       $this->createQuery(
           $first_name,
           $last_name,
@@ -23,6 +23,11 @@ class UserInsertion {
           $time_joined 
       )
     );  
+
+    $insert_result_list = $insert_result->mapRowsTyped();
+    invariant($insert_result_list->count() === 1, "Insert cardinality must be 1");
+
+    return $this->usersTable->extrude($insert_result_list[0]);
   }
 
   private function createQuery(
