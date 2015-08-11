@@ -14,6 +14,7 @@ return array(
     'Table' => $baseDir . '/access_layer/tables/Table.hh',
     'UnsignedInt' => $baseDir . '/utils/data_types/UnsignedInt.hh',
     'User' => $baseDir . '/access_layer/models/User.hh',
+    'UserFetchById' => $baseDir . '/access_layer/queries/users/UserFetchById.hh',
     'UserInsertion' => $baseDir . '/access_layer/queries/users/UserInsertion.hh',
     'UserPrivilege' => $baseDir . '/access_layer/models/UserPrivilege.hh',
     'UserPrivilegeType' => $baseDir . '/access_layer/models/UserPrivilege.hh',

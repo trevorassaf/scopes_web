@@ -1,8 +1,5 @@
 <?hh // strict
 
-require_once(dirname(__FILE__)."/../../tables/UsersTable.hh");
-require_once(dirname(__FILE__)."/../../models/User.hh");
-
 class UserInsertion {
 
   public function __construct(
@@ -10,14 +7,31 @@ class UserInsertion {
       private UsersTable $usersTable
   ) {}
 
-  public async function insert(User $user): Awaitable<void> {
-    echo "Insertion query: " . $this->createQuery($user) . "\n";
+  public async function insert(
+      string $first_name,
+      string $last_name,
+      Email $email,
+      string $password_hash,
+      DateTime $time_joined
+  ): Awaitable<void> {
     await $this->asyncMysqlConnection->query(
-      $this->createQuery($user)
+      $this->createQuery(
+          $first_name,
+          $last_name,
+          $email,
+          $password_hash,
+          $time_joined 
+      )
     );  
   }
 
-  public function createQuery(User $user): string {
+  private function createQuery(
+      string $first_name,
+      string $last_name,
+      Email $email,
+      string $password_hash,
+      DateTime $time_joined
+  ): string {
     return 
       "INSERT INTO " . $this->usersTable->getTableName() . " ("
         . $this->usersTable->getIdKey() . ", "
@@ -27,12 +41,11 @@ class UserInsertion {
         . $this->usersTable->getPasswordHashKey() . ", "
         . $this->usersTable->getTimeJoinedKey() 
       . ") VALUES ("
-        . $user->getId()->getNumber() . ", '"
-        . $user->getFirstName() . "', '"
-        . $user->getLastName() . "', '"
-        . $user->getEmail()->toString() . "', '"
-        . $user->getPasswordHash() . "', '"
-        . $user->getTimeJoined()->format('Y-m-d H:i:s')
+        . $first_name . "', '"
+        . $last_name . "', '"
+        . $email->toString() . "', '"
+        . $password_hash . "', '"
+        . $time_joined->format('Y-m-d H:i:s')
       . "')";
   }
 }
