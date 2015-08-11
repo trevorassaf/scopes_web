@@ -18,4 +18,8 @@ class UserPrivilege implements Model {
   public function getId(): UnsignedInt {
     return $this->id;
   }
+
+  public function getType(): UserPrivilegeType {
+    return UserPrivilegeType::assert($this->id->getNumber());
+  }
 }
