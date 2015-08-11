@@ -5,7 +5,7 @@ class UserPrivilegesTable {
   const string TABLE_NAME = "UserPrivileges";
   const string ID_KEY = "id";
 
-  public function extrude(Map<string, string> $params): UserPrivilege {
+  public function extrude(Map<string, mixed> $params): UserPrivilege {
     return new UserPrivilege(
         new UnsignedInt((int)$params[$this->getIdKey()])
     );
