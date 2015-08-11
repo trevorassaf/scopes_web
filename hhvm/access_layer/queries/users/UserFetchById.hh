@@ -9,11 +9,13 @@ class UserFetchById {
 
   public async function fetch(
       UnsignedInt $user_id
-  ): Awaitable<void> {
+  ): Awaitable<User> {
     $result_set =  await $this->asyncMysqlConnection->query(
       $this->createQuery($user_id)
     ); 
-    var_dump($result_set->mapRowsTyped());
+    $user_field_map_list = $result_set->mapRowsTyped();
+    invariant($user_field_map_list->count() === 1, "Must only have 1 result!");
+    return $this->usersTable->extrude($user_field_map_list[0]);
   }
 
   private function createQuery(

@@ -10,14 +10,14 @@ class UsersTable {
   const string PASSWORD_KEY = "passwordHash";
   const string TIME_JOINED_KEY = "timeJoined";
   
-  public function extrude(Map<string, string> $params): User {
+  public function extrude(Map<string, mixed> $params): User {
     return new User(
       new UnsignedInt((int)$params[$this->getIdKey()]),
-      $params[$this->getFirstNameKey()],
-      $params[$this->getLastNameKey()],
-      new Email($params[$this->getEmailKey()]),
-      $params[$this->getPasswordHashKey()],
-      new DateTime($params[$this->getTimeJoinedKey()])
+      (string)$params[$this->getFirstNameKey()],
+      (string)$params[$this->getLastNameKey()],
+      new Email((string)$params[$this->getEmailKey()]),
+      (string)$params[$this->getPasswordHashKey()],
+      new DateTime((string)$params[$this->getTimeJoinedKey()])
     );
   } 
 
