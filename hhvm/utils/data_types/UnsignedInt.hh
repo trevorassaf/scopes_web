@@ -11,7 +11,7 @@ class UnsignedInt {
   }
 
   public function __construct(int $number) {
-    if (static::isUnsigned($number)) {
+    if (!static::isUnsigned($number)) {
       throw new Exception("{$number} cannot be negative!");
     }
 

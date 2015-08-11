@@ -1,5 +1,8 @@
 <?hh // strict
 
+require_once(dirname(__FILE__)."/../../tables/UsersTable.hh");
+require_once(dirname(__FILE__)."/../../models/User.hh");
+
 class UserInsertion {
 
   public function __construct(
@@ -16,20 +19,20 @@ class UserInsertion {
 
   public function createQuery(User $user): string {
     return 
-      "INSERT INTO " . $this->usersTable->getTableName() . " VALUES ("
+      "INSERT INTO " . $this->usersTable->getTableName() . " ("
         . $this->usersTable->getIdKey() . ", "
         . $this->usersTable->getFirstNameKey() . ", "
         . $this->usersTable->getLastNameKey() . ", "
         . $this->usersTable->getEmailKey() . ", "
         . $this->usersTable->getPasswordHashKey() . ", "
         . $this->usersTable->getTimeJoinedKey() 
-      . ") ("
-        . $user->getId()->getNumber() . ", "
-        . $user->getFirstName() . ", "
-        . $user->getLastName() . ", "
-        . $user->getEmail()->toString() . ", "
-        . $user->getPasswordHash() . ", "
-        . $user->getTimeJoined()->format(DateTime::W3C)
-      . ")";
+      . ") VALUES ("
+        . $user->getId()->getNumber() . ", '"
+        . $user->getFirstName() . "', '"
+        . $user->getLastName() . "', '"
+        . $user->getEmail()->toString() . "', '"
+        . $user->getPasswordHash() . "', '"
+        . $user->getTimeJoined()->format('Y-m-d H:i:s')
+      . "')";
   }
 }

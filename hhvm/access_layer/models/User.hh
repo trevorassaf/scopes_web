@@ -1,4 +1,9 @@
-<?hh
+<?hh // strict
+
+require_once('Model.hh');
+
+require_once(dirname(__FILE__)."/../../utils/data_types/UnsignedInt.hh");
+require_once(dirname(__FILE__)."/../../utils/data_types/Email.hh");
 
 class User implements Model {
 
