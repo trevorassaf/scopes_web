@@ -24,10 +24,15 @@ class UserInsertion {
       )
     );  
 
-    $insert_result_list = $insert_result->mapRowsTyped();
-    invariant($insert_result_list->count() === 1, "Insert cardinality must be 1");
-
-    return $this->usersTable->extrude($insert_result_list[0]);
+    $user_id = $insert_result->lastInsertId();
+    return new User(
+      new UnsignedInt($user_id),
+      $first_name,
+      $last_name,
+      $email,
+      $password_hash,
+      $time_joined
+    );
   }
 
   private function createQuery(

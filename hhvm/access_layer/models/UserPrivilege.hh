@@ -10,8 +10,14 @@ enum UserPrivilegeType: int {
 
 class UserPrivilege implements Model {
 
+  public static function fromType(
+    UserPrivilegeType $type
+  ): UserPrivilege {
+    return new UserPrivilege(new UnsignedInt((int)$type));
+  }
+
   public function __construct(
-      private UnsignedInt $id
+    private UnsignedInt $id
   ) {}
 
   public function getId(): UnsignedInt {

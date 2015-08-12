@@ -12,19 +12,15 @@ class UserPrivilegeInsert {
       $this->createQuery($type)
     ); 
 
-    $insert_result_list = $insert_result->mapRowsTyped();
-    invariant($insert_result_list->count() === 1, "Insertion size must be 1");
-
-    return $this->userPrivilegesTable->extrude(
-      $insert_result_list[0]
-    );
+    $user_privilege_id = $insert_result->lastInsertId();
+    return new UserPrivilege(new UnsignedInt($user_privilege_id));
   }
 
   private function createQuery(UserPrivilegeType $type): string {
     return "INSERT INTO "
       . $this->userPrivilegesTable->getTableName()
-      . " VALUES (" . $this->userPrivilegesTable->getIdKey()
-      . ") ("
+      . " (" . $this->userPrivilegesTable->getIdKey()
+      . ") VALUES ('"
       . UserPrivilegeType::assert($type)
       . "')";
   }

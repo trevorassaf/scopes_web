@@ -1,4 +1,4 @@
-<?hh // strict 
+<?hh // decl
 
 require_once(dirname(__FILE__).'/../vendor/autoload.php');
 
@@ -7,7 +7,19 @@ async function initAdminEdges(
   ImmVector<User> $admin_users
 ): Awaitable<void> {
 
+  $edge_insert_query = new UserPrivilegeEdgeInsert(
+    $conn,
+    new UsersTable(),
+    new UserPrivilegesTable(),
+    new UserUserPrivilegeEdgesTable()
+  );
 
+  foreach ($admin_users as $user) {
+    await $edge_insert_query->insert(
+      $user,
+      UserPrivilege::fromType(UserPrivilegeType::ADMIN)
+    );   
+  }
 }
 
 async function initUserPrivileges(
@@ -52,7 +64,7 @@ async function initAdmins(
   $admin_users[] = await $user_insertion_query->insert(
     "Kevin",
     "LaForest",
-    new Email("kmforest@med.umich.edu"),
+    new Email("kmforest@umich.edu"),
     "password",
     new DateTime()
   );
@@ -77,4 +89,7 @@ async function initDb(): Awaitable<void> {
   await initUserPrivileges($conn); 
 
   // Load admin user/user-privilege edges
+  await initAdminEdges($conn, $users->toImmVector());
 }
+
+initDb()->join();

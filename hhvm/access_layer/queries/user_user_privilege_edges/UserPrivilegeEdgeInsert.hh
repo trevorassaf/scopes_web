@@ -28,11 +28,11 @@ class UserPrivilegeEdgeInsert {
       "INSERT INTO "
       . $this->userUserPrivilegeEdgesTable->getTableName()
       . " ("
-      . $this->userUserPrivilegeEdgesTable->getUserIdKey() . ", "
-      . $this->userUserPrivilegeEdgesTable->getUserPrivilegeIdKey()
+        . $this->userUserPrivilegeEdgesTable->getUserIdKey() . ", "
+        . $this->userUserPrivilegeEdgesTable->getUserPrivilegeIdKey()
       . ") VALUES ('"
-      . $user->getId()->getNumber() . ", "
-      . $user_privilege->getId()->getNumber()
+        . $user->getId()->getNumber() . "', '"
+        . $user_privilege->getId()->getNumber()
       . "')";
   }
 }
