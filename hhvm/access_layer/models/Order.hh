@@ -1,9 +1,5 @@
 <?hh // strict
 
-require_once('Model.hh');
-
-require_once(dirname(__FILE__)."/../../utils/data_types/UnsignedInt.hh");
-
 class Order implements Model {
   
   public function __construct(
@@ -28,5 +24,4 @@ class Order implements Model {
   public function getReservedMinutesCount(): UnsignedInt {
     return $this->reservedMinutesCount;
   }
-
 }

@@ -2,6 +2,27 @@
 
 require_once(dirname(__FILE__).'/../vendor/autoload.php');
 
+date_default_timezone_set("America/Detroit");
+
+async function initOrderConfiguration(
+  AsyncMysqlConnection $conn,
+): Awaitable<void> {
+  $insert_query = new OrderConfigurationInsert(
+    $conn,
+    new OrderConfigurationTable()
+  );
+
+  $minutes_per_interval_count = new UnsignedInt(60);
+  $price_per_interval_count = new UnsignedInt(100);
+  $scopes_count = new UnsignedInt(16);
+
+  await $insert_query->insert(
+    $minutes_per_interval_count,
+    $price_per_interval_count,
+    $scopes_count 
+  );
+}
+
 async function initAdminEdges(
   AsyncMysqlConnection $conn,
   ImmVector<User> $admin_users
@@ -90,6 +111,9 @@ async function initDb(): Awaitable<void> {
 
   // Load admin user/user-privilege edges
   await initAdminEdges($conn, $users->toImmVector());
+
+  // Load order configuration
+  await initOrderConfiguration($conn);
 }
 
 initDb()->join();
