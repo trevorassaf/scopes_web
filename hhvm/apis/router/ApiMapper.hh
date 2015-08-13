@@ -21,7 +21,8 @@ class ApiMapper {
     private AsyncMysqlConnection $asyncMysqlConnection,
     private WebParamsFetcher $webParamsFetcher,
     private SerializerFactory $serializerFactory,
-    private QueryToApiExceptionConverter $queryToApiExceptionConverter
+    private QueryToApiExceptionConverter $queryToApiExceptionConverter,
+    private ApiExceptionToApiResultErrorConverter $apiExceptionToApiResultErrorConverter
   ) {}
 
   public function loadApi(ApiType $type): Api {
@@ -30,14 +31,15 @@ class ApiMapper {
       return new AddUserApi(
         $this->webParamsFetcher,
         new ApiEmailValidator(),
+        $this->serializerFactory,
+        $this->apiExceptionToApiResultErrorConverter,
         new AddUserMethod(
+          $this->queryToApiExceptionConverter,
           new UserInsertQuery(
             $this->asyncMysqlConnection,
             new UsersTable() 
-          ),
-          $this->queryToApiExceptionConverter
-        ),
-        $this->serializerFactory
+          )
+        )
       );
       break;
       default:

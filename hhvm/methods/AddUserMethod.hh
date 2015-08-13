@@ -3,8 +3,8 @@
 class AddUserMethod {
 
   public function __construct(
-    private UserInsertQuery $userInsertQuery,
-    private QueryToApiExceptionConverter $queryToApiExceptionConverter
+    private QueryToApiExceptionConverter $queryToApiExceptionConverter,
+    private UserInsertQuery $userInsertQuery
   ) {}
 
   public function addUser(

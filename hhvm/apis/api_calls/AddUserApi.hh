@@ -10,8 +10,9 @@ class AddUserApi implements Api {
   public function __construct(
     private WebParamsFetcher $webParamsFetcher,
     private ApiEmailValidator $apiEmailValidator,
-    private AddUserMethod $addUserMethod,
-    private SerializerFactory $serializerFactory
+    private SerializerFactory $serializerFactory,
+    private ApiExceptionToApiResultErrorConverter $apiExceptionToApiResultErrorConverter,
+    private AddUserMethod $addUserMethod
   ) {}
 
   public function processRequest(): ApiResult {
@@ -38,10 +39,9 @@ class AddUserApi implements Api {
         $password_hash
       );
     } catch (ApiException $ex) {
-      return new ApiResultError(
-        $this->serializerFactory,
-        $ex->getApiErrorTypes()
-      );
+      return $this
+        ->apiExceptionToApiResultErrorConverter
+        ->convert($ex);
     }
 
     // Data passed api integrity checks, so
@@ -55,16 +55,15 @@ class AddUserApi implements Api {
         $password_hash
       );
 
-      // User added successfully, return data to user...
+      // User added successfully, return data to client...
       return new AddUserApiResult(
         $this->serializerFactory,
         $user
       );
     } catch (ApiException $ex) {
-      return new ApiResultError(
-        $this->serializerFactory,
-        $ex->getApiErrorTypes()
-      );
+      return $this
+        ->apiExceptionToApiResultErrorConverter
+        ->convert($ex);
     }
   }
 
