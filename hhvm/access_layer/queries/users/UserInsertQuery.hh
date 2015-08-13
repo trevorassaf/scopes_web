@@ -1,6 +1,6 @@
 <?hh // strict
 
-class UserInsertion {
+class UserInsertQuery {
 
   public function __construct(
       private AsyncMysqlConnection $asyncMysqlConnection,
