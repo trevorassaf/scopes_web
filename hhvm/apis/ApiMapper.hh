@@ -16,8 +16,20 @@ enum ApiType : int {
 
 class ApiMapper {
 
+  private WebParamsFetcher $webParamsFetcher;
+
+  public function __construct() {
+    $this->webParamsFetcher = new WebParamsFetcher();
+  }
+
   public function loadApi(ApiType $type): Api {
     switch ($type) {
+    case ApiType::ADD_USER:
+      return new AddUserApi(
+        $this->webParamsFetcher,
+        new AddUserMethod()
+      );
+      break;
       default:
         throw new Exception("Unsupported api: " . (int)$type);
     }  

@@ -2,13 +2,13 @@
 
 class MethodResultBuilder {
 
-  private Set<MethodError> $methodErrorSet;
+  private Set<MethodErrorType> $methodErrorSet;
 
   public function __construct() {
     $this->methodErrorSet = Set{};  
   }
 
-  public function addMethodError(MethodError $method_error): this {
+  public function addMethodErrorType(MethodErrorType $method_error): this {
     $this->methodErrorSet->add($method_error);
     return $this; 
   }

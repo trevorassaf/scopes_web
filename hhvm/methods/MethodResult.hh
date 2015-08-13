@@ -3,14 +3,14 @@
 class MethodResult {
 
   public function __construct(
-    private ImmSet<MethodError> $methodErrorSet
+    private ImmSet<MethodErrorType> $methodErrorSet
   ) {}
 
   public function isSuccessful(): bool {
     return $this->methodErrorSet->isEmpty();
   }
 
-  public function getMethodErrors(): ImmSet<MethodError> {
+  public function getMethodErrors(): ImmSet<MethodErrorType> {
     return $this->methodErrorSet;
   }
 }
