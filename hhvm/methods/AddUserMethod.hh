@@ -3,34 +3,30 @@
 class AddUserMethod {
 
   public function __construct(
-    private UserInsertQuery $userInsertQuery
+    private UserInsertQuery $userInsertQuery,
+    private QueryToApiExceptionConverter $queryToApiExceptionConverter
   ) {}
 
   public function addUser(
     string $first_name,
     string $last_name,
     Email $email,
-    string $password_hash,
-    MethodResultBuilder $method_result_builder
+    string $password_hash
   ): User {
     try {
-      $user = $this->userInsertQuery
+      $query_wait_handle = $this->userInsertQuery
         ->insert(
           $first_name,
           $last_name,
           $email,
           $password_hash,
           new DateTime()
-        )
+        );
+      return $query_wait_handle
+        ->getWaitHandle()
         ->join();
     } catch (QueryException $ex) {
-      $method_error_builder = new MethodErrorBuilder(); 
-      $method_result_builder->addMethodError(
-        
-      );
+      throw $this->queryToApiExceptionConverter->convert($ex); 
     }
-
-    $method_result_builder = new MethodResultBuilder();
-    return $method_result_builder->build();
   }
 }

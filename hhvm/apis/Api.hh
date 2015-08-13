@@ -2,6 +2,6 @@
 
 interface Api {
 
-  public function processRequest(): string;
+  public function processRequest(): ApiResult;
 
 }

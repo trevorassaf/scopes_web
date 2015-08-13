@@ -9,18 +9,18 @@ class AddUserApi implements Api {
 
   public function __construct(
     private WebParamsFetcher $webParamsFetcher,
-    private EmailValidator $emailValidator,
-    private AddUserMethod $addUserMethod
+    private ApiEmailValidator $apiEmailValidator,
+    private AddUserMethod $addUserMethod,
+    private SerializerFactory $serializerFactory
   ) {}
 
-  public function processRequest(): string {
-    $this->addUser(
+  public function processRequest(): ApiResult {
+    return $this->addUser(
       $this->webParamsFetcher->fetchPostParam(self::FIRST_NAME_KEY),
       $this->webParamsFetcher->fetchPostParam(self::LAST_NAME_KEY),
       $this->webParamsFetcher->fetchPostParam(self::EMAIL_KEY),
       $this->webParamsFetcher->fetchPostParam(self::PASSWORD_HASH_KEY)
     );
-    return ''; 
   }
 
   public function addUser(
@@ -28,99 +28,130 @@ class AddUserApi implements Api {
     string $last_name,
     string $email,
     string $password_hash,
-  ): MethodResult {
-    $method_result_builder = new MethodResultBuilder();
-
-    // Validate parameter integrity
-    $this->validateParameters(
-      $first_name,
-      $last_name,
-      $email,
-      $password_hash,
-      $method_result_builder
-    );
-
-    // Exit early because we've encountered an integrity error
-    if ($method_result_builder->hasError()) {
-      return $method_result_builder->build();
+  ): ApiResult {
+    // Validate parameters against api-specific requirements  
+    try {
+      $this->validateParameters(
+        $first_name,
+        $last_name,
+        $email,
+        $password_hash
+      );
+    } catch (ApiException $ex) {
+      return new ApiResultError(
+        $this->serializerFactory,
+        $ex->getApiErrorTypes()
+      );
     }
 
-    // Data is good, so write to database
-    $method_result = $this->addUserMethod->addUser(
-      $first_name,
-      $last_name,
-      new Email($email),
-      $password_hash
-    );
+    // Data passed api integrity checks, so
+    // attempt db write. May still receive error
+    // from db layer...
+    try {
+      $user = $this->addUserMethod->addUser(
+        $first_name,
+        $last_name,
+        new Email($email),
+        $password_hash
+      );
 
-    return $method_result->build();
+      // User added successfully, return data to user...
+      return new AddUserApiResult(
+        $this->serializerFactory,
+        $user
+      );
+    } catch (ApiException $ex) {
+      return new ApiResultError(
+        $this->serializerFactory,
+        $ex->getApiErrorTypes()
+      );
+    }
   }
 
   private function validateParameters(
     string $first_name,
     string $last_name,
     string $email,
-    string $password_hash,
-    MethodResultBuilder $method_result_builder
+    string $password_hash
   ): void {
-    $this->validateFirstName($first_name, $method_result_builder);
-    $this->validateLastName($last_name, $method_result_builder);
-    $this->validateEmail($email, $method_result_builder);
-    $this->validatePasswordHash($password_hash, $method_result_builder);
+    $api_exception_builder = new ApiExceptionBuilder();
+
+    // Validate first name
+    try {
+      $this->validateFirstName($first_name);
+    } catch (ApiException $ex) {
+      $api_exception_builder->assimilateApiErrors($ex);
+    }
+    
+    // Validate last name
+    try {
+      $this->validateLastName($last_name);
+    } catch (ApiException $ex) {
+      $api_exception_builder->assimilateApiErrors($ex);
+    }
+    
+    // Validate email 
+    try {
+      $this->validateEmail($email);
+    } catch (ApiException $ex) {
+      $api_exception_builder->assimilateApiErrors($ex);
+    }
+    
+    // Validate password hash
+    try {
+      $this->validatePasswordHash($password_hash);
+    } catch (ApiException $ex) {
+      $api_exception_builder->assimilateApiErrors($ex);
+    }
+
+    // Rethrow if we've encountered an error
+    if ($api_exception_builder->hasError()) {
+      throw $api_exception_builder->build();
+    }
   }
 
   private function verifyNonEmpty(
     string $parameter_value,
-    MethodErrorType $method_error_type,
-    MethodResultBuilder $method_result_builder
+    ApiErrorType $api_error_type
   ): void {
-    if (empty($parameter_value)) {
-      $method_result_builder->addMethodErrorType($method_error_type);
+    if ($parameter_value == '') {
+      $api_exception_builder = new ApiExceptionBuilder();
+      throw $api_exception_builder
+        ->addApiError($api_error_type)
+        ->build();
     }
   }
 
   private function validateFirstName(
-    string $first_name,
-    MethodResultBuilder $method_result_builder
+    string $first_name
   ): void {
     $this->verifyNonEmpty(
       $first_name,
-      $method_result_builder
+      ApiErrorType::EMPTY_USER_FIRST_NAME
     ); 
   }
   
   private function validateLastName(
-    string $last_name,
-    MethodResultBuilder $method_result_builder
+    string $last_name
   ): void {
     $this->verifyNonEmpty(
       $last_name,
-      $method_result_builder
+      ApiErrorType::EMPTY_USER_LAST_NAME
     ); 
   }
 
   private function validateEmail(
-    string $email,
-    MethodResultBuilder $method_result_builder
+    string $email
   ): void {
-    $this->verifyNonEmpty(
-      $email,
-      $method_result_builder
-    ); 
-
-    $this->emailValidator->validateAddress(
-      $email,
-      $method_result_builder
-    );
+    $this->apiEmailValidator->validateAddress($email);
   }
 
   private function validatePasswordHash(
-    string $password_hash,
-    MethodResultBuilder $method_result_builder
+    string $password_hash
   ): void {
     $this->verifyNonEmpty(
       $password_hash,
-      $method_result_builder
+      ApiErrorType::EMPTY_USER_PASSWORD
     ); 
   }
 }

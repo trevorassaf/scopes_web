@@ -16,18 +16,28 @@ enum ApiType : int {
 
 class ApiMapper {
 
-  private WebParamsFetcher $webParamsFetcher;
 
-  public function __construct() {
-    $this->webParamsFetcher = new WebParamsFetcher();
-  }
+  public function __construct(
+    private AsyncMysqlConnection $asyncMysqlConnection,
+    private WebParamsFetcher $webParamsFetcher,
+    private SerializerFactory $serializerFactory,
+    private QueryToApiExceptionConverter $queryToApiExceptionConverter
+  ) {}
 
   public function loadApi(ApiType $type): Api {
     switch ($type) {
     case ApiType::ADD_USER:
       return new AddUserApi(
         $this->webParamsFetcher,
-        new AddUserMethod()
+        new ApiEmailValidator(),
+        new AddUserMethod(
+          new UserInsertQuery(
+            $this->asyncMysqlConnection,
+            new UsersTable() 
+          ),
+          $this->queryToApiExceptionConverter
+        ),
+        $this->serializerFactory
       );
       break;
       default:
