@@ -6,11 +6,10 @@
   "homepage": "https://github.com/trevorassaf/scopes_web/",
   "autoload": {
     "classmap": [
-        "utils/data_types/",
-        "access_layer/db/",
-        "access_layer/tables/",
-        "access_layer/models/",
-        "access_layer/queries/"
+        "access_layer/",
+        "apis/",
+        "utils/",
+        "methods/"
     ]
   },
   "extra": {
