@@ -3,12 +3,12 @@
 class QueryException extends Exception {
 
   public function __construct(
-    private QueryErrorType $queryErrorType
+    private ImmSet<QueryErrorType> $queryErrorTypes
   ) {
     parent::__construct('');
   }
 
-  public function getQueryErrorType(): QueryErrorType {
-    return $this->queryErrorType;
+  public function getQueryErrorTypes(): ImmSet<QueryErrorType> {
+    return $this->queryErrorTypes;
   }
 }
