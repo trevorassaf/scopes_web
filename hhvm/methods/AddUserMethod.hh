@@ -14,13 +14,14 @@ class AddUserMethod {
     string $password_hash
   ): User {
     try {
+      $timestamp_builder = new TimestampBuilder();
       $query_wait_handle = $this->userInsertQuery
         ->insert(
           $first_name,
           $last_name,
           $email,
           $password_hash,
-          new DateTime()
+          $timestamp_builder->now()
         );
       return $query_wait_handle
         ->getWaitHandle()
