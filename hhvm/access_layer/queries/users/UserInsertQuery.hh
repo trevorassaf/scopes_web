@@ -12,7 +12,7 @@ class UserInsertQuery {
       string $last_name,
       Email $email,
       string $password_hash,
-      DateTime $time_joined
+      Timestamp $time_joined
   ): Awaitable<User> {
     $insert_result = await $this->asyncMysqlConnection->query(
       $this->createQuery(
@@ -40,7 +40,7 @@ class UserInsertQuery {
       string $last_name,
       Email $email,
       string $password_hash,
-      DateTime $time_joined
+      Timestamp $time_joined
   ): string {
     return 
       "INSERT INTO " . $this->usersTable->getTableName() . " ("
@@ -54,7 +54,7 @@ class UserInsertQuery {
         . $last_name . "', '"
         . $email->toString() . "', '"
         . $password_hash . "', '"
-        . $time_joined->format('Y-m-d H:i:s')
+        . $time_joined->toString()
       . "')";
   }
 }

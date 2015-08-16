@@ -1,6 +1,6 @@
 <?hh // strict
 
-class GetUserByEmailResult extends SuccessfulApiResult {
+class GetUserByEmailApiResult extends SuccessfulApiResult {
 
   const string USER_ID_KEY = "user-id";
   const string FIRST_NAME_KEY = "first-name";
@@ -38,7 +38,7 @@ class GetUserByEmailResult extends SuccessfulApiResult {
     // Add date-joined 
     $serializer->addParameter(
       self::DATE_JOINED_KEY,
-      $this->user->getDateJoined()->toString()
+      $this->user->getTimeJoined()->toString()
     );
   }
 }

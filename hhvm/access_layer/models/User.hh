@@ -1,10 +1,5 @@
 <?hh // strict
 
-require_once('Model.hh');
-
-require_once(dirname(__FILE__)."/../../utils/data_types/UnsignedInt.hh");
-require_once(dirname(__FILE__)."/../../utils/data_types/Email.hh");
-
 class User implements Model {
 
   public function __construct(
@@ -13,7 +8,7 @@ class User implements Model {
       private string $lastName,
       private Email $email,
       private string $passwordHash,
-      private DateTime $timeJoined
+      private Timestamp $timeJoined
   ) {}
 
   public function getId(): UnsignedInt {
@@ -36,7 +31,7 @@ class User implements Model {
     return $this->passwordHash;
   }
 
-  public function getTimeJoined(): DateTime {
+  public function getTimeJoined(): Timestamp {
     return $this->timeJoined;
   }
 }

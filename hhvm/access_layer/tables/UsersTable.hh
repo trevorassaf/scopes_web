@@ -17,7 +17,7 @@ class UsersTable {
       (string)$params[$this->getLastNameKey()],
       new Email((string)$params[$this->getEmailKey()]),
       (string)$params[$this->getPasswordHashKey()],
-      new DateTime((string)$params[$this->getTimeJoinedKey()])
+      new Timestamp((string)$params[$this->getTimeJoinedKey()])
     );
   } 
 
