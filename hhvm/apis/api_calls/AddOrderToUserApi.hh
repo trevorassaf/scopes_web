@@ -53,6 +53,12 @@ class AddOrderToUserApi implements Api {
         new Timestamp($start_time),
         new UnsignedInt((int)$rsvd_min_count)
       );
+      
+      // Order added successfully, return data to client...
+      return new AddOrderToUserApiResult(
+        $this->serializerFactory,
+        $order
+      );
     } catch (ApiException $ex) {
       return $this
         ->apiExceptionToApiResultErrorConverter

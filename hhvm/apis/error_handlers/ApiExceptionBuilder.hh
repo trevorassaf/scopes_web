@@ -2,16 +2,16 @@
 
 class ApiExceptionBuilder {
 
-  private Set<ApiErrorType> $apiErrors;
+  private Set<ApiError> $apiErrors;
 
   public function __construct() {
     $this->apiErrors = Set{};
   }
 
   public function addApiError(
-    ApiErrorType $api_error
+    ApiError $api_error
   ): this {
-    $this->apiErrors[] = $api_error;
+    $this->apiErrors->add($api_error);
     return $this;
   }
 
@@ -22,7 +22,7 @@ class ApiExceptionBuilder {
   public function assimilateApiErrors(
     ApiException $api_exception
   ): this {
-    $this->apiErrors->addAll($api_exception->getApiErrorTypes()); 
+    $this->apiErrors->addAll($api_exception->getApiErrors()); 
     return $this;
   }
 

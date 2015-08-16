@@ -3,7 +3,6 @@
 class QueryToApiErrorMapper {
 
   private static ImmMap<QueryErrorType, ApiErrorType> $QUERY_TO_API_ERROR_MAP = ImmMap {
-    QueryErrorType::DUPLICATE_USER_EMAIL => ApiErrorType::DUPLICATE_USER_EMAIL,
   };
 
   public function map(QueryErrorType $query_error_type): ApiErrorType {

@@ -3,12 +3,12 @@
 class ApiException extends Exception {
 
   public function __construct(
-    private ImmSet<ApiErrorType> $apiErrorTypes
+    private ImmSet<ApiError> $apiErrors
   ) {
     parent::__construct("");
   }
 
-  public function getApiErrorTypes(): ImmSet<ApiErrorType> {
-    return $this->apiErrorTypes;
+  public function getApiErrors(): ImmSet<ApiError> {
+    return $this->apiErrors;
   }
 }

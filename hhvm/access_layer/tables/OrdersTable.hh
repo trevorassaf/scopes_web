@@ -8,11 +8,11 @@ class OrdersTable {
   const string START_TIME_KEY = "startTime";
   const string RESERVED_MINUTES_COUNT_KEY = "reservedMinutesCount";
 
-  public function extrude(Map<string, string> $params): Order {
+  public function extrude(Map<string, mixed> $params): Order {
     return new Order(
         new UnsignedInt((int)$params[$this->getIdKey()]),
         new UnsignedInt((int)$params[$this->getScopesCountKey()]),
-        new DateTime($params[$this->getStartTimeKey()]),
+        new Timestamp((string)$params[$this->getStartTimeKey()]),
         new UnsignedInt((int)$params[$this->getReservedMinutesCountKey()])
     );
   }

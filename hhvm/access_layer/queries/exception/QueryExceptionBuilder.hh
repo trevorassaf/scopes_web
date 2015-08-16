@@ -2,22 +2,22 @@
 
 class QueryExceptionBuilder {
 
-  private Set<QueryErrorType> $queryErrorTypes;
+  private Set<QueryError> $queryErrors;
 
   public function __construct() {
-    $this->queryErrorTypes = Set{}; 
+    $this->queryErrors = Set{}; 
   }
 
-  public function addQueryErrorType(
-    QueryErrorType $query_error_type
+  public function addQueryError(
+    QueryError $query_error
   ): this {
-    $this->queryErrorTypes[] = $query_error_type; 
+    $this->queryErrors->add($query_error);
     return $this;
   }
 
   public function build(): QueryException {
     return new QueryException(
-      $this->queryErrorTypes->toImmSet()
+      $this->queryErrors->toImmSet()
     );
   }
 }

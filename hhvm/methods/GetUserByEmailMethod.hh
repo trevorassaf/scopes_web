@@ -22,10 +22,15 @@ class GetUserByEmailMethod {
 
     // Raise error because the email didn't match a user
     if ($user == null) {
+      // TODO return error indicating no user found
+      /*
       $api_exception_builder = new ApiExceptionBuilder();
       throw $api_exception_builder
         ->addApiError(ApiErrorType::FETCH_MISS)
         ->build();
+       */
+      $api_exception_builder = new ApiExceptionBuilder();
+      throw $api_exception_builder->build();
     }
 
     return $user;

@@ -5,7 +5,7 @@ class Order implements Model {
   public function __construct(
       private UnsignedInt $id,
       private UnsignedInt $scopesCount,
-      private DateTime $startTime,
+      private Timestamp $startTime,
       private UnsignedInt $reservedMinutesCount 
   ) {}
 
@@ -17,7 +17,7 @@ class Order implements Model {
     return $this->scopesCount;
   }
 
-  public function getStartTime(): DateTime {
+  public function getStartTime(): Timestamp {
     return $this->startTime;
   }
   

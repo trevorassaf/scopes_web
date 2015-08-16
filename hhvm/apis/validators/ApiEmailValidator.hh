@@ -12,6 +12,7 @@ class ApiEmailValidator {
   public function validateAddress(
     string $email_address,
   ): void {
+    /*
     // We might need to throw something...
     $api_exception_builder = new ApiExceptionBuilder();
 
@@ -56,5 +57,6 @@ class ApiEmailValidator {
         ->addApiError(ApiErrorType::EMAIL_MISSING_DOMAIN_TOKEN)
         ->build();
     }
+     */
   }
 }

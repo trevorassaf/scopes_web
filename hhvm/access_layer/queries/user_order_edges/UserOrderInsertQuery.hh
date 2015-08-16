@@ -1,6 +1,6 @@
 <?hh // strict
 
-class OrderInsert {
+class UserOrderInsertQuery {
 
   public function __construct(
       private AsyncMysqlConnection $asyncMysqlConnection,
@@ -10,9 +10,9 @@ class OrderInsert {
   ) {}
 
   public async function insert(
-      User $user,
+      UnsignedInt $user_id,
       UnsignedInt $scopes_count,
-      DateTime $start_time,
+      Timestamp $start_time,
       UnsignedInt $reserved_minutes_count
   ): Awaitable<Order> {
     // Insert order and retrieve id
@@ -30,18 +30,17 @@ class OrderInsert {
       $insert_order_query_result->lastInsertId()
     );
 
-    $order = new Order(
-      $order_id,
-      $scopes_count,
-      $start_time,
-      $reserved_minutes_count
-    );
+    $param_map = $insert_order_query_result->mapRowsTyped()[0];
+    $param_map[$this->ordersTable->getIdKey()] =
+        $order_id->getNumber();
+
+    $order = $this->ordersTable->extrude($param_map);
 
     // Insert user-order edge
     $insert_edge_query_result = 
       await $this->asyncMysqlConnection->query(
         $this->createInsertUserOrderEdgeQuery(
-          $user,
+          $user_id,
           $order
         )
       );
@@ -51,7 +50,7 @@ class OrderInsert {
 
   private function createInsertOrderQuery(
       UnsignedInt $scopes_count,
-      DateTime $start_time,
+      Timestamp $start_time,
       UnsignedInt $reserved_minutes_count
   ): string {
     return 
@@ -61,13 +60,13 @@ class OrderInsert {
         . $this->ordersTable->getReservedMinutesCountKey()
       . ") VALUES ('"
         . $scopes_count->getNumber() . "', '"
-        . $start_time->format("Y-m-d H:i:s") . "', '"
+        . $start_time->toString() . "', '"
         . $reserved_minutes_count->getNumber()
       . "')";
   }
 
   private function createInsertUserOrderEdgeQuery(
-      User $user,
+      UnsignedInt $user_id,
       Order $order
   ): string {
     return 
@@ -75,7 +74,7 @@ class OrderInsert {
         . $this->userOrderEdgesTable->getUserIdKey() . ", "
         . $this->userOrderEdgesTable->getOrderIdKey()
       . ") VALUES ('"
-        . $user->getId()->getNumber() . "', '"
+        . $user_id->getNumber() . "', '"
         . $order->getId()->getNumber()
       . "')";
   }

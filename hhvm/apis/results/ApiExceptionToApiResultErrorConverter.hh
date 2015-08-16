@@ -11,7 +11,7 @@ class ApiExceptionToApiResultErrorConverter {
   ): ApiResultError {
     return new ApiResultError(
       $this->serializerFactory,
-      $api_exception->getApiErrorTypes()
+      ImmSet{}
     );  
   }
 

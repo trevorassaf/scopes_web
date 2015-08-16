@@ -9,10 +9,6 @@ class QueryToApiExceptionConverter {
   public function convert(
     QueryException $query_exception
   ): ApiException {
-    return new ApiException(
-      $this->queryToApiErrorFilter->filter(
-        $query_exception->getQueryErrorTypes()
-      )
-    );
+    return new ApiException(ImmSet{});
   }
 }
