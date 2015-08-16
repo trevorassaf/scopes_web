@@ -9,6 +9,7 @@ class AddUserApi implements Api {
 
   public function __construct(
     private WebParamsFetcher $webParamsFetcher,
+    private ParamsValidator $paramsValidator,
     private ApiEmailValidator $apiEmailValidator,
     private SerializerFactory $serializerFactory,
     private ApiExceptionToApiResultErrorConverter $apiExceptionToApiResultErrorConverter,
@@ -28,7 +29,7 @@ class AddUserApi implements Api {
     string $first_name,
     string $last_name,
     string $email,
-    string $password_hash,
+    string $password_hash
   ): ApiResult {
     // Validate parameters against api-specific requirements  
     try {
@@ -76,81 +77,36 @@ class AddUserApi implements Api {
     $api_exception_builder = new ApiExceptionBuilder();
 
     // Validate first name
-    try {
-      $this->validateFirstName($first_name);
-    } catch (ApiException $ex) {
-      $api_exception_builder->assimilateApiErrors($ex);
+    if (!$this->paramsValidator->verifyNonEmpty($first_name)) {
+      $api_exception_builder->addApiError(
+        ApiErrorType::EMPTY_USER_FIRST_NAME
+      );  
     }
     
     // Validate last name
-    try {
-      $this->validateLastName($last_name);
-    } catch (ApiException $ex) {
-      $api_exception_builder->assimilateApiErrors($ex);
+    if (!$this->paramsValidator->verifyNonEmpty($last_name)) {
+      $api_exception_builder->addApiError(
+        ApiErrorType::EMPTY_USER_LAST_NAME
+      );  
     }
     
     // Validate email 
     try {
-      $this->validateEmail($email);
+      $this->apiEmailValidator->validateAddress($email);
     } catch (ApiException $ex) {
       $api_exception_builder->assimilateApiErrors($ex);
     }
     
     // Validate password hash
-    try {
-      $this->validatePasswordHash($password_hash);
-    } catch (ApiException $ex) {
-      $api_exception_builder->assimilateApiErrors($ex);
+    if (!$this->paramsValidator->verifyNonEmpty($password_hash)) {
+      $api_exception_builder->addApiError(
+        ApiErrorType::EMPTY_USER_PASSWORD
+      );  
     }
 
     // Rethrow if we've encountered an error
     if ($api_exception_builder->hasError()) {
       throw $api_exception_builder->build();
     }
-  }
-
-  private function verifyNonEmpty(
-    string $parameter_value,
-    ApiErrorType $api_error_type
-  ): void {
-    if ($parameter_value == '') {
-      $api_exception_builder = new ApiExceptionBuilder();
-      throw $api_exception_builder
-        ->addApiError($api_error_type)
-        ->build();
-    }
-  }
-
-  private function validateFirstName(
-    string $first_name
-  ): void {
-    $this->verifyNonEmpty(
-      $first_name,
-      ApiErrorType::EMPTY_USER_FIRST_NAME
-    ); 
-  }
-  
-  private function validateLastName(
-    string $last_name
-  ): void {
-    $this->verifyNonEmpty(
-      $last_name,
-      ApiErrorType::EMPTY_USER_LAST_NAME
-    ); 
-  }
-
-  private function validateEmail(
-    string $email
-  ): void {
-    $this->apiEmailValidator->validateAddress($email);
-  }
-
-  private function validatePasswordHash(
-    string $password_hash
-  ): void {
-    $this->verifyNonEmpty(
-      $password_hash,
-      ApiErrorType::EMPTY_USER_PASSWORD
-    ); 
   }
 }

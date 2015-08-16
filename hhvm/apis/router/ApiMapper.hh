@@ -20,6 +20,8 @@ class ApiMapper {
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
     private WebParamsFetcher $webParamsFetcher,
+    private ParamsValidator $paramsValidator,
+    private ApiEmailValidator $apiEmailValidator,
     private SerializerFactory $serializerFactory,
     private QueryToApiExceptionConverter $queryToApiExceptionConverter,
     private ApiExceptionToApiResultErrorConverter $apiExceptionToApiResultErrorConverter
@@ -30,7 +32,8 @@ class ApiMapper {
     case ApiType::ADD_USER:
       return new AddUserApi(
         $this->webParamsFetcher,
-        new ApiEmailValidator(),
+        $this->paramsValidator,
+        $this->apiEmailValidator,
         $this->serializerFactory,
         $this->apiExceptionToApiResultErrorConverter,
         new AddUserMethod(

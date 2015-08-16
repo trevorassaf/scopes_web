@@ -5,6 +5,10 @@ class ApiEmailValidator {
   const string EMAIL_USERNAME_TOKEN = "@";
   const string EMAIL_DOMAIN_TOKEN = ".";
 
+  public function __construct(
+    private ParamsValidator $paramsValidator
+  ) {}
+
   public function validateAddress(
     string $email_address,
   ): void {
@@ -12,7 +16,7 @@ class ApiEmailValidator {
     $api_exception_builder = new ApiExceptionBuilder();
 
     // Check for non-empty string
-    if ($email_address == '') {
+    if ($this->paramsValidator->verifyNonEmpty($email_address)) {
       throw $api_exception_builder
         ->addApiError(ApiErrorType::EMPTY_USER_EMAIL)
         ->build();
