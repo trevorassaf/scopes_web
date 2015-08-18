@@ -1,7 +1,14 @@
 <html>
   <head>
-    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <!-- Import html -->
     <link rel="import" href="html/elements.html">
+
+    <!-- Import js -->
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Import styles -->
     <link rel="stylesheet" href="css/main.css">
   </head>
 
@@ -21,7 +28,7 @@
           <paper-button noink id="mvs-back-btn" class="side-panel-button"> 
             <div class="side-panel-button-component-wrapper">
               <span id="mvs-back-arrow">
-                <iron-icon class="side-panel-icon" icon="image:navigate-before"></iron-icon>
+                <iron-icon class="side-panel-icon" icon="arrow-back"></iron-icon>
               </span>
               <span id="mvs-decal">
                 <span id="mvs-logo">
@@ -30,25 +37,25 @@
                 <span id="mvs-title" class="side-panel-text">
                   MVS
                 </span>
-                <span id="mvs-vers">
-                  1.0.0
-                </span>
               </span>
               </div>
           </paper-button>
         </div>
 
+
         <!-- Experiment panel label-->
-        <div class="side-panel-element" id="experiment-panel-label">
-          <span>Experiment Panel</span>
+        <div class="side-panel-element" id="experiment-panel-label-container">
+          <iron-icon class="side-panel-icon" icon="image:navigate-before"></iron-icon>
+          <span id="experiment-panel-label">MVS Experiment Panel</span>
+          <iron-icon class="side-panel-icon" icon="image:navigate-next"></iron-icon>
         </div>
 
         <!-- Experiment panel buttons -->
-        <div id="experiment-panel-btns">
+        <div id="mvs-panel-btns">
           
           <!-- New Experiment Button -->
           <div class="side-panel-element">
-            <paper-button noink toggles class="side-panel-button">
+            <paper-button noink toggles id="new-exp-btn" class="side-panel-button">
               <div class="side-panel-button-component-wrapper">
                 <span class="icon-component">
                   <iron-icon icon="add-circle-outline"></iron-icon>
@@ -62,13 +69,13 @@
           
           <!-- Scheduled Experiments Button -->
           <div class="side-panel-element">
-            <paper-button noink toggles class="side-panel-button">
+            <paper-button noink toggles id="my-exp-btn" class="side-panel-button">
               <div class="side-panel-button-component-wrapper">
                 <span class="icon-component">
                   <iron-icon icon="group-work"></iron-icon>
                 </span>
                 <span class="side-panel-text">
-                  View Experiments
+                  My Experiments
                 </span>
               </div>
             </paper-button>
@@ -76,13 +83,13 @@
 
           <!-- Recordings Button -->
           <div class="side-panel-element">
-            <paper-button noink toggles class="side-panel-button">
+            <paper-button noink toggles id="recordings-btn" class="side-panel-button">
               <div class="side-panel-button-component-wrapper">
                 <span class="icon-component">
                   <iron-icon icon="cloud-queue"></iron-icon>
                 </span>
                 <span class="side-panel-text">
-                  Video Recordings 
+                  Recorded Experiments 
                 </span>
               </div>
             </paper-button>
@@ -90,7 +97,7 @@
 
           <!-- Settings Button -->
           <div class="side-panel-element">
-            <paper-button noink toggles class="side-panel-button">
+            <paper-button noink toggles id="settings-btn" class="side-panel-button">
               <div class="side-panel-button-component-wrapper">
                 <span class="icon-component">
                   <iron-icon icon="settings"></iron-icon>
@@ -104,7 +111,7 @@
 
           <!-- Contact us button -->
           <div class="side-panel-element">
-            <paper-button noink toggles class="side-panel-button">
+            <paper-button noink toggles id="contact-us-btn" class="side-panel-button">
               <div class="side-panel-button-component-wrapper">
                 <span class="icon-component">
                   <iron-icon icon="info-outline"></iron-icon>
