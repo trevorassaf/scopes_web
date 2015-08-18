@@ -1,6 +1,16 @@
 <html>
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="bower_components/polymer/polymer.html">
-  <body>
+  <head>
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="html/elements.html">
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+
+  <body unresolved>
+    <paper-card id="side-panel" class="panel" elevation="4">
+      <div class="inner"></div>
+    </paper-card>
+    <paper-card id="main-panel" class="panel" elevation="1">
+      <div class="inner"></div>
+    </paper-card>
   </body>
 </html>
