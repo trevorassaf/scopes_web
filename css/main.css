@@ -1,5 +1,6 @@
 html {
   height: 100%;
+  font-family: arial;
 }
 
 body {
@@ -7,6 +8,7 @@ body {
   margin: 0px;
   background-color: white;
   height: 100%;
+  background-color: #fafafa;
 }
 
 paper-card {
@@ -18,18 +20,116 @@ paper-card {
 
 #side-panel {
   position: fixed;
-  width: 200px;
+  width: 241px;
   left: 0px;
   top: 0px;
 }
 
 #main-panel {
   width: 900px;
-  left: 250px;
+  left: 350px;
   top: 100px;
+}
+
+#um-med-banner {
+  background-color: #002f5e;
 }
 
 .inner {
   height: 100%;
   width: 100%;
 }
+
+.side-panel-element {}
+
+.side-panel-button {
+  display: block;
+  padding: 0px;
+  width: 100%;
+}
+
+.side-panel-text {
+  font-weight: normal;
+  text-transform: capitalize;
+}
+
+paper-button {
+  text-transform: capitalize;
+  margin-left: 0px;
+}
+
+#mvs-back-btn-container {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  background-color: #eceff1;
+  border-top: 1px solid #cfc8dc;
+  border-bottom: 1px solid #cfc8dc;
+}
+
+#mvs-logo {
+  position: relative;
+  color: #002f5e;
+  border: 1px solid #e5e5e5;
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  padding: 5px;
+  margin-right: 10px;
+  background-color: #fff;
+  top: 1px;
+}
+
+#mvs-title {
+  color: #424242;
+  position: relative;
+  top: 3px;
+  font-weight: normal; 
+}
+
+#mvs-decal {
+  position: relative;
+  left: 0px;
+  font-size: 14pt;
+}
+
+#mvs-vers {
+  font-size: 8pt;
+  color: #cfcedc;
+  position: relative;
+  left: 5px;
+}
+
+.side-panel-icon {
+  color: #757575;
+}
+
+#experiment-panel-label {
+  color: #424242;
+  font-size: 12pt;
+  padding-left: 18px;
+  padding-top: 20px;
+  padding-bottom: 10px;
+  /*border-top: 1px solid #cfc8dc;*/
+  /*border-bottom: 1px solid #cfc8dc;*/
+}
+
+.side-panel-button-component-wrapper {
+  text-align: left;
+}
+
+#experiment-panel-btns .side-panel-button {
+  color: #757575; 
+  font-size: 10pt;
+  margin-left: 8px;
+}
+
+#experiment-panel-btns .icon-component {
+  position: relative;
+  bottom: 2px;
+}
+
+#experiment-panel-btns .side-panel-button[toggles][active] .icon-component {
+  color: #2962ff; 
+}
+
+

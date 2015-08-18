@@ -7,10 +7,119 @@
 
   <body unresolved>
     <paper-card id="side-panel" class="panel" elevation="4">
-      <div class="inner"></div>
+      <div id="side-panel-inner" class="inner">
+        
+        <!-- UM Med school banner -->
+        <div id="um-med-banner">
+          <a id="um-med-banner-link" href="http://medicine.umich.edu/medschool/">
+            <img id="um-med-banner-img" src="assets/images/med_school_banner_blue.png">
+          </a>
+        </div>
+
+        <!-- MVS back button -->
+        <div id="mvs-back-btn-container" class="side-panel-element">
+          <paper-button noink id="mvs-back-btn" class="side-panel-button"> 
+            <div class="side-panel-button-component-wrapper">
+              <span id="mvs-back-arrow">
+                <iron-icon class="side-panel-icon" icon="image:navigate-before"></iron-icon>
+              </span>
+              <span id="mvs-decal">
+                <span id="mvs-logo">
+                  <iron-icon icon="image:camera"></iron-icon>
+                </span>
+                <span id="mvs-title" class="side-panel-text">
+                  MVS
+                </span>
+                <span id="mvs-vers">
+                  1.0.0
+                </span>
+              </span>
+              </div>
+          </paper-button>
+        </div>
+
+        <!-- Experiment panel label-->
+        <div class="side-panel-element" id="experiment-panel-label">
+          <span>Experiment Panel</span>
+        </div>
+
+        <!-- Experiment panel buttons -->
+        <div id="experiment-panel-btns">
+          
+          <!-- New Experiment Button -->
+          <div class="side-panel-element">
+            <paper-button noink toggles class="side-panel-button">
+              <div class="side-panel-button-component-wrapper">
+                <span class="icon-component">
+                  <iron-icon icon="add-circle-outline"></iron-icon>
+                </span>
+                <span class="side-panel-text">
+                 New Experiment
+               </span>
+             </div>
+            </paper-button>
+          </div>
+          
+          <!-- Scheduled Experiments Button -->
+          <div class="side-panel-element">
+            <paper-button noink toggles class="side-panel-button">
+              <div class="side-panel-button-component-wrapper">
+                <span class="icon-component">
+                  <iron-icon icon="group-work"></iron-icon>
+                </span>
+                <span class="side-panel-text">
+                  View Experiments
+                </span>
+              </div>
+            </paper-button>
+          </div>
+
+          <!-- Recordings Button -->
+          <div class="side-panel-element">
+            <paper-button noink toggles class="side-panel-button">
+              <div class="side-panel-button-component-wrapper">
+                <span class="icon-component">
+                  <iron-icon icon="cloud-queue"></iron-icon>
+                </span>
+                <span class="side-panel-text">
+                  Video Recordings 
+                </span>
+              </div>
+            </paper-button>
+          </div>
+
+          <!-- Settings Button -->
+          <div class="side-panel-element">
+            <paper-button noink toggles class="side-panel-button">
+              <div class="side-panel-button-component-wrapper">
+                <span class="icon-component">
+                  <iron-icon icon="settings"></iron-icon>
+                </span>
+                <span class="side-panel-text">
+                  Settings
+                </span>
+              </div>
+            </paper-button>
+          </div>
+
+          <!-- Contact us button -->
+          <div class="side-panel-element">
+            <paper-button noink toggles class="side-panel-button">
+              <div class="side-panel-button-component-wrapper">
+                <span class="icon-component">
+                  <iron-icon icon="info-outline"></iron-icon>
+                </span>
+                <span class="side-panel-text">
+                  Contact Us 
+                </span>
+              </div>
+            </paper-button>
+          </div>
+        </div>
+      </div>
     </paper-card>
     <paper-card id="main-panel" class="panel" elevation="1">
-      <div class="inner"></div>
+      <div id="main-panel-inner" class="inner"></div>
     </paper-card>
   </body>
 </html>
