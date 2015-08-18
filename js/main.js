@@ -1,22 +1,66 @@
 $(document).ready(function() {
-  // Bind back button
-  var back_button = $("#mvs-back-btn-container");
-  back_button.on('click', function() {
-    alert("back"); 
-  }); 
 
-  var mvs_button_panel = $("#mvs-panel-btns");
-  var mvs_side_panel_buttons = mvs_button_panel.find("paper-button");
-  var selected_side_panel_button = null;
-  console.log(mvs_side_panel_buttons);
-  mvs_button_panel.on(
-    'click',
-    'paper-button',
-    function() {
-      if (selected_side_panel_button != null) {
-        $(selected_side_panel_button).removeAttr('active');
+  // Content panel module
+  var MainPanel = (function() { 
+    // Cache main panel super header panel
+    var mainPanelSuperPanel = $("#main-panel-super-header");
+
+    // Cache main panel handle
+    var mainPanel = $("#main-panel-inner");
+
+    // Public handle
+    return {
+      loadPage: function(id) {
+        var name = null;
+        switch (id) {
+          case "new-exp-btn":
+            name = "New Experiment";
+            break;
+          case "my-exp-btn":
+            name = "My Experiments";
+            break;
+          case "recordings-btn":
+            name = "Recordings";
+            break;
+          case "settings-btn":
+            name = "Settings";
+            break;
+          case "contact-us-btn":
+            name = "Contact Us";
+            break;
+          default:
+            alert("Invalid page name: " + name);
+            break;
+        }
+        mainPanelSuperPanel.html(name); 
+      }  
+    };
+  })();
+
+  // Side panel module
+  var SidePanel = (function(main_panel) {
+  
+    // Cache main panel handle
+    var mainPanel = main_panel;
+
+    var activeButton = null;
+
+    // Set mvs button panel click listener
+    $('#mvs-panel-btns').on(
+      'click',
+      'paper-button',
+      function() {
+        if (activeButton != null) {
+          $(activeButton).removeAttr('active');
+        }
+        activeButton = $(this)[0];
+        mainPanel.loadPage(activeButton.id);
+
       }
-      selected_side_panel_button = $(this)[0];;
-    }  
-  );
+    );
+    return {};
+  })(MainPanel);
+
+  // Load initial page
+  $('#my-exp-btn').click();
 });

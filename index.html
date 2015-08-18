@@ -42,7 +42,6 @@
           </paper-button>
         </div>
 
-
         <!-- Experiment panel label-->
         <div class="side-panel-element" id="experiment-panel-label-container">
           <iron-icon class="side-panel-icon" icon="image:navigate-before"></iron-icon>
@@ -52,6 +51,20 @@
 
         <!-- Experiment panel buttons -->
         <div id="mvs-panel-btns">
+          
+          <!-- My Experiments Button -->
+          <div class="side-panel-element">
+            <paper-button noink toggles id="my-exp-btn" class="side-panel-button">
+              <div class="side-panel-button-component-wrapper">
+                <span class="icon-component">
+                  <iron-icon icon="group-work"></iron-icon>
+                </span>
+                <span class="side-panel-text">
+                  My Experiments
+                </span>
+              </div>
+            </paper-button>
+          </div>
           
           <!-- New Experiment Button -->
           <div class="side-panel-element">
@@ -64,20 +77,6 @@
                  New Experiment
                </span>
              </div>
-            </paper-button>
-          </div>
-          
-          <!-- Scheduled Experiments Button -->
-          <div class="side-panel-element">
-            <paper-button noink toggles id="my-exp-btn" class="side-panel-button">
-              <div class="side-panel-button-component-wrapper">
-                <span class="icon-component">
-                  <iron-icon icon="group-work"></iron-icon>
-                </span>
-                <span class="side-panel-text">
-                  My Experiments
-                </span>
-              </div>
             </paper-button>
           </div>
 
@@ -125,6 +124,7 @@
         </div>
       </div>
     </paper-card>
+    <div id="main-panel-super-header"></div>
     <paper-card id="main-panel" class="panel" elevation="1">
       <div id="main-panel-inner" class="inner"></div>
     </paper-card>

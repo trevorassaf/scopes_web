@@ -1,6 +1,5 @@
 html {
   height: 100%;
-  font-family: arial;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -27,9 +26,20 @@ paper-card {
 }
 
 #main-panel {
-  width: 900px;
+  position: absolute;
+  width: 60%;
   left: 300px;
-  top: 100px;
+  top: 80px;
+}
+
+#main-panel-super-header {
+  position: absolute;
+  left: 300px;
+  top: 0px;
+  font-size: 24px;
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #424242;
+  padding-top: 30px;
 }
 
 #um-med-banner {
