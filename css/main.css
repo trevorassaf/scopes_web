@@ -40,8 +40,6 @@ paper-card {
   width: 100%;
 }
 
-.side-panel-element {}
-
 .side-panel-button {
   display: block;
   padding: 0px;
@@ -126,6 +124,7 @@ paper-button {
 #experiment-panel-btns .icon-component {
   position: relative;
   bottom: 2px;
+  margin-right: 6px;
 }
 
 #experiment-panel-btns .side-panel-button[toggles][active] .icon-component {
