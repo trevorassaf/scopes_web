@@ -3,24 +3,24 @@
 class ReserveOrderMethod {
 
   public function __construct(
-    private UserOrderInsertQuery $userOrderInsertQuery
+    private RsvdOrderInsertQuery $rsvdOrderInsertQuery
   ) {}
 
   public function reserve(
     UnsignedInt $user_id,
+    Timestamp $lease_start,
     UnsignedInt $scopes_count,
     Timestamp $start_time,
-    UnsignedInt $rsvd_min_count
+    UnsignedInt $reserved_minutes_count
   ): void {
     try {
-      $query_wait_handle = $this
-        ->userOrderInsertQuery
+      $query_wait_handle = $this->rsvdOrderInsertQuery
         ->insert(
           $user_id,
+          $lease_start,
           $scopes_count,
           $start_time,
-          $rsvd_min_count,
-          OrderStatusType::RESERVED
+          $reserved_minutes_count
         );
       $query_wait_handle
         ->getWaitHandle()
