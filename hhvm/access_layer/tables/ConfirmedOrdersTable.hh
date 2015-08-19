@@ -1,9 +1,8 @@
 <?hh // strict
 
-class ConfirmedOrdersTable {
+class ConfirmedOrdersTable extends Table<ConfirmedOrder> {
 
   const string TABLE_NAME = "ConfirmedOrders";
-  const string ID_KEY = "id";
   const string USER_ID_KEY = "userId";
   const string SCOPES_COUNT_KEY = "scopesCount";
   const string START_TIME_KEY = "startTime";
@@ -13,7 +12,10 @@ class ConfirmedOrdersTable {
   const string SHORT_CODE_KEY = "shortCode";
   const string RECORDING_DURATION_KEY = "recordingDurationMinutes";
 
-  public function extrude(Map<string, mixed> $params): ConfirmedOrder {
+  public function extrudeWithId(
+    UnsignedInt $id,
+    ImmMap<string, mixed> $params
+  ): ConfirmedOrder {
     return new ConfirmedOrder(
       new UnsignedInt((int)$params[$this->getIdKey()]),
       new UnsignedInt((int)$params[$this->getUserIdKey()]), 
@@ -29,10 +31,6 @@ class ConfirmedOrdersTable {
 
   public function getTableName(): string {
     return self::TABLE_NAME;
-  }
-
-  public function getIdKey(): string {
-    return self::ID_KEY;
   }
 
   public function getUserIdKey(): string {

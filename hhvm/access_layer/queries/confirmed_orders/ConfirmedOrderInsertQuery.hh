@@ -30,16 +30,10 @@ class ConfirmedOrderInsertQuery {
       )
     ); 
 
-    $confirmed_order_id = new UnsignedInt(
-      $query_result->lastInsertId()
+    return $this->confirmedOrdersTable->extrudeWithId(
+      new UnsignedInt($query_result->lastInsertId()),
+      $query_result->mapRowsTyped()[0]->toImmMap()
     );
-
-    $param_map = $query_result->mapRowsTyped()[0];
-    $param_map[$this->confirmedOrdersTable->getIdKey()] =
-      $confirmed_order_id->getNumber();
-
-    $confirmed_order = $this->confirmedOrdersTable->extrude($param_map);
-    return $confirmed_order;
   }
 
   private function createQuery(

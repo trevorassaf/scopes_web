@@ -1,18 +1,20 @@
 <?hh // strict
 
-class RsvdOrdersTable {
+class RsvdOrdersTable extends Table<RsvdOrder> {
 
   const string TABLE_NAME = "RsvdOrders";
-  const string ID_KEY = "id";
   const string USER_ID_KEY = "userId";
   const string LEASE_START_KEY = "leaseStart";
   const string SCOPES_COUNT_KEY = "scopesCount";
   const string START_TIME_KEY = "startTime";
   const string RESERVED_MINUTES_COUNT_KEY = "reservedMinutesCount";
 
-  public function extrude(Map<string, mixed> $params): RsvdOrder {
+  public function extrudeWithId(
+    UnsignedInt $id,
+    ImmMap<string, mixed> $params
+  ): RsvdOrder {
     return new RsvdOrder(
-      new UnsignedInt((int)$params[$this->getIdKey()]),
+      $id,
       new UnsignedInt((int)$params[$this->getUserIdKey()]), 
       new Timestamp((string)$params[$this->getLeaseStartKey()]),
       new UnsignedInt((int)$params[$this->getScopesCountKey()]),
@@ -23,10 +25,6 @@ class RsvdOrdersTable {
 
   public function getTableName(): string {
     return self::TABLE_NAME;
-  }
-
-  public function getIdKey(): string {
-    return self::ID_KEY;
   }
 
   public function getUserIdKey(): string {

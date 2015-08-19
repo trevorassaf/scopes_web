@@ -23,17 +23,11 @@ class RsvdOrderInsertQuery {
         $reserved_minutes_count  
       )
     ); 
-
-    $rsvd_order_id = new UnsignedInt(
-      $query_result->lastInsertId()
+    
+    return $this->rsvdOrdersTable->extrudeWithId(
+      new UnsignedInt($query_result->lastInsertId()),
+      $query_result->mapRowsTyped()[0]->toImmMap()
     );
-
-    $param_map = $query_result->mapRowsTyped()[0];
-    $param_map[$this->rsvdOrdersTable->getIdKey()] =
-      $rsvd_order_id->getNumber();
-
-    $rsvd_order = $this->rsvdOrdersTable->extrude($param_map);
-    return $rsvd_order;
   }
 
   private function createQuery(

@@ -19,7 +19,7 @@ class UserPrivilegesFetch {
     $user_privileges = Vector{};
     $fetched_result_maps = $fetch_result->mapRowsTyped();
     foreach ($fetched_result_maps as $map) {
-      $user_privileges[] = $this->userPrivilegesTable->extrude($map);    
+      $user_privileges[] = $this->userPrivilegesTable->extrude($map->toImmMap());    
     }
     
     return $user_privileges;

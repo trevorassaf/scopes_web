@@ -1,18 +1,20 @@
 <?hh // strict
 
-class UsersTable {
+class UsersTable extends Table<User> {
 
   const string TABLE_NAME = "Users";
-  const string ID_KEY = "id";
   const string FIRST_NAME_KEY = "firstName";
   const string LAST_NAME_KEY = "lastName";
   const string EMAIL_KEY = "email";
   const string PASSWORD_KEY = "passwordHash";
   const string TIME_JOINED_KEY = "timeJoined";
   
-  public function extrude(Map<string, mixed> $params): User {
+  public function extrudeWithId(
+    UnsignedInt $id,
+    ImmMap<string, mixed> $params
+  ): User {
     return new User(
-      new UnsignedInt((int)$params[$this->getIdKey()]),
+      $id,
       (string)$params[$this->getFirstNameKey()],
       (string)$params[$this->getLastNameKey()],
       new Email((string)$params[$this->getEmailKey()]),
@@ -23,10 +25,6 @@ class UsersTable {
 
   public function getTableName(): string {
     return self::TABLE_NAME;
-  }
-
-  public function getIdKey(): string {
-    return self::ID_KEY;
   }
 
   public function getFirstNameKey(): string {
