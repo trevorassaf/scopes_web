@@ -3,10 +3,12 @@
 use Scopes;
 
 -- Join tables
-drop table UserOrderEdges;
 drop table UserUserPrivilegeEdges;
 
 -- Model tables
-drop table Orders;
+drop table CellLabels;
+drop table ConfirmedOrders;
+drop table RsvdOrders;
+
 drop table UserPrivileges;
 drop table Users;
