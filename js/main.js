@@ -1,5 +1,35 @@
 $(document).ready(function() {
 
+  var PageController = function(
+    title,
+    $page_root,
+    activater,
+    reducer 
+  ) {
+    var _title = title; 
+    var _$pageRoot = $page_root;
+    var _activater = activater;
+    var _reducer = reducer;
+    
+    return {
+      getTitle: function() {
+        return _title; 
+      },
+
+      activate: function() {
+        _activater(_$pageRoot);
+      },
+
+      reduce: function() {
+        _reducer(_$pageRoot);
+      }
+    };
+  };
+
+  var NewExpPageController = function() {
+    
+  };
+
   // Content panel module
   var MainPanel = (function() { 
     // Cache main panel super header panel
@@ -8,6 +38,10 @@ $(document).ready(function() {
     // Cache main panel handle
     var mainPanel = $("#main-panel-inner");
 
+    // Map of button-id to corresponding
+    // main-page controller
+    var mainPageCache = [];
+
     // Public handle
     return {
       loadPage: function(id) {
@@ -15,18 +49,33 @@ $(document).ready(function() {
         switch (id) {
           case "new-exp-btn":
             name = "New Experiment";
+            if (!(id in mainPageCache)) {
+                        
+            }
             break;
           case "my-exp-btn":
             name = "My Experiments";
+            if (!(id in mainPageCache)) {
+              
+            }
             break;
           case "recordings-btn":
             name = "Recordings";
+            if (!(id in mainPageCache)) {
+              
+            }
             break;
           case "settings-btn":
             name = "Settings";
+            if (!(id in mainPageCache)) {
+              
+            }
             break;
           case "contact-us-btn":
             name = "Contact Us";
+            if (!(id in mainPageCache)) {
+              
+            }
             break;
           default:
             alert("Invalid page name: " + name);
@@ -58,9 +107,11 @@ $(document).ready(function() {
 
       }
     );
+    
+    // Load initial page
+    $('#new-exp-btn').click();
+    
     return {};
   })(MainPanel);
 
-  // Load initial page
-  $('#my-exp-btn').click();
 });

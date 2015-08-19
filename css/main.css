@@ -29,7 +29,7 @@ paper-card {
   position: absolute;
   width: 60%;
   left: 300px;
-  top: 80px;
+  top: 100px;
 }
 
 #main-panel-super-header {
@@ -39,7 +39,7 @@ paper-card {
   font-size: 24px;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #424242;
-  padding-top: 30px;
+  padding-top: 40px;
 }
 
 #um-med-banner {
@@ -73,6 +73,7 @@ paper-button {
   background-color: #eceff1;
   border-top: 1px solid #cfc8dc;
   border-bottom: 1px solid #cfc8dc;
+  display: none;
 }
 
 #mvs-logo {
@@ -107,7 +108,7 @@ paper-button {
 
 #experiment-panel-label-container {
   padding-left: 5px;
-  padding-top: 20px;
+  padding-top: 30px;
   padding-bottom: 16px;
   /*border-top: 1px solid #cfc8dc;*/
   /*border-bottom: 1px solid #cfc8dc;*/
@@ -142,4 +143,15 @@ paper-button {
 
 #mvs-panel-btns .side-panel-button[toggles][active] {
   background-color: #eeeeee;
+}
+
+#aux-btn-panel {
+  position: absolute;
+  top: 40px;
+  right: 100px;
+  color: #757575;
+}
+
+#aux-btn-panel paper-icon-button[toggles][active] {
+  color: #2962ff;
 }
