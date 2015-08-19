@@ -1,0 +1,30 @@
+--- FIELDS FOR NEW EXPERIMENT ---
+
+1. Scheduling data:
+- [required-field] Scope count: positive int, max value loaded from server
+- [require-field] Experiment Duration: positive int
+
+- [server-request] fetch from server available slots
+  - Present user with list of available time slots (ranked s.t. soonest is first)
+  - Allow user to sort through by searching date/time
+
+- [field] Timestamp search: timestamp components
+- [required-field] Start timestamp: timestamp
+
+- [server-request] after user selects time, we send request to server and reserve timeslot
+        provisionally...
+
+2. Video design:
+- Present user with grid displaying number of requested microscopes
+- User can select cell and add label
+- User specifies title here
+- User specifies total video time: positive float 
+
+- [required-field] label for each scope 
+- [required-field] title
+- [required-field] condensed video duration
+
+3. Confirmation
+- Compute estimated cost and ask user to confirm
+- [required-field] confirmation
+
