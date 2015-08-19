@@ -3,7 +3,6 @@
 class ReserveOrderMethod {
 
   public function __construct(
-    private QueryToApiExceptionConverter $queryToApiExceptionConverter,
     private UserOrderInsertQuery $userOrderInsertQuery
   ) {}
 
@@ -11,9 +10,8 @@ class ReserveOrderMethod {
     UnsignedInt $user_id,
     UnsignedInt $scopes_count,
     Timestamp $start_time,
-    UnsignedInt $rsvd_min_count,
-    OrderStatusType $order_status_type
-  ): Order {
+    UnsignedInt $rsvd_min_count
+  ): void {
     try {
       $query_wait_handle = $this
         ->userOrderInsertQuery
@@ -22,13 +20,11 @@ class ReserveOrderMethod {
           $scopes_count,
           $start_time,
           $rsvd_min_count,
-          $order_status_type
+          OrderStatusType::RESERVED
         );
-      return $query_wait_handle
+      $query_wait_handle
         ->getWaitHandle()
         ->join();
-    } catch (QueryException $ex) {
-      throw $this->queryToApiExceptionConverter->convert($ex); 
-    }
+    } catch (QueryException $ex) {}
   }
 }
