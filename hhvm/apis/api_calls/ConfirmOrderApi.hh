@@ -2,10 +2,11 @@
 
 class ConfirmOrderApi implements Api {
 
-  const USER_ID_KEY = "user-id";
-  const SCOPES_COUNT_KEY = "scopes-count";
-  const START_TIME_KEY = "start-time";
-  const RESERVED_MINUTES_COUNT = "rsvd-min-count";
+  const string RSVD_ORDER_KEY = "ro-id"; 
+  const string TITLE_KEY = "title";
+  const string DESCRIPTION_KEY = "desc";
+  const string SHORT_CODE_KEY = "short-code";
+  const string RECORDING_DURATION_KEY = "rec-duration";
 
   public function __construct(
     private WebParamsFetcher $webParamsFetcher,
@@ -14,19 +15,21 @@ class ConfirmOrderApi implements Api {
 
   public function processRequest(): ApiResult {
     $this->confirmOrder(
-      $this->webParamsFetcher->fetchPostParam(self::USER_ID_KEY),
-      $this->webParamsFetcher->fetchPostParam(self::SCOPES_COUNT_KEY),
-      $this->webParamsFetcher->fetchPostParam(self::START_TIME_KEY),
-      $this->webParamsFetcher->fetchPostParam(self::RESERVED_MINUTES_COUNT)
+      $this->webParamsFetcher->fetchPostParam(self::RSVD_ORDER_KEY),
+      $this->webParamsFetcher->fetchPostParam(self::TITLE_KEY),
+      $this->webParamsFetcher->fetchPostParam(self::DESCRIPTION_KEY),
+      $this->webParamsFetcher->fetchPostParam(self::SHORT_CODE_KEY),
+      $this->webParamsFetcher->fetchPostParam(self::RECORDING_DURATION_KEY)
     ); 
     return new EmptyApiResult();
   }
 
   public function confirmOrder(
     string $user_id,
-    string $scopes_count,
-    string $start_time,
-    string $rsvd_min_count
+    string $title,
+    string $description,
+    string $short_code,
+    string $recording_duration
   ): void {
     // Validate parameters against api-specific requirements
 
@@ -35,7 +38,11 @@ class ConfirmOrderApi implements Api {
     // from db layer...
     try {
       $this->confirmOrderMethod->confirm(
-        new UnsignedInt((int)$user_id)
+        new UnsignedInt((int)$user_id),
+        $title,
+        $description,
+        $short_code,
+        $recording_duration
       );
       
       // Order added successfully, return data to client...

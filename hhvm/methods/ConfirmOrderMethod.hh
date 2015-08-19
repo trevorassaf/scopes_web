@@ -3,21 +3,17 @@
 class ConfirmOrderMethod {
 
   public function __construct(
-    private UpdateOrderStatusQuery $updateQueryStatusOrder
+    private ConfirmedOrderInsertQuery $confirmedOrderInsertQuery
   ) {}
 
   public function confirm(
-    UnsignedInt $id
+    UnsignedInt $id,
+    string $title,
+    string $description,
+    string $short_code,
+    string $recording_duration
   ): void {
     try {
-      $query_wait_handle = $this->updateQueryStatusOrder
-        ->update(
-          $id,
-          new OrderStatus(OrderStatusType::CONFIRMED)
-        );  
-      $query_wait_handle
-        ->getWaitHandle()
-        ->join();
     } catch (QueryException $ex) {} 
   }
 }
