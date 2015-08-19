@@ -7,6 +7,7 @@ CREATE TABLE RsvdOrders (
   PRIMARY KEY(id),
   userId INT UNSIGNED NOT NULL,
   FOREIGN KEY(userId) REFERENCES Users(id),
+  leaseStart TIMESTAMP NOT NULL,
   scopesCount INT UNSIGNED NOT NULL,
   startTime TIMESTAMP NOT NULL,
   reservedMinutesCount INT UNSIGNED NOT NULL
