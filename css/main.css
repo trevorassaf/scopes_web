@@ -25,14 +25,44 @@ paper-card {
   top: 0px;
 }
 
+#main-panel-container {
+  display: inline-block;
+  width: 60%;
+  position: absolute;
+  left: 300px;
+}
+
 #main-panel {
+  width: 100%;
+  /*
   position: absolute;
   width: 60%;
   left: 300px;
   top: 100px;
+  height: auto;
+  */
+}
+
+#main-panel paper-card {
+  position: relative;
+}
+
+#new-exp-logistics-card {
+  position: relative;
+}
+
+#new-exp-video-card {
+  position: relative;
+}
+
+.main-card {
+  margin-bottom: 60px;
+
 }
 
 #main-panel-super-header {
+  display: inline-block;
+  /*
   position: absolute;
   left: 300px;
   top: 0px;
@@ -40,6 +70,21 @@ paper-card {
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #424242;
   padding-top: 40px;
+  */
+}
+
+#aux-btn-panel {
+  display: inline-block;
+  /*
+  position: absolute;
+  top: 40px;
+  right: 100px;
+  color: #757575;
+  */
+}
+
+#aux-btn-panel paper-icon-button[toggles][active] {
+  /*color: #2962ff;*/
 }
 
 #um-med-banner {
@@ -145,13 +190,3 @@ paper-button {
   background-color: #eeeeee;
 }
 
-#aux-btn-panel {
-  position: absolute;
-  top: 40px;
-  right: 100px;
-  color: #757575;
-}
-
-#aux-btn-panel paper-icon-button[toggles][active] {
-  color: #2962ff;
-}

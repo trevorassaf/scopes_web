@@ -125,21 +125,49 @@
       </div>
     </paper-card>
 
-    <div id="main-panel-super-header"></div>
-    
-    <div id="aux-btn-panel">
-      <paper-icon-button toggles icon="account-circle"></paper-icon-button>
-      <paper-icon-button icon="home"></paper-icon-button>
-    </div>
-
-    <paper-card id="main-panel" class="panel" elevation="1">
-      <div id="main-panel-inner" class="inner">
-        <div>
-          <paper-input label="Title"></paper-input> 
-          <paper-input label="Description"></paper-input> 
+    <div id="main-panel-container">
+      <div id="main-panel-super-container">
+        <div id="main-panel-super-header"></div>
+        
+        <div id="aux-btn-panel">
+          <paper-icon-button toggles icon="account-circle"></paper-icon-button>
+          <paper-icon-button icon="home"></paper-icon-button>
         </div>
       </div>
-    </paper-card>
+
+      <div>
+        <span>Schedule Experiment</span>
+      </div>
+      <paper-card id="new-exp-logistics-card" class="main-card" elevation="1">
+        <div>
+          <div>
+            <div>
+              <span>How many scopes do you need?</span> 
+              <paper-slider pin max="16" step="1" value="4"></paper-slider>
+            </div>
+            <div>
+              <span>How long is your experiment?</span> 
+              <paper-slider pin min="1" max="24" step="1" value="1"></paper-slider>
+            </div>
+          </div>
+        </div>
+      </paper-card>
+      
+      <paper-card id="new-exp-video-card" class="main-card" elevation="1">
+        <div>
+          <div>
+            <div>
+              <span>How many scopes do you need?</span> 
+              <paper-slider pin max="16" step="1" value="4"></paper-slider>
+            </div>
+            <div>
+              <span>How long is your experiment?</span> 
+              <paper-slider pin min="1" max="24" step="1" value="1"></paper-slider>
+            </div>
+          </div>
+        </div>
+      </paper-card>
+    </div>
 
   </body>
 </html>
