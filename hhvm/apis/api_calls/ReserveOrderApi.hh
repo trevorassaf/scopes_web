@@ -1,6 +1,6 @@
 <?hh // strict
 
-class AddOrderToUserApi implements Api {
+class ReserveOrderApi implements Api {
 
   const USER_ID_KEY = "user-id";
   const SCOPES_COUNT_KEY = "scopes-count";
@@ -11,7 +11,7 @@ class AddOrderToUserApi implements Api {
     private WebParamsFetcher $webParamsFetcher,
     private SerializerFactory $serializerFactory,
     private ApiExceptionToApiResultErrorConverter $apiExceptionToApiResultErrorConverter,
-    private AddOrderToUserMethod $addOrderToUserMethod    
+    private ReserveOrderMethod $reserveOrderMethod    
   ) {}
 
   public function processRequest(): ApiResult {
@@ -47,15 +47,16 @@ class AddOrderToUserApi implements Api {
     // db write. May still receive error
     // from db layer...
     try {
-      $order = $this->addOrderToUserMethod->addOrder(
+      $order = $this->reserveOrderMethod->reserve(
         new UnsignedInt((int)$user_id),
         new UnsignedInt((int)$scopes_count),
         new Timestamp($start_time),
-        new UnsignedInt((int)$rsvd_min_count)
+        new UnsignedInt((int)$rsvd_min_count),
+        OrderStatusType::RESERVED
       );
       
       // Order added successfully, return data to client...
-      return new AddOrderToUserApiResult(
+      return new ReserveOrderApiResult(
         $this->serializerFactory,
         $order
       );

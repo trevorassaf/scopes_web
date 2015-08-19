@@ -7,5 +7,7 @@ CREATE TABLE Orders (
   scopesCount INT UNSIGNED NOT NULL,
   startTime TIMESTAMP NOT NULL,
   reservedMinutesCount INT UNSIGNED NOT NULL,
+  statusId INT UNSIGNED NOT NULL,
+  FOREIGN KEY(statusId) REFERENCES OrderStatuses(id),
   PRIMARY KEY(id)
 );

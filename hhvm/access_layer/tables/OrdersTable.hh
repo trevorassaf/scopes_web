@@ -7,13 +7,19 @@ class OrdersTable {
   const string SCOPES_COUNT_KEY = "scopesCount";
   const string START_TIME_KEY = "startTime";
   const string RESERVED_MINUTES_COUNT_KEY = "reservedMinutesCount";
+  const string ORDER_STATUS_KEY = "orderStatus";
 
   public function extrude(Map<string, mixed> $params): Order {
     return new Order(
         new UnsignedInt((int)$params[$this->getIdKey()]),
         new UnsignedInt((int)$params[$this->getScopesCountKey()]),
         new Timestamp((string)$params[$this->getStartTimeKey()]),
-        new UnsignedInt((int)$params[$this->getReservedMinutesCountKey()])
+        new UnsignedInt((int)$params[$this->getReservedMinutesCountKey()]),
+        new OrderStatus(
+          OrderStatusType::assert(
+            ((int)$params[$this->getOrderStatusKey()])
+          )
+        )
     );
   }
 
@@ -35,5 +41,9 @@ class OrdersTable {
 
   public function getReservedMinutesCountKey(): string {
     return self::RESERVED_MINUTES_COUNT_KEY;
+  }
+
+  public function getOrderStatusKey(): string {
+    return self::ORDER_STATUS_KEY;
   }
 }

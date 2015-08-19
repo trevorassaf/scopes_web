@@ -13,7 +13,8 @@ class UserOrderInsertQuery {
       UnsignedInt $user_id,
       UnsignedInt $scopes_count,
       Timestamp $start_time,
-      UnsignedInt $reserved_minutes_count
+      UnsignedInt $reserved_minutes_count,
+      OrderStatusType $order_status_type
   ): Awaitable<Order> {
     // Insert order and retrieve id
     $insert_order_query_result =
@@ -21,7 +22,8 @@ class UserOrderInsertQuery {
         $this->createInsertOrderQuery(
           $scopes_count,
           $start_time,
-          $reserved_minutes_count
+          $reserved_minutes_count,
+          $order_status_type
         )
       );
 
@@ -51,17 +53,20 @@ class UserOrderInsertQuery {
   private function createInsertOrderQuery(
       UnsignedInt $scopes_count,
       Timestamp $start_time,
-      UnsignedInt $reserved_minutes_count
+      UnsignedInt $reserved_minutes_count,
+      OrderStatusType $order_status_type
   ): string {
     return 
       "INSERT INTO " . $this->ordersTable->getTableName() . "("
         . $this->ordersTable->getScopesCountKey() . ", "
         . $this->ordersTable->getStartTimeKey() . ", "
-        . $this->ordersTable->getReservedMinutesCountKey()
+        . $this->ordersTable->getReservedMinutesCountKey() . ", "
+        . $this->ordersTable->getOrderStatusKey()
       . ") VALUES ('"
         . $scopes_count->getNumber() . "', '"
         . $start_time->toString() . "', '"
-        . $reserved_minutes_count->getNumber()
+        . $reserved_minutes_count->getNumber() . "', '"
+        . $order_status_type
       . "')";
   }
 

@@ -1,6 +1,6 @@
 <?hh // strict
 
-class AddOrderToUserApiResult extends SuccessfulApiResult {
+class ReserveOrderApiResult extends SuccessfulApiResult {
 
   const string ORDER_ID_KEY = "order-id";
 

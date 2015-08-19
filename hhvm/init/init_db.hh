@@ -4,6 +4,18 @@ require_once(dirname(__FILE__).'/../vendor/autoload.php');
 
 date_default_timezone_set("America/Detroit");
 
+async function initOrderStatuses(
+  AsyncMysqlConnection $conn,
+): Awaitable<void> {
+  $insert_query = new OrderStatusInsertQuery(
+    $conn,
+    new OrderStatusesTable()
+  );
+
+  await $insert_query->insert(OrderStatusType::RESERVED);
+  await $insert_query->insert(OrderStatusType::CONFIRMED);
+}
+
 async function initOrderConfiguration(
   AsyncMysqlConnection $conn,
 ): Awaitable<void> {
@@ -59,7 +71,7 @@ async function initAdmins(
   AsyncMysqlConnection $conn
 ): Awaitable<Vector<User>> {
   $users_table = new UsersTable();
-  $user_insertion_query = new UserInsertion(
+  $user_insertion_query = new UserInsertQuery(
     $conn,
     $users_table
   );
