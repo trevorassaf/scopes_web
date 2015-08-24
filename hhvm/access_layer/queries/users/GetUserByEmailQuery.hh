@@ -26,5 +26,4 @@ class GetUserByEmailQuery {
       . " WHERE " . $this->usersTable->getEmailKey()
       . " = " . $email->toString(); 
   }
-
 }
