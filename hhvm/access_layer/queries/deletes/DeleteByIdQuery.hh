@@ -3,24 +3,23 @@
 class DeleteByIdQuery<Tmodel> {
 
   public function __construct(
-    private AsyncMysqlConnection $asyncMysqlConnection,
-    private Table<Tmodel> $table
+    private DeleteQuery<Tmodel> $deleteQuery,
+    private Table<Tmodel> $table,
+    private WhereClauseBuilder $whereClauseBuilder,
+    private TermBuilder $termBuilder
   ) {}
 
   public async function delete(
     UnsignedInt $id
   ): Awaitable<void> {
-    await $this->asyncMysqlConnection->query(
-      $this->createQuery($id)
-    );
-  }
-
-  private function createQuery(
-    UnsignedInt $id
-  ): string {
-    return
-      "DELETE FROM " . $this->table->getTableName() . " WHERE "
-      . $this->table->getIdKey() . "="
-      . $id->getNumber();
+    await $this->deleteQuery->delete(
+      $this->whereClauseBuilder->setFirst(
+        $this->termBuilder->equalTo(
+          $this->table->getIdKey(),
+          $id->getNumber()
+        )
+      )
+      ->build()
+    ); 
   }
 }
