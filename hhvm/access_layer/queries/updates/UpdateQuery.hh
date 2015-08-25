@@ -9,19 +9,35 @@ class UpdateQuery<Tmodel> {
     private Table<Tmodel> $table
   ) {}
 
-  public async function update(
+  public async function updateAll(
     ImmMap<string, mixed> $condition_params,
-    ImmMap<string, mixed> $update_params 
   ): Awaitable<void> {}
 
-  private function createQuery(
+  public async function update(
+    ImmMap<string, mixed> $condition_params,
+    WhereClause $where_clause
+  ): Awaitable<void> {}
+
+  private function createUpdateAllQuery(
+    ImmMap<string, mixed> $update_params
+  ): string {
+    return $this->createUpdateQueryHeader($update_params);
+  }
+  
+  private function createUpdateQuery(
     ImmMap<string, mixed> $update_params,
-    ImmMap<string, mixed> $condition_params
+    WhereClause $where_clause
+  ): string {
+    return $this->createUpdateQueryHeader($update_params)
+      . " WHERE " . $where_clause->serialize();
+  }
+
+  private function createUpdateQueryHeader(
+    ImmMap<string, mixed> $update_params
   ): string {
     return
       "UPDATE " . $this->table->getTableName() . " SET "
-      . $this->createUpdatedFieldsClause($update_params)
-      . " WHERE " . $this->createConditionFieldsClause($condition_params);
+      . $this->createUpdatedFieldsClause($update_params);
   }
 
   private function createUpdatedFieldsClause(
@@ -29,7 +45,7 @@ class UpdateQuery<Tmodel> {
   ): string {
     $update_clause = "";
     foreach ($update_params as $key => $value) {
-      $update_params .= $key . "='" . $value . "'" . self::FIELD_DELIMITER;
+      $update_params .= $key . "='" . (string)$value . "'" . self::FIELD_DELIMITER;
     }
     return substr(
       $update_clause,
@@ -37,8 +53,4 @@ class UpdateQuery<Tmodel> {
       strlen($update_clause) - strlen(self::FIELD_DELIMITER)
     );
   }
-  
-  private function createConditionFieldsClause(
-    ImmMap<string, mixed> $condition_params
-  ): string {}
 }

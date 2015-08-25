@@ -3,10 +3,15 @@
 class WhereClauseNode {
 
   public function __construct(
+    private LogicalOperatorTypeStringer $logicalOperatorTypeStringer,
     private LogicalOperatorType $logicalOperatorType,
-    private SerailizeableSqlClause $serializeableSqlClause,
-    private ?WhereClauseNode $nextWhereClauseNode
+    private WhereClauseElement $whereClauseElement
   ) {}
 
-  public function serializeWhereClauseNode(): string {}
+  public function serialize(): string {
+    return $this
+      ->logicalOperatorTypeStringer
+        ->getString($this->logicalOperatorType) 
+      . " " . $this->whereClauseElement->serialize();
+  }
 }

@@ -1,12 +1,17 @@
 <?hh // strict
 
-class Term implements SerializeableSqlClause {
+class Term implements WhereClauseElement {
   
   public function __construct(
+    private ComparisonOperatorTypeStringer $comparisonOperatorStringer, 
     private string $lhs,
-    private ComparisonOperatorType $comparisonOperator,
-    private mixed $rhs
+    private mixed $rhs,
+    private ComparisonOperatorType $comparisonOperator
   ) {}
 
-  public function serializeSqlClause(): string {}
+  public function serialize(): string {
+    return $this->lhs
+      . $this->comparisonOperatorStringer->getString($this->comparisonOperator)
+      . "'" . (string)$this->rhs . "'";
+  }
 }

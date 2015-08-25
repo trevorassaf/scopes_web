@@ -1,6 +1,6 @@
 <?hh // strict
 
-enum LogicalOperatorType as int {
+enum LogicalOperatorType : int {
   AND = 0x0;
   OR = 0x1;
 }

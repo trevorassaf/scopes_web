@@ -1,6 +1,6 @@
 <?hh // strict
 
-class MysqlLogicalOperatorTypeStringer {
+class MysqlLogicalOperatorTypeStringer implements LogicalOperatorTypeStringer {
 
   private static ImmMap<LogicalOperatorType, string> $STRING_MAP = ImmMap{
     LogicalOperatorType::AND => "AND",
@@ -8,6 +8,6 @@ class MysqlLogicalOperatorTypeStringer {
   };
 
   public function getString(LogicalOperatorType $type): string {
-    return self::$STRING_MAP->get($type);
+    return self::$STRING_MAP[$type];
   }
 }

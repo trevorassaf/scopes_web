@@ -1,6 +1,6 @@
 <?hh // strict
 
-enum ComparisonOperatorType as int {
+enum ComparisonOperatorType : int {
   EQUAL_TO = 0x0;
   NOT_EQUAL_TO = 0x1;
   GREATER_THAN = 0x2;

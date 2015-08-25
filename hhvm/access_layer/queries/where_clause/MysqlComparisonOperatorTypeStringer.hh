@@ -1,6 +1,6 @@
 <?hh // strict
 
-class MysqlComparisonOperatorTypeStringer {
+class MysqlComparisonOperatorTypeStringer implements ComparisonOperatorTypeStringer {
 
   private static ImmMap<ComparisonOperatorType, string> $STRING_MAP = ImmMap{
     ComparisonOperatorType::EQUAL_TO => "=",
@@ -12,6 +12,6 @@ class MysqlComparisonOperatorTypeStringer {
   };
 
   public function getString(ComparisonOperatorType $type): string {
-    return self::$STRING_MAP->get($type);
+    return self::$STRING_MAP[$type];
   }
 }
