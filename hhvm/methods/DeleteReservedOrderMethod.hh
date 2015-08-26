@@ -10,7 +10,10 @@ class DeleteReservedOrderMethod {
     UnsignedInt $rsvd_order_id
   ): void {
     try {
-      $this->deleteOrderQuery->delete($rsvd_order_id); 
+      $this->deleteOrderQuery
+        ->delete($rsvd_order_id)
+        ->genWaitHandle()
+        ->join(); 
     } catch (QueryException $ex) {}
   }
 }
