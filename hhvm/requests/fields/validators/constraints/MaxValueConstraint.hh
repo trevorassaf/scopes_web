@@ -1,15 +1,15 @@
 <?hh // strict
 
-class MinValueConstraint implements RequestFieldConstraint<int> {
+class MaxValueConstraint implements RequestFieldConstraint<int> {
 
   public function __construct(
-    private int $minValue
+    private int $maxValue
   ) {}
   
   public function apply(string $key, int $value): void {
-    if ($value < $minValue) {
+    if ($value < $maxValue) {
       throw new RequestFieldConstraintException(
-        RequestFieldConstraintType::MIN_VALUE,
+        RequestFieldConstraintType::MAX_VALUE,
         $key,
         $value 
       );
