@@ -1,6 +1,6 @@
 <?hh // strict
 
-class RequestFieldConstraintException extends Exception {
+class RequestFieldConstraintException extends RequestException {
 
   private static ImmMap<RequestFieldConstraintType, string> $REQUEST_FIELD_CONSTRAINT_TYPE_NAME_MAP = ImmMap{
     RequestFieldConstraintType::MIN_VALUE => "Minimum Value",

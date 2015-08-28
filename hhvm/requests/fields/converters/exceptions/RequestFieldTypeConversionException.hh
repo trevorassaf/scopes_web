@@ -1,6 +1,6 @@
 <?hh // strict
 
-class RequestFieldTypeConversionException extends Exception {
+class RequestFieldTypeConversionException extends RequestException {
 
   private static ImmMap<RequestFieldType, string> $REQUEST_FIELD_STRING_MAP = ImmMap{
     RequestFieldType::INT => "Int",

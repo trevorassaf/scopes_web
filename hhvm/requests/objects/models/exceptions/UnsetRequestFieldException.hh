@@ -1,13 +1,13 @@
 <?hh // strict
 
-class UnsetRequestFieldException extends Exception {
+class UnsetRequestFieldException extends RequestException {
 
   public function __construct(
-    private string $apiObjectName,
+    private string $requestObjectName,
     private string $keyName
   ) {
     parent::__construct(
-      "Request field \"{$this->keyName}\" missing from api object \"{$this->apiObjectName}\""
+      "Request object \"{$this->requestObjectName}\" missing request field \"{$this->keyName}\""
     );
   } 
 }
