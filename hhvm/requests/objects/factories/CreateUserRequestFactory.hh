@@ -55,7 +55,7 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
   public function make(ImmMap<string, mixed> $raw_field_map): CreateUserRequest {
     $create_user_request_builder = new CreateUserRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
-      switch ($raw_field) {
+      switch ($key) {
         case CreateUserRequest::FIRST_NAME_KEY:
           $create_user_request_builder->setFirstName(
             $this->firstNameFieldFactory->make($key, $value)
@@ -81,5 +81,6 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
           break;
       }
     }
+    return $create_user_request_builder->build();
   }
 }

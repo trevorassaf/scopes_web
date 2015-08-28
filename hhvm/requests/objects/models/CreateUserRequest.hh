@@ -67,23 +67,19 @@ class CreateUserRequestBuilder {
   }
 
   public function build(): CreateUserRequest {
-    invariant(
-      $this->firstName !== null,
-      "First name must not be null when building CreateUserRequest"
-    );
-    invariant(
-      $this->lastName !== null,
-      "Last name must not be null when building CreateUserRequest"
-    );
-    invariant(
-      $this->email !== null,
-      "Email must not be null when building CreateUserRequest"
-    );
-    invariant(
-      $this->passwordHash !== null,
-      "Password hash must not be null when building CreateUserRequest"
-    );
-
+    // Check for missing request keys
+    if ($this->firstName == null) {
+      throw UnsetRequestFieldException(RequestWrapper::FIRST_NAME_KEY); 
+    }
+    if ($this->lastName == null) {
+      throw UnsetRequestFieldException(RequestWrapper::LAST_NAME_KEY); 
+    }
+    if ($this->email == null) {
+      throw UnsetRequestFieldException(RequestWrapper::EMAIL_KEY); 
+    }
+    if ($this->passwordHash == null) {
+      throw UnsetRequestFieldException(RequestWrapper::PASSWORD_HASH_KEY); 
+    }
     return new CreateUserRequest(
       $this->firstName,
       $this->lastName,
