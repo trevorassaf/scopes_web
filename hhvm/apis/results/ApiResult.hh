@@ -2,6 +2,6 @@
 
 interface ApiResult {
   
-  public function serialize(): string;
+  public function toResponseFieldMap(): ImmMap<string, mixed>;
 
 }

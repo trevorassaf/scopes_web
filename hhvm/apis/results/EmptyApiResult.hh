@@ -2,8 +2,8 @@
 
 class EmptyApiResult implements ApiResult {
   
-  public function serialize(): string {
-    return '';
+  public function toResponseFieldMap(): ImmMap<string, mixed> {
+    return ImmMap{};
   }
 
 }
