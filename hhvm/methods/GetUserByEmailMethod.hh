@@ -19,7 +19,7 @@ class GetUserByEmailMethod {
       }
       return $user;
     } catch (QueryException $ex) {
-      return new UnknownErrorException();
+      throw new UnknownErrorException();
     } 
   }
 }

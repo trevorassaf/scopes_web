@@ -17,14 +17,13 @@ class CreateUserMethod {
 
     try {
       // Attempt insert
-      $insert_query_wait_handle = $this->userInsertQuery
-        ->insert(
-          $first_name,
-          $last_name,
-          $email,
-          $password_hash,
-          $timestamp_builder->now()
-        );
+      $insert_query_wait_handle = $this->userInsertQuery->insert(
+        $first_name,
+        $last_name,
+        $email,
+        $password_hash,
+        $timestamp_builder->now()
+      );
       return $insert_query_wait_handle
         ->getWaitHandle()
         ->join();

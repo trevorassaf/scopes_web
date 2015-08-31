@@ -80,6 +80,8 @@ class CreateUserRequestBuilder {
     if ($this->passwordHash == null) {
       throw UnsetRequestFieldException(RequestWrapper::PASSWORD_HASH_KEY); 
     }
+    
+    // Extrude request object
     return new CreateUserRequest(
       $this->firstName,
       $this->lastName,

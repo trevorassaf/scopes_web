@@ -77,7 +77,7 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
           );
           break;
         default:
-          throw new InvalidRequestFieldKeyException(__CLASS__, $key)
+          throw new InvalidRequestFieldKeyException(__CLASS__, $key);
           break;
       }
     }
