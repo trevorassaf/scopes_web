@@ -3,36 +3,23 @@
 class GetUserByEmailMethod {
 
   public function __construct(
-    private QueryToApiExceptionConverter $queryToApiExceptionConverter,
-    private GetUserByEmailQuery $getUserByEmailQuery
+    private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery
   ) {}
 
   public function getUser(Email $email): User {
-    $user = null;
     try {
       $query_wait_handle = $this
-        ->getUserByEmailQuery
-        ->get($email);  
+        ->fetchUserByUniqueKeyQuery
+        ->fetch($email);  
       $user = $query_wait_handle
         ->getWaitHandle()
         ->join();
+      if ($user == null) {
+        throw new NonextantObjectException();
+      }
+      return $user;
     } catch (QueryException $ex) {
-      throw $this->queryToApiExceptionConverter->convert($ex); 
+      return new UnknownErrorException();
     } 
-
-    // Raise error because the email didn't match a user
-    if ($user == null) {
-      // TODO return error indicating no user found
-      /*
-      $api_exception_builder = new ApiExceptionBuilder();
-      throw $api_exception_builder
-        ->addApiError(ApiErrorType::FETCH_MISS)
-        ->build();
-       */
-      $api_exception_builder = new ApiExceptionBuilder();
-      throw $api_exception_builder->build();
-    }
-
-    return $user;
   }
 }
