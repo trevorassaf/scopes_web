@@ -12,7 +12,7 @@ class DeleteConfirmedOrderMethod {
     try {
       $this->deleteOrderQuery
         ->delete($confirmed_order_id)
-        ->genWaitHandle()
+        ->getWaitHandle()
         ->join(); 
     } catch (QueryException $ex) {}
   }

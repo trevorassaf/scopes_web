@@ -15,11 +15,11 @@ class RequestFieldTypeConversionException extends RequestException {
   public function __construct(
     private RequestFieldType $requestFieldType,
     private string $key,
-    private string $value
+    private mixed $value
   ) {
     parent::__construct(
-      "Failed to convert <{$key}:{$value}> to type: "
-          . self::$REQUEST_FIELD_STRING_MAP[$this->requestFieldType]; 
+      "Failed to convert <{$key}:".(string)$value."> to type: "
+          . self::$REQUEST_FIELD_STRING_MAP[$this->requestFieldType]
     );
   }
 }

@@ -3,33 +3,17 @@
 class ReserveOrderMethod {
 
   public function __construct(
-    private ReservedOrderPolicyFetchQuery $rsvdOrderPolicyFetchQuery,
     private ReservedOrderInsertQuery $rsvdOrderInsertQuery,
-    private ReservedOrderValidationQuery $rsvdOrderValidationQuery
   ) {}
 
-  public function reserve(
+  public function reserveOrder(
     UnsignedInt $user_id,
     Timestamp $lease_start,
     UnsignedInt $scopes_count,
     Timestamp $start_time,
     UnsignedInt $rsvd_min_count
-  ): ReservedOrder {
-    // First, perform light-weight policy check on reservation request
-    try {
-      $rsvd_order_policy = $this
-        ->rsvdOrderPolicyFetchQuery
-        ->fetch()
-        ->getWaitHandle()
-        ->join(); 
-
-      // Check if reservation starts too early
-      if ($lease_start->isBefore($rsvd_order_policy->getStartTime())) {
-        throw new ReservedOrderTooEarlyException(); 
-      }
-    } catch (QueryException $ex) {
-      throw new UnknownApiErrorException();
-    }
+  ): RsvdOrder {
+    // TODO First, perform light-weight policy check on reservation request
 
     $rsvd_order = null;
     // Second, optimistically insert reserve order into db
@@ -44,11 +28,12 @@ class ReserveOrderMethod {
       ->getWaitHandle()
       ->join();
     } catch (QueryException $ex) {
-      throw new UnknownApiErrorException();
+      throw new MethodException();
     }
 
     // Then, we validate our reservation by ensuring that we didn't 
     // overbook the scopes
 
+    return $rsvd_order;
   }
 }

@@ -3,14 +3,17 @@
 class GetUserByEmailMethod {
 
   public function __construct(
-    private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery
+    private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery,
+    private UsersTable $usersTable
   ) {}
 
   public function getUser(Email $email): User {
     try {
       $query_wait_handle = $this
         ->fetchUserByUniqueKeyQuery
-        ->fetch($email);  
+        ->fetch(
+          ImmMap{$this->usersTable->getEmailKey() => $email}
+        );  
       $user = $query_wait_handle
         ->getWaitHandle()
         ->join();
@@ -19,7 +22,7 @@ class GetUserByEmailMethod {
       }
       return $user;
     } catch (QueryException $ex) {
-      throw new UnknownErrorException();
+      throw new MethodException();
     } 
   }
 }

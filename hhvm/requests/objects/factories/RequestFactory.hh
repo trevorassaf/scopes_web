@@ -2,5 +2,5 @@
 
 interface RequestFactory<Trequest> {
 
-  public function get(ImmMap<string, mixed> $raw_field_map): Trequest;
+  public function make(ImmMap<string, mixed> $raw_field_map): Trequest;
 }

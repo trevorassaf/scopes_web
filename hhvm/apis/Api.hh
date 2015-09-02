@@ -10,10 +10,12 @@ abstract class Api<Trequest> {
     try {
       $request = $this->requestFactory->make($raw_request_fields);
       return $this->processRequestObject($request);
-    } catch (UnknownMethodException $ex) {
-      return new FailedApiResult(ApiErrorType::UNKNOWN_ERROR);
+    } catch (MethodException $ex) {
+      return new FailedApiResult($this->getApiType());
     }
   }
 
-  abstract protected function processRequestObject($request_object): ApiResult;
+  abstract protected function processRequestObject(Trequest $request_object): ApiResult;
+
+  abstract public function getApiType(): ApiType;
 }

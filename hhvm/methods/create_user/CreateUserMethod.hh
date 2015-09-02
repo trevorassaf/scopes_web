@@ -4,10 +4,11 @@ class CreateUserMethod {
 
   public function __construct(
     private UserInsertQuery $userInsertQuery,
-    private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery
+    private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery,
+    private UsersTable $usersTable
   ) {}
 
-  public function addUser(
+  public function createUser(
     string $first_name,
     string $last_name,
     Email $email,
@@ -33,15 +34,17 @@ class CreateUserMethod {
       if ($this->isDuplicateEmail($email)) {
         throw new DuplicateEmailException();
       } else {
-        throw new UnknownErrorException();
+        throw new MethodException();
       }
     }
   }
 
-  private function isDupliateEmail(Email $email): bool {
+  private function isDuplicateEmail(Email $email): bool {
     $fetch_query_wait_handle = $this->fetchUserByUniqueKeyQuery
       ->fetch(
-        $email
+        ImmMap{
+          $this->usersTable->getEmailKey() => $email->toString(),
+        }
       ); 
     $user = $fetch_query_wait_handle
       ->getWaitHandle()

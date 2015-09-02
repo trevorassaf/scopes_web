@@ -1,8 +1,8 @@
 <?hh // strict
 
 enum ApiFieldType : int {
-  INT = 0X0;
-  FLOAT = 0X1;
-  BOOL = 0X2;
-  STRING = 0X3;
+  INT = 0x0;
+  FLOAT = 0x1;
+  BOOL = 0x2;
+  STRING = 0x3;
 }

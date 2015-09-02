@@ -12,7 +12,7 @@ class RequestField<Ttype> {
     $this->value = $this->requestFieldValidator->validate($this->key, $value);
   }
 
-  public function getValue(): Ttype {
+  public function get(): Ttype {
     return $this->value;
   }
 }

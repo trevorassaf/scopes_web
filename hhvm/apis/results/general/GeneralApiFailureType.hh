@@ -2,5 +2,5 @@
 
 enum GeneralApiFailureType : int {
 
-  UNKNOWN_ERROR = 0x000;
+  UNKNOWN = 0x000;
 }

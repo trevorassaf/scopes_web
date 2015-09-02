@@ -5,7 +5,7 @@ class BoolFieldConverter implements RequestFieldTypeConverter<bool> {
   public function convert(string $key, mixed $value): bool {
     // Validate bool type
     if (!is_bool($value)) {
-      throw RequestFieldTypeConversionException(
+      throw new RequestFieldTypeConversionException(
         RequestFieldType::BOOL,
         $key,
         $value

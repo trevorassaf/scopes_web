@@ -14,7 +14,7 @@ class GetUserByUniqueKeyApiResult extends SuccessfulApiResult {
     parent::__construct($api_type);
     $this->id = $user->getId()->getNumber();
     $this->firstName = $user->getFirstName();
-    $this->firstName = $user->getLastName();
+    $this->lastName = $user->getLastName();
     $this->email = $user->getEmail()->toString();
   }
 }

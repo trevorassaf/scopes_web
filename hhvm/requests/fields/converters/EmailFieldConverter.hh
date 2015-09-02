@@ -5,7 +5,7 @@ class EmailFieldConverter implements RequestFieldTypeConverter<Email> {
   public function convert(string $key, mixed $value): Email {
     // Validate int type
     if (!is_string($value) || Email::isValid((string)$value)) {
-      throw RequestFieldTypeConversionException(
+      throw new RequestFieldTypeConversionException(
         RequestFieldType::EMAIL,
         $key,
         $value

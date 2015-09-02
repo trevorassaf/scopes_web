@@ -5,7 +5,7 @@ class IntFieldConverter implements RequestFieldTypeConverter<int> {
   public function convert(string $key, mixed $value): int {
     // Validate int type
     if (!is_int($value)) {
-      throw RequestFieldTypeConversionException(
+      throw new RequestFieldTypeConversionException(
         RequestFieldType::INT,
         $key,
         $value

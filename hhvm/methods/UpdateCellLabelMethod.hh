@@ -13,7 +13,7 @@ class UpdateCellLabelMethod {
     try {
       $this->updateQuery
         ->update($update_params, $id)
-        ->genWaitHandle()
+        ->getWaitHandle()
         ->join();
     } catch (QueryException $ex) {} 
   }

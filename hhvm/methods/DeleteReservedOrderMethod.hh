@@ -3,7 +3,7 @@
 class DeleteReservedOrderMethod {
 
   public function __construct(
-    private DeleteByIdQuery<ReservedOrder> $deleteOrderQuery
+    private DeleteByIdQuery<RsvdOrder> $deleteOrderQuery
   ) {}
 
   public function deleteReservedOrder(
@@ -12,7 +12,7 @@ class DeleteReservedOrderMethod {
     try {
       $this->deleteOrderQuery
         ->delete($rsvd_order_id)
-        ->genWaitHandle()
+        ->getWaitHandle()
         ->join(); 
     } catch (QueryException $ex) {}
   }

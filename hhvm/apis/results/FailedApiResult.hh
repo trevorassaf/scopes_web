@@ -3,8 +3,8 @@
 class FailedApiResult extends ApiResult {
 
   public function __construct(
-    public ApiType $apiType
+    ApiType $api_type
   ) {
-    parent::__construct(false, $this->apiType);    
+    parent::__construct(false, $api_type);    
   }
 }
