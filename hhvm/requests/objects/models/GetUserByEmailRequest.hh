@@ -2,6 +2,8 @@
 
 class GetUserByEmailRequest {
 
+  const string REQUEST_OBJECT_NAME = "GetUserByEmailRequest";
+
   const string EMAIL_KEY = "email";
 
   public function __construct(
@@ -27,7 +29,10 @@ class GetUserByEmailRequestBuilder {
   public function build(): GetUserByEmailRequest {
     // Check for missing request keys
     if ($this->email == null) {
-      throw UnsetRequestFieldException(RequestWrapper::EMAIL_KEY);
+      throw new UnsetRequestFieldException(
+        GetUserByEmailRequest::REQUEST_OBJECT_NAME,
+        GetUserByEmailRequest::EMAIL_KEY
+      );
     }
 
     // Extrude request object

@@ -6,7 +6,9 @@ class RequestFieldFactoryBuilder<Ttype> {
 
   public function __construct(
     private RequestFieldTypeConverter<Ttype> $requestFieldTypeConverter
-  ) {}
+  ) {
+    $this->requestFieldConstraints = Vector{};
+  }
 
   public function addConstraint(RequestFieldConstraint<Ttype> $constraint): this {
     $this->requestFieldConstraints[] = $constraint;
@@ -14,7 +16,7 @@ class RequestFieldFactoryBuilder<Ttype> {
   }
 
   public function build(): RequestFieldFactory<Ttype> {
-    return new RequestFieldFactory<Ttype>(
+    return new RequestFieldFactory(
       new RequestFieldValidator(
         $this->requestFieldTypeConverter,
         $this->requestFieldConstraints->toImmVector()

@@ -1,6 +1,6 @@
 <?hh // strict
 
-class GetUserByEmailRequestFactory implements RequestFactory<GetUserByEmail> {
+class GetUserByEmailRequestFactory implements RequestFactory<GetUserByEmailRequest> {
 
   public function __construct(
     private RequestFieldFactory<Email> $emailFieldFactory

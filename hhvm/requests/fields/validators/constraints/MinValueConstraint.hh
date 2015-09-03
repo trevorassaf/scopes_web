@@ -7,11 +7,11 @@ class MinValueConstraint implements RequestFieldConstraint<int> {
   ) {}
   
   public function apply(string $key, int $value): void {
-    if ($value < $minValue) {
+    if ($value < $this->minValue) {
       throw new RequestFieldConstraintException(
         RequestFieldConstraintType::MIN_VALUE,
         $key,
-        $value 
+        (string)$value 
       );
     }
   }

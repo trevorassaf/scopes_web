@@ -1,6 +1,6 @@
 <?hh // strict
 
-enum ApiType : int {
+enum ApiType : int as int {
 
   CREATE_USER = 0x0;
   GET_USER = 0x1; 

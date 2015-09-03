@@ -16,7 +16,7 @@ class RequestFieldConstraintException extends RequestException {
   ) {
     parent::__construct(
       "Request field <{$this->key}:{$this->value}> violates the \""
-          . self::$REQUEST_FIELD_CONSTRAIN_TYPE_NAME_MAP[$this->requestFieldConstraintType] . "\" constraint";
+          . self::$REQUEST_FIELD_CONSTRAINT_TYPE_NAME_MAP[$this->requestFieldConstraintType] . "\" constraint"
     );
   }
 

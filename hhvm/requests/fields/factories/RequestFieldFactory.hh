@@ -7,7 +7,7 @@ class RequestFieldFactory<Ttype> {
   ) {}
 
   public function make(string $key, mixed $value): RequestField<Ttype> {
-    return new RequestField<Ttype>(
+    return new RequestField(
       $this->requestFieldValidator,
       $key,
       $value

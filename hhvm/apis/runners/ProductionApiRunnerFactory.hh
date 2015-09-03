@@ -10,7 +10,7 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
     protected ApiResultSerializer $apiResultSerializer,
     protected ApiRouter $apiRouter
   ) {
-    $this->displayRequestFieldErrors = new ServerState(false);
+    $this->displayRequestFieldErrors = new StaticServerState(false);
   }
 
   public function make(): ApiRunner {

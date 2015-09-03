@@ -7,11 +7,11 @@ class MaxValueConstraint implements RequestFieldConstraint<int> {
   ) {}
   
   public function apply(string $key, int $value): void {
-    if ($value < $maxValue) {
+    if ($value < $this->maxValue) {
       throw new RequestFieldConstraintException(
         RequestFieldConstraintType::MAX_VALUE,
         $key,
-        $value 
+        (string)$value 
       );
     }
   }

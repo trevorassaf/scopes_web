@@ -40,8 +40,8 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
     // Create email field factory
     $email_field_factory_builder = new EmailRequestFieldFactoryBuilder();
     $this->emailFieldFactory = $email_field_factory_builder
-        ->addConstraint(new MinLengthConstraint(self::EMAIL_MIN_LENGTH))
-        ->addConstraint(new MaxLengthConstraint(self::EMAIL_MAX_LENGTH))
+    //    ->addConstraint(new MinLengthConstraint(self::EMAIL_MIN_LENGTH))
+    //    ->addConstraint(new MaxLengthConstraint(self::EMAIL_MAX_LENGTH))
         ->build();
     
     // Create password hash field factory

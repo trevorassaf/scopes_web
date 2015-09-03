@@ -8,4 +8,5 @@ enum RequestFieldType : int {
   STRING = 0x4;
   EMAIL = 0x5;
   TIMESTAMP = 0x6;
+  API_TYPE = 0x7;
 }

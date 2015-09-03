@@ -2,6 +2,8 @@
 
 class ReserveOrderRequest {
 
+  const string REQUEST_OBJECT_NAME = "ReserveOrderRequest";
+
   const string USER_ID_KEY = "user-id";
   const string LEASE_START_KEY = "lease-start";
   const string SCOPES_COUNT_KEY = "scopes-count";
@@ -83,19 +85,38 @@ class ReserveOrderRequestBuilder {
   public function build(): ReserveOrderRequest {
     // Check for missing request keys
     if ($this->userId == null) {
-      throw UnsetRequestFieldException(RequestWrapper::USER_ID_KEY); 
+      throw new UnsetRequestFieldException(
+        ReserveOrderRequest::REQUEST_OBJECT_NAME,
+        ReserveOrderRequest::USER_ID_KEY
+      ); 
     }
+
     if ($this->leaseStart == null) {
-      throw UnsetRequestFieldException(RequestWrapper::LEASE_START_KEY); 
+      throw new UnsetRequestFieldException(
+        ReserveOrderRequest::REQUEST_OBJECT_NAME,
+        ReserveOrderRequest::LEASE_START_KEY
+      ); 
     }
+
     if ($this->scopesCount == null) {
-      throw UnsetRequestFieldException(RequestWrapper::SCOPES_COUNT_KEY); 
+      throw new UnsetRequestFieldException(
+        ReserveOrderRequest::REQUEST_OBJECT_NAME,
+        ReserveOrderRequest::SCOPES_COUNT_KEY
+      ); 
     }
+
     if ($this->startTime == null) {
-      throw UnsetRequestFieldException(RequestWrapper::START_TIME_KEY); 
+      throw new UnsetRequestFieldException(
+        ReserveOrderRequest::REQUEST_OBJECT_NAME,
+        ReserveOrderRequest::START_TIME_KEY
+      ); 
     }
+
     if ($this->reservedMinutesCount == null) {
-      throw UnsetRequestFieldException(RequestWrapper::RSVD_MIN_COUNT_KEY); 
+      throw new UnsetRequestFieldException(
+        ReserveOrderRequest::REQUEST_OBJECT_NAME,
+        ReserveOrderRequest::RSVD_MIN_COUNT_KEY
+      ); 
     }
 
     return new ReserveOrderRequest(

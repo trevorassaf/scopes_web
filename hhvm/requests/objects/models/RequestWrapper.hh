@@ -2,12 +2,14 @@
 
 class RequestWrapper {
 
+  const string REQUEST_OBJECT_NAME = "RequestWrapper";
+
   const string API_TYPE_KEY = "api-type";
   const string PAYLOAD_KEY = "payload";
 
   public function __construct(
-    RequestField<ApiType> $apiType,
-    RequestField<string> $payload
+    private RequestField<ApiType> $apiType,
+    private RequestField<string> $payload
   ) {}
 
   public function getApiType(): RequestField<ApiType> {
@@ -37,10 +39,16 @@ class RequestWrapperBuilder {
   public function build(): RequestWrapper {
     // Check for missing request keys 
     if ($this->apiType == null) {
-      throw UnsetRequestFieldException(RequestWrapper::API_TYPE_KEY); 
+      throw new UnsetRequestFieldException(
+        RequestWrapper::REQUEST_OBJECT_NAME,
+        RequestWrapper::API_TYPE_KEY
+      ); 
     }
     if ($this->payload == null) {
-      throw UnsetRequestFieldException(RequestWrapper::PAYLOAD_KEY); 
+      throw new UnsetRequestFieldException(
+        RequestWrapper::REQUEST_OBJECT_NAME,
+        RequestWrapper::PAYLOAD_KEY
+      ); 
     }
 
     return new RequestWrapper(
