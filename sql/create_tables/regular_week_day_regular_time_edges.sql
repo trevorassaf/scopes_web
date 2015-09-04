@@ -6,6 +6,7 @@ CREATE TABLE RegularWeekDayRegularTimeEdges (
   regularWeekDayId INT UNSIGNED NOT NULL,
   FOREIGN KEY(regularWeekDayId) REFERENCES RegularWeekDays(id),
   regularTimeId INT UNSIGNED NOT NULL,
-  FOREIGN KEY(regularTimeId) REFERENCES RegularTimes(id)
+  FOREIGN KEY(regularTimeId) REFERENCES RegularTimes(id),
+  UNIQUE KEY(regularWeekDayId, regularTimeId)
 );
 
