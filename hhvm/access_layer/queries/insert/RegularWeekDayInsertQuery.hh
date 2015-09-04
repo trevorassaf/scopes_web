@@ -8,11 +8,11 @@ class RegularWeekDayInsertQuery {
   ) {}
 
   public async function insert(
-    DayOfTheWeekType $day 
+    UnsignedInt $day_id
   ): Awaitable<RegularWeekDay> {
     return await $this->insertQuery->insert(
       ImmMap{
-        $this->regularWeekDaysTable->getIdKey() => (int)$day,
+        $this->regularWeekDaysTable->getIdKey() => $day_id->getNumber(),
       }
     ); 
   }
