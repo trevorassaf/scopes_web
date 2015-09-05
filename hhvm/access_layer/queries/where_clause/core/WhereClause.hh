@@ -1,6 +1,6 @@
 <?hh // strict
 
-interface MySqlTerm {
+interface WhereClause {
 
   public function serialize(): string;
 }

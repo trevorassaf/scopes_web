@@ -1,6 +1,6 @@
 <?hh // strict
 
-abstract class OrTerm implements LogicalTerm {
+abstract class OrWhereClause extends LogicalWhereClause {
 
   const string LOGICAL_TOKEN = "OR";
 

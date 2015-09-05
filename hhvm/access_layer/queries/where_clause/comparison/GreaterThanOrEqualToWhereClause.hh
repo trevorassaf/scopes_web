@@ -1,8 +1,8 @@
 <?hh // strict
 
-class LessThanTerm extends ComparisonTerm {
+class GreaterThanWhereClause extends ComparisonTerm {
 
-  const string COMPARISON_TOKEN = "<=";
+  const string COMPARISON_TOKEN = ">=";
 
   protected function getComparisonToken(): string {
     return self::COMPARISON_TOKEN; 

@@ -10,21 +10,24 @@ class FetchQuery<Tmodel> {
   ) {} 
 
   public async function fetchAll(): Awaitable<ImmVector<Tmodel>> {
-    $result_set = await $this->asyncMysqlConnection->query(
+    return await $this->executeFetchQuery(
       $this->createFetchAllQuery()
-    ); 
-    return $this->extrudeResultMap($result_set->mapRowsTyped());
+    );
   }
 
-  public async function fetch(WhereClause $where_clause): Awaitable<ImmVector<Tmodel>> {
-    $result_set = await $this->asyncMysqlConnection->query(
+  public async function fetch(
+    WhereClause $where_clause
+  ): Awaitable<ImmVector<Tmodel>> {
+    return await $this->executeFetchQuery(
       $this->createFetchQuery($where_clause)
     );
   }
 
-  private function extrudeResultMap(
-    ImmMap<string, mixed> $field_map_set
-  ): ImmVector<Tmodel> {
+  private async function executeFetchQuery(
+    string $fetch_query
+  ): Awaitable<ImmVector<Tmodel>> {
+    $result_set = await $this->asyncMysqlConnection->query($fetch_query);
+    $field_map_set = $result_set->mapRowsTyped();
     $objects = Vector{};
     foreach ($field_map_set as $field_map) {
       $objects[] = $this->table->extrude($field_map->toImmMap());

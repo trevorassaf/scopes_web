@@ -4,8 +4,6 @@ class FetchByUniqueKeyQuery<Tmodel> {
 
   public function __construct(
     private FetchQuery<Tmodel> $fetchQuery,
-    private WhereClauseBuilder $whereClauseBuilder,
-    private TermBuilder $termBuilder,
     private Table<Tmodel> $table
   ) {} 
 
@@ -27,7 +25,9 @@ class FetchByUniqueKeyQuery<Tmodel> {
 
   private function translateConstraintMapToConjunctiveWhereClause(
     ImmMap<string, mixed> $params
-  ): WhereClause {}
+  ): WhereClause {
+    
+  }
 
   public function getTable(): Table<Tmodel> {
     return $this->fetchQuery->getTable();

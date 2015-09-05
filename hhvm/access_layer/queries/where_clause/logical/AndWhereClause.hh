@@ -1,6 +1,6 @@
 <?hh // strict
 
-abstract class AndTerm implements LogicalTerm {
+abstract class AndWhereClause implements LogicalWhereClause {
 
   const string LOGICAL_TOKEN = "AND";
 

@@ -1,6 +1,6 @@
 <?hh // strict
 
-class EqualsTerm extends ComparisonTerm {
+class EqualsWhereClause extends ComparisonWhereClause {
 
   const string COMPARISON_TOKEN = "=";
 

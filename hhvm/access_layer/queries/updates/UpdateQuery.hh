@@ -16,7 +16,9 @@ class UpdateQuery<Tmodel> {
   public async function update(
     ImmMap<string, mixed> $condition_params,
     WhereClause $where_clause
-  ): Awaitable<void> {}
+  ): Awaitable<void> {
+          
+  }
 
   private function createUpdateAllQuery(
     ImmMap<string, mixed> $update_params
