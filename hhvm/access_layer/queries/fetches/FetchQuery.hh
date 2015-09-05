@@ -9,14 +9,22 @@ class FetchQuery<Tmodel> {
     private Table<Tmodel> $table 
   ) {} 
 
-  public async function fetch(
-    ImmMap<string, mixed> $params 
-  ): Awaitable<ImmVector<Tmodel>> {
+  public async function fetchAll(): Awaitable<ImmVector<Tmodel>> {
     $result_set = await $this->asyncMysqlConnection->query(
-      $this->createQuery($params)
+      $this->createFetchAllQuery()
     ); 
+    return $this->extrudeResultMap($result_set->mapRowsTyped());
+  }
 
-    $field_map_set = $result_set->mapRowsTyped();
+  public async function fetch(WhereClause $where_clause): Awaitable<ImmVector<Tmodel>> {
+    $result_set = await $this->asyncMysqlConnection->query(
+      $this->createFetchQuery($where_clause)
+    );
+  }
+
+  private function extrudeResultMap(
+    ImmMap<string, mixed> $field_map_set
+  ): ImmVector<Tmodel> {
     $objects = Vector{};
     foreach ($field_map_set as $field_map) {
       $objects[] = $this->table->extrude($field_map->toImmMap());
@@ -24,31 +32,19 @@ class FetchQuery<Tmodel> {
     return $objects->toImmVector();
   }
 
+  private function createFetchAllQuery(): string {
+    return "SELECT * FROM " . $this->table->getTableName();
+  }
+
   public function getTable(): Table<Tmodel> {
     return $this->table;
   }
 
-  private function createQuery(
-    ImmMap<string, mixed> $params
+  private function createFetchQuery(
+    WhereClause $where_clause
   ): string {
     return
-      "SELECT FROM " . $this->table->getTableName()
-      . " WHERE " . $this->createWhereClauseCondition($params);
-  }
-
-  private function createWhereClauseCondition(
-    ImmMap<string, mixed> $params
-  ): string {
-    $where_clause_condition = "";  
-    foreach ($params as $key => $value) {
-      $where_clause_condition .=
-        $key . "='" . (string)$value . "'"
-        . self::WHERE_CONDITION_LIST_DELIMITER;
-    }
-    return substr(
-      $where_clause_condition,
-      0,
-      strlen($where_clause_condition) - strlen(self::WHERE_CONDITION_LIST_DELIMITER)
-    );
+      "SELECT * FROM " . $this->table->getTableName()
+      . " WHERE " . $where_clause->serialize();
   }
 }
