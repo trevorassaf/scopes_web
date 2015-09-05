@@ -11,9 +11,7 @@ class FetchUsersConfirmedOrdersQuery {
     UnsignedInt $user_id
   ): Awaitable<ImmVector<ConfirmedOrder>> {
     return await $this->fetchQuery->fetch(
-      ImmMap{
-        $this->confirmedOrdersTable->getUserIdKey() => $user_id->getNumber(),
-      }
+      ImmMap{}
     ); 
   }
 }
