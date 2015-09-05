@@ -2,8 +2,6 @@
 
 class FetchQuery<Tmodel> {
 
-  const string WHERE_CONDITION_LIST_DELIMITER = ", ";
-
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
     private Table<Tmodel> $table 

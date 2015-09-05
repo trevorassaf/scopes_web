@@ -9,9 +9,13 @@ class WhereClauseVectorBuilder {
     $this->whereClauses = Vector{};
   }
 
-  public function setFirst(WhereClause $clause): this {
+  public function setFirstClause(WhereClause $clause): this {
     $this->firstClause = $clause; 
     return $this;
+  }
+  
+  public function hasFirstClause(): bool {
+    return $this->firstClause != null;
   }
 
   public function and(WhereClause $clause): this {

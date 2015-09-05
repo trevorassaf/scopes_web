@@ -1,18 +1,18 @@
 <?hh // strict
 
-class FetchByUniqueKeyQuery<Tmodel> {
+class UpdateByUniqueKeyQuery<Tmodel> {
 
   public function __construct(
-    private FetchQuery<Tmodel> $fetchQuery,
+    private UpdateQuery<Tmodel> $updateQuery,
     private Table<Tmodel> $table,
     private ConstraintMapToConjunctiveWhereClauseTranslator $constraintMapToConjunctiveWhereClauseTranslator
-  ) {} 
+  ) {}
 
-  public async function fetch(
+  public async function update(): Awaitable<?Tmodel> {
     ImmMap<string, mixed> $params
   ): Awaitable<?Tmodel> {
     // Perform fetch
-    $result_set = await $this->fetchQuery->fetch(
+    $result_set = await $this->updateQuery->update(
       $this->constraintMapToConjunctiveWhereClauseTranslator->translate($params)
     );
 
@@ -28,6 +28,6 @@ class FetchByUniqueKeyQuery<Tmodel> {
   }
 
   public function getTable(): Table<Tmodel> {
-    return $this->fetchQuery->getTable();
+    return $this->updateQuery->getTable();
   }
 }

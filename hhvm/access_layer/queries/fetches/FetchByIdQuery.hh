@@ -11,10 +11,7 @@ class FetchByIdQuery<Tmodel> {
   ): Awaitable<?Tmodel> {
     return await $this->fetchByUniqueKeyQuery->fetch(
       ImmMap{
-        $this
-          ->fetchByUniqueKeyQuery
-          ->getTable()
-          ->getIdKey() => $id->getNumber()
+        $this->fetchByUniqueKeyQuery->getTable()->getIdKey() => $id->getNumber(),
       }
     );
   }
