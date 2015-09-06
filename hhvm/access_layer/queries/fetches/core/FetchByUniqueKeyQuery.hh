@@ -4,7 +4,6 @@ class FetchByUniqueKeyQuery<Tmodel> {
 
   public function __construct(
     private FetchQuery<Tmodel> $fetchQuery,
-    private Table<Tmodel> $table,
     private ConstraintMapToConjunctiveWhereClauseTranslator $constraintMapToConjunctiveWhereClauseTranslator
   ) {} 
 
@@ -12,8 +11,13 @@ class FetchByUniqueKeyQuery<Tmodel> {
     ImmMap<string, mixed> $params
   ): Awaitable<?Tmodel> {
     // Perform fetch
+    $where_clause = $this->constraintMapToConjunctiveWhereClauseTranslator->translate($params);
+    $fetch_params_builder = new FetchParamsBuilder();
     $result_set = await $this->fetchQuery->fetch(
-      $this->constraintMapToConjunctiveWhereClauseTranslator->translate($params)
+      $fetch_params_builder
+        ->setTable($this->fetchQuery->getTable())
+        ->setWhereClause($where_clause)
+        ->build() 
     );
 
     // We expect to receive at most one record from
