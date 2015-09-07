@@ -45,4 +45,55 @@ class IsConflictingReservedOrderMethod {
       throw new MethodException();
     }
   }
+
+  private function condenseOrdersToSortedTimeIntervals(
+    ImmVector<RsvdOrder> $rsvd_order,
+    ImmVector<ConfirmedOrder> $confirmed_order
+  ): ImmVector<TimeInterval> {
+    $time_intervals = Vector{};
+    $rsvd_order_idx = 0;
+    $confirmed_order_idx = 0;
+
+    // Interleave reserved/confirmed
+    while ($rsvd_order_idx < $rsvd_order->count() && $confirmed_order_idx < $confirmed_order->count()) {
+      $rsvd_order = $rsvd_orders[$rsvd_order_idx];
+      $confirmed_order = $confirmed_orders[$confirmed_order_idx];
+      
+      if ($rsvd_order->getStartTime()->before($confirmed_order->startTime())) {
+        $time_intervals[] = new TimeInterval(
+          $rsvd_order->getStartTime(),
+          $rsvd_order->getEndTime()
+        );
+        ++$rsvd_order_idx;
+      } else {
+        $time_intervals[] = new TimeInterval(
+          $confirmed_order->getStartTime(),
+          $confirmed_order->getEndTime()
+        );
+        ++$confirmed_order_idx;
+      }
+    }
+
+    // Either rsvd order or confirmed orders are remaining, but not both.
+    // Append remaining orders to end of list.
+    // Rsvd orders
+    while ($rsvd_order_idx < $rsvd_order->count()) {
+      $time_intervals[] = new TimeInterval(
+        $rsvd_order->getStartTime(),
+        $rsvd_order->getEndTime()
+      );
+      ++$rsvd_order_idx;
+    }
+
+    // Confirmed orders
+    while ($confirmed_order_idx < $confirmed_order->count()) {
+      $time_intervals[] = new TimeInterval(
+        $confirmed_order->getStartTime(),
+        $confirmed_order->getEndTime()
+      );
+      ++$confirmed_order_idx;
+    }
+
+    return $time_intervals;
+  }
 }
