@@ -2,11 +2,10 @@
 
 class Time {
 
-  const string FORMAT = "H:i:s";
+  const string TIME_FORMAT = "H:i:s";
 
   public function isValid(string $time): bool {
-    // TODO write validation logic
-    return true;
+    return new DateTime::fromFormat(self::TIME_FORMAT, $time) == false;
   }
 
   public function __construct(
@@ -15,5 +14,17 @@ class Time {
 
   public function toString(): string {
     return $this->time;
+  }
+
+  public function isBefore(Time $time): bool {
+    return $this->time < $time->toString();
+  }
+    
+  public function isAfter(Time $time): bool {
+    return $this->time > $time->toString();
+  }
+  
+  public function equals(Time $time): bool {
+    return $this->time == $time->toString();
   }
 }

@@ -2,19 +2,19 @@
 
 class FieldClauseBuilder {
 
-  private Set<string> $fields;
+  private Set<FieldClauseTerm> $fields;
 
   public function __construct() {
     $this->fields = Set{};
   }
 
-  public function addField(string $field): this {
+  public function addField(Field $field): this {
     $this->fields->set($field);
     return $this;
   }
 
   public function build(): FieldClause {
-    return new FieldClause($this->fields);
+    return new FieldClause($this->fields->toImmSet());
   }
 
 }

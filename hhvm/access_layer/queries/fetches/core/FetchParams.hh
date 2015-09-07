@@ -1,6 +1,6 @@
 <?hh // strict
 
-class FetchParams<Tmodel> {
+class FetchParams<Tmodel> implements FetchQueryMaker<Tmodel> {
 
   public function __construct(
     private Table<Tmodel> $table,

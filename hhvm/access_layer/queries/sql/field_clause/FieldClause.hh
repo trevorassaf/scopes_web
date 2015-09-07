@@ -5,7 +5,7 @@ class FieldClause {
   const string DELIMITER_TOKEN = ", ";
 
   public function __construct(
-    private ImmSet<string> $fields
+    private ImmSet<FieldClauseTerm> $fields
   ) {}
 
   public function serialize(): string {
@@ -16,7 +16,7 @@ class FieldClause {
     // Assemble field list
     $fields_query_str = ""; 
     foreach ($this->fields as $field) {
-      $fields_query_str .= $field . self::DELIMITER_TOKEN; 
+      $fields_query_str .= $field->serialize() . self::DELIMITER_TOKEN; 
     }
 
     // Trim last delimiter token

@@ -2,11 +2,10 @@
 
 class Date {
 
-  const string FORMAT = "Y-m-d";
+  const string DATE_FORMAT = "Y-m-d";
 
   public static function isValid(string $date): bool {
-    // TODO write validation logic
-    return true;
+    return new DateTime::fromFormat(self::DATE_FORMAT, $date) == false;  
   }
 
   public function __construct(
@@ -15,5 +14,17 @@ class Date {
 
   public function toString(): string {
     return $this->date;
+  }
+
+  public function isBefore(Date $date): bool {
+    return $this->date < $date->toString();
+  }
+    
+  public function isAfter(Date $date): bool {
+    return $this->date > $date->toString();
+  }
+  
+  public function equals(Date $date): bool {
+    return $this->date == $date->toString();
   }
 }
