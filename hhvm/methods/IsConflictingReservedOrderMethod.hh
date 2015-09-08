@@ -74,6 +74,34 @@ class IsConflictingReservedOrderMethod {
   ): bool {
     $available_scopes_count = $max_scopes->getNumber() - $scopes_count->getNumber();
 
+    // Create priority queue that orders by end-time in ascending order.
+    // Top-most element is always time interval that will finish earliest
+    $queue = new PriorityQueue(
+      new MinEndTimeOrderTimeIntervalComparator(),
+      $max_scopes
+    ); 
+
+    foreach ($time_intervals as $interval) {
+      // Pop all time intervals that finish before 'interval' starts. Their scopes
+      // are now available, so restore them to 'available_scopes_count'
+      while (!$interval->getStartTime()->isBefore($queue->peek()->getEndTime())) {
+        $available_scopes_count += $queue->pop();
+      }
+
+      // Check to see if 'interval' would overbook us. We know 'interval' to be a valid
+      // order, one that doesn't overbook our scopes, thus, the new order is to blame
+      // for the overbooking. Reject this delinquent order!
+      if ($available_scopes_count < $interval->getScopesCount()) {
+        return false;
+      }
+
+      // Still not overbooked, so add interval to queue and deduct number of scopes
+      // reserved by that interval from the number of available scopes.
+      $queue->push($interval);
+      $available_scopes_count -= $interval->getNumber();
+    }
+
+    return true;
   }
 
   private function condenseOrdersToSortedTimeIntervals(
@@ -84,7 +112,7 @@ class IsConflictingReservedOrderMethod {
     $rsvd_order_idx = 0;
     $confirmed_order_idx = 0;
 
-    // Interleave reserved/confirmed
+    // Interleave reserved/confirmed using the 'merge' algorithm of Merge Sort
     while ($rsvd_order_idx < $rsvd_orders->count() && $confirmed_order_idx < $confirmed_orders->count()) {
       $rsvd_order = $rsvd_orders[$rsvd_order_idx];
       $confirmed_order = $confirmed_orders[$confirmed_order_idx];
