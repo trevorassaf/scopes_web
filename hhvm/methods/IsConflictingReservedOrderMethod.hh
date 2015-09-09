@@ -8,7 +8,7 @@ class IsConflictingReservedOrderMethod {
     private FetchReservedOrderPolicyQuery $fetchReservedOrderPolicyQuery
   ) {}
 
-  public function isConflictingReservedOrder(
+  public function check(
     UnsignedInt $scopes_count,
     Timestamp $start_time,
     Timestamp $end_time
