@@ -4,18 +4,21 @@ class IsValidReservedOrderMethod {
 
   public function __construct(
     private IsConflictingReservedOrderMethod $isConflictingReservedOrderMethod,
-    private FetchRegularTimeQuery $fetchRegularTimeQuery,
-    private FetchIrregularTimesQuery $fetchIrregularTimesQuery
+    private FetchByIdQuery<RegularWeekDay> $fetchRegularWeekDayByIdQuery,
+    private FetchRegularTimesQuery $fetchRegularTimesByRegularWeekDayQuery,
+    private FetchIrregularTimesQuery $fetchIrregularTimesByIrregularDateQuery,
+    private FetchIrregularDateByDateQuery $fetchIrregularDateByDateQuery
   ) {}
 
   public function check(TimeInterval $interval): bool {
     try {
+      // TODO must first fetch DateId
       // Initiate ir/regular time fetch queries
       $irregular_time_fetch_handle = $this->fetchIrregularTimeQuery->fetch(
         $interval->getDate()
       );
       
-      $regular_time_fetch_handle = $this->fetchRegularTimeQuery->fetch(
+      $regular_time_fetch_handle = $this->fetchRegularTimesQuery->fetch(
         $interval->getDate()->toDayOfTheWeek()
       );  
 
@@ -23,17 +26,17 @@ class IsValidReservedOrderMethod {
         // Check to see if this violates the irregular time
         $irregular_times = $irregular_time_fetch_handle->getWaitHandle()->join();
 
-        return $this->satisfiesIrregularTimes(
+        return $this->satisfiesAllowedTimes(
           $interval,
           $irregular_times
         );
       } catch (NonextantDateException $ex) {
         // Check to see if this violates the regular time
-        $regular_time = $regular_time_fetch_handle->getWaitHandle()->join();
+        $regular_times = $regular_time_fetch_handle->getWaitHandle()->join();
 
-        return $this->satisfiesRegularTime(
+        return $this->satisfiesAllowedTimes(
           $interval,
-          $regular_time
+          $regular_times
         );
       }
     } catch (QueryException $ex) {
@@ -42,7 +45,7 @@ class IsValidReservedOrderMethod {
     } 
   }
 
-  private function satisfiesIrregularTimes(
+  private function satisfiesAllowedTimes(
     TimeInterval $requested_interval,
     ImmVector<TimeInterval> $allowed_time_intervals
   ): bool {
@@ -53,13 +56,5 @@ class IsValidReservedOrderMethod {
       }
     }
     return false; 
-  }
-
-  private function satisfiesRegularTimes(
-    TimeInterval $requested_interval,
-    TimeInterval $allowed_interval 
-  ): bool {
-    return !$requested_interval->getStartTime()->isBefore($allowed_interval->getStartTime()) &&
-      !$requested_interval->getEndTime()->isAfter($allowed_interval->getEndTime());
   }
 }
