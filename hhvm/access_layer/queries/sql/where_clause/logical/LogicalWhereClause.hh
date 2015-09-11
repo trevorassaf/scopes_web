@@ -9,6 +9,6 @@ abstract class LogicalWhereClause implements WhereClause {
   abstract protected function getLogicalToken(): string;
 
   public function serialize(): string {
-    return $this->getLogicalToken() . " " . $right->serialize();
+    return $this->getLogicalToken() . " " . $this->clause->serialize();
   }
 }

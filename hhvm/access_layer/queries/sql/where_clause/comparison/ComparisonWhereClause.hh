@@ -11,5 +11,5 @@ abstract class ComparisonWhereClause implements WhereClause {
     return "(" . $this->left . $this->getComparisonToken() . " " . $this->right . ")";      
   }
 
-  abstract protected function getComparisonToken(): string
+  abstract protected function getComparisonToken(): string;
 }

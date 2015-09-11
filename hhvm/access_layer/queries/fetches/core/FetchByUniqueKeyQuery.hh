@@ -4,6 +4,7 @@ class FetchByUniqueKeyQuery<Tmodel> {
 
   public function __construct(
     private FetchQuery<Tmodel> $fetchQuery,
+    private Table<Tmodel> $table,
     private ConstraintMapToConjunctiveWhereClauseTranslator $constraintMapToConjunctiveWhereClauseTranslator
   ) {} 
 
@@ -15,7 +16,7 @@ class FetchByUniqueKeyQuery<Tmodel> {
     $fetch_params_builder = new FetchParamsBuilder();
     $result_set = await $this->fetchQuery->fetch(
       $fetch_params_builder
-        ->setTable($this->fetchQuery->getTable())
+        ->setTable($this->table)
         ->setWhereClause($where_clause)
         ->build() 
     );
@@ -29,9 +30,5 @@ class FetchByUniqueKeyQuery<Tmodel> {
     }
 
     return $result_set->count() === 0 ? null : $result_set[0];
-  }
-
-  public function getTable(): Table<Tmodel> {
-    return $this->fetchQuery->getTable();
   }
 }

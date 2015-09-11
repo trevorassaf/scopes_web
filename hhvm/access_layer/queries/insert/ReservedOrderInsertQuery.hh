@@ -12,7 +12,7 @@ class ReservedOrderInsertQuery {
     Timestamp $lease_start,
     UnsignedInt $scopes_count,
     Timestamp $start_time,
-    UnsignedInt $rsvd_min_count
+    Timestamp $end_time,
   ): Awaitable<RsvdOrder> {
     return await $this->insertQuery->insert(
       ImmMap{
@@ -20,7 +20,7 @@ class ReservedOrderInsertQuery {
         $this->reservedOrdersTable->getLeaseStartKey() => $lease_start->toString(),
         $this->reservedOrdersTable->getScopesCountKey() => $scopes_count->getNumber(),
         $this->reservedOrdersTable->getStartTimeKey() => $start_time->toString(),
-        $this->reservedOrdersTable->getReservedMinutesCountKey() => $rsvd_min_count->getNumber(),
+        $this->reservedOrdersTable->getEndTimeKey() => $end_time->toString(),
       }
     );
   }

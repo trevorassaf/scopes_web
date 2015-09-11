@@ -3,7 +3,7 @@
 class OrderConfigurationFactory extends ConcreteModelFactory<OrderConfiguration> {
   
   public function __construct(
-    private OrderConfigurationsTable $orderConfigurationsTable
+    private OrderConfigurationTable $orderConfigurationsTable
   ) {}
 
   public function extrudeWithId(

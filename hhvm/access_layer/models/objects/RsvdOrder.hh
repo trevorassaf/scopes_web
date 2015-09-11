@@ -5,10 +5,9 @@ class RsvdOrder implements Model {
   public function __construct(
     private UnsignedInt $id,
     private UnsignedInt $userId, 
-    private Timestamp $leaseStart,
     private UnsignedInt $scopesCount,
     private Timestamp $startTime,
-    private UnsignedInt $reservedMinutesCount
+    private Timestamp $endTime
   ) {}
 
   public function getId(): UnsignedInt {
@@ -19,10 +18,6 @@ class RsvdOrder implements Model {
     return $this->userId;
   }
 
-  public function getLeaseStart(): Timestamp {
-    return $this->leaseStart;
-  }
-
   public function getScopesCount(): UnsignedInt {
     return $this->scopesCount;
   }
@@ -31,7 +26,8 @@ class RsvdOrder implements Model {
     return $this->startTime;
   }
   
-  public function getReservedMinutesCount(): UnsignedInt {
-    return $this->reservedMinutesCount;
+  public function getEndTime(): Timestamp {
+    return $this->endTime;
   }
+
 }

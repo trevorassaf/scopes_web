@@ -15,7 +15,7 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getUserIdKey()]), 
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getScopesCountKey()]),
       new Timestamp((string)$params[$this->confirmedOrdersTable->getStartTimeKey()]),
-      new UnsignedInt((int)$params[$this->confirmedOrdersTable->getReservedMinutesCountKey()]),
+      new Timestamp((string)$params[$this->confirmedOrdersTable->getEndTimeKey()]),
       (string)$params[$this->confirmedOrdersTable->getTitleKey()],
       (string)$params[$this->confirmedOrdersTable->getDescriptionKey()],
       (string)$params[$this->confirmedOrdersTable->getShortCodeKey()],

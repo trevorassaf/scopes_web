@@ -7,7 +7,7 @@ class CellLabelsTable extends Table<CellLabel> {
   const string CELL_NUMBER_KEY = "cellNumber";
   const string LABEL_KEY = "label";
 
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 

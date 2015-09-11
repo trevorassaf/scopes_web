@@ -3,12 +3,15 @@
 class FetchParamsBuilder<Tmodel> {
 
   private ?Table<Tmodel> $table;
-  private ?WhereClause $whereClause;
-  private ?OrderByClause $orderByClause;
+  private WhereClause $whereClause;
+  private OrderByClause $orderByClause;
 
   public function __construct() {
-    $this->whereClause = new WhereClause();
-    $this->orderByClause = new OrderByClause();
+    $where_clause_builder = new WhereClauseVectorBuilder();
+    $this->whereClause = $where_clause_builder->build();
+
+    $order_by_clause_builder = new OrderByClauseBuilder();
+    $this->orderByClause = $order_by_clause_builder->build();
   }
 
   public function setTable(Table<Tmodel> $table): this {

@@ -40,6 +40,6 @@ class DeleteQuery<Tmodel> {
 
   private function createDeleteQueryHeader(): string {
     return
-      "DELETE FROM " . $this->table->getTableName();
+      "DELETE FROM " . $this->table->getName();
   }
 }

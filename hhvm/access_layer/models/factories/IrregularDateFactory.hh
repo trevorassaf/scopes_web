@@ -1,6 +1,6 @@
 <?hh // strict
 
-class IrregularDateFactory extends ConcreteModelFactory<CellLabel> {
+class IrregularDateFactory extends ConcreteModelFactory<IrregularDate> {
 
   public function __construct(
     private IrregularDatesTable $irregularDatesTable

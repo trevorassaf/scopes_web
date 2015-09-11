@@ -1,6 +1,6 @@
 <?hh // strict
 
-class LessThanWhereClause extends ComparisonTerm {
+class LessThanWhereClause extends ComparisonWhereClause {
 
   const string COMPARISON_TOKEN = "<";
 

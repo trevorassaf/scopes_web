@@ -5,7 +5,7 @@ class IrregularDatesTable extends Table<IrregularDate> {
   const string TABLE_NAME = "IrregularDates";
   const string DATE_KEY = "date";
 
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 

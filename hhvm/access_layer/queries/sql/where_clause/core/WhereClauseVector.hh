@@ -1,6 +1,6 @@
 <?hh // strict
 
-class WhereClauseVector extends WhereClause {
+class WhereClauseVector implements WhereClause {
 
   public function __construct(
     private WhereClause $firstWhereClause,
@@ -8,9 +8,10 @@ class WhereClauseVector extends WhereClause {
   ) {}
 
   public function serialize(): string {
-    $where_clause_str = '';
+    $where_clause_str = $this->firstWhereClause->serialize();
     foreach ($this->whereClauseVector as $where_clause) {
-      $where_clause_str .= $where_clause-> 
+      $where_clause_str .= " " . $where_clause->serialize();
     }
+    return $where_clause_str;
   }
 }

@@ -4,7 +4,7 @@ class RegularWeekDaysTable extends Table<RegularWeekDay> {
 
   const string TABLE_NAME = "RegularWeekDay";
 
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 }

@@ -3,11 +3,12 @@
 class FetchQuery<Tmodel> {
 
   public function __construct(
-    private AsyncMysqlConnection $asyncMysqlConnection
+    private AsyncMysqlConnection $asyncMysqlConnection,
+    private ModelFactory<Tmodel> $modelFactory
   ) {} 
 
   public async function fetch(
-    FetchQueryMaker $query_maker
+    FetchQueryMaker<Tmodel> $query_maker
   ): Awaitable<ImmVector<Tmodel>> {
     // Execute query
     $result_set = await $this->asyncMysqlConnection
@@ -19,12 +20,8 @@ class FetchQuery<Tmodel> {
     $field_map_set = $result_set->mapRowsTyped();
     $objects = Vector{};
     foreach ($field_map_set as $field_map) {
-      $objects[] = $this->table->extrude($field_map->toImmMap());
+      $objects[] = $this->modelFactory->extrude($field_map->toImmMap());
     }
     return $objects->toImmVector();
-  }
-
-  public function getTable(): Table<Tmodel> {
-    return $this->table;
   }
 }

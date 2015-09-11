@@ -3,14 +3,14 @@
 class FetchReservedOrdersByTimeQuery {
 
   public function __construct(
-    private FetchQuery<ReservedOrder> $fetchQuery,
-    private ReservedOrdersTable $rsvdOrdersTable
+    private FetchQuery<RsvdOrder> $fetchQuery,
+    private RsvdOrdersTable $rsvdOrdersTable
   ) {}
 
   public async function fetch(
     Timestamp $start_time,
     Timestamp $end_time
-  ): Awaitable<ImmVector<ReservedOrder>> {
+  ): Awaitable<ImmVector<RsvdOrder>> {
     // Build where clause
     $where_clause_vector_builder = new WhereClauseVectorBuilder();
     $where_clause = $where_clause_vector_builder
@@ -29,7 +29,7 @@ class FetchReservedOrdersByTimeQuery {
       ->build();
 
     // Build order by clause
-    $order_clause_builder = new OrderClauseBuilder();
+    $order_clause_builder = new OrderByClauseBuilder();
     $order_clause = $order_clause_builder
       ->asc($this->rsvdOrdersTable->getStartTimeKey())
       ->build();

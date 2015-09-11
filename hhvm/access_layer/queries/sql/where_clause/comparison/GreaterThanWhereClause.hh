@@ -1,6 +1,6 @@
 <?hh // strict
 
-class GreaterThanWhereClause extends ComparisonTerm {
+class GreaterThanWhereClause extends ComparisonWhereClause {
 
   const string COMPARISON_TOKEN = ">";
 

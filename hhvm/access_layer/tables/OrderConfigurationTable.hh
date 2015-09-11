@@ -7,7 +7,7 @@ class OrderConfigurationTable extends Table<OrderConfiguration> {
   const string PRICE_PER_INTERVAL_COUNT_KEY = "pricePerIntervalCount";
   const string SCOPES_COUNT_KEY = "scopesCount";
 
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 

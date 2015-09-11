@@ -11,8 +11,8 @@ class IrregularTimeInsertQuery {
     UnsignedInt $irregular_date_id,
     Time $start_time, 
     Time $end_time
-  ): Awaitable<IrregularTimesTable> {
-    return await $this->insertQuery->query(
+  ): Awaitable<IrregularTime> {
+    return await $this->insertQuery->insert(
       ImmMap{
         $this->irregularTimesTable->getIrregularDateIdKey() => $irregular_date_id->getNumber(),
         $this->irregularTimesTable->getStartTimeKey() => $start_time->toString(),

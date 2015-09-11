@@ -5,6 +5,7 @@ class InsertQuery<Tmodel> {
   public function __construct(
       private AsyncMysqlConnection $asyncMysqlConnection,
       private Table<Tmodel> $table,
+      private ConcreteModelFactory<Tmodel> $concreteModelFactory,
       private InsertQueryCreater $insertQueryCreater
   ) {}
 
@@ -13,12 +14,12 @@ class InsertQuery<Tmodel> {
   ): Awaitable<Tmodel> {
     $insert_result = await $this->asyncMysqlConnection->query(
       $this->insertQueryCreater->createQuery(
-        $this->table->getTableName(),
+        $this->table->getName(),
         $params
       )
     ); 
 
-    return $this->table->extrudeWithId(
+    return $this->concreteModelFactory->extrudeWithId(
       new UnsignedInt($insert_result->lastInsertId()),
       $params
     );

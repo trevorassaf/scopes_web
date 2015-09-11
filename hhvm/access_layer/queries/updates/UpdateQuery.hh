@@ -10,44 +10,53 @@ class UpdateQuery<Tmodel> {
   ) {}
 
   public async function updateAll(
-    ImmMap<string, mixed> $condition_params,
-  ): Awaitable<void> {}
+    ImmMap<string, mixed> $new_values,
+  ): Awaitable<void> {
+    await $this->asyncMysqlConnection->query(
+      $this->createUpdateAllQuery($new_values)
+    );
+  }
 
   public async function update(
-    ImmMap<string, mixed> $condition_params,
+    ImmMap<string, mixed> $new_values,
     WhereClause $where_clause
   ): Awaitable<void> {
-          
+    await $this->asyncMysqlConnection->query(
+      $this->createUpdateQuery(
+        $new_values,
+        $where_clause
+      )
+    );
   }
 
   private function createUpdateAllQuery(
-    ImmMap<string, mixed> $update_params
+    ImmMap<string, mixed> $new_values
   ): string {
-    return $this->createUpdateQueryHeader($update_params);
+    return $this->createUpdateQueryHeader($new_values);
   }
   
   private function createUpdateQuery(
-    ImmMap<string, mixed> $update_params,
+    ImmMap<string, mixed> $new_values,
     WhereClause $where_clause
   ): string {
-    return $this->createUpdateQueryHeader($update_params)
+    return $this->createUpdateQueryHeader($new_values)
       . " WHERE " . $where_clause->serialize();
   }
 
   private function createUpdateQueryHeader(
-    ImmMap<string, mixed> $update_params
+    ImmMap<string, mixed> $new_values
   ): string {
     return
-      "UPDATE " . $this->table->getTableName() . " SET "
-      . $this->createUpdatedFieldsClause($update_params);
+      "UPDATE " . $this->table->getName() . " SET "
+      . $this->createUpdatedFieldsClause($new_values);
   }
 
   private function createUpdatedFieldsClause(
-    ImmMap<string, mixed> $update_params
+    ImmMap<string, mixed> $new_values
   ): string {
     $update_clause = "";
-    foreach ($update_params as $key => $value) {
-      $update_params .= $key . "='" . (string)$value . "'" . self::FIELD_DELIMITER;
+    foreach ($new_values as $key => $value) {
+      $new_values .= $key . "='" . (string)$value . "'" . self::FIELD_DELIMITER;
     }
     return substr(
       $update_clause,

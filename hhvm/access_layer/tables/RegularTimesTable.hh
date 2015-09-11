@@ -6,7 +6,7 @@ class RegularTimesTable extends Table<RegularTime> {
   const string START_TIME_KEY = "startTime";
   const string END_TIME_KEY = "endTime";
 
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 

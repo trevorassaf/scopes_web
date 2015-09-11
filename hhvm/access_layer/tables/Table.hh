@@ -9,9 +9,9 @@ abstract class Table<T> {
     return self::ID_KEY; 
   }
 
-  abstract public function getTableName(): string;
+  abstract public function getName(): string;
 
   protected function makeTableQualifiedKey(string $key_name): string {
-    return $this->getTableName() . self::TABLE_QUALIFYING_TOKEN . $key_name; 
+    return $this->getName() . self::TABLE_QUALIFYING_TOKEN . $key_name; 
   }
 }

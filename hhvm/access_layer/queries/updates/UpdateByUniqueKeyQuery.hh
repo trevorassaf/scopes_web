@@ -8,26 +8,15 @@ class UpdateByUniqueKeyQuery<Tmodel> {
     private ConstraintMapToConjunctiveWhereClauseTranslator $constraintMapToConjunctiveWhereClauseTranslator
   ) {}
 
-  public async function update(): Awaitable<?Tmodel> {
-    ImmMap<string, mixed> $params
-  ): Awaitable<?Tmodel> {
+  public async function update(
+    ImmMap<string, mixed> $new_values,
+    ImmMap<string, mixed> $conditions
+  ): Awaitable<void> {
     // Perform fetch
-    $result_set = await $this->updateQuery->update(
-      $this->constraintMapToConjunctiveWhereClauseTranslator->translate($params)
+    await $this->updateQuery->update(
+      $new_values,
+      $this->constraintMapToConjunctiveWhereClauseTranslator
+        ->translate($conditions)
     );
-
-    // We expect to receive at most one record from
-    // the db. Check for extraneous records...
-    if ($result_set->count() > 1) {
-      throw new Exception(
-        "Received more than one record during unique key query from table"
-      ); 
-    }
-
-    return $result_set->count() === 0 ? null : $result_set[0];
-  }
-
-  public function getTable(): Table<Tmodel> {
-    return $this->updateQuery->getTable();
   }
 }

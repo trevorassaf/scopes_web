@@ -16,7 +16,7 @@ class BatchInsertQuery<Tmodel> {
     foreach ($model_field_maps as $field_map) {
       $insert_handle = await $this->asyncMysqlConnection->query(
         $this->insertQueryCreater->createQuery(
-          $this->table->getTableName(),
+          $this->table->getName(),
           $field_map
         )
       );

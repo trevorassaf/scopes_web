@@ -5,7 +5,7 @@ class IsConflictingReservedOrderMethod {
   public function __construct(
     private FetchReservedOrdersByTimeQuery $fetchReservedOrdersByTimeQuery,
     private FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery,
-    private FetchReservedOrderPolicyQuery $fetchReservedOrderPolicyQuery
+    private FetchSingletonQuery<ReservedOrderPolicy> $fetchReservedOrderPolicyQuery
   ) {}
 
   public function check(
@@ -45,7 +45,7 @@ class IsConflictingReservedOrderMethod {
       $rsvd_orders = $rsvd_order_fetch_handle
         ->getWaitHandle()
         ->join();
-      $confirmed_orders = $confirmed_orders_fetch_handle
+      $confirmed_orders = $confirmed_order_fetch_handle
         ->getWaitHandle()
         ->join();
 
@@ -68,7 +68,7 @@ class IsConflictingReservedOrderMethod {
   }
 
   private function isConflictingRequest(
-    ImmVector<OrderTimeInterval> $time_intervals,
+    ImmVector<OrderTimestampInterval> $time_intervals,
     UnsignedInt $max_scopes,
     UnsignedInt $scopes_count
   ): bool {
@@ -77,7 +77,7 @@ class IsConflictingReservedOrderMethod {
     // Create priority queue that orders by end-time in ascending order.
     // Top-most element is always time interval that will finish earliest
     $queue = new PriorityQueue(
-      new MinEndTimeOrderTimeIntervalComparator(),
+      new MinEndTimeOrderTimestampIntervalComparator(),
       $max_scopes
     ); 
 
@@ -85,20 +85,23 @@ class IsConflictingReservedOrderMethod {
       // Pop all time intervals that finish before 'interval' starts. Their scopes
       // are now available, so restore them to 'available_scopes_count'
       while (!$interval->getStartTime()->isBefore($queue->peek()->getEndTime())) {
-        $available_scopes_count += $queue->pop();
+        $available_scopes_count += $queue
+          ->pop()
+          ->getScopesCount()
+          ->getNumber();
       }
 
       // Check to see if 'interval' would overbook us. We know 'interval' to be a valid
       // order, one that doesn't overbook our scopes, thus, the new order is to blame
       // for the overbooking. Reject this delinquent order!
-      if ($available_scopes_count < $interval->getScopesCount()) {
+      if ($available_scopes_count < $interval->getScopesCount()->getNumber()) {
         return false;
       }
 
       // Still not overbooked, so add interval to queue and deduct number of scopes
       // reserved by that interval from the number of available scopes.
       $queue->push($interval);
-      $available_scopes_count -= $interval->getNumber();
+      $available_scopes_count -= $interval->getScopesCount()->getNumber();
     }
 
     return true;
@@ -107,7 +110,7 @@ class IsConflictingReservedOrderMethod {
   private function condenseOrdersToSortedTimeIntervals(
     ImmVector<RsvdOrder> $rsvd_orders,
     ImmVector<ConfirmedOrder> $confirmed_orders
-  ): ImmVector<OrderTimeInterval> {
+  ): ImmVector<OrderTimestampInterval> {
     $time_intervals = Vector{};
     $rsvd_order_idx = 0;
     $confirmed_order_idx = 0;
@@ -117,17 +120,21 @@ class IsConflictingReservedOrderMethod {
       $rsvd_order = $rsvd_orders[$rsvd_order_idx];
       $confirmed_order = $confirmed_orders[$confirmed_order_idx];
       
-      if ($rsvd_order->getStartTime()->before($confirmed_order->startTime())) {
-        $time_intervals[] = new OrderTimeInterval(
-          $rsvd_order->getStartTime(),
-          $rsvd_order->getEndTime(),
+      if ($rsvd_order->getStartTime()->isBefore($confirmed_order->getStartTime())) {
+        $time_intervals[] = new OrderTimestampInterval(
+          new TimestampInterval(
+            $rsvd_order->getStartTime(),
+            $rsvd_order->getEndTime()
+          ),
           $rsvd_order->getScopesCount()
         );
         ++$rsvd_order_idx;
       } else {
-        $time_intervals[] = new OrderTimeInterval(
-          $confirmed_order->getStartTime(),
-          $confirmed_order->getEndTime(),
+        $time_intervals[] = new OrderTimestampInterval(
+          new TimestampInterval(
+            $confirmed_order->getStartTime(),
+            $confirmed_order->getEndTime()
+          ),
           $confirmed_order->getScopesCount()
         );
         ++$confirmed_order_idx;
@@ -138,9 +145,12 @@ class IsConflictingReservedOrderMethod {
     // Append remaining orders to end of list.
     // Rsvd orders
     while ($rsvd_order_idx < $rsvd_orders->count()) {
-      $time_intervals[] = new OrderTimeInterval(
-        $rsvd_order->getStartTime(),
-        $rsvd_order->getEndTime(),
+      $rsvd_order = $rsvd_orders[$rsvd_order_idx];
+      $time_intervals[] = new OrderTimestampInterval(
+        new TimestampInterval(
+          $rsvd_order->getStartTime(),
+          $rsvd_order->getEndTime()
+        ),
         $rsvd_order->getScopesCount()
       );
       ++$rsvd_order_idx;
@@ -148,14 +158,17 @@ class IsConflictingReservedOrderMethod {
 
     // Confirmed orders
     while ($confirmed_order_idx < $confirmed_orders->count()) {
-      $time_intervals[] = new OrderTimeInterval(
-        $confirmed_order->getStartTime(),
-        $confirmed_order->getEndTime(),
+      $confirmed_order = $confirmed_orders[$confirmed_order_idx];
+      $time_intervals[] = new OrderTimestampInterval(
+        new TimestampInterval(
+          $confirmed_order->getStartTime(),
+          $confirmed_order->getEndTime()
+        ),
         $confirmed_order->getScopesCount()
       );
       ++$confirmed_order_idx;
     }
 
-    return $time_intervals;
+    return $time_intervals->toImmVector();
   }
 }

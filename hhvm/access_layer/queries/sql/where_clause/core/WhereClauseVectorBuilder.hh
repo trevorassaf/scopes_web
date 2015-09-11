@@ -3,7 +3,7 @@
 class WhereClauseVectorBuilder {
 
   private ?WhereClause $firstClause;
-  private Vector<WhereClause> $whereClauses;
+  private Vector<LogicalWhereClause> $whereClauses;
 
   public function __construct() {
     $this->whereClauses = Vector{};
@@ -23,7 +23,7 @@ class WhereClauseVectorBuilder {
     return $this;
   }
   
-  public function or(): this {
+  public function or(WhereClause $clause): this {
     $this->whereClauses[] = new OrWhereClause($clause);
     return $this;
   }
@@ -35,7 +35,7 @@ class WhereClauseVectorBuilder {
     );
     return new WhereClauseVector(
       $this->firstClause,
-      $this->whereClauses
+      $this->whereClauses->toImmVector()
     );
   }
 }

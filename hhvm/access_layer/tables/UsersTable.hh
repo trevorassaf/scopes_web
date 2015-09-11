@@ -9,7 +9,7 @@ class UsersTable extends Table<User> {
   const string PASSWORD_KEY = "passwordHash";
   const string TIME_JOINED_KEY = "timeJoined";
   
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 

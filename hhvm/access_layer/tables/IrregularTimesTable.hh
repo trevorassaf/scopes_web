@@ -7,7 +7,7 @@ class IrregularTimesTable extends Table<IrregularTime> {
   const string END_TIME_KEY = "endTime";
   const string IRREGULAR_DATE_ID_KEY = "irregularDateId";
 
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 

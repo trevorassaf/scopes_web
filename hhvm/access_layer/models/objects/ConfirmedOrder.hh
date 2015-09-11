@@ -7,7 +7,7 @@ class ConfirmedOrder implements Model {
     private UnsignedInt $userId,
     private UnsignedInt $scopesCount,
     private Timestamp $startTime,
-    private UnsignedInt $reservedMinutesCount,
+    private Timestamp $endTime,
     private string $title,
     private string $description,
     private string $shortCode,
@@ -29,10 +29,10 @@ class ConfirmedOrder implements Model {
   public function getStartTime(): Timestamp {
     return $this->startTime;
   }
-  
-  public function getReservedMinutesCount(): UnsignedInt {
-    return $this->reservedMinutesCount;
-  }
+
+  public function getEndTime(): Timestamp {
+    return $this->endTime;
+  }  
 
   public function getTitle(): string {
     return $this->title;
