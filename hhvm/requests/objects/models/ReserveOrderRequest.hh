@@ -8,14 +8,14 @@ class ReserveOrderRequest {
   const string LEASE_START_KEY = "lease-start";
   const string SCOPES_COUNT_KEY = "scopes-count";
   const string START_TIME_KEY = "start-time";
-  const string RSVD_MIN_COUNT_KEY = "rmc";
+  const string END_TIME_KEY = "end-time";
 
   public function __construct(
     private RequestField<UnsignedInt> $userId,
     private RequestField<Timestamp> $leaseStart,
     private RequestField<UnsignedInt> $scopesCount,
     private RequestField<Timestamp> $startTime,
-    private RequestField<UnsignedInt> $reservedMinutesCount
+    private RequestField<Timestamp> $endTime
   ) {}
 
   public function getUserId(): RequestField<UnsignedInt> {
@@ -33,9 +33,9 @@ class ReserveOrderRequest {
   public function getStartTime(): RequestField<Timestamp> {
     return $this->startTime;
   }
-
-  public function getReservedMinutesCount(): RequestField<UnsignedInt> {
-    return $this->reservedMinutesCount;
+  
+  public function getEndTime(): RequestField<Timestamp> {
+    return $this->endTime;
   }
 }
 
@@ -45,7 +45,7 @@ class ReserveOrderRequestBuilder {
   private ?RequestField<Timestamp> $leaseStart;
   private ?RequestField<UnsignedInt> $scopesCount;
   private ?RequestField<Timestamp> $startTime;
-  private ?RequestField<UnsignedInt> $reservedMinutesCount;
+  private ?RequestField<Timestamp> $endTime;
 
   public function setUserId(
     RequestField<UnsignedInt> $user_id
@@ -67,7 +67,7 @@ class ReserveOrderRequestBuilder {
     $this->scopesCount = $scopes_count;
     return $this;
   }
-
+  
   public function setStartTime(
     RequestField<Timestamp> $start_time
   ): this {
@@ -75,10 +75,10 @@ class ReserveOrderRequestBuilder {
     return $this;
   }
 
-  public function setReservedMinutesCount(
-    RequestField<UnsignedInt> $rsvd_min_count
+  public function setEndTime(
+    RequestField<Timestamp> $end_time
   ): this {
-    $this->reservedMinutesCount = $rsvd_min_count;
+    $this->endTime = $end_time;
     return $this;
   }
 
@@ -112,10 +112,10 @@ class ReserveOrderRequestBuilder {
       ); 
     }
 
-    if ($this->reservedMinutesCount == null) {
+    if ($this->endTime == null) {
       throw new UnsetRequestFieldException(
         ReserveOrderRequest::REQUEST_OBJECT_NAME,
-        ReserveOrderRequest::RSVD_MIN_COUNT_KEY
+        ReserveOrderRequest::END_TIME_KEY
       ); 
     }
 
@@ -124,7 +124,7 @@ class ReserveOrderRequestBuilder {
       $this->leaseStart,
       $this->scopesCount,
       $this->startTime,
-      $this->reservedMinutesCount
+      $this->endTime
     );
   }
 }

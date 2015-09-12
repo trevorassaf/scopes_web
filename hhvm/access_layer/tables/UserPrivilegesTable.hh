@@ -1,6 +1,6 @@
 <?hh // strict
 
-class UserPrivilegesTable extends Table<UserPrivilege> {
+class UserPrivilegesTable extends Table {
 
   const string TABLE_NAME = "UserPrivileges";
 

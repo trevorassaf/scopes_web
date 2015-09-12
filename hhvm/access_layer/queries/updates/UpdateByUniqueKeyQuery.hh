@@ -1,10 +1,10 @@
 <?hh // strict
 
-class UpdateByUniqueKeyQuery<Tmodel> {
+class UpdateByUniqueKeyQuery {
 
   public function __construct(
-    private UpdateQuery<Tmodel> $updateQuery,
-    private Table<Tmodel> $table,
+    private UpdateQuery $updateQuery,
+    private Table $table,
     private ConstraintMapToConjunctiveWhereClauseTranslator $constraintMapToConjunctiveWhereClauseTranslator
   ) {}
 

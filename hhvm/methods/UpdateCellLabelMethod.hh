@@ -3,7 +3,7 @@
 class UpdateCellLabelMethod {
 
   public function __construct(
-    private UpdateByIdQuery<CellLabel>  $updateQuery
+    private UpdateByIdQuery $updateQuery
   ) {}
 
   public function update(

@@ -3,7 +3,7 @@
 class UpdateConfirmedOrderMethod {
 
   public function __construct(
-    private UpdateByIdQuery<ConfirmedOrder>  $updateQuery
+    private UpdateByIdQuery $updateQuery
   ) {}
 
   public function update(

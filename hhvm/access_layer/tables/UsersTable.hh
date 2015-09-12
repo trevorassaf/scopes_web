@@ -1,6 +1,6 @@
 <?hh // strict
 
-class UsersTable extends Table<User> {
+class UsersTable extends Table {
 
   const string TABLE_NAME = "Users";
   const string FIRST_NAME_KEY = "firstName";

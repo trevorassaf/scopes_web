@@ -1,6 +1,6 @@
 <?hh // strict
 
-class RegularWeekDaysTable extends Table<RegularWeekDay> {
+class RegularWeekDaysTable extends Table {
 
   const string TABLE_NAME = "RegularWeekDay";
 

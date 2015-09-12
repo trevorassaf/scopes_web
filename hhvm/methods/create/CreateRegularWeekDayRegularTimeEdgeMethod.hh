@@ -1,17 +1,17 @@
 <?hh // strict
 
-class CreateRegularWeekDayRegularTimeMethod {
+class CreateRegularWeekDayRegularTimeEdgeMethod {
 
   public function __construct(
-    private RegularWeekDayRegularTimeInsertQuery $edgeInsertQuery,
+    private RegularWeekDayRegularTimeEdgeInsertQuery $edgeInsertQuery,
     private FetchByUniqueKeyQuery<RegularWeekDayRegularTimeEdge> $fetchEdgeByUniqueKeyQuery,
-    private RegularWeekDayRegularTimesTable $edgesTable
+    private RegularWeekDayRegularTimeEdgesTable $edgesTable
   ) {}
 
   public function create(
     UnsignedInt $day_id,
     UnsignedInt $time_id
-  ): RegularWeekDayRegularTime {
+  ): RegularWeekDayRegularTimeEdge {
     try {
       // Attempt query 
       $insert_query_handle = $this->edgeInsertQuery->insert(
@@ -23,10 +23,9 @@ class CreateRegularWeekDayRegularTimeMethod {
         ->join();
     } catch (QueryException $ex) {
       if ($this->isDuplicateEdge($day_id, $time_id)) {
-        throw new DuplicateRegularWeekDayTimeEdgeException($day_id, $time_id);
-      } else {
-        throw new MethodException();
-      }
+        //throw new DuplicateRegularWeekDayTimeEdgeException($day_id, $time_id);
+      } 
+      throw new MethodException();
     }
   }
 
@@ -36,8 +35,8 @@ class CreateRegularWeekDayRegularTimeMethod {
   ): bool {
     $fetch_query_handle = $this->fetchEdgeByUniqueKeyQuery->fetch(
       ImmMap{
-        $this->edgesTable->getDayId() => $day_id,
-        $this->edgesTable->getTimeId() => $time_id,
+        $this->edgesTable->getRegularWeekDayIdKey() => $day_id,
+        $this->edgesTable->getRegularTimeIdKey() => $time_id,
       }
     );
     $edge = $fetch_query_handle

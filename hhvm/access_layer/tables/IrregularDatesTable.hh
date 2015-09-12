@@ -1,6 +1,6 @@
 <?hh // strict
 
-class IrregularDatesTable extends Table<IrregularDate> {
+class IrregularDatesTable extends Table {
 
   const string TABLE_NAME = "IrregularDates";
   const string DATE_KEY = "date";

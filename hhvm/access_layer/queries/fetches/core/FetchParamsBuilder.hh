@@ -1,8 +1,8 @@
 <?hh // strict
 
-class FetchParamsBuilder<Tmodel> {
+class FetchParamsBuilder {
 
-  private ?Table<Tmodel> $table;
+  private ?Table $table;
   private WhereClause $whereClause;
   private OrderByClause $orderByClause;
 
@@ -14,7 +14,7 @@ class FetchParamsBuilder<Tmodel> {
     $this->orderByClause = $order_by_clause_builder->build();
   }
 
-  public function setTable(Table<Tmodel> $table): this {
+  public function setTable(Table $table): this {
     $this->table = $table;
     return $this;
   }
@@ -29,7 +29,7 @@ class FetchParamsBuilder<Tmodel> {
     return $this;
   }
 
-  public function build(): FetchParams<Tmodel> {
+  public function build(): FetchParams {
     invariant($this->table != null, "Table can't be null!");
     return new FetchParams(
       $this->table,

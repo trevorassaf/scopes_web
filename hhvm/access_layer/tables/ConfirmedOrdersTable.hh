@@ -1,6 +1,6 @@
 <?hh // strict
 
-class ConfirmedOrdersTable extends Table<ConfirmedOrder> {
+class ConfirmedOrdersTable extends Table {
 
   const string TABLE_NAME = "ConfirmedOrders";
   const string USER_ID_KEY = "userId";

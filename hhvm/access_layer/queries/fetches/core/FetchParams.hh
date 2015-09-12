@@ -1,9 +1,9 @@
 <?hh // strict
 
-class FetchParams<Tmodel> implements FetchQueryMaker<Tmodel> {
+class FetchParams implements FetchQueryMaker {
 
   public function __construct(
-    private Table<Tmodel> $table,
+    private Table $table,
     private WhereClause $whereClause,
     private OrderByClause $orderByClause
   ) {}

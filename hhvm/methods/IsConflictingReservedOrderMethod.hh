@@ -36,7 +36,7 @@ class IsConflictingReservedOrderMethod {
 
       // Fail immediately if the number of requested scopes exceeds
       // the maximum number of scopes that could be available
-      if ($order_policy->getMaxScopes()->getNumber() > $scopes_count->getNumber()) {
+      if ($order_policy->getScopesCount()->getNumber() > $scopes_count->getNumber()) {
         return false;
       }
 
@@ -59,7 +59,7 @@ class IsConflictingReservedOrderMethod {
       // Determine if request would overbook our available scopes 
       return $this->isConflictingRequest(
         $time_intervals,
-        $order_policy->getMaxScopes(),
+        $order_policy->getScopesCount(),
         $scopes_count
       );
     } catch (QueryException $ex) {
@@ -84,7 +84,16 @@ class IsConflictingReservedOrderMethod {
     foreach ($time_intervals as $interval) {
       // Pop all time intervals that finish before 'interval' starts. Their scopes
       // are now available, so restore them to 'available_scopes_count'
-      while (!$interval->getStartTime()->isBefore($queue->peek()->getEndTime())) {
+      while (!$interval
+        ->getTimestampInterval()
+        ->getStart()
+        ->isBefore(
+          $queue
+            ->peek()
+            ->getTimestampInterval()
+            ->getEnd()
+        )
+      ) {
         $available_scopes_count += $queue
           ->pop()
           ->getScopesCount()

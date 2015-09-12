@@ -1,6 +1,6 @@
 <?hh //strict
 
-abstract class Table<T> {
+abstract class Table {
 
   const string ID_KEY = "id";
   const string TABLE_QUALIFYING_TOKEN = ".";

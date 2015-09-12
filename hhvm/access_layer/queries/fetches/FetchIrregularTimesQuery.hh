@@ -3,7 +3,7 @@
 class FetchIrregularTimesQuery {
 
   public function __construct(
-    private FetchQuery<ImmVector<IrregularTime>> $fetchIrregularTimesQuery,
+    private FetchQuery<IrregularTime> $fetchIrregularTimesQuery,
     private IrregularTimesTable $irregularTimesTable
   ) {}
 
@@ -17,9 +17,10 @@ class FetchIrregularTimesQuery {
         $fetch_params_builder->setWhereClause(
           new EqualsWhereClause(
             $this->irregularTimesTable->getIrregularDateIdKey(),
-            $irregular_date_id
+            (string)$irregular_date_id->getNumber()
           )
         )
+        ->build()
       );
 
     return $fetch_irregular_time_query_handle

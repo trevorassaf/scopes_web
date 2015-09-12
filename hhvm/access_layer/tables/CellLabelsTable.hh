@@ -1,6 +1,6 @@
 <?hh // strict
 
-class CellLabelsTable extends Table<CellLabel> {
+class CellLabelsTable extends Table {
   
   const string TABLE_NAME = "CellLabels";
   const string CONFIRMED_ORDER_ID_KEY = "confirmedOrderId";

@@ -4,7 +4,7 @@ class BatchInsertQuery<Tmodel> {
 
   public function __construct(
       private AsyncMysqlConnection $asyncMysqlConnection,
-      private Table<Tmodel> $table,
+      private Table $table,
       private InsertQueryCreater $insertQueryCreater
   ) {}
 

@@ -4,7 +4,7 @@ class InsertQuery<Tmodel> {
 
   public function __construct(
       private AsyncMysqlConnection $asyncMysqlConnection,
-      private Table<Tmodel> $table,
+      private Table $table,
       private ConcreteModelFactory<Tmodel> $concreteModelFactory,
       private InsertQueryCreater $insertQueryCreater
   ) {}

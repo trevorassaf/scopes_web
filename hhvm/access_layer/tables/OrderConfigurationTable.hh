@@ -1,6 +1,6 @@
 <?hh // strict
 
-class OrderConfigurationTable extends Table<OrderConfiguration> {
+class OrderConfigurationTable extends Table {
 
   const string TABLE_NAME = "OrderConfiguration";
   const string MINUTES_PER_INTERVAL_COUNT_KEY = "minutesPerIntervalCount";

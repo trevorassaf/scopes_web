@@ -1,6 +1,6 @@
 <?hh // strict
 
-interface FetchQueryMaker<Tmodel> {
+interface FetchQueryMaker {
 
   public function serialize(): string;
 

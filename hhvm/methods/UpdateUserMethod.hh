@@ -3,7 +3,7 @@
 class UpdateUserMethod {
 
   public function __construct(
-    private UpdateByIdQuery<User>  $updateQuery
+    private UpdateByIdQuery  $updateQuery
   ) {}
 
   public function update(

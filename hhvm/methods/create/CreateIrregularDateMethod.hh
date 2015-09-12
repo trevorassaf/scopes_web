@@ -4,7 +4,7 @@ class CreateIrregularDateMethod {
 
   public function __construct(
     private IrregularDateInsertQuery $irregularTimeInsertQuery,
-    private FetchByUniqueQuery<IrregularDate> $fetchIrregularDateByUniqueQuery,
+    private FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateByUniqueQuery,
     private IrregularDatesTable $irregularDatesTable
   ) {}
 
@@ -19,11 +19,10 @@ class CreateIrregularDateMethod {
         ->join();
     } catch (QueryException $ex) {
       // Check for duplication
-      if ($this->isDuplicateIrregularTime($date)) {
-        throw new DuplicateIrregularTimeException($date);  
-      } else {
-        throw new MethodException(); 
-      }
+      if ($this->isDuplicateIrregularDate($date)) {
+        //throw new DuplicateIrregularDateException($date);  
+      } 
+      throw new MethodException(); 
     }
   }
 

@@ -1,6 +1,6 @@
 <?hh // strict
 
-abstract class FetchQueryString<Tmodel> implements FetchQueryMaker<Tmodel> {
+abstract class FetchQueryString implements FetchQueryMaker {
 
   public function serialize(): string {
     return $this->getQueryString();

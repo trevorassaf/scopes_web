@@ -4,7 +4,7 @@ class DeleteByIdQuery<Tmodel> {
 
   public function __construct(
     private DeleteQuery<Tmodel> $deleteQuery,
-    private Table<Tmodel> $table,
+    private Table $table,
     private WhereClauseVectorBuilder $whereClauseBuilder
   ) {}
 

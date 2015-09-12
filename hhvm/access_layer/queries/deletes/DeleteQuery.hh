@@ -4,7 +4,7 @@ class DeleteQuery<Tmodel> {
 
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
-    private Table<Tmodel> $table
+    private Table $table
   ) {}
 
   public async function deleteAll(): Awaitable<void> {

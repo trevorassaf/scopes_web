@@ -1,12 +1,12 @@
 <?hh // strict
 
-class UpdateQuery<Tmodel> {
+class UpdateQuery {
 
   const string FIELD_DELIMITER = ", ";
 
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
-    private Table<Tmodel> $table
+    private Table $table
   ) {}
 
   public async function updateAll(

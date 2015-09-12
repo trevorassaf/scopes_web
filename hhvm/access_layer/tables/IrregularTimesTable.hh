@@ -1,6 +1,6 @@
 <?hh // strict
 
-class IrregularTimesTable extends Table<IrregularTime> {
+class IrregularTimesTable extends Table {
 
   const string TABLE_NAME = "IrregularTimes";
   const string START_TIME_KEY = "startTime";

@@ -4,7 +4,7 @@ class FetchByUniqueKeyQuery<Tmodel> {
 
   public function __construct(
     private FetchQuery<Tmodel> $fetchQuery,
-    private Table<Tmodel> $table,
+    private Table $table,
     private ConstraintMapToConjunctiveWhereClauseTranslator $constraintMapToConjunctiveWhereClauseTranslator
   ) {} 
 

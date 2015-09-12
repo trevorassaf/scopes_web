@@ -1,6 +1,6 @@
 <?hh // strict
 
-class RsvdOrdersTable extends Table<RsvdOrder> {
+class RsvdOrdersTable extends Table {
 
   const string TABLE_NAME = "RsvdOrders";
   const string USER_ID_KEY = "userId";

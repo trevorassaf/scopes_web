@@ -22,10 +22,9 @@ class CreateRegularWeekDayMethod {
     } catch (QueryException $ex) {
       // Check for duplicate day of the week 
       if ($this->isDuplicateDay($day)) {
-        throw new DuplicateRegularWeekDayException($day);
-      } else {
-        throw new MethodException();
-      }
+        //throw new DuplicateRegularWeekDayException($day);
+      } 
+      throw new MethodException();
     }
   }
 

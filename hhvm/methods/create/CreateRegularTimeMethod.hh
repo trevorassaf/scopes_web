@@ -32,10 +32,9 @@ class CreateRegularTimeMethod {
     } catch (QueryException $ex) {
       // Check for duplication 
       if ($this->isDuplicateRegularTime($start_time, $end_time)) {
-        throw new DuplicateRegularTimeException($start_time, $end_time);
-      } else {
-        throw new MethodException();
-      }
+        //throw new DuplicateRegularTimeException($start_time, $end_time);
+      } 
+      throw new MethodException();
     }
   }
 

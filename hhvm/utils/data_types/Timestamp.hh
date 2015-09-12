@@ -2,31 +2,54 @@
 
 class Timestamp {
   
-  const string TIMESTAMP_FORMAT = "Y-m-d H:i:s";
+  public static function getFormat(): string {
+    return Date::getFormat() . " " . Time::getFormat(); 
+  }
 
   public static function isValid(string $timestamp): bool {
-    return new DateTime::fromFormat(self::TIMESTAMP_FORMAT, $timestamp) == false; 
+    return new DateTime::fromFormat(self::getFormat(), $timestamp) == false; 
+  }
+
+  public static function fromString(string $timestamp): Timestamp {
+    invariant(self::isValid($timestamp), "Invalid timestamp string format!");
+    $date_time = new DateTime::fromFormat(self::getFormat(), $timestamp);
+    return new Timestamp(
+      new Date($date_time->format(Date::getFormat())),
+      new Time($date_time->format(Time::getFormat()))
+    );
   }
 
   public function __construct(
-    private string $timestamp    
-  ) {
-    invariant(self::isValid($this->timestamp), "Must be valid timestamp!");
-  }
+    private Date $date,
+    private Time $time 
+  ) {}
 
   public function toString(): string {
-    return $this->timestamp;
+    return $this->date->toString() . " " . $this->time->toString();
+  }
+
+  public function getDate(): Date {
+    return $this->date;
+  }
+
+  public function getTime(): Time {
+    return $this->time;
   }
 
   public function isBefore(Timestamp $timestamp): bool {
-    return $this->timestamp < $timestamp->toString();
+    return $this->date->isBefore($timestamp->getDate()) ||
+      $this->date->equals($timestamp->getDate()) &&
+      $this->time->isBefore($timestamp->getTime());
   }
     
   public function isAfter(Timestamp $timestamp): bool {
-    return $this->timestamp > $timestamp->toString();
+    $this->date->isAfter($timestamp->getDate()) ||
+      $this->date->equals($timestamp->getDate()) &&
+      $this->time->isBefore($timestamp->getTime());
   }
   
   public function equals(Timestamp $timestamp): bool {
-    return $this->timestamp == $timestamp->toString();
+    $this->date->equals($timestamp->getDate()) &&
+      $this->time->equals($timestamp->getTime());
   }
 }

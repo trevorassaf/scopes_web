@@ -14,8 +14,8 @@ class RsvdOrderFactory extends ConcreteModelFactory<RsvdOrder> {
       $id,
       new UnsignedInt((int)$params[$this->rsvdOrdersTable->getUserIdKey()]), 
       new UnsignedInt((int)$params[$this->rsvdOrdersTable->getScopesCountKey()]),
-      new Timestamp((string)$params[$this->rsvdOrdersTable->getStartTimeKey()]),
-      new Timestamp((string)$params[$this->rsvdOrdersTable->getEndTimeKey()])
+      Timestamp::fromString((string)$params[$this->rsvdOrdersTable->getStartTimeKey()]),
+      Timestamp::fromString((string)$params[$this->rsvdOrdersTable->getEndTimeKey()])
     );
   }
 }

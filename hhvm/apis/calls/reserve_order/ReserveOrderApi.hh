@@ -18,7 +18,7 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
       $request->getLeaseStart()->get(),
       $request->getScopesCount()->get(),
       $request->getStartTime()->get(),
-      $request->getReservedMinutesCount()->get()
+      $request->getEndTime()->get()
     ); 
     return new ReserveOrderApiResult($rsvd_order->getId());
   }

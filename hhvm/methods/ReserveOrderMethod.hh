@@ -11,7 +11,7 @@ class ReserveOrderMethod {
     Timestamp $lease_start,
     UnsignedInt $scopes_count,
     Timestamp $start_time,
-    UnsignedInt $rsvd_min_count
+    Timestamp $end_time
   ): RsvdOrder {
     // TODO First, perform light-weight policy check on reservation request
 
@@ -23,7 +23,7 @@ class ReserveOrderMethod {
         $lease_start,
         $scopes_count,
         $start_time,
-        $rsvd_min_count
+        $end_time
       )
       ->getWaitHandle()
       ->join();

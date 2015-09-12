@@ -8,7 +8,7 @@ class FetchQuery<Tmodel> {
   ) {} 
 
   public async function fetch(
-    FetchQueryMaker<Tmodel> $query_maker
+    FetchQueryMaker $query_maker
   ): Awaitable<ImmVector<Tmodel>> {
     // Execute query
     $result_set = await $this->asyncMysqlConnection

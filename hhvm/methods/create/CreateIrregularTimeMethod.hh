@@ -19,6 +19,10 @@ class CreateIrregularTimeMethod {
         $start_time,
         $end_time
       ); 
+
+      return $insert_query_handle
+        ->getWaitHandle()
+        ->join();
     } catch (QueryException $ex) {
       throw new MethodException(); 
     }

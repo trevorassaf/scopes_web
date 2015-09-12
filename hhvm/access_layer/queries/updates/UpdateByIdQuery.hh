@@ -1,10 +1,10 @@
 <?hh // strict
 
-class UpdateByIdQuery<Tmodel> {
+class UpdateByIdQuery {
 
   public function __construct(
-    private UpdateByUniqueKeyQuery<Tmodel> $updateByUniqueKeyQuery,
-    private Table<Tmodel> $table
+    private UpdateByUniqueKeyQuery $updateByUniqueKeyQuery,
+    private Table $table
 
   ) {}
 
