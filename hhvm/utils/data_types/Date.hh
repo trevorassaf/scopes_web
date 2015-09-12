@@ -4,8 +4,12 @@ class Date {
 
   const string DATE_FORMAT = "Y-m-d";
 
+  public static function getFormat(): string {
+    return self::DATE_FORMAT;
+  }
+
   public static function isValid(string $date): bool {
-    return new DateTime::fromFormat(self::DATE_FORMAT, $date) == false;  
+    return DateTime::createFromFormat(self::getFormat(), $date) == false;  
   }
 
   public function __construct(
@@ -26,5 +30,10 @@ class Date {
   
   public function equals(Date $date): bool {
     return $this->date == $date->toString();
+  }
+
+  public function toDayOfTheWeek(): DayOfTheWeekType {
+    $date_index = (date("w", $this->toString()) + 6) % 7;
+    return DayOfTheWeekType::assert($date_index);
   }
 }

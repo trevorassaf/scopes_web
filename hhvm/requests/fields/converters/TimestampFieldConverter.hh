@@ -13,6 +13,6 @@ class TimestampFieldConverter implements RequestFieldTypeConverter<Timestamp> {
     }
 
     // Convert to timestamp 
-    return new Timestamp((string)$value);
+    return Timestamp::fromString((string)$value);
   }
 }

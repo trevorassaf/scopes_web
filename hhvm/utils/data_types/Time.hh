@@ -4,8 +4,12 @@ class Time {
 
   const string TIME_FORMAT = "H:i:s";
 
-  public function isValid(string $time): bool {
-    return new DateTime::fromFormat(self::TIME_FORMAT, $time) == false;
+  public static function getFormat(): string {
+    return self::TIME_FORMAT;
+  }
+
+  public static function isValid(string $time): bool {
+    return DateTime::createFromFormat(self::getFormat(), $time) == false;
   }
 
   public function __construct(

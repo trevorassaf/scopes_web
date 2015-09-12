@@ -50,9 +50,30 @@ class IsValidReservedOrderMethod {
         );
 
       } else {
-        // Fetch regular date
+        // Fetch regular date by day of the week index
+        $day_of_the_week_fetch_params_builder = new FetchParamsBuilder();
+        $day_of_the_week_where_clause_builder = new WhereClauseVectorBuilder();
+        $day_of_the_week_order_builder = new OrderByClauseBuilder();
+
         $regular_edges_fetch_handle = $this->fetchRegularEdgesQuery->fetch(
-          $interval->getDate()->toDayOfTheWeek()
+          $day_of_the_week_fetch_params_builder
+            ->setTable($this->regularEdgesTable)
+            ->setWhereClause(
+              $day_of_the_week_where_clause_builder->setFirstClause(
+                new EqualsWhereClause(
+                  $this->regularEdgesTable->getIdKey(),
+                  (string)$date->toDayOfTheWeek()
+                )
+              ) 
+              ->build()
+            )
+            ->setOrderByClause(
+              $day_of_the_week_order_builder->asc(
+                $this->regularEdgesTable->getRegularWeekDayIdKey()
+              )
+              ->build()
+            )
+            ->build()
         );  
 
         // Block until regular-date fetch finishes

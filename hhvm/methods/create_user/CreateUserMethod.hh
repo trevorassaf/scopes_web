@@ -3,7 +3,7 @@
 class CreateUserMethod {
 
   public function __construct(
-    private UserInsertQuery $userInsertQuery,
+    private InsertUserQuery $insertUserQuery,
     private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery,
     private UsersTable $usersTable
   ) {}
@@ -18,7 +18,7 @@ class CreateUserMethod {
 
     try {
       // Attempt insert
-      $insert_query_wait_handle = $this->userInsertQuery->insert(
+      $insert_query_wait_handle = $this->insertUserQuery->insert(
         $first_name,
         $last_name,
         $email,

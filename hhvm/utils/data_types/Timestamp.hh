@@ -7,12 +7,12 @@ class Timestamp {
   }
 
   public static function isValid(string $timestamp): bool {
-    return new DateTime::fromFormat(self::getFormat(), $timestamp) == false; 
+    return DateTime::createFromFormat(self::getFormat(), $timestamp) == false; 
   }
 
   public static function fromString(string $timestamp): Timestamp {
     invariant(self::isValid($timestamp), "Invalid timestamp string format!");
-    $date_time = new DateTime::fromFormat(self::getFormat(), $timestamp);
+    $date_time = DateTime::createFromFormat(self::getFormat(), $timestamp);
     return new Timestamp(
       new Date($date_time->format(Date::getFormat())),
       new Time($date_time->format(Time::getFormat()))
@@ -43,13 +43,13 @@ class Timestamp {
   }
     
   public function isAfter(Timestamp $timestamp): bool {
-    $this->date->isAfter($timestamp->getDate()) ||
+    return $this->date->isAfter($timestamp->getDate()) ||
       $this->date->equals($timestamp->getDate()) &&
       $this->time->isBefore($timestamp->getTime());
   }
   
   public function equals(Timestamp $timestamp): bool {
-    $this->date->equals($timestamp->getDate()) &&
+    return $this->date->equals($timestamp->getDate()) &&
       $this->time->equals($timestamp->getTime());
   }
 }

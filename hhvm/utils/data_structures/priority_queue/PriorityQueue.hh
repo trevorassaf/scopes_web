@@ -8,7 +8,7 @@ class PriorityQueue<T> {
 
   public function __construct(
     private Comparator<T> $comparator,
-    UnsignedInt $startingSize = new UnsignedInt(self::DEFAULT_STARTING_SIZE)
+    private UnsignedInt $startingSize = new UnsignedInt(self::DEFAULT_STARTING_SIZE)
   ) {
     $this->heap = Vector{};
     $this->heap->reserve($this->startingSize->getNumber());
@@ -20,6 +20,8 @@ class PriorityQueue<T> {
     
     // Restore heap property
     $this->fixUp($this->getCount() - 1);
+    
+    return $this;
   }
 
   public function pop(): T {
@@ -43,7 +45,7 @@ class PriorityQueue<T> {
     $element = $this->heap[$idx];
     $parent_idx = (int)(($idx - 1) / 2);
 
-    while ($idx != 0 && $this->compare($this->heap[$idx], $this->heap[$parent_idx]) > 0) {
+    while ($idx != 0 && $this->comparator->compare($this->heap[$idx], $this->heap[$parent_idx]) > 0) {
       // Swap elements
       $this->heap[$idx] = $this->heap[$parent_idx];
       $this->heap[$parent_idx] = $element;
@@ -100,7 +102,7 @@ class PriorityQueue<T> {
     return $this->heap->isEmpty();
   }
 
-  public function getSize(): UnsignedInt {
-    return $this->heap->size();
+  public function getCount(): int {
+    return $this->heap->count();
   }
 }
