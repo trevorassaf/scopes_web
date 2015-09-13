@@ -3,10 +3,10 @@
 class InsertQuery<Tmodel> {
 
   public function __construct(
-      private AsyncMysqlConnection $asyncMysqlConnection,
-      private Table $table,
-      private ConcreteModelFactory<Tmodel> $concreteModelFactory,
-      private InsertQueryCreater $insertQueryCreater
+    private AsyncMysqlConnection $asyncMysqlConnection,
+    private Table $table,
+    private ConcreteModelFactory<Tmodel> $concreteModelFactory,
+    private InsertQueryCreater $insertQueryCreater
   ) {}
 
   public async function insert(

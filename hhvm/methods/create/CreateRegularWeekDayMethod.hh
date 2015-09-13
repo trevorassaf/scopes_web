@@ -3,7 +3,7 @@
 class CreateRegularWeekDayMethod {
 
   public function __construct(
-    private RegularWeekDayInsertQuery $regularWeekDayInsertQuery,
+    private InsertRegularWeekDayQuery $regularWeekDayInsertQuery,
     private FetchByIdQuery<RegularWeekDay> $fetchRegularWeekDayByIdQuery,
     private RegularWeekDaysTable $regularWeekDaysQuery
   ) {}

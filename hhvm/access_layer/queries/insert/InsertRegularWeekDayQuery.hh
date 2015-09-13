@@ -1,6 +1,6 @@
 <?hh // strict
 
-class RegularWeekDayInsertQuery {
+class InsertRegularWeekDayQuery {
 
   public function __construct(
     private InsertQuery<RegularWeekDay> $insertQuery,

@@ -2,20 +2,29 @@
 
 class QueryInjector {
 
+  // User queries
   private ?InsertQuery<User> $insertUserQuery;
   private ?InsertUserQuery $concreteInsertUserQuery;
   private ?FetchQuery<User> $fetchUserQuery;
   private ?FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery;
+
+  // Ir/regular date/time queries
+  private ?InsertQuery<RegularWeekDay> $insertRegularWeekDayQuery;
+  private ?InsertRegularWeekDayQuery $concreteInsertRegularWeekDayQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
     private LazyLoader<UsersTable> $usersTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<User>> $userModelFactoryLazyLoader,
-    private LazyLoader<InsertQueryCreater> $insertQueryCreaterLazyLoader
+    private LazyLoader<InsertQueryCreater> $insertQueryCreaterLazyLoader,
+    private LazyLoader<RegularWeekDaysTable> $regularWeekDaysTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<RegularWeekDay>> $regularWeekDayModelFactoryLazyLoader
   ) {}
 
-  // User queries
+  /**
+   * User queries
+   */
   public function getInsertUserQuery(): InsertQuery<User> {
     if ($this->insertUserQuery === null) {
       $this->insertUserQuery = new InsertQuery(
@@ -57,5 +66,30 @@ class QueryInjector {
       );
     }
     return $this->fetchUserByUniqueKeyQuery;
+  }
+
+  /**
+   * Date/Time queries
+   */
+  public function getInsertRegularWeekDayQuery(): InsertQuery<RegularWeekDay> {
+    if ($this->insertRegularWeekDayQuery === null) {
+      $this->insertRegularWeekDayQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->regularWeekDaysTableLazyLoader->load(),
+        $this->regularWeekDayModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      );
+    } 
+    return $this->insertRegularWeekDayQuery;
+  }
+
+  public function getConcreteInsertRegularWeekDayQuery(): InsertRegularWeekDayQuery {
+    if ($this->concreteInsertRegularWeekDayQuery === null) {
+      $this->concreteInsertRegularWeekDayQuery = new InsertRegularWeekDayQuery(
+        $this->getInsertRegularWeekDayQuery(),
+        $this->regularWeekDaysTableLazyLoader->load()
+      );
+    }
+    return $this->concreteInsertRegularWeekDayQuery;
   }
 }
