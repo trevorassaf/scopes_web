@@ -6,7 +6,7 @@ abstract class LazyLoader<T> {
 
   public function load(): T {
     if ($this->t === null) {
-      $this->t = $this->load();
+      $this->t = $this->make();
     }
     return $this->t;
   }

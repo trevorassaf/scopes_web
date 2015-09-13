@@ -7,7 +7,7 @@ class Timestamp {
   }
 
   public static function isValid(string $timestamp): bool {
-    return DateTime::createFromFormat(self::getFormat(), $timestamp) == false; 
+    return DateTime::createFromFormat(self::getFormat(), $timestamp) != false; 
   }
 
   public static function fromString(string $timestamp): Timestamp {

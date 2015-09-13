@@ -1,7 +1,6 @@
 <?hh // strict
 
 class MethodInjector {
-
   private ?CreateUserMethod $createUserMethod;
 
   public function __construct(
@@ -20,4 +19,5 @@ class MethodInjector {
     return $this->createUserMethod;
   }
 
+  public function getFetchUserByEmailMethod(): void {}
 }

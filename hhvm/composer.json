@@ -10,7 +10,8 @@
         "apis/",
         "utils/",
         "methods/",
-        "requests/"
+        "requests/",
+        "dependency_injection/"
     ]
   },
   "extra": {
