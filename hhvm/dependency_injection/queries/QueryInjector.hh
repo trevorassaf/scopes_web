@@ -11,6 +11,9 @@ class QueryInjector {
   // Ir/regular date/time queries
   private ?InsertQuery<RegularWeekDay> $insertRegularWeekDayQuery;
   private ?InsertRegularWeekDayQuery $concreteInsertRegularWeekDayQuery;
+  private ?FetchByIdQuery<RegularWeekDay> $fetchRegularWeekDayByIdQuery;
+  private ?FetchByUniqueKeyQuery<RegularWeekDay> $fetchRegularWeekDayByUniqueKeyQuery;
+  private ?FetchQuery<RegularWeekDay> $fetchRegularWeekDayQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -91,5 +94,36 @@ class QueryInjector {
       );
     }
     return $this->concreteInsertRegularWeekDayQuery;
+  }
+
+  public function getFetchRegularWeekDayQuery(): FetchQuery<RegularWeekDay> {
+    if ($this->fetchRegularWeekDayQuery === null) {
+      $this->fetchRegularWeekDayQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->regularWeekDayModelFactoryLazyLoader->load()
+      );
+    }
+    return $this->fetchRegularWeekDayQuery;
+  }
+
+  public function getFetchRegularWeekDayByUniqueKeyQuery(): FetchByUniqueKeyQuery<RegularWeekDay> {
+    if ($this->fetchRegularWeekDayByUniqueKeyQuery === null) {
+      $this->fetchRegularWeekDayByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchRegularWeekDayQuery(),
+        $this->regularWeekDaysTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      );
+    } 
+    return $this->fetchRegularWeekDayByUniqueKeyQuery;
+  }
+
+  public function getFetchRegularWeekDayByIdQuery(): FetchByIdQuery<RegularWeekDay> {
+    if ($this->fetchRegularWeekDayByIdQuery === null) {
+      $this->fetchRegularWeekDayByIdQuery = new FetchByIdQuery(
+        $this->getFetchRegularWeekDayByUniqueKeyQuery(),
+        $this->regularWeekDaysTableLazyLoader->load()
+      );
+    }
+    return $this->fetchRegularWeekDayByIdQuery;
   }
 }

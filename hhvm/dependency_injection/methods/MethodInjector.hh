@@ -1,11 +1,17 @@
 <?hh // strict
 
 class MethodInjector {
+
+  // User methods
   private ?CreateUserMethod $createUserMethod;
+
+  // Ir/regular day/time methods
+  private ?CreateRegularWeekDayMethod $createRegularWeekDayMethod;
 
   public function __construct(
     private QueryInjector $queryInjector,
-    private LazyLoader<UsersTable> $usersTableLoader
+    private LazyLoader<UsersTable> $usersTableLoader,
+    private LazyLoader<RegularWeekDaysTable> $regularWeekDaysTableLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -19,5 +25,17 @@ class MethodInjector {
     return $this->createUserMethod;
   }
 
-  public function getFetchUserByEmailMethod(): void {}
+  /**
+   * Ir/regular day/time methods
+   */
+  public function getCreateRegularWeekDayMethod(): CreateRegularWeekDayMethod {
+    if ($this->createRegularWeekDayMethod === null) {
+      $this->createRegularWeekDayMethod = new CreateRegularWeekDayMethod(
+        $this->queryInjector->getConcreteInsertRegularWeekDayQuery(),
+        $this->queryInjector->getFetchRegularWeekDayByIdQuery(),
+        $this->regularWeekDaysTableLoader->load() 
+      );
+    }
+    return $this->createRegularWeekDayMethod;
+  }
 }
