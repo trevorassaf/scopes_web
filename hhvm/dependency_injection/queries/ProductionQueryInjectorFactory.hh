@@ -10,7 +10,8 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       ),
       new ConstraintMapToConjunctiveWhereClauseTranslatorLazyLoader(),
       $users_table_loader,
-      new UserModelFactoryLazyLoader($users_table_loader)
+      new UserModelFactoryLazyLoader($users_table_loader),
+      new InsertQueryCreaterLazyLoader()
     );
   }
 }
