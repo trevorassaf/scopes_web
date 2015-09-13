@@ -3,7 +3,7 @@
 class CreateRegularWeekDayRegularTimeEdgeMethod {
 
   public function __construct(
-    private RegularWeekDayRegularTimeEdgeInsertQuery $edgeInsertQuery,
+    private InsertRegularWeekDayRegularTimeEdgeQuery $edgeInsertQuery,
     private FetchByUniqueKeyQuery<RegularWeekDayRegularTimeEdge> $fetchEdgeByUniqueKeyQuery,
     private RegularWeekDayRegularTimeEdgesTable $edgesTable
   ) {}

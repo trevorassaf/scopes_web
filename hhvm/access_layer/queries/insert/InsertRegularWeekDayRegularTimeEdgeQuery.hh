@@ -1,6 +1,6 @@
 <?hh // strict
 
-class RegularWeekDayRegularTimeEdgeInsertQuery {
+class InsertRegularWeekDayRegularTimeEdgeQuery {
 
   public function __construct(
     private InsertQuery<RegularWeekDayRegularTimeEdge> $insertQuery,

@@ -3,7 +3,7 @@
 class CreateRegularTimeMethod {
 
   public function __construct(
-    private RegularTimeInsertQuery $regularTimeInsertQuery,
+    private InsertRegularTimeQuery $regularTimeInsertQuery,
     private FetchByUniqueKeyQuery<RegularTime> $fetchRegularTimeByUniqueKeyQuery,
     private RegularTimesTable $regularTimesTable
   ) {}

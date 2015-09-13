@@ -1,6 +1,6 @@
 <?hh // strict
 
-class RegularTimeInsertQuery {
+class InsertRegularTimeQuery {
 
   public function __construct(
     private InsertQuery<RegularTime> $insertQuery,

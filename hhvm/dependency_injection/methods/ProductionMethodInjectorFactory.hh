@@ -8,7 +8,8 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
     return new MethodInjector(
       $production_query_injector_factory->get(),
       new UsersTableLazyLoader(),
-      new RegularWeekDaysTableLazyLoader()
+      new RegularWeekDaysTableLazyLoader(),
+      new RegularTimesTableLazyLoader()
     ); 
   }
 }

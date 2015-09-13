@@ -17,14 +17,30 @@ function initDbMain(): void {
 }
 
 function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {
+
+  // Create regular allowed times
+  $create_regular_time_method = $method_injector->getCreateRegularTimeMethod();
+
+  $regular_time = $create_regular_time_method->create(
+    new Time("9:00:00"),
+    new Time("17:00:00")
+  );
+
+  // Create M-F week days
+  $active_days_of_the_week = ImmVector{
+    DayOfTheWeekType::MONDAY,
+    DayOfTheWeekType::TUESDAY,
+    DayOfTheWeekType::WEDNESDAY,
+    DayOfTheWeekType::THURSDAY,
+    DayOfTheWeekType::FRIDAY,
+  };
+
   $create_regular_week_days_method = $method_injector->getCreateRegularWeekDayMethod();
 
-  // Create M-F 
-  $create_regular_week_days_method->create(DayOfTheWeekType::MONDAY);
-  $create_regular_week_days_method->create(DayOfTheWeekType::TUESDAY);
-  $create_regular_week_days_method->create(DayOfTheWeekType::WEDNESDAY);
-  $create_regular_week_days_method->create(DayOfTheWeekType::THURSDAY);
-  $create_regular_week_days_method->create(DayOfTheWeekType::FRIDAY);
+  foreach ($active_days_of_the_week as $day) {
+    $regular_day = $create_regular_week_days_method->create($day);
+    // TODO insert time edge
+  }
 }
 
 function initUsers(MethodInjector $method_injector): void {
