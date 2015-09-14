@@ -36,10 +36,17 @@ function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {
   };
 
   $create_regular_week_days_method = $method_injector->getCreateRegularWeekDayMethod();
+  $create_regular_edge_method = $method_injector->getCreateRegularEdgeMethod();
 
   foreach ($active_days_of_the_week as $day) {
+    // Insert regular day
     $regular_day = $create_regular_week_days_method->create($day);
-    // TODO insert time edge
+
+    // Bind regular week day to regular time
+    $create_regular_edge_method->create(
+      $regular_day->getId(),
+      $regular_time->getId()
+    ); 
   }
 }
 
