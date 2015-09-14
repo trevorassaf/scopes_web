@@ -14,12 +14,20 @@ class MethodInjector {
   // Regular edge methods
   private ?CreateRegularWeekDayRegularTimeEdgeMethod $createRegularEdgeMethod;
 
+  // Irregular date methods
+  private ?CreateIrregularDateMethod $createIrregularDateMethod;
+
+  // Irregular time methods
+  private ?CreateIrregularTimeMethod $createIrregularTimeMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
     private LazyLoader<RegularWeekDaysTable> $regularWeekDaysTableLoader,
     private LazyLoader<RegularTimesTable> $regularTimesTableLoader,
-    private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularEdgesTableLazyLoader
+    private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularEdgesTableLoader,
+    private LazyLoader<IrregularDatesTable> $irregularDatesTableLoader,
+    private LazyLoader<IrregularTimesTable> $irregularTimesTableLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -69,9 +77,36 @@ class MethodInjector {
       $this->createRegularEdgeMethod = new CreateRegularWeekDayRegularTimeEdgeMethod(
         $this->queryInjector->getConcreteInsertRegularEdgeQuery(),
         $this->queryInjector->getFetchRegularEdgeByUniqueKeyQuery(),
-        $this->regularEdgesTableLazyLoader->load() 
+        $this->regularEdgesTableLoader->load() 
       );
     } 
     return $this->createRegularEdgeMethod;
+  }
+
+  /**
+   * Irregular date methods
+   */
+  public function getCreateIrregularDateMethod(): CreateIrregularDateMethod {
+    if ($this->createIrregularDateMethod === null) {
+      $this->createIrregularDateMethod = new CreateIrregularDateMethod(
+        $this->queryInjector->getConcreteInsertIrregularDateQuery(),
+        $this->queryInjector->getFetchIrregularDateByUniqueKeyQuery(),
+        $this->irregularDatesTableLoader->load() 
+      );
+    }   
+    return $this->createIrregularDateMethod;
+  }
+
+  /**
+   * Irregular time methods
+   */
+  public function getCreateIrregularTimeMethod(): CreateIrregularTimeMethod {
+    if ($this->createIrregularTimeMethod === null) {
+      $this->createIrregularTimeMethod = new CreateIrregularTimeMethod(
+        $this->queryInjector->getConcreteInsertIrregularTimeQuery(),
+        $this->irregularTimesTableLoader->load() 
+      );
+    }   
+    return $this->createIrregularTimeMethod;
   }
 }

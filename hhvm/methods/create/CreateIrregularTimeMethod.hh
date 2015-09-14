@@ -3,7 +3,7 @@
 class CreateIrregularTimeMethod {
 
   public function __construct(
-    private IrregularTimeInsertQuery $irregularTimeInsertQuery,
+    private InsertIrregularTimeQuery $irregularTimeInsertQuery,
     private IrregularTimesTable $irregularTimesTable
   ) {}
 

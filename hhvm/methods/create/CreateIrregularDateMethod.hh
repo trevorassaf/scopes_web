@@ -3,7 +3,7 @@
 class CreateIrregularDateMethod {
 
   public function __construct(
-    private IrregularDateInsertQuery $irregularTimeInsertQuery,
+    private InsertIrregularDateQuery $irregularTimeInsertQuery,
     private FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateByUniqueQuery,
     private IrregularDatesTable $irregularDatesTable
   ) {}

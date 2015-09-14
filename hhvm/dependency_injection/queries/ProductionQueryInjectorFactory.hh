@@ -6,6 +6,8 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
     $users_table_loader = new UsersTableLazyLoader(); 
     $regular_times_table_loader = new RegularTimesTableLazyLoader();
     $regular_edge_table_loader = new RegularWeekDayRegularTimeEdgesTableLazyLoader();
+    $irregular_times_table_loader = new IrregularTimesTableLazyLoader();
+    $irregular_dates_table_loader = new IrregularDatesTableLazyLoader();
 
     return new QueryInjector(
       new AsyncMysqlConnectionLazyLoader(
@@ -24,6 +26,14 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $regular_edge_table_loader,
       new RegularWeekDayRegularTimeEdgeModelFactoryLazyLoader(
         $regular_edge_table_loader
+      ),
+      $irregular_dates_table_loader,
+      new IrregularDateModelFactoryLazyLoader(
+        $irregular_dates_table_loader
+      ),
+      $irregular_times_table_loader,
+      new IrregularTimeModelFactoryLazyLoader(
+        $irregular_times_table_loader
       )
     );
   }

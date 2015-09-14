@@ -1,6 +1,6 @@
 <?hh // strict
 
-class IrregularTimeInsertQuery {
+class InsertIrregularTimeQuery {
   
   public function __construct(
     private InsertQuery<IrregularTime> $insertQuery,

@@ -10,7 +10,9 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
       new UsersTableLazyLoader(),
       new RegularWeekDaysTableLazyLoader(),
       new RegularTimesTableLazyLoader(),
-      new RegularWeekDayRegularTimeEdgesTableLazyLoader()
+      new RegularWeekDayRegularTimeEdgesTableLazyLoader(),
+      new IrregularDatesTableLazyLoader(),
+      new IrregularTimesTableLazyLoader()
     ); 
   }
 }

@@ -27,6 +27,16 @@ class QueryInjector {
   private ?FetchQuery<RegularWeekDayRegularTimeEdge> $fetchRegularEdgeQuery;
   private ?FetchByUniqueKeyQuery<RegularWeekDayRegularTimeEdge> $fetchRegularEdgeByUniqueKeyQuery;
 
+  // Irregular day queries
+  private ?InsertQuery<IrregularTime> $insertIrregularTimeQuery;
+  private ?InsertQuery<IrregularDate> $insertIrregularDateQuery;
+  private ?InsertIrregularTimeQuery $concreteInsertIrregularTimeQuery;
+  private ?InsertIrregularDateQuery $concreteInsertIrregularDateQuery;
+  private ?FetchQuery<IrregularTime> $fetchIrregularTimeQuery;
+  private ?FetchQuery<IrregularDate> $fetchIrregularDateQuery;
+  private ?FetchByUniqueKeyQuery<IrregularTime> $fetchIrregularTimeByUniqueKeyQuery;
+  private ?FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateByUniqueKeyQuery;
+
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
@@ -38,7 +48,11 @@ class QueryInjector {
     private LazyLoader<RegularTimesTable> $regularTimesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<RegularTime>> $regularTimeModelFactoryLazyLoader,
     private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularEdgesTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<RegularWeekDayRegularTimeEdge>> $regularEdgeModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<RegularWeekDayRegularTimeEdge>> $regularEdgeModelFactoryLazyLoader,
+    private LazyLoader<IrregularDatesTable> $irregularDatesTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<IrregularDate>> $irregularDateModelFactoryLazyLoader,
+    private LazyLoader<IrregularTimesTable> $irregularTimesTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<IrregularTime>> $irregularTimeModelFactoryLazyLoader
   ) {}
 
   /**
@@ -229,5 +243,97 @@ class QueryInjector {
       );
     }
     return $this->fetchRegularEdgeByUniqueKeyQuery;
+  }
+
+  /**
+   * Irregular date queries
+   */
+  public function getFetchIrregularDateQuery(): FetchQuery<IrregularDate> {
+    if ($this->fetchIrregularDateQuery === null) {
+      $this->fetchIrregularDateQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->irregularDateModelFactoryLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchIrregularDateQuery;
+  }
+  
+  public function getFetchIrregularDateByUniqueKeyQuery(): FetchByUniqueKeyQuery<IrregularDate> {
+    if ($this->fetchIrregularDateByUniqueKeyQuery === null) {
+      $this->fetchIrregularDateByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchIrregularDateQuery(),
+        $this->irregularDatesTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchIrregularDateByUniqueKeyQuery;
+  }
+
+  public function getInsertIrregularDateQuery(): InsertQuery<IrregularDate> {
+    if ($this->insertIrregularDateQuery === null) {
+      $this->insertIrregularDateQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->irregularDatesTableLazyLoader->load(),
+        $this->irregularDateModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      ); 
+    }
+    return $this->insertIrregularDateQuery;
+  }
+  
+  public function getConcreteInsertIrregularDateQuery(): InsertIrregularDateQuery {
+    if ($this->concreteInsertIrregularDateQuery === null) {
+      $this->concreteInsertIrregularDateQuery = new InsertIrregularDateQuery(
+        $this->getInsertIrregularDateQuery(),
+        $this->irregularDatesTableLazyLoader->load()  
+      ); 
+    }
+    return $this->concreteInsertIrregularDateQuery;
+  }
+
+  /**
+   * Irregular time queries
+   */
+  public function getFetchIrregularTimeQuery(): FetchQuery<IrregularTime> {
+    if ($this->fetchIrregularTimeQuery === null) {
+      $this->fetchIrregularTimeQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->irregularTimeModelFactoryLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchIrregularTimeQuery;
+  }
+
+  public function getFetchIrregularTimeByUniqueKeyQuery(): FetchByUniqueKeyQuery<IrregularTime> {
+    if ($this->fetchIrregularTimeByUniqueKeyQuery === null) {
+      $this->fetchIrregularTimeByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchIrregularTimeQuery(),
+        $this->irregularTimesTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchIrregularTimeByUniqueKeyQuery;
+  }
+
+  public function getInsertIrregularTimeQuery(): InsertQuery<IrregularTime> {
+    if ($this->insertIrregularTimeQuery === null) {
+      $this->insertIrregularTimeQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->irregularTimesTableLazyLoader->load(),
+        $this->irregularTimeModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      ); 
+    }
+    return $this->insertIrregularTimeQuery;
+  }
+
+  public function getConcreteInsertIrregularTimeQuery(): InsertIrregularTimeQuery {
+    if ($this->concreteInsertIrregularTimeQuery === null) {
+      $this->concreteInsertIrregularTimeQuery = new InsertIrregularTimeQuery(
+        $this->getInsertIrregularTimeQuery(),
+        $this->irregularTimesTableLazyLoader->load()  
+      ); 
+    }
+    return $this->concreteInsertIrregularTimeQuery;
   }
 }
