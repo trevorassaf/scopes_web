@@ -37,8 +37,8 @@ class QueryInjector {
     private LazyLoader<ConcreteModelFactory<RegularWeekDay>> $regularWeekDayModelFactoryLazyLoader,
     private LazyLoader<RegularTimesTable> $regularTimesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<RegularTime>> $regularTimeModelFactoryLazyLoader,
-    private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularWeekDayRegularTimeEdgesTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<RegularWeekDayRegularTimeEdge>> $regularWeekDayRegularTimeEdgeModelFactoryLazyLoader
+    private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularEdgesTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<RegularWeekDayRegularTimeEdge>> $regularEdgeModelFactoryLazyLoader
   ) {}
 
   /**
@@ -192,11 +192,42 @@ class QueryInjector {
     if ($this->insertRegularEdgeQuery === null) {
       $this->insertRegularEdgeQuery = new InsertQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->regularWeekDayRegularTimeEdgesTableLazyLoader->load(),
-        $this->regularWeekDayRegularTimeEdgeModelFactoryLazyLoader->load(),
+        $this->regularEdgesTableLazyLoader->load(),
+        $this->regularEdgeModelFactoryLazyLoader->load(),
         $this->insertQueryCreaterLazyLoader->load()
       );
     }
     return $this->insertRegularEdgeQuery;
+  }
+
+  public function getConcreteInsertRegularEdgeQuery(): InsertRegularWeekDayRegularTimeEdgeQuery {
+    if ($this->concreteInsertRegularEdgeQuery === null) {
+      $this->concreteInsertRegularEdgeQuery = new InsertRegularWeekDayRegularTimeEdgeQuery(
+        $this->getInsertRegularEdgeQuery(),
+        $this->regularEdgesTableLazyLoader->load() 
+      );
+    }    
+    return $this->concreteInsertRegularEdgeQuery;
+  }
+
+  public function getFetchRegularEdgeQuery(): FetchQuery<RegularWeekDayRegularTimeEdge> {
+    if ($this->fetchRegularEdgeQuery === null) {
+      $this->fetchRegularEdgeQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->regularEdgeModelFactoryLazyLoader->load()  
+      ); 
+    }
+    return $this->fetchRegularEdgeQuery;
+  }
+
+  public function getFetchRegularEdgeByUniqueKeyQuery(): FetchByUniqueKeyQuery<RegularWeekDayRegularTimeEdge> {
+    if ($this->fetchRegularEdgeByUniqueKeyQuery === null) {
+      $this->fetchRegularEdgeByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchRegularEdgeQuery(),
+        $this->regularEdgesTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()  
+      );
+    }
+    return $this->fetchRegularEdgeByUniqueKeyQuery;
   }
 }

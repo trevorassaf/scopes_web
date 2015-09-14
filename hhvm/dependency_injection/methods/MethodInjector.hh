@@ -11,11 +11,15 @@ class MethodInjector {
   // Regular time methods
   private ?CreateRegularTimeMethod $createRegularTimeMethod;
 
+  // Regular edge methods
+  private ?CreateRegularWeekDayRegularTimeEdgeMethod $createRegularEdgeMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
     private LazyLoader<RegularWeekDaysTable> $regularWeekDaysTableLoader,
-    private LazyLoader<RegularTimesTable> $regularTimesTableLoader
+    private LazyLoader<RegularTimesTable> $regularTimesTableLoader,
+    private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularEdgesTableLazyLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -60,4 +64,14 @@ class MethodInjector {
   /**
    * Regular edge methods
    */
+  public function getCreateRegularEdgeMethod(): CreateRegularWeekDayRegularTimeEdgeMethod {
+    if ($this->createRegularEdgeMethod === null) {
+      $this->createRegularEdgeMethod = new CreateRegularWeekDayRegularTimeEdgeMethod(
+        $this->queryInjector->getConcreteInsertRegularEdgeQuery(),
+        $this->queryInjector->getFetchRegularEdgeByUniqueKeyQuery(),
+        $this->regularEdgesTableLazyLoader->load() 
+      );
+    } 
+    return $this->createRegularEdgeMethod;
+  }
 }
