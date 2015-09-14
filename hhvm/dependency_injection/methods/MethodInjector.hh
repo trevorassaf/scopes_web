@@ -56,4 +56,8 @@ class MethodInjector {
     }
     return $this->createRegularTimeMethod;
   }
+
+  /**
+   * Regular edge methods
+   */
 }
