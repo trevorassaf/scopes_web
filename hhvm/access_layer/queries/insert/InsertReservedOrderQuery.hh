@@ -1,6 +1,6 @@
 <?hh // strict
 
-class ReservedOrderInsertQuery {
+class InsertReservedOrderQuery {
 
   public function __construct(
     private InsertQuery<RsvdOrder> $insertQuery,

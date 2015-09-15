@@ -3,7 +3,7 @@
 class ReserveOrderMethod {
 
   public function __construct(
-    private ReservedOrderInsertQuery $rsvdOrderInsertQuery,
+    private InsertReservedOrderQuery $rsvdOrderInsertQuery,
   ) {}
 
   public function reserveOrder(

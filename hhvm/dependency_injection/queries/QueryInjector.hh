@@ -41,10 +41,14 @@ class QueryInjector {
   // Reserved orders queries
   private ?FetchQuery<RsvdOrder> $fetchRsvdOrderQuery;
   private ?FetchReservedOrdersByTimeQuery $fetchRsvdOrdersByTimeQuery;
+  private ?InsertQuery<RsvdOrder> $insertRsvdOrderQuery;
+  private ?InsertReservedOrderQuery $concreteInsertRsvdOrderQuery;
 
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
   private ?FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery;
+  private ?InsertQuery<ConfirmedOrder> $insertConfirmedOrderQuery;
+  private ?InsertConfirmedOrderQuery $concreteInsertConfirmedOrderQuery;
 
   // Reserved order policy queries
   private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
@@ -388,6 +392,28 @@ class QueryInjector {
     return $this->fetchRsvdOrdersByTimeQuery;
   }
 
+  public function getInsertRsvdOrderQuery(): InsertQuery<RsvdOrder> {
+    if ($this->insertRsvdOrderQuery === null) {
+      $this->insertRsvdOrderQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->rsvdOrdersTableLazyLoader->load(),
+        $this->rsvdOrderModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      ); 
+    }
+    return $this->insertRsvdOrderQuery;
+  }
+
+  public function getConcreteInsertRsvdOrderQuery(): InsertReservedOrderQuery {
+    if ($this->concreteInsertRsvdOrderQuery === null) {
+      $this->concreteInsertRsvdOrderQuery = new InsertReservedOrderQuery(
+        $this->getInsertRsvdOrderQuery(),
+        $this->rsvdOrdersTableLazyLoader->load() 
+      );
+    }
+    return $this->concreteInsertRsvdOrderQuery;
+  }
+
   /**
    * Confirmed order queries
    */
@@ -409,6 +435,28 @@ class QueryInjector {
       ); 
     }
     return $this->fetchConfirmedOrdersByTimeQuery;
+  }
+  
+  public function getInsertConfirmedOrderQuery(): InsertQuery<ConfirmedOrder> {
+    if ($this->insertConfirmedOrderQuery === null) {
+      $this->insertConfirmedOrderQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->confirmedOrdersTableLazyLoader->load(),
+        $this->confirmedOrderModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      ); 
+    }
+    return $this->insertConfirmedOrderQuery;
+  }
+
+  public function getConcreteInsertConfirmedOrderQuery(): InsertConfirmedOrderQuery {
+    if ($this->concreteInsertConfirmedOrderQuery === null) {
+      $this->concreteInsertConfirmedOrderQuery = new InsertConfirmedOrderQuery(
+        $this->getInsertConfirmedOrderQuery(),
+        $this->confirmedOrdersTableLazyLoader->load() 
+      );
+    }
+    return $this->concreteInsertConfirmedOrderQuery;
   }
 
   /**

@@ -4,7 +4,7 @@ class ConfirmOrderMethod {
 
   public function __construct(
     private FetchByIdQuery<RsvdOrder> $fetchRsvdOrderQuery,
-    private ConfirmedOrderInsertQuery $confirmedOrderInsertQuery,
+    private InsertConfirmedOrderQuery $confirmedOrderInsertQuery,
     private BatchInsertQuery<CellLabel> $cellLabelBatchInsertQuery,
     private DeleteByIdQuery<RsvdOrder> $deleteRsvdOrderQuery,
     private CellLabelsTable $cellLabelsTable

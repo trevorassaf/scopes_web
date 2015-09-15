@@ -1,6 +1,6 @@
 <?hh // strict
 
-class ConfirmedOrderInsertQuery {
+class InsertConfirmedOrderQuery {
 
   public function __construct(
     private InsertQuery<ConfirmedOrder> $insertQuery,
