@@ -67,7 +67,9 @@ class QueryInjector {
     private LazyLoader<RsvdOrdersTable> $rsvdOrdersTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<RsvdOrder>> $rsvdOrderModelFactoryLazyLoader,
     private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<ConfirmedOrder>> $confirmedOrderModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<ConfirmedOrder>> $confirmedOrderModelFactoryLazyLoader,
+    private LazyLoader<ReservedOrderPolicyTable> $rsvdOrderPolicyTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<ReservedOrderPolicy>> $rsvdOrderPolicyModelFactoryLazyLoader
   ) {}
 
   /**
@@ -355,5 +357,68 @@ class QueryInjector {
   /**
    * Reserved order queries.
    */
+  public function getFetchRsvdOrderQuery(): FetchQuery<RsvdOrder> {
+    if ($this->fetchRsvdOrderQuery === null) {
+      $this->fetchRsvdOrderQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->rsvdOrderModelFactoryLazyLoader->load()
+      );
+    }
+    return $this->fetchRsvdOrderQuery;
+  }
 
+  public function getFetchRsvdOrdersByTimeQuery(): FetchReservedOrdersByTimeQuery {
+    if ($this->fetchRsvdOrdersByTimeQuery === null) {
+      $this->fetchRsvdOrdersByTimeQuery = new FetchReservedOrdersByTimeQuery(
+        $this->getFetchRsvdOrderQuery(), 
+        $this->rsvdOrdersTableLazyLoader->load()
+      );
+    }
+    return $this->fetchRsvdOrdersByTimeQuery;
+  }
+
+  /**
+   * Confirmed order queries
+   */
+  public function getFetchConfirmedOrderQuery(): FetchQuery<ConfirmedOrder> {
+    if ($this->fetchConfirmedOrderQuery === null) {
+      $this->fetchConfirmedOrderQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->confirmedOrderModelFactoryLazyLoader->load() 
+      );
+    }
+    return $this->fetchConfirmedOrderQuery;
+  }
+
+  public function getFetchConfirmedOrdersByTimeQuery(): FetchConfirmedOrdersByTimeQuery {
+    if ($this->fetchConfirmedOrdersByTimeQuery === null) {
+      $this->fetchConfirmedOrdersByTimeQuery = new FetchConfirmedOrdersByTimeQuery(
+        $this->getFetchConfirmedOrderQuery(),
+        $this->confirmedOrdersTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchConfirmedOrdersByTimeQuery;
+  }
+
+  /**
+   * Reserved order policy queries
+   */
+  public function getFetchReservedOrderPolicyQuery(): FetchSingletonQuery<ReservedOrderPolicy> {
+    if ($this->fetchSingletonRsvdOrderPolicyQuery === null) {
+      $this->fetchSingletonRsvdOrderPolicyQuery = new FetchSingletonQuery(
+        new FetchByIdQuery(
+          new FetchByUniqueKeyQuery(
+            new FetchQuery(
+              $this->asyncMysqlConnectionLazyLoader->load(),
+              $this->rsvdOrderPolicyModelFactoryLazyLoader->load()
+            ),
+            $this->rsvdOrderPolicyTableLazyLoader->load(),
+            $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+          ),
+          $this->rsvdOrderPolicyTableLazyLoader->load() 
+        )
+      ); 
+    }
+    return $this->fetchSingletonRsvdOrderPolicyQuery;
+  }
 }
