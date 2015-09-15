@@ -27,7 +27,7 @@ class QueryInjector {
   private ?FetchQuery<RegularWeekDayRegularTimeEdge> $fetchRegularEdgeQuery;
   private ?FetchByUniqueKeyQuery<RegularWeekDayRegularTimeEdge> $fetchRegularEdgeByUniqueKeyQuery;
 
-  // Irregular day queries
+  // Irregular time/day queries
   private ?InsertQuery<IrregularTime> $insertIrregularTimeQuery;
   private ?InsertQuery<IrregularDate> $insertIrregularDateQuery;
   private ?InsertIrregularTimeQuery $concreteInsertIrregularTimeQuery;
@@ -36,6 +36,7 @@ class QueryInjector {
   private ?FetchQuery<IrregularDate> $fetchIrregularDateQuery;
   private ?FetchByUniqueKeyQuery<IrregularTime> $fetchIrregularTimeByUniqueKeyQuery;
   private ?FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateByUniqueKeyQuery;
+  private ?FetchIrregularTimesQuery $concreteFetchIrregularTimesQuery;
 
   // Reserved orders queries
   private ?FetchQuery<RsvdOrder> $fetchRsvdOrderQuery;
@@ -319,6 +320,16 @@ class QueryInjector {
       ); 
     }
     return $this->fetchIrregularTimeQuery;
+  }
+
+  public function getConcreteFetchIrregularTimeQuery(): FetchIrregularTimesQuery {
+    if ($this->concreteFetchIrregularTimesQuery === null) {
+      $this->concreteFetchIrregularTimesQuery = new FetchIrregularTimesQuery(
+        $this->getFetchIrregularTimeQuery(),
+        $this->irregularTimesTableLazyLoader->load() 
+      ); 
+    }
+   return $this->concreteFetchIrregularTimesQuery; 
   }
 
   public function getFetchIrregularTimeByUniqueKeyQuery(): FetchByUniqueKeyQuery<IrregularTime> {

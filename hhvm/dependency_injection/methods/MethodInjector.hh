@@ -20,6 +20,12 @@ class MethodInjector {
   // Irregular time methods
   private ?CreateIrregularTimeMethod $createIrregularTimeMethod;
 
+  // Is conflicting reserved order method
+  private ?IsConflictingReservedOrderMethod $isConflictingReservedOrderMethod;
+
+  // Is valid reserved order method
+  private ?IsValidReservedOrderMethod $isValidReservedOrderMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
@@ -108,5 +114,38 @@ class MethodInjector {
       );
     }   
     return $this->createIrregularTimeMethod;
+  }
+
+  /**
+   * Is conflicting reserved order method
+   */
+  public function getIsConflictingReservedOrderMethod(): IsConflictingReservedOrderMethod {
+    if ($this->isConflictingReservedOrderMethod === null) {
+      $this->isConflictingReservedOrderMethod = new IsConflictingReservedOrderMethod(
+        $this->queryInjector->getFetchRsvdOrdersByTimeQuery(),
+        $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
+        $this->queryInjector->getFetchReservedOrderPolicyQuery()
+      ); 
+    } 
+    return $this->isConflictingReservedOrderMethod;
+  }
+
+  /**
+   * Is valid reserved order method
+   */
+  public function getIsValidReservedOrderMethod(): IsValidReservedOrderMethod {
+    if ($this->isValidReservedOrderMethod === null) {
+      $this->isValidReservedOrderMethod = new IsValidReservedOrderMethod(
+        $this->getIsConflictingReservedOrderMethod(),
+        $this->queryInjector->getFetchRegularEdgeQuery(),
+        $this->regularEdgesTableLoader->load(),
+        $this->queryInjector->getFetchRegularTimeQuery(),
+        $this->regularTimesTableLoader->load(),
+        $this->queryInjector->getConcreteFetchIrregularTimeQuery(),
+        $this->queryInjector->getFetchIrregularDateByUniqueKeyQuery(),
+        $this->irregularDatesTableLoader->load()
+      ); 
+    }
+    return $this->isValidReservedOrderMethod;
   }
 }
