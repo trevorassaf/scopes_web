@@ -37,6 +37,17 @@ class QueryInjector {
   private ?FetchByUniqueKeyQuery<IrregularTime> $fetchIrregularTimeByUniqueKeyQuery;
   private ?FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateByUniqueKeyQuery;
 
+  // Reserved orders queries
+  private ?FetchQuery<RsvdOrder> $fetchRsvdOrderQuery;
+  private ?FetchReservedOrdersByTimeQuery $fetchRsvdOrdersByTimeQuery;
+
+  // Confirmed orders queries
+  private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
+  private ?FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery;
+
+  // Reserved order policy queries
+  private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
+
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
@@ -52,7 +63,11 @@ class QueryInjector {
     private LazyLoader<IrregularDatesTable> $irregularDatesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<IrregularDate>> $irregularDateModelFactoryLazyLoader,
     private LazyLoader<IrregularTimesTable> $irregularTimesTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<IrregularTime>> $irregularTimeModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<IrregularTime>> $irregularTimeModelFactoryLazyLoader,
+    private LazyLoader<RsvdOrdersTable> $rsvdOrdersTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<RsvdOrder>> $rsvdOrderModelFactoryLazyLoader,
+    private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<ConfirmedOrder>> $confirmedOrderModelFactoryLazyLoader
   ) {}
 
   /**
@@ -336,4 +351,9 @@ class QueryInjector {
     }
     return $this->concreteInsertIrregularTimeQuery;
   }
+
+  /**
+   * Reserved order queries.
+   */
+
 }
