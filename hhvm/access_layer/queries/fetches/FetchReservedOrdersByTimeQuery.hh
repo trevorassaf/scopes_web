@@ -8,8 +8,7 @@ class FetchReservedOrdersByTimeQuery {
   ) {}
 
   public async function fetch(
-    Timestamp $start_time,
-    Timestamp $end_time
+    TimestampInterval $interval
   ): Awaitable<ImmVector<RsvdOrder>> {
     // Build where clause
     $where_clause_vector_builder = new WhereClauseVectorBuilder();
@@ -17,13 +16,13 @@ class FetchReservedOrdersByTimeQuery {
       ->setFirstClause(
         new GreaterThanOrEqualToWhereClause(
           $this->rsvdOrdersTable->getStartTimeKey(),
-          $start_time->toString()
+          $interval->getStart()->toString()
         )
       )
       ->and(
         new LessThanOrEqualToWhereClause(
           $this->rsvdOrdersTable->getEndTimeKey(),
-          $end_time->toString()
+          $interval->getEnd()->toString()
         )
       )
       ->build();

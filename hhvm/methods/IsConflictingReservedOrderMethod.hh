@@ -10,23 +10,16 @@ class IsConflictingReservedOrderMethod {
 
   public function check(
     UnsignedInt $scopes_count,
-    Timestamp $start_time,
-    Timestamp $end_time
+    TimestampInterval $scopes_interval
   ): bool {
     // TODO fail fast if start_time comes after end_time
     try {
       // Commence queries simultaneously. Start with order fetches
       // because they take the longest...
       $rsvd_order_fetch_handle = $this->fetchReservedOrdersByTimeQuery 
-        ->fetch(
-          $start_time,
-          $end_time
-        );
+        ->fetch($scopes_interval);
       $confirmed_order_fetch_handle = $this->fetchConfirmedOrdersByTimeQuery 
-        ->fetch(
-          $start_time,
-          $end_time
-        );
+        ->fetch($scopes_interval);
       $order_policy_fetch_handle = $this->fetchReservedOrderPolicyQuery->fetch();
 
       // Wait for completion...

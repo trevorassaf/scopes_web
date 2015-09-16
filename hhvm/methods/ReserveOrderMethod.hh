@@ -10,8 +10,7 @@ class ReserveOrderMethod {
   public function reserve(
     UnsignedInt $user_id,
     UnsignedInt $scopes_count,
-    Timestamp $start_time,
-    Timestamp $end_time
+    TimestampInterval $scopes_interval
   ): RsvdOrder {
     // TODO First, perform light-weight policy check on reservation request
 
@@ -21,8 +20,8 @@ class ReserveOrderMethod {
       $rsvd_order = $this->rsvdOrderInsertQuery->insert(
         $user_id,
         $scopes_count,
-        $start_time,
-        $end_time
+        $scopes_interval->getStart(),
+        $scopes_interval->getEnd()
       )
       ->getWaitHandle()
       ->join();

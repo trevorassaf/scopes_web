@@ -8,8 +8,7 @@ class FetchConfirmedOrdersByTimeQuery {
   ) {}
 
   public async function fetch(
-    Timestamp $start_time,
-    Timestamp $end_time
+    TimestampInterval $interval
   ): Awaitable<ImmVector<ConfirmedOrder>> {
     $fetch_params_builder = new FetchParamsBuilder();
 
@@ -20,13 +19,13 @@ class FetchConfirmedOrdersByTimeQuery {
         ->setFirstClause(
           new GreaterThanOrEqualToWhereClause(
             $this->confirmedOrdersTable->getStartTimeKey(),
-            $start_time->toString()
+            $interval->getStart()->toString()
           )
         )
         ->and(
           new LessThanOrEqualToWhereClause(
             $this->confirmedOrdersTable->getEndTimeKey(),
-            $end_time->toString()
+            $interval->getEnd()->toString()
           )
         )
         ->build()

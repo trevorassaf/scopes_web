@@ -16,8 +16,10 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
     $rsvd_order = $this->reserveOrderMethod->reserve(
       $request->getUserId()->get(),
       $request->getScopesCount()->get(),
-      $request->getStartTime()->get(),
-      $request->getEndTime()->get()
+      new TimestampInterval(
+        $request->getStartTime()->get(),
+        $request->getEndTime()->get()
+      )
     ); 
     return new ReserveOrderApiResult($rsvd_order->getId());
   }
