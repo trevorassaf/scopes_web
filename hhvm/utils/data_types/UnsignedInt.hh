@@ -6,6 +6,14 @@ class UnsignedInt {
   
   private int $number; 
 
+  public static function isValidString(string $number): bool {
+    return is_int($number) && self::isUnsigned((int)$number);
+  }
+
+  public static function fromString(string $number): UnsignedInt {
+    return new UnsignedInt((int)$number);
+  }
+
   public static function isUnsigned(int $number): bool {
     return $number >= 0;
   }

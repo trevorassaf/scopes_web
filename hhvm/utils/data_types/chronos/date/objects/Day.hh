@@ -4,9 +4,15 @@ class Day {
 
   const int MAX_DAY = 31;
 
+  public static function isValid(UnsignedInt $day_number): bool {
+    return $day_number->getNumber() <= self::MAX_DAY;
+  }
+
   public function __construct(
     private UnsignedInt $day
-  ) {}
+  ) {
+    invariant(self::isValid($this->day), "invalid day!");
+  }
 
   public function getNumber(): UnsignedInt {
     return $this->day;
