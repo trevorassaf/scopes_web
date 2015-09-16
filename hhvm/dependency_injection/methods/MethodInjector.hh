@@ -26,6 +26,12 @@ class MethodInjector {
   // Is valid reserved order method
   private ?IsValidReservedOrderMethod $isValidReservedOrderMethod;
 
+  // Reserve order method
+  private ?ReserveOrderMethod $reserveOrderMethod;
+
+  // Confirm order method
+  private ?ConfirmOrderMethod $confirmOrderMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
@@ -33,7 +39,8 @@ class MethodInjector {
     private LazyLoader<RegularTimesTable> $regularTimesTableLoader,
     private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularEdgesTableLoader,
     private LazyLoader<IrregularDatesTable> $irregularDatesTableLoader,
-    private LazyLoader<IrregularTimesTable> $irregularTimesTableLoader
+    private LazyLoader<IrregularTimesTable> $irregularTimesTableLoader,
+    private LazyLoader<CellLabelsTable> $cellsLabelTableLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -148,4 +155,33 @@ class MethodInjector {
     }
     return $this->isValidReservedOrderMethod;
   }
+
+  /**
+   * Reserve order method
+   */
+  public function getReserveOrderMethod(): ReserveOrderMethod {
+    if ($this->reserveOrderMethod === null) {
+      $this->reserveOrderMethod = new ReserveOrderMethod(
+        $this->queryInjector->getConcreteInsertRsvdOrderQuery()
+      ); 
+    }
+    return $this->reserveOrderMethod;
+  }
+
+  /**
+   * Confirm order method
+   */
+  public function getConfirmOrderMethod(): ConfirmOrderMethod {
+    if ($this->confirmOrderMethod === null) {
+      $this->confirmOrderMethod = new ConfirmOrderMethod(
+        $this->queryInjector->getFetchRsvdOrderByIdQuery(),
+        $this->queryInjector->getConcreteInsertConfirmedOrderQuery(),
+        $this->queryInjector->getBatchInsertCellLabelsQuery(),
+        $this->queryInjector->getDeleteRsvdOrderByIdQuery(),
+        $this->cellsLabelTableLoader->load()
+      ); 
+    }
+    return $this->confirmOrderMethod;
+  }
+
 }

@@ -11,6 +11,7 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
     $rsvd_orders_table_loader = new ReservedOrdersTableLazyLoader();
     $confirmed_orders_table_loader = new ConfirmedOrdersTableLazyLoader();
     $rsvd_order_policy_table_loader = new ReservedOrderPolicyTableLazyLoader();
+    $cell_labels_table_loader = new CellLabelsTableLazyLoader();
 
     return new QueryInjector(
       new AsyncMysqlConnectionLazyLoader(
@@ -49,6 +50,10 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $rsvd_order_policy_table_loader,
       new ReservedOrderPolicyModelFactoryLazyLoader(
         $rsvd_order_policy_table_loader
+      ),
+      $cell_labels_table_loader,
+      new CellLabelModelFactoryLazyLoader(
+        $cell_labels_table_loader
       )
     );
   }

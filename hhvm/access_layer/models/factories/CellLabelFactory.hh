@@ -1,6 +1,6 @@
 <?hh // strict
 
-class CellLabelModelFactory extends ConcreteModelFactory<CellLabel> {
+class CellLabelFactory extends ConcreteModelFactory<CellLabel> {
 
   public function __construct(
     private CellLabelsTable $cellLabelsTable

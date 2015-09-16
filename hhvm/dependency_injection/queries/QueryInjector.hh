@@ -40,9 +40,13 @@ class QueryInjector {
 
   // Reserved orders queries
   private ?FetchQuery<RsvdOrder> $fetchRsvdOrderQuery;
+  private ?FetchByUniqueKeyQuery<RsvdOrder> $fetchRsvdOrderByUniqueKeyQuery;
+  private ?FetchByIdQuery<RsvdOrder> $fetchRsvdOrderByIdQuery;
   private ?FetchReservedOrdersByTimeQuery $fetchRsvdOrdersByTimeQuery;
   private ?InsertQuery<RsvdOrder> $insertRsvdOrderQuery;
   private ?InsertReservedOrderQuery $concreteInsertRsvdOrderQuery;
+  private ?DeleteQuery<RsvdOrder> $deleteRsvdOrderQuery;
+  private ?DeleteByIdQuery<RsvdOrder> $deleteRsvdOrderByIdQuery;
 
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
@@ -52,6 +56,9 @@ class QueryInjector {
 
   // Reserved order policy queries
   private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
+
+  // Cell label queries
+  private ?BatchInsertQuery<CellLabel> $batchInsertCellLabelQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -74,7 +81,9 @@ class QueryInjector {
     private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<ConfirmedOrder>> $confirmedOrderModelFactoryLazyLoader,
     private LazyLoader<ReservedOrderPolicyTable> $rsvdOrderPolicyTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<ReservedOrderPolicy>> $rsvdOrderPolicyModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<ReservedOrderPolicy>> $rsvdOrderPolicyModelFactoryLazyLoader,
+    private LazyLoader<CellLabelsTable> $cellLabelsTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<CellLabel>> $cellLabelModelFactoryLazyLoader
   ) {}
 
   /**
@@ -392,6 +401,27 @@ class QueryInjector {
     return $this->fetchRsvdOrdersByTimeQuery;
   }
 
+  public function getFetchRsvdOrderByUniqueKeyQuery(): FetchByUniqueKeyQuery<RsvdOrder> {
+    if ($this->fetchRsvdOrderByUniqueKeyQuery === null) {
+      $this->fetchRsvdOrderByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchRsvdOrderQuery(),
+        $this->rsvdOrdersTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load() 
+      );
+    }
+    return $this->fetchRsvdOrderByUniqueKeyQuery;
+  }
+
+  public function getFetchRsvdOrderByIdQuery(): FetchByIdQuery<RsvdOrder> {
+    if ($this->fetchRsvdOrderByIdQuery === null) {
+      $this->fetchRsvdOrderByIdQuery = new FetchByIdQuery(
+        $this->getFetchRsvdOrderByUniqueKeyQuery(),
+        $this->rsvdOrdersTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchRsvdOrderByIdQuery;
+  }
+
   public function getInsertRsvdOrderQuery(): InsertQuery<RsvdOrder> {
     if ($this->insertRsvdOrderQuery === null) {
       $this->insertRsvdOrderQuery = new InsertQuery(
@@ -412,6 +442,26 @@ class QueryInjector {
       );
     }
     return $this->concreteInsertRsvdOrderQuery;
+  }
+
+  public function getDeleteRsvdOrderQuery(): DeleteQuery<RsvdOrder> {
+    if ($this->deleteRsvdOrderQuery === null) {
+      $this->deleteRsvdOrderQuery = new DeleteQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->rsvdOrdersTableLazyLoader->load()
+      ); 
+    } 
+    return $this->deleteRsvdOrderQuery;
+  }
+
+  public function getDeleteRsvdOrderByIdQuery(): DeleteByIdQuery<RsvdOrder> {
+    if ($this->deleteRsvdOrderByIdQuery === null) {
+      $this->deleteRsvdOrderByIdQuery = new DeleteByIdQuery(
+        $this->getDeleteRsvdOrderQuery(),
+        $this->rsvdOrdersTableLazyLoader->load()
+      ); 
+    }
+   return $this->deleteRsvdOrderByIdQuery; 
   }
 
   /**
@@ -479,5 +529,19 @@ class QueryInjector {
       ); 
     }
     return $this->fetchSingletonRsvdOrderPolicyQuery;
+  }
+
+  /**
+   * Cell label queries
+   */
+  public function getBatchInsertCellLabelsQuery(): BatchInsertQuery<CellLabel> {
+    if ($this->batchInsertCellLabelQuery === null) {
+      $this->batchInsertCellLabelQuery = new BatchInsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->cellLabelsTableLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      ); 
+    } 
+    return $this->batchInsertCellLabelQuery;
   }
 }
