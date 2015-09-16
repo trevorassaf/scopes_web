@@ -2,7 +2,7 @@
 
 class HRDateSerializer implements DateSerializer {
 
-  const string DELIMITER = ":";
+  const string DELIMITER = "-";
 
   public function serialize(Date $date): string {
     return $date->getYear()->toString() . self::DELIMITER
@@ -44,15 +44,11 @@ class HRDateSerializer implements DateSerializer {
       return false; 
     }
 
-    $year = new Year($year_number);
-    $month = new Month($month_number);
-    $day = new Day($day_number);
-
     // Check integrity of date
     return checkdate(
-      $month->getNumber()->getNumber(),
-      $day->getNumber()->getNumber(),
-      $year->getNumber()->getNumber()
+      $month_number->getNumber(),
+      $day_number->getNumber(),
+      $year_number->getNumber()
     );
   }
 }
