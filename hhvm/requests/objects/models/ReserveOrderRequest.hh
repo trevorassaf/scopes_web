@@ -5,14 +5,12 @@ class ReserveOrderRequest {
   const string REQUEST_OBJECT_NAME = "ReserveOrderRequest";
 
   const string USER_ID_KEY = "user-id";
-  const string LEASE_START_KEY = "lease-start";
   const string SCOPES_COUNT_KEY = "scopes-count";
   const string START_TIME_KEY = "start-time";
   const string END_TIME_KEY = "end-time";
 
   public function __construct(
     private RequestField<UnsignedInt> $userId,
-    private RequestField<Timestamp> $leaseStart,
     private RequestField<UnsignedInt> $scopesCount,
     private RequestField<Timestamp> $startTime,
     private RequestField<Timestamp> $endTime
@@ -20,10 +18,6 @@ class ReserveOrderRequest {
 
   public function getUserId(): RequestField<UnsignedInt> {
     return $this->userId;
-  }
-
-  public function getLeaseStart(): RequestField<Timestamp> {
-    return $this->leaseStart;
   }
 
   public function getScopesCount(): RequestField<UnsignedInt> {
@@ -42,7 +36,6 @@ class ReserveOrderRequest {
 class ReserveOrderRequestBuilder {
 
   private ?RequestField<UnsignedInt> $userId;
-  private ?RequestField<Timestamp> $leaseStart;
   private ?RequestField<UnsignedInt> $scopesCount;
   private ?RequestField<Timestamp> $startTime;
   private ?RequestField<Timestamp> $endTime;
@@ -51,13 +44,6 @@ class ReserveOrderRequestBuilder {
     RequestField<UnsignedInt> $user_id
   ): this {
     $this->userId = $user_id;
-    return $this;
-  }
-
-  public function setLeaseStart(
-    RequestField<Timestamp> $lease_start
-  ): this {
-    $this->leaseStart = $lease_start;
     return $this;
   }
 
@@ -91,13 +77,6 @@ class ReserveOrderRequestBuilder {
       ); 
     }
 
-    if ($this->leaseStart == null) {
-      throw new UnsetRequestFieldException(
-        ReserveOrderRequest::REQUEST_OBJECT_NAME,
-        ReserveOrderRequest::LEASE_START_KEY
-      ); 
-    }
-
     if ($this->scopesCount == null) {
       throw new UnsetRequestFieldException(
         ReserveOrderRequest::REQUEST_OBJECT_NAME,
@@ -121,7 +100,6 @@ class ReserveOrderRequestBuilder {
 
     return new ReserveOrderRequest(
       $this->userId,
-      $this->leaseStart,
       $this->scopesCount,
       $this->startTime,
       $this->endTime

@@ -13,7 +13,11 @@ class IsValidReservedOrderMethod {
     private IrregularDatesTable $irregularDatesTable
   ) {}
 
-  public function check(Date $date, TimeInterval $interval): bool {
+  public function check(
+    UnsignedInt $num_requested_scopes,
+    Date $date,
+    TimeInterval $interval
+  ): bool {
     try {
       // Check if 'date' is designated as an irregular date. Lookup
       // id of corresponding object.

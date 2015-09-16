@@ -56,6 +56,8 @@ class QueryInjector {
 
   // Reserved order policy queries
   private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
+  private ?InsertQuery<ReservedOrderPolicy> $insertReservedOrderPolicyQuery;
+  private ?InsertReservedOrderPolicyQuery $concreteInsertReservedOrderPolicyQuery;
 
   // Cell label queries
   private ?BatchInsertQuery<CellLabel> $batchInsertCellLabelQuery;
@@ -529,6 +531,28 @@ class QueryInjector {
       ); 
     }
     return $this->fetchSingletonRsvdOrderPolicyQuery;
+  }
+
+  public function getInsertReservedOrderPolicyQuery(): InsertQuery<ReservedOrderPolicy> {
+    if ($this->insertReservedOrderPolicyQuery === null) {
+      $this->insertReservedOrderPolicyQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->rsvdOrderPolicyTableLazyLoader->load(),
+        $this->rsvdOrderPolicyModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      ); 
+    }
+    return $this->insertReservedOrderPolicyQuery;
+  }
+
+  public function getConcreteInsertReservedOrderPolicyQuery(): InsertReservedOrderPolicyQuery {
+    if ($this->concreteInsertReservedOrderPolicyQuery === null) {
+      $this->concreteInsertReservedOrderPolicyQuery = new InsertReservedOrderPolicyQuery(
+        $this->getInsertReservedOrderPolicyQuery(),
+        $this->rsvdOrderPolicyTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertReservedOrderPolicyQuery;
   }
 
   /**

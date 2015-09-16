@@ -4,11 +4,11 @@ class ReserveOrderMethod {
 
   public function __construct(
     private InsertReservedOrderQuery $rsvdOrderInsertQuery,
+    private IsValidReservedOrderMethod $isValidReservedOrderMethod
   ) {}
 
-  public function reserveOrder(
+  public function reserve(
     UnsignedInt $user_id,
-    Timestamp $lease_start,
     UnsignedInt $scopes_count,
     Timestamp $start_time,
     Timestamp $end_time
@@ -20,7 +20,6 @@ class ReserveOrderMethod {
     try {
       $rsvd_order = $this->rsvdOrderInsertQuery->insert(
         $user_id,
-        $lease_start,
         $scopes_count,
         $start_time,
         $end_time

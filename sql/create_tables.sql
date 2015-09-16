@@ -15,3 +15,5 @@ source create_tables/regular_times.sql
 source create_tables/regular_week_days.sql
 source create_tables/regular_week_day_regular_time_edges.sql
 
+source create_tables/rsvd_order_policy.sql
+

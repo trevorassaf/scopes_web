@@ -13,9 +13,8 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
     ReserveOrderRequest $request
   ): ApiResult {
     // TODO error checking!
-    $rsvd_order = $this->reserveOrderMethod->reserveOrder(
+    $rsvd_order = $this->reserveOrderMethod->reserve(
       $request->getUserId()->get(),
-      $request->getLeaseStart()->get(),
       $request->getScopesCount()->get(),
       $request->getStartTime()->get(),
       $request->getEndTime()->get()

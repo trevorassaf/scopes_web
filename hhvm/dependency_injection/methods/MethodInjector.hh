@@ -32,6 +32,8 @@ class MethodInjector {
   // Confirm order method
   private ?ConfirmOrderMethod $confirmOrderMethod;
 
+  private ?CreateReservedOrderPolicyMethod $createReservedOrderPolicyMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
@@ -162,7 +164,8 @@ class MethodInjector {
   public function getReserveOrderMethod(): ReserveOrderMethod {
     if ($this->reserveOrderMethod === null) {
       $this->reserveOrderMethod = new ReserveOrderMethod(
-        $this->queryInjector->getConcreteInsertRsvdOrderQuery()
+        $this->queryInjector->getConcreteInsertRsvdOrderQuery(),
+        $this->getIsValidReservedOrderMethod()
       ); 
     }
     return $this->reserveOrderMethod;
@@ -182,6 +185,19 @@ class MethodInjector {
       ); 
     }
     return $this->confirmOrderMethod;
+  }
+
+  /**
+   * Create reserved order policy method
+   */
+  public function getCreateReservedOrderPolicyMethod(): CreateReservedOrderPolicyMethod {
+    if ($this->createReservedOrderPolicyMethod === null) {
+      $this->createReservedOrderPolicyMethod = new CreateReservedOrderPolicyMethod(
+        $this->queryInjector->getConcreteInsertReservedOrderPolicyQuery(),
+        $this->queryInjector->getFetchReservedOrderPolicyQuery() 
+      );
+    }
+    return $this->createReservedOrderPolicyMethod;
   }
 
 }

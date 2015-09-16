@@ -4,6 +4,8 @@ use Scopes;
 
 
 -- Model tables
+drop table ReservedOrderPolicy;
+
 drop table IrregularDates;
 drop table IrregularTimes;
 drop table RegularWeekDays;

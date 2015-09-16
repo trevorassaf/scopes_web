@@ -14,6 +14,28 @@ function initDbMain(): void {
   initUsers($method_injector);
   initRegularWeekDaysAndTimes($method_injector);
 
+  // TEST: reserve method
+  initRsvdOrderPolicy($method_injector);
+  initReservedOrders($method_injector);
+}
+
+function initReservedOrders(MethodInjector $method_injector): void {
+  
+  $reserve_order_method = $method_injector->getReserveOrderMethod();
+
+  // Reserve orders for first user
+  $rsvd_order_1 = $reserve_order_method->reserve(
+    new UnsignedInt(1),
+    new UnsignedInt(17),
+    new Timestamp(
+      new Date("2015-8-1"),
+      new Time("09:00:00")
+    ),
+    new Timestamp(
+      new Date("2015-8-1"),
+      new Time("10:00:00")
+    )
+  );
 }
 
 function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {
@@ -48,6 +70,12 @@ function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {
       $regular_time->getId()
     ); 
   }
+}
+
+function initRsvdOrderPolicy(MethodInjector $method_injector): void {
+
+  $create_rsvd_order_policy_method = $method_injector->getCreateReservedOrderPolicyMethod();
+  $create_rsvd_order_policy_method->create(new UnsignedInt(16));
 }
 
 function initUsers(MethodInjector $method_injector): void {

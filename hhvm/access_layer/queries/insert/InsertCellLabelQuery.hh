@@ -1,6 +1,6 @@
 <?hh // strict
 
-class CellLabelInsertQuery {
+class InsertCellLabelQuery {
 
   public function __construct(
     private InsertQuery<CellLabel> $insertQuery,
