@@ -18,4 +18,16 @@ class Day {
       ? "0" . $day_str
       : $day_str;    
   }
+  
+  public function equals(Day $day): bool {
+    return $this->day->getNumber() == $day->getNumber()->getNumber();
+  }
+
+  public function isBefore(Day $day): bool {
+    return $this->day->getNumber() < $day->getNumber()->getNumber();
+  }
+
+  public function isAfter(Day $day): bool {
+    return $day->isBefore($this);
+  }
 }

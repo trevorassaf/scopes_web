@@ -21,4 +21,16 @@ class Hour {
       ? "0" . $hour_str
       : $hour_str;
   }
+
+  public function equals(Hour $hour): bool {
+    return $this->hour->getNumber() == $hour->getNumber()->getNumber();
+  }
+
+  public function isBefore(Hour $hour): bool {
+    return $this->hour->getNumber() < $hour->getNumber()->getNumber();
+  }
+
+  public function isAfter(Hour $hour): bool {
+    return $hour->isBefore($this);
+  }
 }

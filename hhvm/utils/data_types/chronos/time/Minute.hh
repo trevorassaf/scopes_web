@@ -21,4 +21,16 @@ class Minute {
       ? "0" . $minute_str
       : $minute_str;
   }
+
+  public function equals(Minute $minute): bool {
+    return $this->minute->getNumber() == $minute->getNumber()->getNumber();
+  }
+
+  public function isBefore(Minute $minute): bool {
+    return $this->minute->getNumber() < $minute->getNumber()->getNumber();
+  }
+
+  public function isAfter(Minute $minute): bool {
+    return $minute->isBefore($this);
+  }
 }

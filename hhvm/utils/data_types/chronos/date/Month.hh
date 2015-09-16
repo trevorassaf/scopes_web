@@ -18,4 +18,16 @@ class Month {
       ? "0" . $month_str
       : $month_str;
   }
+  
+  public function equals(Month $month): bool {
+    return $this->month->getNumber() == $month->getNumber()->getNumber();
+  }
+
+  public function isBefore(Month $month): bool {
+    return $this->month->getNumber() < $month->getNumber()->getNumber();
+  }
+
+  public function isAfter(Month $month): bool {
+    return $month->isBefore($this);
+  }
 }

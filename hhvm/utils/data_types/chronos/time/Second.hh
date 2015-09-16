@@ -21,4 +21,16 @@ class Second {
       ? "0" . $second_str
       : $second_str;
   }
+
+  public function equals(Second $second): bool {
+    return $this->second->getNumber() == $second->getNumber()->getNumber();
+  }
+
+  public function isBefore(Second $second): bool {
+    return $this->second->getNumber() < $second->getNumber()->getNumber();
+  }
+
+  public function isAfter(Second $second): bool {
+    return $second->isBefore($this);
+  }
 }
