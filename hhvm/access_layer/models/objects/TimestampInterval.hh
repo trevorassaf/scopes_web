@@ -16,8 +16,4 @@ class TimestampInterval {
   public function getEnd(): Timestamp {
     return $this->end;
   }
-
-  public function getTimestamps(): ImmVector<Timestamp> {
-    
-  }
 }
