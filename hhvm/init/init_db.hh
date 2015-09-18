@@ -24,16 +24,21 @@ function initReservedOrders(MethodInjector $method_injector): void {
   $reserve_order_method = $method_injector->getReserveOrderMethod();
 
   // Reserve orders for first user
+  $start_time = new Timestamp(
+    new Date("2015-8-1"),
+    new Time("09:00:00")
+  );
+  
+  $end_time = new Timestamp(
+    new Date("2015-8-1"),
+    new Time("10:00:00")
+  );
   $rsvd_order_1 = $reserve_order_method->reserve(
     new UnsignedInt(1),
     new UnsignedInt(17),
-    new Timestamp(
-      new Date("2015-8-1"),
-      new Time("09:00:00")
-    ),
-    new Timestamp(
-      new Date("2015-8-1"),
-      new Time("10:00:00")
+    new TimestampInterval(
+      $start_time,
+      $end_time
     )
   );
 }
