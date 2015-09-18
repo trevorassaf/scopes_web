@@ -46,7 +46,8 @@ class MethodInjector {
     private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
     private LazyLoader<TimeSerializer> $timeSerializerLoader,
     private LazyLoader<DateSerializer> $dateSerializerLoader,
-    private LazyLoader<TimestampBuilder> $timestampBuilderLoader
+    private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
+    private LazyLoader<DateToDayOfTheWeekConverter> $dateToDayOfTheWeekConverterLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -160,7 +161,8 @@ class MethodInjector {
         $this->queryInjector->getConcreteFetchIrregularTimeQuery(),
         $this->queryInjector->getFetchIrregularDateByUniqueKeyQuery(),
         $this->irregularDatesTableLoader->load(),
-        $this->dateSerializerLoader->load()
+        $this->dateSerializerLoader->load(),
+        $this->dateToDayOfTheWeekConverterLoader->load()
       ); 
     }
     return $this->isValidReservedOrderMethod;

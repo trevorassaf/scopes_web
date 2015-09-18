@@ -68,7 +68,7 @@ class IsValidReservedOrderMethod {
               $day_of_the_week_where_clause_builder->setFirstClause(
                 new EqualsWhereClause(
                   $this->regularEdgesTable->getIdKey(),
-                  (string)$date->toDayOfTheWeek()
+                  (string)$this->dateToDayOfTheWeekConverter->convert($date)
                 )
               ) 
               ->build()
