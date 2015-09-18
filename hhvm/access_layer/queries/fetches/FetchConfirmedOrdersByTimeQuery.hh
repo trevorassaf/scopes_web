@@ -4,7 +4,8 @@ class FetchConfirmedOrdersByTimeQuery {
 
   public function __construct(
     private FetchQuery<ConfirmedOrder> $fetchQuery,
-    private ConfirmedOrdersTable $confirmedOrdersTable
+    private ConfirmedOrdersTable $confirmedOrdersTable,
+    private TimestampSerializer $timestampSerializer
   ) {}
 
   public async function fetch(
@@ -19,13 +20,13 @@ class FetchConfirmedOrdersByTimeQuery {
         ->setFirstClause(
           new GreaterThanOrEqualToWhereClause(
             $this->confirmedOrdersTable->getStartTimeKey(),
-            $interval->getStart()->toString()
+            $this->timestampSerializer->serialize($interval->getStart())
           )
         )
         ->and(
           new LessThanOrEqualToWhereClause(
             $this->confirmedOrdersTable->getEndTimeKey(),
-            $interval->getEnd()->toString()
+            $this->timestampSerializer->serialize($interval->getEnd())
           )
         )
         ->build()

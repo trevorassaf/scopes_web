@@ -5,7 +5,8 @@ class CreateIrregularDateMethod {
   public function __construct(
     private InsertIrregularDateQuery $irregularTimeInsertQuery,
     private FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateByUniqueQuery,
-    private IrregularDatesTable $irregularDatesTable
+    private IrregularDatesTable $irregularDatesTable,
+    private DateSerializer $dateSerializer
   ) {}
 
   public function create(
@@ -29,7 +30,7 @@ class CreateIrregularDateMethod {
   private function isDuplicateIrregularDate(Date $date): bool {
     $fetch_query_handle = $this->fetchIrregularDateByUniqueQuery->fetch(
       ImmMap{
-        $this->irregularDatesTable->getDateKey() => $date->toString(), 
+        $this->irregularDatesTable->getDateKey() => $this->dateSerializer->serialize($date), 
       }
     );   
     $irregular_date = $fetch_query_handle

@@ -4,7 +4,8 @@ class InsertUserQuery {
 
   public function __construct(
     private InsertQuery<User> $insertQuery,
-    private UsersTable $usersTable
+    private UsersTable $usersTable,
+    private TimestampSerializer $timestampSerializer
   ) {}
 
   public async function insert(
@@ -20,7 +21,7 @@ class InsertUserQuery {
         $this->usersTable->getLastNameKey() => $last_name,
         $this->usersTable->getEmailKey() => $email->toString(),
         $this->usersTable->getPasswordHashKey() => $password_hash,
-        $this->usersTable->getTimeJoinedKey() => $time_joined->toString(),
+        $this->usersTable->getTimeJoinedKey() => $this->timestampSerializer->serialize($time_joined),
       }
     );
   }

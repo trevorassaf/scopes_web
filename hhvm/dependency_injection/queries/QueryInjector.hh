@@ -65,6 +65,9 @@ class QueryInjector {
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
+    private LazyLoader<DateSerializer> $dateSerializerLazyLoader,
+    private LazyLoader<TimeSerializer> $timeSerializerLazyLoader,
+    private LazyLoader<TimestampSerializer> $timestampSerializerLazyLoader,
     private LazyLoader<UsersTable> $usersTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<User>> $userModelFactoryLazyLoader,
     private LazyLoader<InsertQueryCreater> $insertQueryCreaterLazyLoader,
@@ -107,7 +110,8 @@ class QueryInjector {
     if ($this->concreteInsertUserQuery === null) {
       $this->concreteInsertUserQuery = new InsertUserQuery(
         $this->getInsertUserQuery(),
-        $this->usersTableLazyLoader->load()
+        $this->usersTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
       );
     }
     return $this->concreteInsertUserQuery;
@@ -207,7 +211,8 @@ class QueryInjector {
     if ($this->concreteInsertRegularTimeQuery === null) {
       $this->concreteInsertRegularTimeQuery = new InsertRegularTimeQuery(
         $this->getInsertRegularTimeQuery(),
-        $this->regularTimesTableLazyLoader->load()
+        $this->regularTimesTableLazyLoader->load(),
+        $this->timeSerializerLazyLoader->load()
       );
     }
     return $this->concreteInsertRegularTimeQuery;
@@ -318,7 +323,8 @@ class QueryInjector {
     if ($this->concreteInsertIrregularDateQuery === null) {
       $this->concreteInsertIrregularDateQuery = new InsertIrregularDateQuery(
         $this->getInsertIrregularDateQuery(),
-        $this->irregularDatesTableLazyLoader->load()  
+        $this->irregularDatesTableLazyLoader->load(),
+        $this->dateSerializerLazyLoader->load()
       ); 
     }
     return $this->concreteInsertIrregularDateQuery;
@@ -374,7 +380,8 @@ class QueryInjector {
     if ($this->concreteInsertIrregularTimeQuery === null) {
       $this->concreteInsertIrregularTimeQuery = new InsertIrregularTimeQuery(
         $this->getInsertIrregularTimeQuery(),
-        $this->irregularTimesTableLazyLoader->load()  
+        $this->irregularTimesTableLazyLoader->load(),
+        $this->timeSerializerLazyLoader->load()
       ); 
     }
     return $this->concreteInsertIrregularTimeQuery;
@@ -397,7 +404,8 @@ class QueryInjector {
     if ($this->fetchRsvdOrdersByTimeQuery === null) {
       $this->fetchRsvdOrdersByTimeQuery = new FetchReservedOrdersByTimeQuery(
         $this->getFetchRsvdOrderQuery(), 
-        $this->rsvdOrdersTableLazyLoader->load()
+        $this->rsvdOrdersTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
       );
     }
     return $this->fetchRsvdOrdersByTimeQuery;
@@ -440,7 +448,8 @@ class QueryInjector {
     if ($this->concreteInsertRsvdOrderQuery === null) {
       $this->concreteInsertRsvdOrderQuery = new InsertReservedOrderQuery(
         $this->getInsertRsvdOrderQuery(),
-        $this->rsvdOrdersTableLazyLoader->load() 
+        $this->rsvdOrdersTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
       );
     }
     return $this->concreteInsertRsvdOrderQuery;
@@ -483,7 +492,8 @@ class QueryInjector {
     if ($this->fetchConfirmedOrdersByTimeQuery === null) {
       $this->fetchConfirmedOrdersByTimeQuery = new FetchConfirmedOrdersByTimeQuery(
         $this->getFetchConfirmedOrderQuery(),
-        $this->confirmedOrdersTableLazyLoader->load()
+        $this->confirmedOrdersTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
       ); 
     }
     return $this->fetchConfirmedOrdersByTimeQuery;
@@ -505,7 +515,8 @@ class QueryInjector {
     if ($this->concreteInsertConfirmedOrderQuery === null) {
       $this->concreteInsertConfirmedOrderQuery = new InsertConfirmedOrderQuery(
         $this->getInsertConfirmedOrderQuery(),
-        $this->confirmedOrdersTableLazyLoader->load() 
+        $this->confirmedOrdersTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
       );
     }
     return $this->concreteInsertConfirmedOrderQuery;

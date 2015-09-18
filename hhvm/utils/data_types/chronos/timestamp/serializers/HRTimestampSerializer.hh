@@ -1,6 +1,6 @@
 <?hh // strict
 
-class HRTimestampInterval implements TimestampInterval {
+class HRTimestampSerializer implements TimestampSerializer {
 
   const string DELIMITER = " ";
 
@@ -9,16 +9,22 @@ class HRTimestampInterval implements TimestampInterval {
     private HRTimeSerializer $hrTimeSerializer
   ) {}
 
-  public function serializer(Timestamp $timestamp): string {
-    return $this->hrDateInterval;
+  public function getFormat(): string {
+    return $this->hrDateSerializer->getFormat() . self::DELIMITER 
+      . $this->hrTimeSerializer->getFormat();
+  }
+
+  public function serialize(Timestamp $timestamp): string {
+    return $this->hrDateSerializer->serialize($timestamp->getDate()) .
+      self::DELIMITER . $this->hrTimeSerializer->serialize($timestamp->getTime());
   }
 
   public function deserialize(string $timestamp_str): Timestamp {
     invariant($this->isValidString($timestamp_str), "timestamp is not valid!"); 
     $timestamp_tokens = explode(self::DELIMITER, $timestamp_str);
     return new Timestamp(
-      Date::fromString($timestamp_tokens[0]),
-      Time::fromString($timestamp_tokens[1])
+      $this->hrDateSerializer->deserialize($timestamp_tokens[0]),
+      $this->hrTimeSerializer->deserialize($timestamp_tokens[1])
     );
   }
 

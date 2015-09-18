@@ -4,10 +4,14 @@ class Minute {
 
   const int MAX_MINUTE = 60;
 
+  public static function isValid(UnsignedInt $minute): bool {
+    return self::MAX_MINUTE >= $minute->getNumber();
+  }
+
   public function __construct(
     private UnsignedInt $minute
   ) {
-    invariant(self::MAX_MINUTE >= $this->minute->getNumber(), "minute int exceeds max!");
+    invariant(self::isValid($minute), "minute int exceeds max!");
   }
 
   public function getNumber(): UnsignedInt {

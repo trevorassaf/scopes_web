@@ -2,7 +2,13 @@
 
 class TimestampRequestFieldFactoryBuilder extends RequestFieldFactoryBuilder<Timestamp> {
 
-  public function __construct() {
-    parent::__construct(new TimestampFieldConverter());
+  public function __construct(
+    private LazyLoader<TimestampSerializer> $timestampSerializer
+  ) {
+    parent::__construct(
+      new TimestampFieldConverter(
+        $this->timestampSerializer->load()
+      )
+    );
   }
 }

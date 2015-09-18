@@ -3,6 +3,7 @@
 class IrregularTimeFactory extends ConcreteModelFactory<IrregularTime> {
 
   public function __construct(
+    private TimeSerializer $timeSerializer,
     private IrregularTimesTable $irregularTimesTable
   ) {}
   
@@ -13,8 +14,8 @@ class IrregularTimeFactory extends ConcreteModelFactory<IrregularTime> {
     return new IrregularTime(
       $id,
       new UnsignedInt((int)$params[$this->irregularTimesTable->getIrregularDateIdKey()]),
-      new Time((string)$params[$this->irregularTimesTable->getStartTimeKey()]),
-      new Time((string)$params[$this->irregularTimesTable->getEndTimeKey()])
+      $this->timeSerializer->deserialize((string)$params[$this->irregularTimesTable->getStartTimeKey()]),
+      $this->timeSerializer->deserialize((string)$params[$this->irregularTimesTable->getEndTimeKey()])
     );
   }
 }

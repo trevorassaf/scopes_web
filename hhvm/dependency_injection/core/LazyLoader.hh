@@ -1,6 +1,6 @@
 <?hh // strict
 
-abstract class LazyLoader<T> {
+abstract class LazyLoader<+T> {
 
   private ?T $t;
 

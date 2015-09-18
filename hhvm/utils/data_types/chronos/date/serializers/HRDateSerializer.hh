@@ -3,6 +3,11 @@
 class HRDateSerializer implements DateSerializer {
 
   const string DELIMITER = "-";
+  const string FORMAT = "Y-m-d";
+
+  public function getFormat(): string {
+    return self::FORMAT;
+  }
 
   public function serialize(Date $date): string {
     return $date->getYear()->toString() . self::DELIMITER
@@ -20,25 +25,25 @@ class HRDateSerializer implements DateSerializer {
     );
   }
 
-  public function isValidString(string $date_str): string {
+  public function isValidString(string $date_str): bool {
     $date_tokens = explode(self::DELIMITER, $date_str);
-    if ($date_tokens->size() != 3) {
+    if (count($date_tokens) != 3) {
       return false;
     }
 
     // Verify unsigned ints
     foreach ($date_tokens as $token) {
-      if (!UnsignedInt::isValid($token)) {
+      if (!UnsignedInt::isValidString($token)) {
         return false;
       }
     }
 
-    $year_number = UnsignedInt::fromString(date_tokens[0]);
-    $month_number = UnsignedInt::fromString(date_tokens[1]);
-    $day_number = UnsignedInt::fromString(date_tokens[2]);
+    $year_number = UnsignedInt::fromString($date_tokens[0]);
+    $month_number = UnsignedInt::fromString($date_tokens[1]);
+    $day_number = UnsignedInt::fromString($date_tokens[2]);
 
     // Check date components
-    if (!Year::isValid($year_number) && !Month::isValid($month_number)
+    if (!Month::isValid($month_number)
       && !Day::isValid($day_number)) 
     {
       return false; 

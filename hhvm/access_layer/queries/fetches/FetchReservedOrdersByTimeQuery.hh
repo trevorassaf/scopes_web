@@ -4,7 +4,8 @@ class FetchReservedOrdersByTimeQuery {
 
   public function __construct(
     private FetchQuery<RsvdOrder> $fetchQuery,
-    private RsvdOrdersTable $rsvdOrdersTable
+    private RsvdOrdersTable $rsvdOrdersTable,
+    private TimestampSerializer $timestampSerializer
   ) {}
 
   public async function fetch(
@@ -16,13 +17,13 @@ class FetchReservedOrdersByTimeQuery {
       ->setFirstClause(
         new GreaterThanOrEqualToWhereClause(
           $this->rsvdOrdersTable->getStartTimeKey(),
-          $interval->getStart()->toString()
+          $this->timestampSerializer->serialize($interval->getStart())
         )
       )
       ->and(
         new LessThanOrEqualToWhereClause(
           $this->rsvdOrdersTable->getEndTimeKey(),
-          $interval->getEnd()->toString()
+          $this->timestampSerializer->serialize($interval->getEnd())
         )
       )
       ->build();

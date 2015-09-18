@@ -4,7 +4,8 @@ class InsertConfirmedOrderQuery {
 
   public function __construct(
     private InsertQuery<ConfirmedOrder> $insertQuery,
-    private ConfirmedOrdersTable $confirmedOrdersTable
+    private ConfirmedOrdersTable $confirmedOrdersTable,
+    private TimestampSerializer $timestampSerializer
   ) {}
 
   public async function insert(
@@ -21,8 +22,8 @@ class InsertConfirmedOrderQuery {
       ImmMap{
         $this->confirmedOrdersTable->getUserIdKey() => $user_id->getNumber(),
         $this->confirmedOrdersTable->getScopesCountKey() => $scopes_count->getNumber(),
-        $this->confirmedOrdersTable->getStartTimeKey() => $start_time->toString(),
-        $this->confirmedOrdersTable->getEndTimeKey() => $end_time->toString(),
+        $this->confirmedOrdersTable->getStartTimeKey() => $this->timestampSerializer->serialize($start_time),
+        $this->confirmedOrdersTable->getEndTimeKey() => $this->timestampSerializer->serialize($end_time),
         $this->confirmedOrdersTable->getTitleKey() => $title,
         $this->confirmedOrdersTable->getDescriptionKey() => $description,
         $this->confirmedOrdersTable->getShortCodeKey() => $short_code,

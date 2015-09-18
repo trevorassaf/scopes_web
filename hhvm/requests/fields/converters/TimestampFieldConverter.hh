@@ -2,9 +2,13 @@
 
 class TimestampFieldConverter implements RequestFieldTypeConverter<Timestamp> {
 
+  public function __construct(
+    private TimestampSerializer $timestampSerializer
+  ) {}
+
   public function convert(string $key, mixed $value): Timestamp {
     // Validate int type
-    if (!is_string($value) || Timestamp::isValid((string)$value)) {
+    if (!is_string($value) || $this->timestampSerializer->isValidString((string)$value)) {
       throw new RequestFieldTypeConversionException(
         RequestFieldType::TIMESTAMP,
         $key,
@@ -13,6 +17,6 @@ class TimestampFieldConverter implements RequestFieldTypeConverter<Timestamp> {
     }
 
     // Convert to timestamp 
-    return Timestamp::fromString((string)$value);
+    return $this->timestampSerializer->deserialize((string)$value);
   }
 }

@@ -3,6 +3,7 @@
 class UserFactory extends ConcreteModelFactory<User> {
 
   public function __construct(
+    private TimestampSerializer $timestampSerializer,
     private UsersTable $usersTable
   ) {}
 
@@ -16,7 +17,7 @@ class UserFactory extends ConcreteModelFactory<User> {
       (string)$params[$this->usersTable->getLastNameKey()],
       new Email((string)$params[$this->usersTable->getEmailKey()]),
       (string)$params[$this->usersTable->getPasswordHashKey()],
-      Timestamp::fromString((string)$params[$this->usersTable->getTimeJoinedKey()])
+      $this->timestampSerializer->deserialize((string)$params[$this->usersTable->getTimeJoinedKey()])
     );
   } 
 }

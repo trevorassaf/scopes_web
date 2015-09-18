@@ -4,10 +4,14 @@ class Hour {
 
   const int MAX_HOUR = 24;
 
+  public static function isValid(UnsignedInt $hour): bool {
+    return self::MAX_HOUR >= $hour->getNumber();
+  }
+
   public function __construct(
     private UnsignedInt $hour
   ) {
-    invariant(self::MAX_HOUR >= $this->hour->getNumber(), "hour int exceeds max!");
+    invariant(self::isValid($hour), "hour int exceeds max!");
   }
 
   public function getNumber(): UnsignedInt {

@@ -10,7 +10,9 @@ class IsValidReservedOrderMethod {
     private RegularTimesTable $regularTimesTable,
     private FetchIrregularTimesQuery $fetchIrregularTimesQuery,
     private FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateQuery,
-    private IrregularDatesTable $irregularDatesTable
+    private IrregularDatesTable $irregularDatesTable,
+    private DateSerializer $dateSerializer,
+    private DateToDayOfTheWeekConverter $dateToDayOfTheWeekConverter
   ) {}
 
   public function check(
@@ -24,7 +26,7 @@ class IsValidReservedOrderMethod {
       $irregular_date_fetch_handle = $this->fetchIrregularDateQuery
         ->fetch(
           ImmMap{
-            $this->irregularDatesTable->getDateKey() => $date->toString(),
+            $this->irregularDatesTable->getDateKey() => $this->dateSerializer->serialize($date),
           }
         );
 

@@ -42,7 +42,11 @@ class MethodInjector {
     private LazyLoader<RegularWeekDayRegularTimeEdgesTable> $regularEdgesTableLoader,
     private LazyLoader<IrregularDatesTable> $irregularDatesTableLoader,
     private LazyLoader<IrregularTimesTable> $irregularTimesTableLoader,
-    private LazyLoader<CellLabelsTable> $cellsLabelTableLoader
+    private LazyLoader<CellLabelsTable> $cellsLabelTableLoader,
+    private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
+    private LazyLoader<TimeSerializer> $timeSerializerLoader,
+    private LazyLoader<DateSerializer> $dateSerializerLoader,
+    private LazyLoader<TimestampBuilder> $timestampBuilderLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -50,7 +54,8 @@ class MethodInjector {
       $this->createUserMethod = new CreateUserMethod(
         $this->queryInjector->getConcreteInsertUserQuery(),
         $this->queryInjector->getFetchUserByUniqueKeyQuery(),
-        $this->usersTableLoader->load()
+        $this->usersTableLoader->load(),
+        $this->timestampBuilderLoader->load()
       );
     }       
     return $this->createUserMethod;
@@ -78,7 +83,8 @@ class MethodInjector {
       $this->createRegularTimeMethod = new CreateRegularTimeMethod(
         $this->queryInjector->getConcreteInsertRegularTimeQuery(),
         $this->queryInjector->getFetchRegularTimeByUniqueKeyQuery(),
-        $this->regularTimesTableLoader->load()
+        $this->regularTimesTableLoader->load(),
+        $this->timeSerializerLoader->load()
       );
     }
     return $this->createRegularTimeMethod;
@@ -106,7 +112,8 @@ class MethodInjector {
       $this->createIrregularDateMethod = new CreateIrregularDateMethod(
         $this->queryInjector->getConcreteInsertIrregularDateQuery(),
         $this->queryInjector->getFetchIrregularDateByUniqueKeyQuery(),
-        $this->irregularDatesTableLoader->load() 
+        $this->irregularDatesTableLoader->load(),
+        $this->dateSerializerLoader->load()
       );
     }   
     return $this->createIrregularDateMethod;
@@ -152,7 +159,8 @@ class MethodInjector {
         $this->regularTimesTableLoader->load(),
         $this->queryInjector->getConcreteFetchIrregularTimeQuery(),
         $this->queryInjector->getFetchIrregularDateByUniqueKeyQuery(),
-        $this->irregularDatesTableLoader->load()
+        $this->irregularDatesTableLoader->load(),
+        $this->dateSerializerLoader->load()
       ); 
     }
     return $this->isValidReservedOrderMethod;

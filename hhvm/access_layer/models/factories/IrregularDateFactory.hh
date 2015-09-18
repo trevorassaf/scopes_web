@@ -3,6 +3,7 @@
 class IrregularDateFactory extends ConcreteModelFactory<IrregularDate> {
 
   public function __construct(
+    private DateSerializer $dateSerializer,
     private IrregularDatesTable $irregularDatesTable
   ) {}
 
@@ -12,7 +13,7 @@ class IrregularDateFactory extends ConcreteModelFactory<IrregularDate> {
   ): IrregularDate {
     return new IrregularDate(
       $id,
-      new Date((string)$params[$this->irregularDatesTable->getDateKey()])
+      $this->dateSerializer->deserialize((string)$params[$this->irregularDatesTable->getDateKey()])
     );
   }
 }

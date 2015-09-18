@@ -2,31 +2,10 @@
 
 class Timestamp {
   
-  public static function getFormat(): string {
-    return Date::getFormat() . " " . Time::getFormat(); 
-  }
-
-  public static function isValid(string $timestamp): bool {
-    return DateTime::createFromFormat(self::getFormat(), $timestamp) != false; 
-  }
-
-  public static function fromString(string $timestamp): Timestamp {
-    invariant(self::isValid($timestamp), "Invalid timestamp string format!");
-    $date_time = DateTime::createFromFormat(self::getFormat(), $timestamp);
-    return new Timestamp(
-      new Date($date_time->format(Date::getFormat())),
-      new Time($date_time->format(Time::getFormat()))
-    );
-  }
-
   public function __construct(
     private Date $date,
     private Time $time 
   ) {}
-
-  public function toString(): string {
-    return $this->date->toString() . " " . $this->time->toString();
-  }
 
   public function getDate(): Date {
     return $this->date;

@@ -5,7 +5,8 @@ class CreateRegularTimeMethod {
   public function __construct(
     private InsertRegularTimeQuery $regularTimeInsertQuery,
     private FetchByUniqueKeyQuery<RegularTime> $fetchRegularTimeByUniqueKeyQuery,
-    private RegularTimesTable $regularTimesTable
+    private RegularTimesTable $regularTimesTable,
+    private TimeSerializer $timeSerializer
   ) {}
 
   public function create(
@@ -41,8 +42,8 @@ class CreateRegularTimeMethod {
   private function isDuplicateRegularTime(Time $start_time, Time $end_time): bool {
     $fetch_query_handle = $this->fetchRegularTimeByUniqueKeyQuery->fetch(
       ImmMap{
-        $this->regularTimesTable->getStartTimeKey() => $start_time->toString(),
-        $this->regularTimesTable->getEndTimeKey() => $end_time->toString(),
+        $this->regularTimesTable->getStartTimeKey() => $this->timeSerializer->serialize($start_time),
+        $this->regularTimesTable->getEndTimeKey() => $this->timeSerializer->serialize($end_time),
       }  
     );
     $regular_time = $fetch_query_handle

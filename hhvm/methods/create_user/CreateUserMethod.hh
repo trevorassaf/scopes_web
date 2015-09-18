@@ -5,7 +5,8 @@ class CreateUserMethod {
   public function __construct(
     private InsertUserQuery $insertUserQuery,
     private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery,
-    private UsersTable $usersTable
+    private UsersTable $usersTable,
+    private TimestampBuilder $timestampBuilder
   ) {}
 
   public function createUser(
@@ -14,8 +15,6 @@ class CreateUserMethod {
     Email $email,
     string $password_hash
   ): User {
-    $timestamp_builder = new TimestampBuilder();
-
     try {
       // Attempt insert
       $insert_query_wait_handle = $this->insertUserQuery->insert(
@@ -23,7 +22,7 @@ class CreateUserMethod {
         $last_name,
         $email,
         $password_hash,
-        $timestamp_builder->now()
+        $this->timestampBuilder->now()
       );
       return $insert_query_wait_handle
         ->getWaitHandle()
