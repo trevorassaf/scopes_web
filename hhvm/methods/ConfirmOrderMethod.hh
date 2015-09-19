@@ -36,8 +36,8 @@ class ConfirmOrderMethod {
       $confirmed_order_insert_result = $this->confirmedOrderInsertQuery->insert(
         $rsvd_order->getId(),
         $rsvd_order->getScopesCount(),
-        $rsvd_order->getStartTime(),
-        $rsvd_order->getEndTime(),
+        $rsvd_order->getTimestampSegment()->getStart(),
+        $rsvd_order->getTimestampSegment()->getEnd(),
         $confirm_order_request->getTitle(),
         $confirm_order_request->getDescription(),
         $confirm_order_request->getShortCode(),

@@ -3,7 +3,7 @@
 class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
 
   public function __construct(
-    private TimestampSerializer $timeSerializer,
+    private TimestampSerializer $timestampSerializer,
     private ConfirmedOrdersTable $confirmedOrdersTable
   ) {}
 
@@ -15,8 +15,10 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getIdKey()]),
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getUserIdKey()]), 
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getScopesCountKey()]),
-      $this->timeSerializer->deserialize((string)$params[$this->confirmedOrdersTable->getStartTimeKey()]),
-      $this->timeSerializer->deserialize((string)$params[$this->confirmedOrdersTable->getEndTimeKey()]),
+      new TimestampSegment(
+        $this->timestampSerializer->deserialize((string)$params[$this->confirmedOrdersTable->getStartTimeKey()]),
+        $this->timestampSerializer->deserialize((string)$params[$this->confirmedOrdersTable->getEndTimeKey()]),
+      ),
       (string)$params[$this->confirmedOrdersTable->getTitleKey()],
       (string)$params[$this->confirmedOrdersTable->getDescriptionKey()],
       (string)$params[$this->confirmedOrdersTable->getShortCodeKey()],

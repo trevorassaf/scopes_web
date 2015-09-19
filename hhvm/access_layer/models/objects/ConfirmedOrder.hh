@@ -6,8 +6,7 @@ class ConfirmedOrder implements Model {
     private UnsignedInt $id,
     private UnsignedInt $userId,
     private UnsignedInt $scopesCount,
-    private Timestamp $startTime,
-    private Timestamp $endTime,
+    private TimestampSegment $timestampSegment,
     private string $title,
     private string $description,
     private string $shortCode,
@@ -26,13 +25,10 @@ class ConfirmedOrder implements Model {
     return $this->scopesCount;
   }
 
-  public function getStartTime(): Timestamp {
-    return $this->startTime;
-  }
 
-  public function getEndTime(): Timestamp {
-    return $this->endTime;
-  }  
+  public function getTimestampSegment(): TimestampSegment {
+    return $this->timestampSegment;
+  }
 
   public function getTitle(): string {
     return $this->title;

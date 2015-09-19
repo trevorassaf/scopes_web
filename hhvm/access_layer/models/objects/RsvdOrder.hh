@@ -6,8 +6,7 @@ class RsvdOrder implements Model {
     private UnsignedInt $id,
     private UnsignedInt $userId, 
     private UnsignedInt $scopesCount,
-    private Timestamp $startTime,
-    private Timestamp $endTime
+    private TimestampSegment $timestampSegment
   ) {}
 
   public function getId(): UnsignedInt {
@@ -22,12 +21,7 @@ class RsvdOrder implements Model {
     return $this->scopesCount;
   }
 
-  public function getStartTime(): Timestamp {
-    return $this->startTime;
+  public function getTimestampSegment(): TimestampSegment {
+    return $this->timestampSegment;
   }
-  
-  public function getEndTime(): Timestamp {
-    return $this->endTime;
-  }
-
 }

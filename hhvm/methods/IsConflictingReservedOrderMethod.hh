@@ -10,16 +10,15 @@ class IsConflictingReservedOrderMethod {
 
   public function check(
     UnsignedInt $scopes_count,
-    TimestampSegment $scopes_interval
+    TimestampSegment $timestamp_segment
   ): bool {
-    // TODO fail fast if start_time comes after end_time
     try {
       // Commence queries simultaneously. Start with order fetches
       // because they take the longest...
       $rsvd_order_fetch_handle = $this->fetchReservedOrdersByTimeQuery 
-        ->fetch($scopes_interval);
+        ->fetch($timestamp_segment);
       $confirmed_order_fetch_handle = $this->fetchConfirmedOrdersByTimeQuery 
-        ->fetch($scopes_interval);
+        ->fetch($timestamp_segment);
       $order_policy_fetch_handle = $this->fetchReservedOrderPolicyQuery->fetch();
 
       // Wait for completion...
@@ -122,11 +121,11 @@ class IsConflictingReservedOrderMethod {
       $rsvd_order = $rsvd_orders[$rsvd_order_idx];
       $confirmed_order = $confirmed_orders[$confirmed_order_idx];
       
-      if ($rsvd_order->getStartTime()->isBefore($confirmed_order->getStartTime())) {
+      if ($rsvd_order->getTimestampSegment()->getStart()->isBefore($confirmed_order->getTimestampSegment()->getStart())) {
         $time_intervals[] = new OrderTimestampSegment(
           new TimestampSegment(
-            $rsvd_order->getStartTime(),
-            $rsvd_order->getEndTime()
+            $rsvd_order->getTimestampSegment()->getStart(),
+            $rsvd_order->getTimestampSegment()->getEnd()
           ),
           $rsvd_order->getScopesCount()
         );
@@ -134,8 +133,8 @@ class IsConflictingReservedOrderMethod {
       } else {
         $time_intervals[] = new OrderTimestampSegment(
           new TimestampSegment(
-            $confirmed_order->getStartTime(),
-            $confirmed_order->getEndTime()
+            $confirmed_order->getTimestampSegment()->getStart(),
+            $confirmed_order->getTimestampSegment()->getEnd()
           ),
           $confirmed_order->getScopesCount()
         );
@@ -150,8 +149,8 @@ class IsConflictingReservedOrderMethod {
       $rsvd_order = $rsvd_orders[$rsvd_order_idx];
       $time_intervals[] = new OrderTimestampSegment(
         new TimestampSegment(
-          $rsvd_order->getStartTime(),
-          $rsvd_order->getEndTime()
+          $rsvd_order->getTimestampSegment()->getStart(),
+          $rsvd_order->getTimestampSegment()->getEnd()
         ),
         $rsvd_order->getScopesCount()
       );
@@ -163,8 +162,8 @@ class IsConflictingReservedOrderMethod {
       $confirmed_order = $confirmed_orders[$confirmed_order_idx];
       $time_intervals[] = new OrderTimestampSegment(
         new TimestampSegment(
-          $confirmed_order->getStartTime(),
-          $confirmed_order->getEndTime()
+          $confirmed_order->getTimestampSegment()->getStart(),
+          $confirmed_order->getTimestampSegment()->getEnd()
         ),
         $confirmed_order->getScopesCount()
       );
