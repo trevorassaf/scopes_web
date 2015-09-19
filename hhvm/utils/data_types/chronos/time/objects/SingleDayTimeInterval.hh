@@ -1,17 +1,17 @@
 <?hh // strict
 
-class SameDayTimeInterval {
+class SingleDayTimeSegment {
 
   public function __construct(
     private Date $date,
-    private TimeInterval $timeInterval
+    private TimeSegment $timeSegment
   ) {}
 
   public function getDate(): Date {
     return $this->date;
   }
 
-  public function getTimeInterval(): TimeInterval {
-    return $this->timeInterval;
+  public function getTimeSegment(): TimeSegment {
+    return $this->timeSegment;
   }
 }

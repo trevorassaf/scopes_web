@@ -10,7 +10,7 @@ class IsConflictingReservedOrderMethod {
 
   public function check(
     UnsignedInt $scopes_count,
-    TimestampInterval $scopes_interval
+    TimestampSegment $scopes_interval
   ): bool {
     // TODO fail fast if start_time comes after end_time
     try {
@@ -44,7 +44,7 @@ class IsConflictingReservedOrderMethod {
 
       // Convert rsvd/confirmed order types to time intervals and sort them in
       // ascending order by start-time
-      $time_intervals = $this->condenseOrdersToSortedTimeIntervals(
+      $time_intervals = $this->condenseOrdersToSortedTimeSegments(
         $rsvd_orders,
         $confirmed_orders
       );
@@ -61,7 +61,7 @@ class IsConflictingReservedOrderMethod {
   }
 
   private function isConflictingRequest(
-    ImmVector<OrderTimestampInterval> $time_intervals,
+    ImmVector<OrderTimestampSegment> $time_intervals,
     UnsignedInt $max_scopes,
     UnsignedInt $scopes_count
   ): bool {
@@ -70,7 +70,7 @@ class IsConflictingReservedOrderMethod {
     // Create priority queue that orders by end-time in ascending order.
     // Top-most element is always time interval that will finish earliest
     $queue = new PriorityQueue(
-      new MinEndTimeOrderTimestampIntervalComparator(),
+      new MinEndTimeOrderTimestampSegmentComparator(),
       $max_scopes
     ); 
 
@@ -78,12 +78,12 @@ class IsConflictingReservedOrderMethod {
       // Pop all time intervals that finish before 'interval' starts. Their scopes
       // are now available, so restore them to 'available_scopes_count'
       while (!$interval
-        ->getTimestampInterval()
+        ->getTimestampSegment()
         ->getStart()
         ->isBefore(
           $queue
             ->peek()
-            ->getTimestampInterval()
+            ->getTimestampSegment()
             ->getEnd()
         )
       ) {
@@ -109,10 +109,10 @@ class IsConflictingReservedOrderMethod {
     return true;
   }
 
-  private function condenseOrdersToSortedTimeIntervals(
+  private function condenseOrdersToSortedTimeSegments(
     ImmVector<RsvdOrder> $rsvd_orders,
     ImmVector<ConfirmedOrder> $confirmed_orders
-  ): ImmVector<OrderTimestampInterval> {
+  ): ImmVector<OrderTimestampSegment> {
     $time_intervals = Vector{};
     $rsvd_order_idx = 0;
     $confirmed_order_idx = 0;
@@ -123,8 +123,8 @@ class IsConflictingReservedOrderMethod {
       $confirmed_order = $confirmed_orders[$confirmed_order_idx];
       
       if ($rsvd_order->getStartTime()->isBefore($confirmed_order->getStartTime())) {
-        $time_intervals[] = new OrderTimestampInterval(
-          new TimestampInterval(
+        $time_intervals[] = new OrderTimestampSegment(
+          new TimestampSegment(
             $rsvd_order->getStartTime(),
             $rsvd_order->getEndTime()
           ),
@@ -132,8 +132,8 @@ class IsConflictingReservedOrderMethod {
         );
         ++$rsvd_order_idx;
       } else {
-        $time_intervals[] = new OrderTimestampInterval(
-          new TimestampInterval(
+        $time_intervals[] = new OrderTimestampSegment(
+          new TimestampSegment(
             $confirmed_order->getStartTime(),
             $confirmed_order->getEndTime()
           ),
@@ -148,8 +148,8 @@ class IsConflictingReservedOrderMethod {
     // Rsvd orders
     while ($rsvd_order_idx < $rsvd_orders->count()) {
       $rsvd_order = $rsvd_orders[$rsvd_order_idx];
-      $time_intervals[] = new OrderTimestampInterval(
-        new TimestampInterval(
+      $time_intervals[] = new OrderTimestampSegment(
+        new TimestampSegment(
           $rsvd_order->getStartTime(),
           $rsvd_order->getEndTime()
         ),
@@ -161,8 +161,8 @@ class IsConflictingReservedOrderMethod {
     // Confirmed orders
     while ($confirmed_order_idx < $confirmed_orders->count()) {
       $confirmed_order = $confirmed_orders[$confirmed_order_idx];
-      $time_intervals[] = new OrderTimestampInterval(
-        new TimestampInterval(
+      $time_intervals[] = new OrderTimestampSegment(
+        new TimestampSegment(
           $confirmed_order->getStartTime(),
           $confirmed_order->getEndTime()
         ),

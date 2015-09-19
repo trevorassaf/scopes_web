@@ -9,7 +9,7 @@ class FetchConfirmedOrdersByTimeQuery {
   ) {}
 
   public async function fetch(
-    TimestampInterval $interval
+    TimestampSegment $interval
   ): Awaitable<ImmVector<ConfirmedOrder>> {
     $fetch_params_builder = new FetchParamsBuilder();
 

@@ -1,14 +1,14 @@
 <?hh // strict
 
-class OrderTimestampInterval {
+class OrderTimestampSegment {
 
   public function __construct(
-    private TimestampInterval $timestampInterval,
+    private TimestampSegment $timestampSegment,
     private UnsignedInt $scopesCount
   ) {}
 
-  public function getTimestampInterval(): TimestampInterval {
-    return $this->timestampInterval;
+  public function getTimestampSegment(): TimestampSegment {
+    return $this->timestampSegment;
   }
 
   public function getScopesCount(): UnsignedInt {

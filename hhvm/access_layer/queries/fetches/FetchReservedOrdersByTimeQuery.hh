@@ -9,7 +9,7 @@ class FetchReservedOrdersByTimeQuery {
   ) {}
 
   public async function fetch(
-    TimestampInterval $interval
+    TimestampSegment $interval
   ): Awaitable<ImmVector<RsvdOrder>> {
     // Build where clause
     $where_clause_vector_builder = new WhereClauseVectorBuilder();

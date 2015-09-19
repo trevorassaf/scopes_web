@@ -18,7 +18,7 @@ class IsValidReservedOrderMethod {
   public function check(
     UnsignedInt $num_requested_scopes,
     Date $date,
-    TimeInterval $interval
+    TimeSegment $interval
   ): bool {
     try {
       // Check if 'date' is designated as an irregular date. Lookup
@@ -50,7 +50,7 @@ class IsValidReservedOrderMethod {
           ->getWaitHandle()
           ->join();
 
-        $allowed_timestamp_intervals = $this->makeIrregularTimesIntoTimestampIntervals(
+        $allowed_timestamp_intervals = $this->makeIrregularTimesIntoTimestampSegments(
           $date,
           $irregular_times
         );
@@ -126,7 +126,7 @@ class IsValidReservedOrderMethod {
           ->getWaitHandle()
           ->join();
 
-        $allowed_timestamp_intervals = $this->makeRegularTimesIntoTimestampIntervals(
+        $allowed_timestamp_intervals = $this->makeRegularTimesIntoTimestampSegments(
           $date,
           $regular_times
         );        
@@ -135,7 +135,7 @@ class IsValidReservedOrderMethod {
       // Check if ir/regular times (whichever one we're using) allow
       // for the requested timestamp interval
       return $this->doesSatisfyAllowedTimes(
-        $interval->toTimestampInterval($date),
+        $interval->toTimestampSegment($date),
         $allowed_timestamp_intervals
       );
       
@@ -146,8 +146,8 @@ class IsValidReservedOrderMethod {
   }
 
   private function doesSatisfyAllowedTimes(
-    TimestampInterval $requested_interval,
-    ImmVector<TimestampInterval> $allowed_time_intervals
+    TimestampSegment $requested_interval,
+    ImmVector<TimestampSegment> $allowed_time_intervals
   ): bool {
     foreach ($allowed_time_intervals as $time_interval) {
       if (!$requested_interval->getStart()->isBefore($time_interval->getStart()) &&
@@ -158,13 +158,13 @@ class IsValidReservedOrderMethod {
     return false; 
   }
   
-  private function makeIrregularTimesIntoTimestampIntervals(
+  private function makeIrregularTimesIntoTimestampSegments(
     Date $date,
     ImmVector<IrregularTime> $irregular_times
-  ): ImmVector<TimestampInterval> {
+  ): ImmVector<TimestampSegment> {
     $timestamp_intervals = Vector{};
     foreach ($irregular_times as $time) {
-      $timestamp_intervals[] = new TimestampInterval(
+      $timestamp_intervals[] = new TimestampSegment(
         new Timestamp(
           $date,
           $time->getStartTime()
@@ -178,13 +178,13 @@ class IsValidReservedOrderMethod {
     return $timestamp_intervals->toImmVector();
   }
 
-  private function makeRegularTimesIntoTimestampIntervals(
+  private function makeRegularTimesIntoTimestampSegments(
     Date $date,
     ImmVector<RegularTime> $regular_times
-  ): ImmVector<TimestampInterval> {
+  ): ImmVector<TimestampSegment> {
     $timestamp_intervals = Vector{};
     foreach ($regular_times as $time) {
-      $timestamp_intervals[] = new TimestampInterval(
+      $timestamp_intervals[] = new TimestampSegment(
         new Timestamp(
           $date,
           $time->getStartTime()

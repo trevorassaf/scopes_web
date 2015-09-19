@@ -1,6 +1,6 @@
 <?hh // strict
 
-class TimestampInterval {
+class TimestampSegment {
 
   public function __construct(
     private Timestamp $start,

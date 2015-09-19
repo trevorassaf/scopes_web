@@ -10,7 +10,7 @@ class ReserveOrderMethod {
   public function reserve(
     UnsignedInt $user_id,
     UnsignedInt $scopes_count,
-    TimestampInterval $scopes_interval
+    TimestampSegment $scopes_interval
   ): RsvdOrder {
     // TODO First, perform light-weight policy check on reservation request
 
