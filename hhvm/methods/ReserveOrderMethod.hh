@@ -4,7 +4,8 @@ class ReserveOrderMethod {
 
   public function __construct(
     private InsertReservedOrderQuery $rsvdOrderInsertQuery,
-    private IsValidReservedOrderMethod $isValidReservedOrderMethod
+    private IsValidReservedOrderMethod $isValidReservedOrderMethod,
+    private IsConflictingReservedOrderMethod $isConflictingReservedOrderMethod
   ) {}
 
   public function reserve(
@@ -12,21 +13,26 @@ class ReserveOrderMethod {
     UnsignedInt $scopes_count,
     TimestampSegment $timestamp_segment
   ): RsvdOrder {
-    try {
-      if (!$this->isValidReservedOrderMethod->check(
-        $scopes_count,
-        $timestamp_segment)
-      ) {
-        throw new InvalidReservedOrderRequestException();
-      }
-    } catch (QueryException $ex) {
-      throw new MethodException(); 
+    // First, check if the requested order is valid, i.e. it agrees with
+    // the allowed experiment timeslots
+    if (!$this->isValidReservedOrderMethod->check(
+      $scopes_count,
+      $timestamp_segment)
+    ) {
+      throw new InvalidReservedOrderRequestException();
     }
 
-    $rsvd_order = null;
-    // Second, optimistically insert reserve order into db
+    // Second, ensure that the requested order does not overbook our scopes
+    if (!$this->isConflictingReservedOrderMethod->check(
+      $scopes_count,
+      $timestamp_segment)
+    ) {
+      throw new ConflictingReservedOrderRequestException();
+    }
+
+    // Third, persist reserved order 
     try {
-      $rsvd_order = $this->rsvdOrderInsertQuery->insert(
+      return $this->rsvdOrderInsertQuery->insert(
         $user_id,
         $scopes_count,
         $timestamp_segment->getStart(),
@@ -37,10 +43,5 @@ class ReserveOrderMethod {
     } catch (QueryException $ex) {
       throw new MethodException();
     }
-
-    // Then, we validate our reservation by ensuring that we didn't 
-    // overbook the scopes
-
-    return $rsvd_order;
   }
 }

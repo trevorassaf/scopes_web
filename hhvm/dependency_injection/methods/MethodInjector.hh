@@ -154,7 +154,6 @@ class MethodInjector {
   public function getIsValidReservedOrderMethod(): IsValidReservedOrderMethod {
     if ($this->isValidReservedOrderMethod === null) {
       $this->isValidReservedOrderMethod = new IsValidReservedOrderMethod(
-        $this->getIsConflictingReservedOrderMethod(),
         $this->queryInjector->getFetchRegularEdgeQuery(),
         $this->regularEdgesTableLoader->load(),
         $this->queryInjector->getFetchRegularTimeQuery(),
@@ -177,7 +176,8 @@ class MethodInjector {
     if ($this->reserveOrderMethod === null) {
       $this->reserveOrderMethod = new ReserveOrderMethod(
         $this->queryInjector->getConcreteInsertRsvdOrderQuery(),
-        $this->getIsValidReservedOrderMethod()
+        $this->getIsValidReservedOrderMethod(),
+        $this->getIsConflictingReservedOrderMethod()
       ); 
     }
     return $this->reserveOrderMethod;

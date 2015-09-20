@@ -9,7 +9,7 @@ CREATE TABLE ConfirmedOrders (
   FOREIGN KEY(userid) REFERENCES Users(id),
   scopesCount INT UNSIGNED NOT NULL,
   startTime TIMESTAMP NOT NULL,
-  reservedMinutesCount INT UNSIGNED NOT NULL,
+  endTime TIMESTAMP NOT NULL,
   title VARCHAR(40) NOT NULL,
   description VARCHAR(400) NOT NULL,
   shortCode VARCHAR(40) NOT NULL,

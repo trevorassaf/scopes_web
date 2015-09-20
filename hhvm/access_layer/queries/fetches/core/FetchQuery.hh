@@ -18,7 +18,6 @@ class FetchQuery<Tmodel> {
     $field_map_set = $result_set->mapRowsTyped();
     $objects = Vector{};
     foreach ($field_map_set as $field_map) {
-      
       $objects[] = $this->modelFactory->extrude($field_map->toImmMap());
     }
     return $objects->toImmVector();

@@ -13,13 +13,9 @@ class IsConflictingReservedOrderMethod {
     TimestampSegment $timestamp_segment
   ): bool {
     try {
-      // Commence queries simultaneously. Start with order fetches
-      // because they take the longest...
-      $rsvd_order_fetch_handle = $this->fetchReservedOrdersByTimeQuery 
-        ->fetch($timestamp_segment);
-      $confirmed_order_fetch_handle = $this->fetchConfirmedOrdersByTimeQuery 
-        ->fetch($timestamp_segment);
-      $order_policy_fetch_handle = $this->fetchReservedOrderPolicyQuery->fetch();
+      // Check reserved order policy 
+      $order_policy_fetch_handle = $this->fetchReservedOrderPolicyQuery
+        ->fetch();
 
       // Wait for completion...
       $order_policy = $order_policy_fetch_handle
@@ -32,14 +28,26 @@ class IsConflictingReservedOrderMethod {
         return false;
       }
 
-      // Now check to see if our scopes would be overbooked if we run this
-      // order alongside previously scheduled orders
+      // Commence queries simultaneously. Start with order fetches
+      // because they take the longest...
+      $rsvd_order_fetch_handle = $this->fetchReservedOrdersByTimeQuery 
+        ->fetch($timestamp_segment);
+
+      // TODO make better use of async mysql      
       $rsvd_orders = $rsvd_order_fetch_handle
         ->getWaitHandle()
         ->join();
+
+      $confirmed_order_fetch_handle = $this->fetchConfirmedOrdersByTimeQuery 
+        ->fetch($timestamp_segment);
+
+      // TODO make better use of async mysql      
       $confirmed_orders = $confirmed_order_fetch_handle
         ->getWaitHandle()
         ->join();
+
+      // Now check to see if our scopes would be overbooked if we run this
+      // order alongside previously scheduled orders
 
       // Convert rsvd/confirmed order types to time intervals and sort them in
       // ascending order by start-time

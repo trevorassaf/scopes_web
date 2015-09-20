@@ -3,7 +3,6 @@
 class IsValidReservedOrderMethod {
 
   public function __construct(
-    private IsConflictingReservedOrderMethod $isConflictingReservedOrderMethod,
     private FetchQuery<RegularWeekDayRegularTimeEdge> $fetchRegularEdgesQuery,
     private RegularWeekDayRegularTimeEdgesTable $regularEdgesTable,
     private FetchQuery<RegularTime> $fetchRegularTimesQuery,
