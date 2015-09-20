@@ -12,137 +12,173 @@ class IsValidReservedOrderMethod {
     private FetchByUniqueKeyQuery<IrregularDate> $fetchIrregularDateQuery,
     private IrregularDatesTable $irregularDatesTable,
     private DateSerializer $dateSerializer,
-    private DateToDayOfTheWeekConverter $dateToDayOfTheWeekConverter
+    private DateToDayOfTheWeekConverter $dateToDayOfTheWeekConverter,
+    private TimestampSegmentExpander $timestampSegmentExpander
   ) {}
 
   public function check(
     UnsignedInt $num_requested_scopes,
-    Date $date,
-    TimeSegment $interval
+    TimestampSegment $timestamp_segment
   ): bool {
-    try {
-      // Check if 'date' is designated as an irregular date. Lookup
-      // id of corresponding object.
-      $irregular_date_fetch_handle = $this->fetchIrregularDateQuery
-        ->fetch(
-          ImmMap{
-            $this->irregularDatesTable->getDateKey() => $this->dateSerializer->serialize($date),
-          }
-        );
+    // Expand timestamp interval to sequence of single-day-time-segments
+    $single_day_time_segment_sequence = $this->timestampSegmentExpander
+      ->expand($timestamp_segment);
 
-      // Block until we fetch the irregular date
-      $irregular_date = $irregular_date_fetch_handle
-        ->getWaitHandle()
-        ->join();
+    // Step through single-day-time-segments and validate each one
+    $regular_week_day_map = Map{}; // DayOfTheWeekType => ImmVector<TimeSegment>
 
-      // If irregular date is set, then the corresponding irregular times
-      // override the regular times. Fetch the irregular times and
-      // check those.
+    foreach ($single_day_time_segment_sequence as $single_day_time_segment) {
       $allowed_timestamp_intervals = Vector{};
-
-      if ($irregular_date != null) {
-        // Fetch corresponding irregular times
-        $irregular_time_fetch_handle = $this->fetchIrregularTimesQuery->fetch(
-          $irregular_date->getId()
-        );
-
-        $irregular_times = $irregular_time_fetch_handle
+      
+      try {
+        // Check if 'date' is designated as an irregular date. Lookup
+        // id of corresponding object.
+        $irregular_date_fetch_handle = $this->fetchIrregularDateQuery
+          ->fetch(
+            ImmMap{
+              $this->irregularDatesTable->getDateKey() => $this->dateSerializer
+                ->serialize($single_day_time_segment->getDate()),
+            }
+          );
+        
+        // Block until we fetch the irregular date
+        $irregular_date = $irregular_date_fetch_handle
           ->getWaitHandle()
           ->join();
 
-        $allowed_timestamp_intervals = $this->makeIrregularTimesIntoTimestampSegments(
-          $date,
-          $irregular_times
-        );
-
-      } else {
-        // Fetch regular date by day of the week index
-        $day_of_the_week_fetch_params_builder = new FetchParamsBuilder();
-        $day_of_the_week_where_clause_builder = new WhereClauseVectorBuilder();
-        $day_of_the_week_order_builder = new OrderByClauseBuilder();
-
-        $regular_edges_fetch_handle = $this->fetchRegularEdgesQuery->fetch(
-          $day_of_the_week_fetch_params_builder
-            ->setTable($this->regularEdgesTable)
-            ->setWhereClause(
-              $day_of_the_week_where_clause_builder->setFirstClause(
-                new EqualsWhereClause(
-                  $this->regularEdgesTable->getIdKey(),
-                  (string)$this->dateToDayOfTheWeekConverter->convert($date)
-                )
-              ) 
-              ->build()
-            )
-            ->setOrderByClause(
-              $day_of_the_week_order_builder->asc(
-                $this->regularEdgesTable->getRegularWeekDayIdKey()
-              )
-              ->build()
-            )
-            ->build()
-        );  
-
-        // Block until regular-date fetch finishes
-        $regular_edges = $regular_edges_fetch_handle
-          ->getWaitHandle()
-          ->join();
-
-        // If no edges found, then we know that no times are registered
-        // with this regular date. Thus, no time would work, so fail early.
-        if ($regular_edges->isEmpty()) {
-          return false;
-        }
-
-        // Assemble fetch query
-        $where_clause_vector_builder = new WhereClauseVectorBuilder();
-        foreach ($regular_edges as $edge) {
-          $equals_clause = new EqualsWhereClause(
-            $this->regularTimesTable->getIdKey(),
-            (string)$edge->getRegularTimeId()->getNumber()
+        // Irregular-date exists, so we fetch the corresponding irregular-time entry
+        // and compare to this requested order
+        if ($irregular_date != null) {
+          // Fetch corresponding irregular times
+          $irregular_time_fetch_handle = $this->fetchIrregularTimesQuery->fetch(
+            $irregular_date->getId()
           );
 
-          ($where_clause_vector_builder->hasFirstClause())
-            ? $where_clause_vector_builder->or($equals_clause)
-            : $where_clause_vector_builder->setFirstClause($equals_clause);
-        }
+          // Block until we fetch the irregular times
+          $irregular_times = $irregular_time_fetch_handle
+            ->getWaitHandle()
+            ->join();
 
-        // Use edges to lookup concrete regular times
-        $fetch_params_builder = new FetchParamsBuilder();
-        $order_by_clause_builder = new OrderByClauseBuilder();
+          // Transform irregular times into timestamp segments in preparation for check
+          $allowed_timestamp_intervals = $this->makeIrregularTimesIntoTimestampSegments(
+            $single_day_time_segment->getDate(),
+            $irregular_times
+          );
 
-        $regular_times_fetch_handle = $this->fetchRegularTimesQuery->fetch(
-          $fetch_params_builder
-            ->setTable($this->regularTimesTable)
-            ->setWhereClause($where_clause_vector_builder->build())
-            ->setOrderByClause(
-              $order_by_clause_builder
-                ->asc($this->regularTimesTable->getStartTimeKey())
+        } else {
+          // Irregular-date does not exist, so we fetch the corresponding regular-time
+          // entry and compare to this requested order
+          $regular_day_time_segment_sequence = null;
+
+          $day_of_the_week = $this->dateToDayOfTheWeekConverter->convert(
+            $single_day_time_segment->getDate()
+          ); 
+          
+          // First check the cache (we may have already checked this regular-date) for
+          // the approved times of this date
+          if ($regular_week_day_map->containsKey($day_of_the_week)) {
+            // Regular-date is cached, so just use that instead of going to db... 
+            $regular_day_time_segment_sequence = $regular_week_day_map[$day_of_the_week]; 
+          } else {
+            // Regular-date is not cached, so we have to fetch from db, then cache...
+            // Assemble fetch regular-edge query: fetch regular-date by day-of-the-week index
+            $day_of_the_week_fetch_params_builder = new FetchParamsBuilder();
+            $day_of_the_week_where_clause_builder = new WhereClauseVectorBuilder();
+            $day_of_the_week_order_builder = new OrderByClauseBuilder();
+
+            $fetch_query = $day_of_the_week_fetch_params_builder
+              ->setTable($this->regularEdgesTable)
+              ->setWhereClause(
+                $day_of_the_week_where_clause_builder->setFirstClause(
+                  new EqualsWhereClause(
+                    $this->regularEdgesTable->getIdKey(),
+                    (string)$this->dateToDayOfTheWeekConverter->convert($single_day_time_segment->getDate())
+                  )
+                ) 
                 ->build()
-            )
-            ->build()
-        );
+              )
+              ->setOrderByClause(
+                $day_of_the_week_order_builder->asc(
+                  $this->regularEdgesTable->getRegularWeekDayIdKey()
+                )
+                ->build()
+              )
+              ->build();
 
-        $regular_times = $regular_times_fetch_handle
-          ->getWaitHandle()
-          ->join();
+            // Execute regular-edge fetch query...
+            $regular_edges_fetch_handle = $this->fetchRegularEdgesQuery->fetch($fetch_query);  
 
-        $allowed_timestamp_intervals = $this->makeRegularTimesIntoTimestampSegments(
-          $date,
-          $regular_times
-        );        
+            // Block until regular-date fetch finishes
+            $regular_edges = $regular_edges_fetch_handle
+              ->getWaitHandle()
+              ->join();
+            
+            // If no edges found, then we know that no times are registered
+            // with this regular date. Thus, no time would work, so fail early.
+            // Important: we could cache here, but there's not need to b/c 
+            // the request is invalid at this point
+            if ($regular_edges->isEmpty()) {
+              return false;
+            }
+            
+            // Assemble fetch regular-time query: join with regular-edges
+            $where_clause_vector_builder = new WhereClauseVectorBuilder();
+            
+            foreach ($regular_edges as $edge) {
+              $equals_clause = new EqualsWhereClause(
+                $this->regularTimesTable->getIdKey(),
+                (string)$edge->getRegularTimeId()->getNumber()
+              );
+
+              if ($where_clause_vector_builder->hasFirstClause()) {
+                $where_clause_vector_builder->or($equals_clause);
+              } else {
+                $where_clause_vector_builder->setFirstClause($equals_clause);
+              }
+            }
+
+            // Execute fetch regular-times query
+            $fetch_params_builder = new FetchParamsBuilder();
+            $order_by_clause_builder = new OrderByClauseBuilder();
+
+            $regular_times_fetch_handle = $this->fetchRegularTimesQuery->fetch(
+              $fetch_params_builder
+                ->setTable($this->regularTimesTable)
+                ->setWhereClause($where_clause_vector_builder->build())
+                ->setOrderByClause(
+                  $order_by_clause_builder
+                    ->asc($this->regularTimesTable->getStartTimeKey())
+                    ->build()
+                )
+                ->build()
+            );
+
+            $regular_times = $regular_times_fetch_handle
+              ->getWaitHandle()
+              ->join();
+
+            $allowed_timestamp_intervals = $this->makeRegularTimesIntoTimestampSegments(
+              $single_day_time_segment->getDate(),
+              $regular_times
+            );        
+          }
+        }
+      } catch (QueryException $ex) {
+        throw new MethodException();
+      }  
+
+      // Check times  
+      if (!$this->doesSatisfyAllowedTimes(
+        $timestamp_segment,
+        $allowed_timestamp_intervals->toImmVector())
+      ) {
+        return false; 
       }
+    }
 
-      // Check if ir/regular times (whichever one we're using) allow
-      // for the requested timestamp interval
-      return $this->doesSatisfyAllowedTimes(
-        $interval->toTimestampSegment($date),
-        $allowed_timestamp_intervals
-      );
-      
-    } catch (QueryException $ex) {
-      // TODO return specific exceptions for policy violations 
-      throw new MethodException();
-    } 
+    // We validated the requested time-period against all current requests, so 
+    // accept request
+    return true;
   }
 
   private function doesSatisfyAllowedTimes(

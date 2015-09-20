@@ -8,6 +8,10 @@ class Day {
     return $day_number->getNumber() <= self::MAX_DAY;
   }
 
+  public static function fromInt(int $day): Day {
+    return new Day(new UnsignedInt($day));
+  }
+
   public function __construct(
     private UnsignedInt $day
   ) {

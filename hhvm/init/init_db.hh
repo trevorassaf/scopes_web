@@ -24,19 +24,31 @@ function initReservedOrders(MethodInjector $method_injector): void {
   $reserve_order_method = $method_injector->getReserveOrderMethod();
 
   // Reserve orders for first user
+  $date_builder = new DateBuilder();
+  $time_builder = new TimeBuilder();
+
   $start_time = new Timestamp(
-    new Date("2015-8-1"),
-    new Time("09:00:00")
+    $date_builder
+      ->setYear(Year::fromInt(2015))
+      ->setMonth(Month::fromInt(8))
+      ->setDay(Day::fromInt(1))
+      ->build(),
+    $time_builder
+      ->setHour(Hour::fromInt(9))
+      ->build()
   );
   
   $end_time = new Timestamp(
-    new Date("2015-8-1"),
-    new Time("10:00:00")
-  );
+    $date_builder->build(),
+    $time_builder
+      ->setHour(Hour::fromInt(10))
+      ->build()
+    );
+
   $rsvd_order_1 = $reserve_order_method->reserve(
     new UnsignedInt(1),
     new UnsignedInt(17),
-    new TimestampInterval(
+    new TimestampSegment(
       $start_time,
       $end_time
     )
@@ -47,10 +59,15 @@ function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {
 
   // Create regular allowed times
   $create_regular_time_method = $method_injector->getCreateRegularTimeMethod();
+  $time_builder = new TimeBuilder();
 
   $regular_time = $create_regular_time_method->create(
-    new Time("9:00:00"),
-    new Time("17:00:00")
+    $time_builder
+      ->setHour(Hour::fromInt(9))
+      ->build(),
+    $time_builder
+      ->setHour(Hour::fromInt(17))
+      ->build()
   );
 
   // Create M-F week days

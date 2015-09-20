@@ -2,6 +2,10 @@
 
 class Year {
 
+  public static function fromInt(int $year): Year {
+    return new Year(new UnsignedInt($year));
+  }
+
   public function __construct(
     private UnsignedInt $year
   ) {}

@@ -16,6 +16,9 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
     $date_to_week_day_converter_laoder = new DateToDayOfTheWeekConverterLazyLoader(
       $hr_date_serializer_loader
     );
+    $timestamp_segment_expander_loader = new TimestampSegmentExpanderLazyLoader(
+      $hr_date_serializer_loader
+    );
     
     return new MethodInjector(
       $production_query_injector_factory->get(),
@@ -30,7 +33,8 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
       $hr_time_serializer_loader,
       $hr_date_serializer_loader,
       $hr_timestamp_builder_loader,
-      $date_to_week_day_converter_laoder
+      $date_to_week_day_converter_laoder,
+      $timestamp_segment_expander_loader
     ); 
   }
 }

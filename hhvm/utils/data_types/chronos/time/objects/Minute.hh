@@ -8,6 +8,10 @@ class Minute {
     return self::MAX_MINUTE >= $minute->getNumber();
   }
 
+  public static function fromInt(int $minute): Minute {
+    return new Minute(new UnsignedInt($minute));
+  }
+
   public function __construct(
     private UnsignedInt $minute
   ) {

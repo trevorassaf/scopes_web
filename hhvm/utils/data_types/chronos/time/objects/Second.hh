@@ -4,6 +4,10 @@ class Second {
 
   const int MAX_SECOND = 60;
 
+  public static function fromInt(int $second): Second {
+    return new Second(new UnsignedInt($second));
+  }
+
   public function __construct(
     private UnsignedInt $second
   ) {

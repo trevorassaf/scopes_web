@@ -8,6 +8,10 @@ class Month {
     return $month_number->getNumber() <= self::MAX_MONTH;
   }
 
+  public static function fromInt(int $month): Month {
+    return new Month(new UnsignedInt($month));
+  }
+
   public function __construct(
     private UnsignedInt $month
   ) {

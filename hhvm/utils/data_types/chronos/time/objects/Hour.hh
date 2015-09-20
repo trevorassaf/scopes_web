@@ -8,6 +8,10 @@ class Hour {
     return self::MAX_HOUR >= $hour->getNumber();
   }
 
+  public static function fromInt(int $hour): Hour {
+    return new Hour(new UnsignedInt($hour));
+  }
+
   public function __construct(
     private UnsignedInt $hour
   ) {

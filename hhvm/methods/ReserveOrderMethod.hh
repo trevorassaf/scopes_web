@@ -10,9 +10,18 @@ class ReserveOrderMethod {
   public function reserve(
     UnsignedInt $user_id,
     UnsignedInt $scopes_count,
-    TimestampSegment $scopes_interval
+    TimestampSegment $timestamp_segment
   ): RsvdOrder {
-    // TODO First, perform light-weight policy check on reservation request
+    try {
+      if (!$this->isValidReservedOrderMethod->check(
+        $scopes_count,
+        $timestamp_segment)
+      ) {
+        throw new InvalidReservedOrderRequestException();
+      }
+    } catch (QueryException $ex) {
+      throw new MethodException(); 
+    }
 
     $rsvd_order = null;
     // Second, optimistically insert reserve order into db
@@ -20,8 +29,8 @@ class ReserveOrderMethod {
       $rsvd_order = $this->rsvdOrderInsertQuery->insert(
         $user_id,
         $scopes_count,
-        $scopes_interval->getStart(),
-        $scopes_interval->getEnd()
+        $timestamp_segment->getStart(),
+        $timestamp_segment->getEnd()
       )
       ->getWaitHandle()
       ->join();
