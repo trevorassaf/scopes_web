@@ -14,22 +14,22 @@ class UsersTable extends Table {
   }
 
   public function getFirstNameKey(): string {
-    return $this->makeTableQualifiedKey(self::FIRST_NAME_KEY);
+    return self::FIRST_NAME_KEY;
   }
 
   public function getLastNameKey(): string {
-    return $this->makeTableQualifiedKey(self::LAST_NAME_KEY);
+    return self::LAST_NAME_KEY;
   }
 
   public function getEmailKey(): string {
-    return $this->makeTableQualifiedKey(self::EMAIL_KEY);
+    return self::EMAIL_KEY;
   }
 
   public function getPasswordHashKey(): string {
-    return $this->makeTableQualifiedKey(self::PASSWORD_KEY);
+    return self::PASSWORD_KEY;
   }
 
   public function getTimeJoinedKey(): string {
-    return $this->makeTableQualifiedKey(self::TIME_JOINED_KEY);
+    return self::TIME_JOINED_KEY;
   }
 }

@@ -8,6 +8,13 @@ class TimestampSegment {
   ) {
     invariant($this->start->isBefore($this->end), "Start time must preceed end time");
   }
+
+  public function toTimeSegment(): TimeSegment {
+    return new TimeSegment(
+      $this->start->getTime(),
+      $this->end->getTime()
+    );
+  }
   
   public function getStart(): Timestamp {
     return $this->start;

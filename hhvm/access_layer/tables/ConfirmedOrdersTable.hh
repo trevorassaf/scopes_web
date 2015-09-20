@@ -17,34 +17,34 @@ class ConfirmedOrdersTable extends Table {
   }
 
   public function getUserIdKey(): string {
-    return $this->makeTableQualifiedKey(self::USER_ID_KEY);
+    return self::USER_ID_KEY;
   }
 
   public function getScopesCountKey(): string {
-    return $this->makeTableQualifiedKey(self::SCOPES_COUNT_KEY);
+    return self::SCOPES_COUNT_KEY;
   }
 
   public function getStartTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::START_TIME_KEY);
+    return self::START_TIME_KEY;
   }
 
   public function getEndTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::END_TIME_KEY);
+    return self::END_TIME_KEY;
   }
 
   public function getTitleKey(): string {
-    return $this->makeTableQualifiedKey(self::TITLE_KEY);
+    return self::TITLE_KEY;
   }
   
   public function getDescriptionKey(): string {
-    return $this->makeTableQualifiedKey(self::DESCRIPTION_KEY);
+    return self::DESCRIPTION_KEY;
   }
 
   public function getShortCodeKey(): string {
-    return $this->makeTableQualifiedKey(self::SHORT_CODE_KEY);
+    return self::SHORT_CODE_KEY;
   }
 
   public function getRecordingDurationKey(): string {
-    return $this->makeTableQualifiedKey(self::RECORDING_DURATION_KEY);
+    return self::RECORDING_DURATION_KEY;
   }
 }

@@ -10,6 +10,6 @@ class ReservedOrderPolicyTable extends Table {
   }
 
   public function getScopesCountKey(): string {
-    return $this->makeTableQualifiedKey(self::SCOPES_COUNT_KEY);
+    return self::SCOPES_COUNT_KEY;
   }
 }

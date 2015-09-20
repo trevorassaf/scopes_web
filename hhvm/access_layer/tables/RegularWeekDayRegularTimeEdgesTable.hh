@@ -11,10 +11,10 @@ class RegularWeekDayRegularTimeEdgesTable extends Table {
   }
 
   public function getRegularWeekDayIdKey(): string {
-    return $this->makeTableQualifiedKey(self::REGULAR_WEEK_DAY_KEY);
+    return self::REGULAR_WEEK_DAY_KEY;
   }
 
   public function getRegularTimeIdKey(): string {
-    return $this->makeTableQualifiedKey(self::REGULAR_TIME_KEY);
+    return self::REGULAR_TIME_KEY;
   }
 }

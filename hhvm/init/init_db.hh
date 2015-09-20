@@ -41,7 +41,7 @@ function initReservedOrders(MethodInjector $method_injector): void {
   $end_time = new Timestamp(
     $date_builder->build(),
     $time_builder
-      ->setHour(Hour::fromInt(10))
+      ->setHour(Hour::fromInt(17))
       ->build()
     );
 

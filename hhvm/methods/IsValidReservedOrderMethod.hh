@@ -29,7 +29,7 @@ class IsValidReservedOrderMethod {
     $regular_week_day_map = Map{}; // DayOfTheWeekType => ImmVector<TimeSegment>
 
     foreach ($single_day_time_segment_sequence as $single_day_time_segment) {
-      $allowed_timestamp_intervals = Vector{};
+      $allowed_time_intervals = Vector{};
       
       try {
         // Check if 'date' is designated as an irregular date. Lookup
@@ -61,8 +61,7 @@ class IsValidReservedOrderMethod {
             ->join();
 
           // Transform irregular times into timestamp segments in preparation for check
-          $allowed_timestamp_intervals = $this->makeIrregularTimesIntoTimestampSegments(
-            $single_day_time_segment->getDate(),
+          $allowed_time_intervals = $this->makeIrregularTimesIntoTimeSegments(
             $irregular_times
           );
 
@@ -119,6 +118,7 @@ class IsValidReservedOrderMethod {
             // Important: we could cache here, but there's not need to b/c 
             // the request is invalid at this point
             if ($regular_edges->isEmpty()) {
+              echo "Rsvd order request failed because regular edge doesn't exist\n";
               return false;
             }
             
@@ -158,10 +158,7 @@ class IsValidReservedOrderMethod {
               ->getWaitHandle()
               ->join();
 
-            $allowed_timestamp_intervals = $this->makeRegularTimesIntoTimestampSegments(
-              $single_day_time_segment->getDate(),
-              $regular_times
-            );        
+            $allowed_time_intervals = $this->makeRegularTimesIntoTimeSegments($regular_times);        
           }
         }
       } catch (QueryException $ex) {
@@ -170,9 +167,10 @@ class IsValidReservedOrderMethod {
 
       // Check times  
       if (!$this->doesSatisfyAllowedTimes(
-        $timestamp_segment,
-        $allowed_timestamp_intervals->toImmVector())
+        $timestamp_segment->toTimeSegment(),
+        $allowed_time_intervals->toImmVector())
       ) {
+        echo "Rsvd order request does not satisfy allowed times!\n";
         return false; 
       }
     }
@@ -183,56 +181,36 @@ class IsValidReservedOrderMethod {
   }
 
   private function doesSatisfyAllowedTimes(
-    TimestampSegment $requested_interval,
-    ImmVector<TimestampSegment> $allowed_time_intervals
+    TimeSegment $requested_interval,
+    ImmVector<TimeSegment> $allowed_time_intervals
   ): bool {
     foreach ($allowed_time_intervals as $time_interval) {
       if (!$requested_interval->getStart()->isBefore($time_interval->getStart()) &&
-          !$requested_interval->getEnd()->isAfter($time_interval->getEnd())) {
+          !$requested_interval->getEnd()->isAfter($time_interval->getEnd())
+      ) {
         return true; 
       }
     }
     return false; 
   }
   
-  private function makeIrregularTimesIntoTimestampSegments(
-    Date $date,
+  private function makeIrregularTimesIntoTimeSegments(
     ImmVector<IrregularTime> $irregular_times
-  ): ImmVector<TimestampSegment> {
+  ): ImmVector<TimeSegment> {
     $timestamp_intervals = Vector{};
     foreach ($irregular_times as $time) {
-      $timestamp_intervals[] = new TimestampSegment(
-        new Timestamp(
-          $date,
-          $time->getStartTime()
-        ),
-        new Timestamp(
-          $date,
-          $time->getEndTime()
-        )
-      );
+      $timestamp_intervals[] = $time->getTimeSegment();
     }
     return $timestamp_intervals->toImmVector();
   }
 
-  private function makeRegularTimesIntoTimestampSegments(
-    Date $date,
+  private function makeRegularTimesIntoTimeSegments(
     ImmVector<RegularTime> $regular_times
-  ): ImmVector<TimestampSegment> {
+  ): ImmVector<TimeSegment> {
     $timestamp_intervals = Vector{};
     foreach ($regular_times as $time) {
-      $timestamp_intervals[] = new TimestampSegment(
-        new Timestamp(
-          $date,
-          $time->getStartTime()
-        ),
-        new Timestamp(
-          $date,
-          $time->getEndTime()
-        )
-      );
+      $timestamp_intervals[] = $time->getTimeSegment();
     }
-
     return $timestamp_intervals->toImmVector();
   }
 }

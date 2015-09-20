@@ -13,8 +13,10 @@ class RegularTimeFactory extends ConcreteModelFactory<RegularTime> {
   ): RegularTime {
     return new RegularTime(
       $id,
-      $this->timeSerializer->deserialize((string)$params[$this->regularTimesTable->getStartTimeKey()]),
-      $this->timeSerializer->deserialize((string)$params[$this->regularTimesTable->getEndTimeKey()])
+      new TimeSegment(
+        $this->timeSerializer->deserialize((string)$params[$this->regularTimesTable->getStartTimeKey()]),
+        $this->timeSerializer->deserialize((string)$params[$this->regularTimesTable->getEndTimeKey()])
+      )
     );
   }
 }

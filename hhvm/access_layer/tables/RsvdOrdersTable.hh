@@ -14,22 +14,22 @@ class RsvdOrdersTable extends Table {
   }
 
   public function getUserIdKey(): string {
-    return $this->makeTableQualifiedKey(self::USER_ID_KEY);
+    return self::USER_ID_KEY;
   }
 
   public function getLeaseStartKey(): string {
-    return $this->makeTableQualifiedKey(self::LEASE_START_KEY);
+    return self::LEASE_START_KEY;
   }
 
   public function getScopesCountKey(): string {
-    return $this->makeTableQualifiedKey(self::SCOPES_COUNT_KEY);
+    return self::SCOPES_COUNT_KEY;
   }
 
   public function getStartTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::START_TIME_KEY);
+    return self::START_TIME_KEY;
   }
 
   public function getEndTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::END_TIME_KEY);
+    return self::END_TIME_KEY;
   }
 }

@@ -11,10 +11,10 @@ class RegularTimesTable extends Table {
   }
 
   public function getStartTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::START_TIME_KEY);
+    return self::START_TIME_KEY;
   }
 
   public function getEndTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::END_TIME_KEY);
+    return self::END_TIME_KEY;
   }
 }

@@ -12,14 +12,14 @@ class IrregularTimesTable extends Table {
   }
 
   public function getStartTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::START_TIME_KEY);
+    return self::START_TIME_KEY;
   }
 
   public function getEndTimeKey(): string {
-    return $this->makeTableQualifiedKey(self::END_TIME_KEY);
+    return self::END_TIME_KEY;
   }
 
   public function getIrregularDateIdKey(): string {
-    return $this->makeTableQualifiedKey(self::IRREGULAR_DATE_ID_KEY);
+    return self::IRREGULAR_DATE_ID_KEY;
   }
 }

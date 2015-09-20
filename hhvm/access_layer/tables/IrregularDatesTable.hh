@@ -10,6 +10,6 @@ class IrregularDatesTable extends Table {
   }
 
   public function getDateKey(): string {
-    return $this->makeTableQualifiedKey(self::DATE_KEY);
+    return self::DATE_KEY;
   }
 }

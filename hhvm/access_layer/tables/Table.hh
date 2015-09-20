@@ -6,12 +6,12 @@ abstract class Table {
   const string TABLE_QUALIFYING_TOKEN = ".";
 
   public function getIdKey(): string {
-    return $this->makeTableQualifiedKey(self::ID_KEY); 
+    return self::ID_KEY; 
   }
 
   abstract public function getName(): string;
 
-  protected function makeTableQualifiedKey(string $key_name): string {
+  public function makeTableQualifiedKey(string $key_name): string {
     return $this->getName() . self::TABLE_QUALIFYING_TOKEN . $key_name; 
   }
 }

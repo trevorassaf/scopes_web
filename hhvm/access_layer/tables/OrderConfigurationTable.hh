@@ -12,14 +12,14 @@ class OrderConfigurationTable extends Table {
   }
 
   public function getMinutesPerIntervalCountKey(): string {
-    return $this->makeTableQualifiedKey(self::MINUTES_PER_INTERVAL_COUNT_KEY);
+    return self::MINUTES_PER_INTERVAL_COUNT_KEY;
   }
 
   public function getPricePerIntervalCountKey(): string {
-    return $this->makeTableQualifiedKey(self::PRICE_PER_INTERVAL_COUNT_KEY);
+    return self::PRICE_PER_INTERVAL_COUNT_KEY;
   }
 
   public function getScopesCountKey(): string {
-    return $this->makeTableQualifiedKey(self::SCOPES_COUNT_KEY);
+    return self::SCOPES_COUNT_KEY;
   }
 }

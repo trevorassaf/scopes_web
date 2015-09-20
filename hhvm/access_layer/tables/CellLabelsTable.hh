@@ -12,14 +12,14 @@ class CellLabelsTable extends Table {
   }
 
   public function getConfirmedOrderIdKey(): string {
-    return $this->makeTableQualifiedKey(self::CONFIRMED_ORDER_ID_KEY);
+    return self::CONFIRMED_ORDER_ID_KEY;
   }
 
   public function getCellNumberKey(): string {
-    return $this->makeTableQualifiedKey(self::CELL_NUMBER_KEY);
+    return self::CELL_NUMBER_KEY;
   }
 
   public function getLabelKey(): string {
-    return $this->makeTableQualifiedKey(self::LABEL_KEY);
+    return self::LABEL_KEY;
   }
 }
