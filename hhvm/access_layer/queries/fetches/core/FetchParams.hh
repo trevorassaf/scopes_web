@@ -9,7 +9,7 @@ class FetchParams implements FetchQueryMaker {
   ) {}
 
   public function serialize(): string {
-    return "SELECT * FROM " . $this->table->getName()
+    return "SELECT " . $this->table->getName() . ".* FROM " . $this->table->getName()
       . $this->whereClause->serialize() . $this->orderByClause->serialize();
   }
 }

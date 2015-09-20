@@ -15,7 +15,7 @@ class Year {
   }
 
   public function toString(): string {
-    return (string)$this->year;
+    return (string)$this->year->getNumber();
   }
 
   public function equals(Year $year): bool {

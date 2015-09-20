@@ -6,7 +6,7 @@ abstract class Table {
   const string TABLE_QUALIFYING_TOKEN = ".";
 
   public function getIdKey(): string {
-    return self::ID_KEY; 
+    return $this->makeTableQualifiedKey(self::ID_KEY); 
   }
 
   abstract public function getName(): string;

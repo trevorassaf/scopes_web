@@ -40,7 +40,7 @@ class FetchRegularTimesQuery {
 
       // Assemble disjunctive where clause
       ($where_vector_builder->hasFirstClause())
-        ? $where_vector_builder->or($equals_clause)
+        ? $where_vector_builder->logicalOr($equals_clause)
         : $where_vector_builder->setFirstClause($equals_clause);
       
       /*$regular_times[] = await $this->fetchRegularTimeQuery->fetch(

@@ -2,13 +2,23 @@
 
 abstract class ComparisonWhereClause implements WhereClause {
 
+  const string NON_NUMERIC_FIELD_DELIMITER = "'";
+
   public function __construct(
-    private string $left,
-    private string $right
+    private mixed $left,
+    private mixed $right
   ) {}
 
   public function serialize(): string {
-    return "(" . $this->left . $this->getComparisonToken() . " " . $this->right . ")";      
+    $right = $this->typeQualifyFieldValue($this->right);
+
+    return "(" . (string)$this->left . $this->getComparisonToken() . $right . ")";      
+  }
+
+  private function typeQualifyFieldValue(mixed $value): string {
+    return (is_numeric($value)) 
+      ? (string)$value
+      : self::NON_NUMERIC_FIELD_DELIMITER . (string)$value . self::NON_NUMERIC_FIELD_DELIMITER;
   }
 
   abstract protected function getComparisonToken(): string;

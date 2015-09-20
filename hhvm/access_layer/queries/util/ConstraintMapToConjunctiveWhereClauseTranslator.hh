@@ -8,10 +8,10 @@ class ConstraintMapToConjunctiveWhereClauseTranslator {
     $where_clause_vector_builder = new WhereClauseVectorBuilder(); 
     foreach ($constraint_map as $key => $value) {
       $equals_clause = new EqualsWhereClause($key, (string)$value);
-      if ($where_clause_vector_builder->hasFirstClause()) {
+      if (!$where_clause_vector_builder->hasFirstClause()) {
         $where_clause_vector_builder->setFirstClause($equals_clause); 
       } else {
-        $where_clause_vector_builder->and($equals_clause);
+        $where_clause_vector_builder->logicalAnd($equals_clause);
       }
     }
     return $where_clause_vector_builder->build();

@@ -20,7 +20,7 @@ class FetchReservedOrdersByTimeQuery {
           $this->timestampSerializer->serialize($interval->getStart())
         )
       )
-      ->and(
+      ->logicalAnd(
         new LessThanOrEqualToWhereClause(
           $this->rsvdOrdersTable->getEndTimeKey(),
           $this->timestampSerializer->serialize($interval->getEnd())

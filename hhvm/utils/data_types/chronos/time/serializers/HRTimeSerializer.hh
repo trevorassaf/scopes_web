@@ -27,6 +27,7 @@ class HRTimeSerializer implements TimeSerializer {
 
   public function isValidString(string $time_str): bool {
     $time_tokens = explode(self::DELIMITER, $time_str);
+
     if (count($time_tokens) != 3) {
       return false;
     }

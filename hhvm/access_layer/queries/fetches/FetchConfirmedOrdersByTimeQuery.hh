@@ -23,7 +23,7 @@ class FetchConfirmedOrdersByTimeQuery {
             $this->timestampSerializer->serialize($interval->getStart())
           )
         )
-        ->and(
+        ->logicalAnd(
           new LessThanOrEqualToWhereClause(
             $this->confirmedOrdersTable->getEndTimeKey(),
             $this->timestampSerializer->serialize($interval->getEnd())

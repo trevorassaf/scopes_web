@@ -27,6 +27,7 @@ class HRDateSerializer implements DateSerializer {
 
   public function isValidString(string $date_str): bool {
     $date_tokens = explode(self::DELIMITER, $date_str);
+
     if (count($date_tokens) != 3) {
       return false;
     }
@@ -44,10 +45,11 @@ class HRDateSerializer implements DateSerializer {
 
     // Check date components
     if (!Month::isValid($month_number)
-      && !Day::isValid($day_number)) 
-    {
+      || !Day::isValid($day_number)
+    ) {
       return false; 
     }
+
 
     // Check integrity of date
     return checkdate(

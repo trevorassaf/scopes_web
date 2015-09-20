@@ -18,19 +18,19 @@ class WhereClauseVectorBuilder {
     return $this->firstClause != null;
   }
 
-  public function and(WhereClause $clause): this {
+  public function logicalAnd(WhereClause $clause): this {
     $this->whereClauses[] = new AndWhereClause($clause);
     return $this;
   }
   
-  public function or(WhereClause $clause): this {
+  public function logicalOr(WhereClause $clause): this {
     $this->whereClauses[] = new OrWhereClause($clause);
     return $this;
   }
 
   public function build(): WhereClauseVector {
     invariant(
-      $this->firstClause != null,
+      $this->firstClause != null || $this->whereClauses->isEmpty(),
       "First clause in where-clause-vector-builder can't be null!"
     );
     return new WhereClauseVector(

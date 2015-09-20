@@ -14,7 +14,7 @@ class DateToDayOfTheWeekConverter {
       $this->dateSerializer->getFormat(),
       $date_str
     );
-    $week_day_ordinal = $php_date_time_object->format("Y-m-d");
+    $week_day_ordinal = ($php_date_time_object->format("w") + 6) % 7;
     return DayOfTheWeekType::assert($week_day_ordinal);
   }
 }

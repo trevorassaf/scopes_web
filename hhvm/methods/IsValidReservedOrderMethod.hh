@@ -20,6 +20,7 @@ class IsValidReservedOrderMethod {
     UnsignedInt $num_requested_scopes,
     TimestampSegment $timestamp_segment
   ): bool {
+
     // Expand timestamp interval to sequence of single-day-time-segments
     $single_day_time_segment_sequence = $this->timestampSegmentExpander
       ->expand($timestamp_segment);
@@ -131,7 +132,7 @@ class IsValidReservedOrderMethod {
               );
 
               if ($where_clause_vector_builder->hasFirstClause()) {
-                $where_clause_vector_builder->or($equals_clause);
+                $where_clause_vector_builder->logicalOr($equals_clause);
               } else {
                 $where_clause_vector_builder->setFirstClause($equals_clause);
               }

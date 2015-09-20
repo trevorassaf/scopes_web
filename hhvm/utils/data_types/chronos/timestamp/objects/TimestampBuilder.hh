@@ -7,9 +7,10 @@ class TimestampBuilder {
   ) {}
 
   public function now(): Timestamp {
-    $current_date_time = new DateTime();
+    $php_current_date_time = new DateTime();
+
     return $this->timestampSerializer->deserialize(
-      $current_date_time->format($this->timestampSerializer->getFormat())
+      $php_current_date_time->format($this->timestampSerializer->getFormat())
     );
   }
 }

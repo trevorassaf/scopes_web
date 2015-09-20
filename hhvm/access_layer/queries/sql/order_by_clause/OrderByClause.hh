@@ -3,7 +3,7 @@
 class OrderByClause {
 
   const string ORDER_BY_TERM_SEPARATOR = ", ";
-  const string ORDER_BY_CLAUSE_PREFIX = "ORDER BY ";
+  const string ORDER_BY_CLAUSE_PREFIX = " ORDER BY ";
 
   public function __construct(
     private ImmVector<OrderByTerm> $orderByTerms

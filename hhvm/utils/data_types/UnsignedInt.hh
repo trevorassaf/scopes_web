@@ -6,8 +6,8 @@ class UnsignedInt {
   
   private int $number; 
 
-  public static function isValidString(string $number): bool {
-    return is_int($number) && self::isUnsigned((int)$number);
+  public static function isValidString(string $number_str): bool {
+    return ctype_digit($number_str);
   }
 
   public static function fromString(string $number): UnsignedInt {
