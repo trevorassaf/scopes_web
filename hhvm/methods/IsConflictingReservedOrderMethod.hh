@@ -24,7 +24,7 @@ class IsConflictingReservedOrderMethod {
 
       // Fail immediately if the number of requested scopes exceeds
       // the maximum number of scopes that could be available
-      if ($order_policy->getScopesCount()->getNumber() > $scopes_count->getNumber()) {
+      if ($order_policy->getScopesCount()->getNumber() < $scopes_count->getNumber()) {
         return false;
       }
 

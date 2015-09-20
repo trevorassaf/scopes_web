@@ -41,6 +41,7 @@ return array(
     'ConfirmedOrderModelFactoryLazyLoader' => $baseDir . '/dependency_injection/queries/lazy_loaders/ConfirmedOrderModelFactoryLazyLoader.hh',
     'ConfirmedOrdersTable' => $baseDir . '/access_layer/tables/ConfirmedOrdersTable.hh',
     'ConfirmedOrdersTableLazyLoader' => $baseDir . '/dependency_injection/queries/lazy_loaders/ConfirmedOrdersTableLazyLoader.hh',
+    'ConflictingReservedOrderRequestException' => $baseDir . '/methods/exceptions/ConflictingReservedOrderRequestException.hh',
     'ConnectionConfig' => $baseDir . '/access_layer/db/async_mysql/ConnectionConfig.hh',
     'ConnectionConfigBuilder' => $baseDir . '/access_layer/db/async_mysql/ConnectionConfigBuilder.hh',
     'ConstraintMapToConjunctiveWhereClauseTranslator' => $baseDir . '/access_layer/queries/util/ConstraintMapToConjunctiveWhereClauseTranslator.hh',

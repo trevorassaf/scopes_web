@@ -45,14 +45,20 @@ function initReservedOrders(MethodInjector $method_injector): void {
       ->build()
     );
 
+  $time_segment = new TimestampSegment($start_time, $end_time);
+
   $rsvd_order_1 = $reserve_order_method->reserve(
     new UnsignedInt(1),
-    new UnsignedInt(17),
-    new TimestampSegment(
-      $start_time,
-      $end_time
-    )
+    new UnsignedInt(16),
+    $time_segment
   );
+  
+  $rsvd_order_2 = $reserve_order_method->reserve(
+    new UnsignedInt(1),
+    new UnsignedInt(16),
+    $time_segment
+  );
+
 }
 
 function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {
