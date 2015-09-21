@@ -12,12 +12,12 @@ class InsertQuery<Tmodel> {
   public async function insert(
     ImmMap<string, mixed> $params
   ): Awaitable<Tmodel> {
-    $insert_result = await $this->asyncMysqlConnection->query(
-      $this->insertQueryCreater->createQuery(
-        $this->table->getName(),
-        $params
-      )
-    ); 
+    $query_str = $this->insertQueryCreater->createQuery(
+      $this->table->getName(),
+      $params
+    );
+    var_dump($query_str);
+    $insert_result = await $this->asyncMysqlConnection->query($query_str); 
 
     return $this->concreteModelFactory->extrudeWithId(
       new UnsignedInt($insert_result->lastInsertId()),

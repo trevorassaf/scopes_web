@@ -84,21 +84,20 @@ class IsConflictingReservedOrderMethod {
     foreach ($time_intervals as $interval) {
       // Pop all time intervals that finish before 'interval' starts. Their scopes
       // are now available, so restore them to 'available_scopes_count'
-      while (!$interval
-        ->getTimestampSegment()
-        ->getStart()
-        ->isBefore(
-          $queue
-            ->peek()
-            ->getTimestampSegment()
-            ->getEnd()
-        )
-      ) {
-        $available_scopes_count += $queue
-          ->pop()
-          ->getScopesCount()
-          ->getNumber();
-      }
+        while (!$queue->isEmpty() && !$interval->getTimestampSegment()
+          ->getStart()
+          ->isBefore(
+            $queue
+              ->peek()
+              ->getTimestampSegment()
+              ->getEnd()
+          )
+        ) {
+          $available_scopes_count += $queue
+            ->pop()
+            ->getScopesCount()
+            ->getNumber();
+        }
 
       // Check to see if 'interval' would overbook us. We know 'interval' to be a valid
       // order, one that doesn't overbook our scopes, thus, the new order is to blame

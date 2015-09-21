@@ -49,16 +49,30 @@ function initReservedOrders(MethodInjector $method_injector): void {
 
   $rsvd_order_1 = $reserve_order_method->reserve(
     new UnsignedInt(1),
-    new UnsignedInt(16),
+    new UnsignedInt(14),
     $time_segment
   );
   
   $rsvd_order_2 = $reserve_order_method->reserve(
     new UnsignedInt(1),
-    new UnsignedInt(16),
+    new UnsignedInt(2),
     $time_segment
   );
 
+  // Confirm orders
+  $cell_label_requests = Vector{};
+
+  $confirm_order_request = new ConfirmOrderRequest(
+    $rsvd_order_1->getId(),
+    "Title",
+    "description blahblahblah",
+    "shortcode",
+    new UnsignedInt(90),
+    $cell_label_requests->toImmVector()
+  );
+
+  $confirm_order_method = $method_injector->getConfirmOrderMethod();
+  $confirmed_order = $confirm_order_method->confirm($confirm_order_request);
 }
 
 function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {

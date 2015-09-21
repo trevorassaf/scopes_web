@@ -12,7 +12,7 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
     ImmMap<string, mixed> $params
   ): ConfirmedOrder {
     return new ConfirmedOrder(
-      new UnsignedInt((int)$params[$this->confirmedOrdersTable->getIdKey()]),
+      $id,
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getUserIdKey()]), 
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getScopesCountKey()]),
       new TimestampSegment(

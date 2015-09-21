@@ -12,6 +12,7 @@ class FetchQuery<Tmodel> {
   ): Awaitable<ImmVector<Tmodel>> {
     // Execute query
     $query_str = $query_maker->serialize();
+    var_dump($query_str);
     $result_set = await $this->asyncMysqlConnection->query($query_str);
 
     // Extrude query results

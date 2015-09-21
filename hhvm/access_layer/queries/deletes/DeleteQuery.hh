@@ -16,22 +16,15 @@ class DeleteQuery<Tmodel> {
   public async function delete(
     WhereClause $where_clause 
   ): Awaitable<void> {
-    await $this->asyncMysqlConnection->query(
-      $this->createDeleteQuery($where_clause)
-    ); 
+    $query_str = $this->createDeleteQuery($where_clause);
+    var_dump($query_str);
+    await $this->asyncMysqlConnection->query($query_str); 
   }
 
   private function createDeleteQuery(
     WhereClause $where_clause 
   ): string {
-    return $this->createDeleteQueryHeader() . " "
-      . $this->createQueryWhereClause($where_clause); 
-  }
-
-  private function createQueryWhereClause(
-    WhereClause $where_clause
-  ): string {
-    return "WHERE " . $where_clause->serialize();
+    return $this->createDeleteQueryHeader() . $where_clause->serialize();
   }
 
   private function createDeleteAllQuery(): string {
