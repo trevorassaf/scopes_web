@@ -49,7 +49,7 @@ class ReserveOrderRequestFactory implements RequestFactory<ReserveOrderRequest> 
           );
           break;
         default:
-          throw new InvalidRequestFieldKeyException(__CLASS__, $key);
+          throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
           break;
       }
     }

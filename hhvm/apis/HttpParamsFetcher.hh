@@ -3,6 +3,6 @@
 class HttpParamsFetcher {
 
   public function fetch(): ImmMap<string, mixed> {
-    return $_POST;
+    return new ImmMap($_POST);
   }
 }

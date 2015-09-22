@@ -13,6 +13,9 @@ class RequestWrapperFactory implements RequestFactory<RequestWrapper> {
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): RequestWrapper {
+    error_log("RequestWrapperFactory::make()");
+    error_log(print_r($raw_field_map, true));
+
     $request_wrapper_builder = new RequestWrapperBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
@@ -27,7 +30,7 @@ class RequestWrapperFactory implements RequestFactory<RequestWrapper> {
           ); 
           break;
         default:
-          throw new InvalidRequestFieldKeyException(__CLASS__, $key);
+          throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
           break;
       }
     }

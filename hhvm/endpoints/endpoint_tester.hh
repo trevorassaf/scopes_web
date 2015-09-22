@@ -1,13 +1,13 @@
 <?hh // decl
 
 function endpointTesterMain(): void {
-
-  var_dump(ini_get('error_log'));
-
   $url = "www.organicdump.com/scopes_web/hhvm/endpoints/endpoint.hh";
 
   $post_params = ImmMap{
-    "user_id" => 1
+    "api-type" => 1,
+    "payload" => array(
+      "email" => "astrev@umich.edu",
+    )
   };
 
   $curl = curl_init();

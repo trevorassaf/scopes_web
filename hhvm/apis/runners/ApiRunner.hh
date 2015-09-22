@@ -11,6 +11,9 @@ class ApiRunner {
   ) {}
 
   public function run(ImmMap<string, mixed> $request_params): string {
+    // Debug: print http payload
+    error_log("HTTP FIELD PAYLOAD: \n" . print_r($request_params, true));
+
     try {
       $request_wrapper = $this->requestWrapperFactory->make($request_params);
       $api_raw_request_fields = $this

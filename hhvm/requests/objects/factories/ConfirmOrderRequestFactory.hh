@@ -69,7 +69,7 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
           );
           break;
         default:
-          throw new InvalidRequestFieldKeyException(__CLASS__, $key);
+          throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
           break;
       }
     }
