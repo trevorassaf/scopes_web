@@ -2,13 +2,10 @@
 
 class GetUserByEmailRequestFactoryLazyLoader extends LazyLoader<GetUserByEmailRequestFactory> {
 
-  public function __construct(
-    private LazyLoader<RequestFieldFactory<Email>> $emailFieldFactoryLoader
-  ) {}
-
   protected function make(): GetUserByEmailRequestFactory {
+    $email_field_factory_builder = new EmailRequestFieldFactoryBuilder();
     return new GetUserByEmailRequestFactory(
-      $this->emailFieldFactoryLoader->load()
+      $email_field_factory_builder->build()
     );
   }
 }

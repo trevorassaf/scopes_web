@@ -1,6 +1,6 @@
 <?hh // strict
 
-class ConfirmOrderRequestFactory {
+class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> {
 
   private RequestFieldFactory<UnsignedInt> $reserveOrderIdFieldFactory;
   private RequestFieldFactory<string> $titleFieldFactory;
