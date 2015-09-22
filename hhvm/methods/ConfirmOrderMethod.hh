@@ -11,8 +11,13 @@ class ConfirmOrderMethod {
   ) {}
 
   public function confirm(
-    ConfirmOrderRequest $confirm_order_request
-  ): void {
+    UnsignedInt $rsvd_order_id,
+    string $title,
+    string $description,
+    string $short_code,
+    UnsignedInt $recording_duration,
+    ImmVector<CellLabelRequest> $cell_label_list
+  ): ConfirmedOrder {
     // 1. Fetch existing reserved order (ensure number
     //      of cell label requests matches scopes number)
     // 2. Insert new confirmed order
@@ -21,7 +26,7 @@ class ConfirmOrderMethod {
     try {
       // Fetch reserved order       
       $fetch_result = $this->fetchRsvdOrderQuery->fetch(
-        $confirm_order_request->getRsvdOrderId()
+        $rsvd_order_id
       );
 
       // Block until we fetch the reserved order 
@@ -38,10 +43,10 @@ class ConfirmOrderMethod {
         $rsvd_order->getScopesCount(),
         $rsvd_order->getTimestampSegment()->getStart(),
         $rsvd_order->getTimestampSegment()->getEnd(),
-        $confirm_order_request->getTitle(),
-        $confirm_order_request->getDescription(),
-        $confirm_order_request->getShortCode(),
-        $confirm_order_request->getRecordingDuration()
+        $title,
+        $description,
+        $short_code,
+        $recording_duration
       );
 
       // Block until insert completes
@@ -51,14 +56,12 @@ class ConfirmOrderMethod {
       
       // Insert cell labels
       $cell_label_field_map_list = Vector{};
-      $cell_label_list = $confirm_order_request
-        ->getCellLabelRequests();
 
       foreach ($cell_label_list as $cell_label_request) {
         $cell_label_field_map_list[] = ImmMap{
-          $this->cellLabelsTable->getConfirmedOrderIdKey() => $cell_label_request->getConfirmedOrderId()->getNumber(),
-          $this->cellLabelsTable->getCellNumberKey() => $cell_label_request->getCellNumber()->getNumber(),
-          $this->cellLabelsTable->getLabelKey() => $cell_label_request->getLabel(),
+          $this->cellLabelsTable->getConfirmedOrderIdKey() => $cell_label_request->getConfirmedOrderId()->get()->getNumber(),
+          $this->cellLabelsTable->getCellNumberKey() => $cell_label_request->getCellNumber()->get()->getNumber(),
+          $this->cellLabelsTable->getLabelKey() => $cell_label_request->getLabel()->get(),
         };
       } 
 
@@ -84,6 +87,10 @@ class ConfirmOrderMethod {
         ->getWaitHandle()
         ->join();
 
-    } catch (QueryException $ex) {} 
+      return $confirmed_order;
+
+    } catch (QueryException $ex) {
+      throw new MethodException();
+    } 
   }
 }

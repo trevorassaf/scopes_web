@@ -62,7 +62,8 @@ function initReservedOrders(MethodInjector $method_injector): void {
   // Confirm orders
   $cell_label_requests = Vector{};
 
-  $confirm_order_request = new ConfirmOrderRequest(
+  $confirm_order_method = $method_injector->getConfirmOrderMethod();
+  $confirmed_order = $confirm_order_method->confirm(
     $rsvd_order_1->getId(),
     "Title",
     "description blahblahblah",
@@ -70,9 +71,6 @@ function initReservedOrders(MethodInjector $method_injector): void {
     new UnsignedInt(90),
     $cell_label_requests->toImmVector()
   );
-
-  $confirm_order_method = $method_injector->getConfirmOrderMethod();
-  $confirmed_order = $confirm_order_method->confirm($confirm_order_request);
 }
 
 function initRegularWeekDaysAndTimes(MethodInjector $method_injector): void {

@@ -5,6 +5,8 @@ class MethodInjector {
   // User methods
   private ?CreateUserMethod $createUserMethod;
 
+  private ?GetUserByEmailMethod $getUserByEmailMethod;
+
   // Regular week day methods
   private ?CreateRegularWeekDayMethod $createRegularWeekDayMethod;
 
@@ -61,6 +63,16 @@ class MethodInjector {
       );
     }       
     return $this->createUserMethod;
+  }
+
+  public function getGetUserByEmailMethod(): GetUserByEmailMethod {
+    if ($this->getUserByEmailMethod === null) {
+      $this->getUserByEmailMethod = new GetUserByEmailMethod(
+        $this->queryInjector->getFetchUserByUniqueKeyQuery(),
+        $this->usersTableLoader->load() 
+      ); 
+    }
+    return $this->getUserByEmailMethod; 
   }
 
   /**

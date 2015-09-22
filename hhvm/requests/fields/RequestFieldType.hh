@@ -9,4 +9,6 @@ enum RequestFieldType : int {
   EMAIL = 0x5;
   TIMESTAMP = 0x6;
   API_TYPE = 0x7;
+  VECTOR = 0x8;
+  OBJECT_VECTOR = 0x9;
 }
