@@ -1,9 +1,11 @@
-<?hh // decl 
+<?hh // decl
 
 function main(): void {
-  $api_runner_factory = new DebugApiRunnerFactory();
+  error_reporting(E_ALL); 
+  
+  $production_api_runner_factory = new ProductionApiRunnerFactory();
   $http_server = new HttpServer(
-    $api_runner_factory,
+    $production_api_runner_factory->make(),
     new HttpParamsFetcher()
   );
   $http_server->run();
