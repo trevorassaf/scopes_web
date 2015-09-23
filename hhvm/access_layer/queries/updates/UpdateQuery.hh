@@ -21,12 +21,21 @@ class UpdateQuery {
     ImmMap<string, mixed> $new_values,
     WhereClause $where_clause
   ): Awaitable<void> {
-    await $this->asyncMysqlConnection->query(
-      $this->createUpdateQuery(
-        $new_values,
-        $where_clause
-      )
+    // Serialize update query
+    $updat_query_str = $this->createUpdateQuery(
+      $new_values,
+      $where_clause
     );
+
+var_dump($updat_query_str);
+
+    // Execute update query 
+    $update_query_result = await $this->asyncMysqlConnection->query($updat_query_str);
+
+    // Check if update query failed
+    if ($update_query_result instanceof AsyncMysqlQueryErrorResult) {
+      throw new QueryException($update_query_result);
+    }
   }
 
   private function createUpdateAllQuery(

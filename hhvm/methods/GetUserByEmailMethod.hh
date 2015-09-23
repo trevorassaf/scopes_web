@@ -7,30 +7,25 @@ class GetUserByEmailMethod {
     private UsersTable $usersTable
   ) {}
 
-  public function getUser(Email $email): User {
+  public function getUser(Email $email): ?User {
     try {
+      // Attempt to fetch user by email
       $query_wait_handle = $this
         ->fetchUserByUniqueKeyQuery
         ->fetch(
-          ImmMap{$this->usersTable->getEmailKey() => $email->toString()}
+          ImmMap{
+            $this->usersTable->getEmailKey() => $email->toString()
+          }
         );  
+
+      // Block until query finishes
       $user = $query_wait_handle
         ->getWaitHandle()
         ->join();
 
-ob_start();
-var_dump($user);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("GetUserByEmailMethod::getUser() user:\n");
-error_log($contents);
-
-      if ($user === null) {
-        throw new NonextantObjectException();
-      }
       return $user;
     } catch (QueryException $ex) {
-      throw new MethodException();
+      throw new FailedQueryMethodException($ex);
     } 
   }
 }

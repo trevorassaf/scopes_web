@@ -10,28 +10,24 @@ class GetUserByEmailApi extends Api<GetUserByEmailRequest> {
   }
 
   protected function processRequestObject(GetUserByEmailRequest $request): ApiResult {
-
-ob_start();
-var_dump($request);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("GetUserByEmailApi::processRequestObject() request object:\n");
-error_log($contents);
-
-    try {
-      $user = $this->getUserByEmailMethod
-        ->getUser(
-          $request->getEmail()->get()
-        );
-      return new GetUserByUniqueKeyApiResult(
-        $this->getApiType(),
-        $user
+    // Try to fetch user by email
+    $user = $this->getUserByEmailMethod
+      ->getUser(
+        $request->getEmail()->get()
       );
-    } catch (NonextantObjectException $ex) {
+
+    // Email doesn't identify user, so return non-extant object error
+    if ($user === null) {
       return new FailedGetUserByEmailApiResult(
         FailedGetUserByEmailApiResultType::NONEXTANT_OBJECT
-      ); 
+      );
     }
+
+    // Successfully fetches user, so return to caller
+    return new GetUserByUniqueKeyApiResult(
+      $this->getApiType(),
+      $user
+    );
   }
 
   public function getApiType(): ApiType {

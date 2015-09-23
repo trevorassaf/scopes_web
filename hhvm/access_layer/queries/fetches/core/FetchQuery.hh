@@ -10,13 +10,22 @@ class FetchQuery<Tmodel> {
   public async function fetch(
     FetchQueryMaker $query_maker
   ): Awaitable<ImmVector<Tmodel>> {
-    // Execute query
+    // Serialize fetch query
     $query_str = $query_maker->serialize();
-    var_dump($query_str);
+    
+var_dump($query_str);
+
+    // Execute fetch query
     $result_set = await $this->asyncMysqlConnection->query($query_str);
+
+    // Check if query failed
+    if ($result_set instanceof AsyncMysqlQueryErrorResult) {
+      throw new QueryException($result_set); 
+    }
 
     // Extrude query results
     $field_map_set = $result_set->mapRowsTyped();
+    
     $objects = Vector{};
     foreach ($field_map_set as $field_map) {
       $objects[] = $this->modelFactory->extrude($field_map->toImmMap());
