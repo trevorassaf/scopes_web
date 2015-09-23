@@ -13,12 +13,12 @@ class CreateUserApi extends Api<CreateUserRequest> {
     CreateUserRequest $create_user_request
   ): ApiResult {
 
-    ob_start();
-    var_dump($create_user_request);
-    $contents = ob_get_contents();
-    ob_end_clean();
-    error_log("CreateUserApi::processRequestObject()");
-    error_log($contents);
+ob_start();
+var_dump($create_user_request);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("CreateUserApi::processRequestObject()");
+error_log($contents);
 
     try {
       // Execute create user method
@@ -31,7 +31,7 @@ class CreateUserApi extends Api<CreateUserRequest> {
 
       return new CreateUserApiResult($user->getId()); 
     
-    } catch (CreateUserDuplicateEmailException $ex) {
+    } catch (DuplicateEmailException $ex) {
       return new FailedCreateUserApiResult(
         CreateUserApiFailureType::DUPLICATE_EMAIL
       );

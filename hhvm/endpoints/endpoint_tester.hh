@@ -8,9 +8,9 @@ function endpointTesterMain(): void {
   };
 
   $create_user_payload = ImmMap{
-    "first-name" => "Jason",
-    "last-name" => "Leung",
-    "email" => "astrev@umich.edu",
+    "first-name" => "Trevor",
+    "last-name" => "Assaf",
+    "email" => "ASTREV@umich.edu",
     "password-hash" => "brownpoopsbrownpoopsbrownpoopsbrownpoops",
   };
 
