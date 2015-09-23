@@ -25,11 +25,19 @@ class ConfirmOrderApi extends Api<ConfirmOrderRequest> {
       return new ConfirmOrderApiResult($confirmed_order->getId());
 
     } catch (NonextantObjectException $ex) {
+
+error_log("ConfirmOrderApi::processRequestObject() NonextantObjectException catch");
+error_log($ex->getMessage());
+
       return new FailedConfirmOrderApiResult(
         FailedConfirmOrderApiResultType::NONEXTANT_RESERVED_ORDER
       );
 
     } catch (InvalidCellLabelCountException $ex) {
+
+error_log("ConfirmOrderApi::processRequestObject() FailedConfirmOrderApiResult catch");
+error_log($ex->getMessage());
+
       return new FailedConfirmOrderApiResult(
         FailedConfirmOrderApiResultType::INVALID_CELL_LABEL_COUNT
       );

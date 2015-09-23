@@ -18,11 +18,6 @@ class ConfirmOrderMethod {
     UnsignedInt $recording_duration,
     ImmVector<CreateCellLabelRequest> $cell_label_list
   ): ConfirmedOrder {
-    // 1. Fetch existing reserved order (ensure number
-    //      of cell label requests matches scopes number)
-    // 2. Insert new confirmed order
-    // 3. Insert cell label requests
-    // 4. Delete reserved order
     try {
       // Fetch reserved order       
       $fetch_result = $this->fetchRsvdOrderQuery->fetch(
@@ -34,20 +29,28 @@ class ConfirmOrderMethod {
         ->getWaitHandle()
         ->join();
 
-      // Fail if user provided invalid reserved order
+      // Fail if we can't find reserved order
       if ($rsvd_order === null) {
         throw new NonextantObjectException();
       }
 
-      // Fail if user provided incorrect cell label count
-      if ($rsvd_order->getScopesCount() !== $cell_label_list->count()) {
+      ob_start();
+      var_dump($cell_label_list);
+      $contents = ob_get_contents();
+      ob_end_clean();
+      error_log("COnfirmOrderMethod::confirm() print cell label list");
+      error_log($contents);
+
+      // Fail if provided number of cell labels does not equal
+      // numer of scopes in reserved order 
+      if ($rsvd_order->getScopesCount()->getNumber() !== $cell_label_list->count()) {
         throw new InvalidCellLabelCountException(
           $rsvd_order->getScopesCount(),
           new UnsignedInt($cell_label_list->count())
         );
       }
 
-      // Insert new confirmed order
+      // Request passed checks! Insert new confirmed order...
       $confirmed_order_insert_result = $this->confirmedOrderInsertQuery->insert(
         $rsvd_order->getId(),
         $rsvd_order->getScopesCount(),
@@ -64,7 +67,7 @@ class ConfirmOrderMethod {
         ->getWaitHandle()
         ->join();
       
-      // Insert cell labels
+      // Compose insert cell-labels query
       $cell_label_field_map_list = Vector{};
 
       foreach ($cell_label_list as $cell_label_request) {
@@ -74,6 +77,7 @@ class ConfirmOrderMethod {
         };
       } 
 
+      // Execute insert cell-labels query
       $cell_label_insert_query_handle = $this
         ->cellLabelBatchInsertQuery->insert(
           $cell_label_field_map_list->toImmVector()
@@ -99,7 +103,7 @@ class ConfirmOrderMethod {
       return $confirmed_order;
 
     } catch (QueryException $ex) {
-      throw new MethodException();
+      throw new FailedQueryMethodException($ex);
     } 
   }
 }

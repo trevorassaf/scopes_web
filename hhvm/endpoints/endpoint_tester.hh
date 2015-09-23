@@ -22,7 +22,7 @@ function endpointTesterMain(): void {
   };
 
   $confirm_order_payload = ImmMap{
-    "rid" => 3,
+    "rid" => 2,
     "title" => "Title",
     "desc" => "descriptiondescription",
     "code" => "0xC5ghY",
@@ -30,6 +30,9 @@ function endpointTesterMain(): void {
     "labels" => array(
       array(
         "label" => "dmfo1",
+      ),
+      array(
+        "label" => "dmfo2",
       )
     ),
   };
@@ -37,7 +40,7 @@ function endpointTesterMain(): void {
   $json_payload = json_encode($confirm_order_payload->toArray());
 
   $post_params = ImmMap{
-    "api-type" => 2,
+    "api-type" => 3,
     "payload" => $json_payload,
   };
 
