@@ -7,7 +7,7 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
   private RequestFieldFactory<string> $descriptionFieldFactory;
   private RequestFieldFactory<string> $shortCodeFieldFactory;
   private RequestFieldFactory<UnsignedInt> $recordingDurationFieldFactory;
-  private ObjectVectorRequestFieldFactory<CellLabelRequest> $cellLabelsRequestFieldFactory;
+  private ObjectVectorRequestFieldFactory<CreateCellLabelRequest> $cellLabelsRequestFieldFactory;
 
   public function __construct() {
     $uint_field_factory_builder = new UnsignedIntRequestFieldFactoryBuilder();
@@ -29,11 +29,19 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
     $this->shortCodeFieldFactory = $string_field_factory_builder->build();
 
     // Create cell label request
-    $cell_label_vector_factory_builder = new CellLabelVectorRequestFieldFactoryBuilder();
+    $cell_label_vector_factory_builder = new CreateCellLabelVectorRequestFieldFactoryBuilder();
     $this->cellLabelsRequestFieldFactory = $cell_label_vector_factory_builder->build();
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): ConfirmOrderRequest {
+
+ob_start();
+var_dump($raw_field_map);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("ConfirmOrderRequestFactory::make() raw field map");
+error_log($contents);
+
     $confirmed_order_request_builder = new ConfirmOrderRequestBuilder();
 
     foreach ($raw_field_map as $key => $value) {

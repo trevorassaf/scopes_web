@@ -25,6 +25,14 @@ class ReserveOrderRequestFactory implements RequestFactory<ReserveOrderRequest> 
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): ReserveOrderRequest {
+
+    ob_start();
+    var_dump($raw_field_map);
+    $contents = ob_get_contents();
+    ob_end_clean();
+    error_log("ReserveOrderRequestFactory::make() raw fields");
+    error_log($contents);
+
     $reserve_order_request_builder = new ReserveOrderRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {

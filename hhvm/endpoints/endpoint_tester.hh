@@ -14,10 +14,26 @@ function endpointTesterMain(): void {
     "password-hash" => "brownpoopsbrownpoopsbrownpoopsbrownpoops",
   };
 
-  $json_payload = json_encode($create_user_payload->toArray());
+  $reserve_order_payload = ImmMap{
+    "user-id" => 1,
+    "scopes-count" => 1,
+    "start-time"=> "2016-1-1 09:00:00",
+    "end-time"=> "2016-1-1 14:00:00",
+  };
+
+  $confirm_order_payload = ImmMap{
+    "rid" => 3,
+    "title" => "Title",
+    "desc" => "descriptiondescription",
+    "code" => "0xC5ghY",
+    "duration" => 4,
+    "labels" => array(),
+  };
+
+  $json_payload = json_encode($confirm_order_payload->toArray());
 
   $post_params = ImmMap{
-    "api-type" => 0,
+    "api-type" => 2,
     "payload" => $json_payload,
   };
 

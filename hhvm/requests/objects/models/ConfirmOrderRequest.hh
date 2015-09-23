@@ -17,7 +17,7 @@ class ConfirmOrderRequest {
     private RequestField<string> $description,
     private RequestField<string> $shortCode,
     private RequestField<UnsignedInt> $recordingDuration,
-    private ObjectVectorRequestField<CellLabelRequest> $cellLabelRequests
+    private ObjectVectorRequestField<CreateCellLabelRequest> $cellLabelRequests
   ) {}
 
   public function getRsvdOrderId(): RequestField<UnsignedInt> {
@@ -40,7 +40,7 @@ class ConfirmOrderRequest {
     return $this->recordingDuration;
   }
 
-  public function getCellLabelRequests(): ObjectVectorRequestField<CellLabelRequest> {
+  public function getCellLabelRequests(): ObjectVectorRequestField<CreateCellLabelRequest> {
     return $this->cellLabelRequests;
   }
 }
@@ -52,7 +52,7 @@ class ConfirmOrderRequestBuilder {
   private ?RequestField<string> $description;
   private ?RequestField<string> $shortCode;
   private ?RequestField<UnsignedInt> $recordingDuration;
-  private ?ObjectVectorRequestField<CellLabelRequest> $cellLabels;
+  private ?ObjectVectorRequestField<CreateCellLabelRequest> $cellLabels;
 
   public function setRsvdOrderId(RequestField<UnsignedInt> $rsvd_order_id): this {
     $this->rsvdOrderId = $rsvd_order_id;
@@ -79,7 +79,7 @@ class ConfirmOrderRequestBuilder {
     return $this;
   }  
 
-  public function setCellLabels(ObjectVectorRequestField<CellLabelRequest> $cell_labels): this {
+  public function setCellLabels(ObjectVectorRequestField<CreateCellLabelRequest> $cell_labels): this {
     $this->cellLabels = $cell_labels;
     return $this;
   }

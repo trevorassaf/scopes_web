@@ -16,7 +16,7 @@ class ConfirmOrderMethod {
     string $description,
     string $short_code,
     UnsignedInt $recording_duration,
-    ImmVector<CellLabelRequest> $cell_label_list
+    ImmVector<CreateCellLabelRequest> $cell_label_list
   ): ConfirmedOrder {
     // 1. Fetch existing reserved order (ensure number
     //      of cell label requests matches scopes number)
@@ -59,7 +59,6 @@ class ConfirmOrderMethod {
 
       foreach ($cell_label_list as $cell_label_request) {
         $cell_label_field_map_list[] = ImmMap{
-          $this->cellLabelsTable->getConfirmedOrderIdKey() => $cell_label_request->getConfirmedOrderId()->get()->getNumber(),
           $this->cellLabelsTable->getCellNumberKey() => $cell_label_request->getCellNumber()->get()->getNumber(),
           $this->cellLabelsTable->getLabelKey() => $cell_label_request->getLabel()->get(),
         };
