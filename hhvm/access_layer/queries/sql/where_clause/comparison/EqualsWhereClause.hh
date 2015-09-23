@@ -7,4 +7,8 @@ class EqualsWhereClause extends ComparisonWhereClause {
   protected function getComparisonToken(): string {
     return self::COMPARISON_TOKEN;
   }
+
+  protected function getPreComparisonOperator(): string {
+    return "BINARY";
+  }
 }

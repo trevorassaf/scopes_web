@@ -10,9 +10,15 @@ abstract class ComparisonWhereClause implements WhereClause {
   ) {}
 
   public function serialize(): string {
+    // Generate pre comparison operator string 
+    $pre_comparison_operator = $this->getPreComparisonOperator();
+    if ($pre_comparison_operator !== "") {
+      $pre_comparison_operator = " " . $pre_comparison_operator . " "; 
+    }
+     
     $right = $this->typeQualifyFieldValue($this->right);
 
-    return "(" . (string)$this->left . $this->getComparisonToken() . $right . ")";      
+    return "(" . $pre_comparison_operator . (string)$this->left . $this->getComparisonToken() . $right . ")";      
   }
 
   private function typeQualifyFieldValue(mixed $value): string {
@@ -22,4 +28,8 @@ abstract class ComparisonWhereClause implements WhereClause {
   }
 
   abstract protected function getComparisonToken(): string;
+
+  protected function getPreComparisonOperator(): string {
+    return "";
+  }
 }
