@@ -4,13 +4,18 @@ class DeleteQuery<Tmodel> {
 
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
-    private Table $table
+    private Table $table,
+    private QueryExceptionFactory $queryExceptionFactory
   ) {}
 
   public async function deleteAll(): Awaitable<void> {
-    await $this->asyncMysqlConnection->query(
-      $this->createDeleteAllQuery()
-    ); 
+    try { 
+      await $this->asyncMysqlConnection->query(
+        $this->createDeleteAllQuery()
+      ); 
+    } catch (AsyncMysqlQueryException $ex) {
+      throw $this->queryExceptionFactory->make($ex);
+    }
   }
 
   public async function delete(
@@ -21,12 +26,11 @@ class DeleteQuery<Tmodel> {
 
 var_dump($query_str);
 
+    try {
     // Execute delete query
-    $delete_query_result = await $this->asyncMysqlConnection->query($query_str); 
-
-    // Check if query failed
-    if ($delete_query_result instanceof AsyncMysqlQueryErrorResult) {
-      throw new QueryException($delete_query_result);
+      $delete_query_result = await $this->asyncMysqlConnection->query($query_str); 
+    } catch (AsyncMysqlQueryException $ex) {
+      $this->queryExceptionFactory->make($ex);  
     }
   }
 

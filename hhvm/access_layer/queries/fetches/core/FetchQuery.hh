@@ -4,7 +4,8 @@ class FetchQuery<Tmodel> {
 
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
-    private ModelFactory<Tmodel> $modelFactory
+    private ModelFactory<Tmodel> $modelFactory,
+    private QueryExceptionFactory $queryExceptionFactory
   ) {} 
 
   public async function fetch(
@@ -15,21 +16,22 @@ class FetchQuery<Tmodel> {
     
 var_dump($query_str);
 
-    // Execute fetch query
-    $result_set = await $this->asyncMysqlConnection->query($query_str);
+    try {
+      // Execute fetch query
+      $result_set = await $this->asyncMysqlConnection->query($query_str);
+      
+      // Extrude query results
+      $field_map_set = $result_set->mapRowsTyped();
+      
+      $objects = Vector{};
+      foreach ($field_map_set as $field_map) {
+        $objects[] = $this->modelFactory->extrude($field_map->toImmMap());
+      }
 
-    // Check if query failed
-    if ($result_set instanceof AsyncMysqlQueryErrorResult) {
-      throw new QueryException($result_set); 
-    }
+      return $objects->toImmVector();
 
-    // Extrude query results
-    $field_map_set = $result_set->mapRowsTyped();
-    
-    $objects = Vector{};
-    foreach ($field_map_set as $field_map) {
-      $objects[] = $this->modelFactory->extrude($field_map->toImmMap());
+    } catch (AsyncMysqlQueryException $ex) {
+      throw $this->queryExceptionFactory->make($ex);
     }
-    return $objects->toImmVector();
   }
 }

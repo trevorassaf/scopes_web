@@ -57,7 +57,6 @@ class MethodInjector {
     if ($this->createUserMethod === null) {
       $this->createUserMethod = new CreateUserMethod(
         $this->queryInjector->getConcreteInsertUserQuery(),
-        $this->queryInjector->getFetchUserByUniqueKeyQuery(),
         $this->usersTableLoader->load(),
         $this->timestampBuilderLoader->load()
       );

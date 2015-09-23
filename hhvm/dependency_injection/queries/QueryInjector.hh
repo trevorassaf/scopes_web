@@ -88,7 +88,8 @@ class QueryInjector {
     private LazyLoader<ReservedOrderPolicyTable> $rsvdOrderPolicyTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<ReservedOrderPolicy>> $rsvdOrderPolicyModelFactoryLazyLoader,
     private LazyLoader<CellLabelsTable> $cellLabelsTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<CellLabel>> $cellLabelModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<CellLabel>> $cellLabelModelFactoryLazyLoader,
+    private LazyLoader<QueryExceptionFactory> $queryExceptionFactoryLazyLoader
   ) {}
 
   /**
@@ -100,7 +101,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->usersTableLazyLoader->load(),
         $this->userModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load() 
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }  
     return $this->insertUserQuery;
@@ -121,7 +123,8 @@ class QueryInjector {
     if ($this->fetchUserQuery === null) {
       $this->fetchUserQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->userModelFactoryLazyLoader->load()
+        $this->userModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }
     return $this->fetchUserQuery;
@@ -147,7 +150,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->regularWeekDaysTableLazyLoader->load(),
         $this->regularWeekDayModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     } 
     return $this->insertRegularWeekDayQuery;
@@ -167,7 +171,8 @@ class QueryInjector {
     if ($this->fetchRegularWeekDayQuery === null) {
       $this->fetchRegularWeekDayQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->regularWeekDayModelFactoryLazyLoader->load()
+        $this->regularWeekDayModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }
     return $this->fetchRegularWeekDayQuery;
@@ -201,7 +206,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->regularTimesTableLazyLoader->load(),
         $this->regularTimeModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }
     return $this->insertRegularTimeQuery;
@@ -233,7 +239,8 @@ class QueryInjector {
     if ($this->fetchRegularTimeQuery === null) {
       $this->fetchRegularTimeQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->regularTimeModelFactoryLazyLoader->load()
+        $this->regularTimeModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }
     return $this->fetchRegularTimeQuery;
@@ -246,7 +253,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->regularEdgesTableLazyLoader->load(),
         $this->regularEdgeModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }
     return $this->insertRegularEdgeQuery;
@@ -266,7 +274,8 @@ class QueryInjector {
     if ($this->fetchRegularEdgeQuery === null) {
       $this->fetchRegularEdgeQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->regularEdgeModelFactoryLazyLoader->load()  
+        $this->regularEdgeModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->fetchRegularEdgeQuery;
@@ -290,7 +299,8 @@ class QueryInjector {
     if ($this->fetchIrregularDateQuery === null) {
       $this->fetchIrregularDateQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->irregularDateModelFactoryLazyLoader->load() 
+        $this->irregularDateModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->fetchIrregularDateQuery;
@@ -313,7 +323,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->irregularDatesTableLazyLoader->load(),
         $this->irregularDateModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->insertIrregularDateQuery;
@@ -337,7 +348,8 @@ class QueryInjector {
     if ($this->fetchIrregularTimeQuery === null) {
       $this->fetchIrregularTimeQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->irregularTimeModelFactoryLazyLoader->load() 
+        $this->irregularTimeModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->fetchIrregularTimeQuery;
@@ -370,7 +382,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->irregularTimesTableLazyLoader->load(),
         $this->irregularTimeModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->insertIrregularTimeQuery;
@@ -394,7 +407,8 @@ class QueryInjector {
     if ($this->fetchRsvdOrderQuery === null) {
       $this->fetchRsvdOrderQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->rsvdOrderModelFactoryLazyLoader->load()
+        $this->rsvdOrderModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }
     return $this->fetchRsvdOrderQuery;
@@ -438,7 +452,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->rsvdOrdersTableLazyLoader->load(),
         $this->rsvdOrderModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->insertRsvdOrderQuery;
@@ -459,7 +474,8 @@ class QueryInjector {
     if ($this->deleteRsvdOrderQuery === null) {
       $this->deleteRsvdOrderQuery = new DeleteQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->rsvdOrdersTableLazyLoader->load()
+        $this->rsvdOrdersTableLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     } 
     return $this->deleteRsvdOrderQuery;
@@ -482,7 +498,8 @@ class QueryInjector {
     if ($this->fetchConfirmedOrderQuery === null) {
       $this->fetchConfirmedOrderQuery = new FetchQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->confirmedOrderModelFactoryLazyLoader->load() 
+        $this->confirmedOrderModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       );
     }
     return $this->fetchConfirmedOrderQuery;
@@ -505,7 +522,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->confirmedOrdersTableLazyLoader->load(),
         $this->confirmedOrderModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->insertConfirmedOrderQuery;
@@ -532,7 +550,8 @@ class QueryInjector {
           new FetchByUniqueKeyQuery(
             new FetchQuery(
               $this->asyncMysqlConnectionLazyLoader->load(),
-              $this->rsvdOrderPolicyModelFactoryLazyLoader->load()
+              $this->rsvdOrderPolicyModelFactoryLazyLoader->load(),
+              $this->queryExceptionFactoryLazyLoader->load()
             ),
             $this->rsvdOrderPolicyTableLazyLoader->load(),
             $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
@@ -550,7 +569,8 @@ class QueryInjector {
         $this->asyncMysqlConnectionLazyLoader->load(),
         $this->rsvdOrderPolicyTableLazyLoader->load(),
         $this->rsvdOrderPolicyModelFactoryLazyLoader->load(),
-        $this->insertQueryCreaterLazyLoader->load()
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
     return $this->insertReservedOrderPolicyQuery;

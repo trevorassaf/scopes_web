@@ -7,6 +7,7 @@ CREATE TABLE Users (
   firstName VARCHAR(20) NOT NULL,
   lastName VARCHAR(20) NOT NULL,
   email VARCHAR(40) NOT NULL,
+  UNIQUE KEY(email),
   passwordHash VARCHAR(100) NOT NULL,
   timeJoined TIMESTAMP NOT NULL,
   PRIMARY KEY(id)

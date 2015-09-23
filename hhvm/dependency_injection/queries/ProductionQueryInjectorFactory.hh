@@ -3,6 +3,9 @@
 class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
 
   protected function makeQueryInjector(): QueryInjector {
+    // Query core components 
+    $query_exception_factory = new QueryExceptionFactoryLazyLoader();
+
     // Utils
     $date_serializer_loader = new HRDateSerializerLazyLoader(); 
     $time_serializer_loader = new HRTimeSerializerLazyLoader();
@@ -74,7 +77,8 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $cell_labels_table_loader,
       new CellLabelModelFactoryLazyLoader(
         $cell_labels_table_loader
-      )
+      ),
+      $query_exception_factory
     );
   }
 }

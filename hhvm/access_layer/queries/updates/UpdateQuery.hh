@@ -6,7 +6,8 @@ class UpdateQuery {
 
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
-    private Table $table
+    private Table $table,
+    private QueryExceptionFactory $queryExceptionFactory
   ) {}
 
   public async function updateAll(
@@ -29,12 +30,11 @@ class UpdateQuery {
 
 var_dump($updat_query_str);
 
-    // Execute update query 
-    $update_query_result = await $this->asyncMysqlConnection->query($updat_query_str);
-
-    // Check if update query failed
-    if ($update_query_result instanceof AsyncMysqlQueryErrorResult) {
-      throw new QueryException($update_query_result);
+    try {
+      // Execute update query 
+      await $this->asyncMysqlConnection->query($updat_query_str);
+    } catch (AsyncMysqlQueryException $ex) {
+      throw $this->queryExceptionFactory->make($ex);
     }
   }
 

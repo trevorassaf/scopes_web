@@ -4,7 +4,6 @@ class CreateUserMethod {
 
   public function __construct(
     private InsertUserQuery $insertUserQuery,
-    private FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery,
     private UsersTable $usersTable,
     private TimestampBuilder $timestampBuilder
   ) {}
@@ -31,29 +30,14 @@ class CreateUserMethod {
         ->join();
 
     } catch (QueryException $ex) {
-      // Something went wrong, check for known errors 
-      // 1. Duplicate email
-      if ($this->isDuplicateEmail($email)) {
-        throw new DuplicateEmailException();
-      } else {
-        throw new FailedQueryMethodException($ex);
+      switch ($ex->getErrorType()) {
+        case QueryErrorType::DUPLICATE_KEY:
+          throw new DuplicateEmailException();
+          break;
+        default:
+          throw new FailedQueryMethodException($ex);
+          break;
       }
     }
-  }
-
-  private function isDuplicateEmail(Email $email): bool {
-    // Execute fetch query: get user by email
-    $fetch_query_wait_handle = $this->fetchUserByUniqueKeyQuery->fetch(
-      ImmMap{
-        $this->usersTable->getEmailKey() => $email->toString(),
-      }
-    ); 
-
-    // Block until query finishes
-    $user = $fetch_query_wait_handle
-      ->getWaitHandle()
-      ->join();
-
-    return $user != null;
   }
 }
