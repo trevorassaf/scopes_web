@@ -53,25 +53,64 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): CreateUserRequest {
+
+ob_start();
+var_dump($raw_field_map);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("CreateUserRequestFactory::make()");
+error_log($contents);
+
     $create_user_request_builder = new CreateUserRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
+ob_start();
+var_dump($key);
+var_dump($value);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log($contents);
       switch ($key) {
         case CreateUserRequest::FIRST_NAME_KEY:
+ob_start();
+var_dump($key);
+var_dump($value);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log($contents);
+
           $create_user_request_builder->setFirstName(
             $this->firstNameFieldFactory->make($key, $value)
           );
           break;
         case CreateUserRequest::LAST_NAME_KEY:
+ob_start();
+var_dump($key);
+var_dump($value);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log($contents);
           $create_user_request_builder->setLastName(
             $this->lastNameFieldFactory->make($key, $value)
           );
           break;
         case CreateUserRequest::EMAIL_KEY:
+ob_start();
+var_dump($key);
+var_dump($value);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log($contents);
           $create_user_request_builder->setEmail(
             $this->emailFieldFactory->make($key, $value)
           );
           break;
         case CreateUserRequest::PASSWORD_HASH_KEY:
+ob_start();
+var_dump($key);
+var_dump($value);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log($contents);
           $create_user_request_builder->setPasswordHash(
             $this->passwordHashFieldFactory->make($key, $value)
           );

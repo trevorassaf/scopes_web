@@ -7,7 +7,7 @@ class MaxLengthConstraint implements RequestFieldConstraint<string> {
   ) {}
   
   public function apply(string $key, string $value): void {
-    if (strlen($value) < $this->maxLength) {
+    if (strlen($value) > $this->maxLength) {
       throw new RequestFieldConstraintException(
         RequestFieldConstraintType::MAX_LENGTH,
         $key,

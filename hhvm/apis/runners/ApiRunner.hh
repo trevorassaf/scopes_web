@@ -48,6 +48,7 @@ error_log($contents);
       return $this->apiResultSerializer->serialize($api_result);
 
     } catch (RequestException $ex) {
+      error_log($ex->getMessage());
       return $this->displayRequestFieldErrors->get()
         ? $ex->getMessage()
         : "";

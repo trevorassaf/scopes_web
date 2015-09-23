@@ -7,10 +7,17 @@ function endpointTesterMain(): void {
       "email" => "astrev@umich.edu",
   };
 
-  $json_payload = json_encode($get_user_payload->toArray());
+  $create_user_payload = ImmMap{
+    "first-name" => "Jason",
+    "last-name" => "Leung",
+    "email" => "jasleung@umich.edu",
+    "password-hash" => "brownpoopsbrownpoopsbrownpoopsbrownpoops",
+  };
+
+  $json_payload = json_encode($create_user_payload->toArray());
 
   $post_params = ImmMap{
-    "api-type" => 1,
+    "api-type" => 0,
     "payload" => $json_payload,
   };
 
