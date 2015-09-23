@@ -80,6 +80,21 @@ class ConfirmOrderRequestBuilder {
   }  
 
   public function setCellLabels(ObjectVectorRequestField<CreateCellLabelRequest> $cell_labels): this {
+    // Make sure each label is unique
+    $label_set = Set{};
+
+    foreach ($cell_labels->get() as $label) {
+      if ($label_set->contains($label->getLabel()->get())) {
+        throw new UniqueElementViolationException(
+          ConfirmOrderRequest::REQUEST_OBJECT_NAME,
+          ConfirmOrderRequest::CELL_LABEL_REQUESTS_KEY,
+          $label->getLabel()->get()
+        );
+      }
+
+      $label_set[] = $label->getLabel()->get();
+    }
+
     $this->cellLabels = $cell_labels;
     return $this;
   }

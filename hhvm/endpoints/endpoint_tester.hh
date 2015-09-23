@@ -27,7 +27,11 @@ function endpointTesterMain(): void {
     "desc" => "descriptiondescription",
     "code" => "0xC5ghY",
     "duration" => 4,
-    "labels" => array(),
+    "labels" => array(
+      array(
+        "label" => "dmfo1",
+      )
+    ),
   };
 
   $json_payload = json_encode($confirm_order_payload->toArray());

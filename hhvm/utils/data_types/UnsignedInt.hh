@@ -18,6 +18,10 @@ class UnsignedInt {
     return $number >= 0;
   }
 
+  public function equals(UnsignedInt $other): bool {
+    return $other->number === $this->number; 
+  }
+
   public function __construct(int $number) {
     if (!static::isUnsigned($number)) {
       throw new Exception("{$number} cannot be negative!");

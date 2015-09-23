@@ -1,6 +1,6 @@
 <?hh // strict
 
-class CreateCellLabelRequestFactory implements RequestFactory<CellLabelRequest> {
+class CreateCellLabelRequestFactory implements RequestFactory<CreateCellLabelRequest> {
 
   private RequestFieldFactory<UnsignedInt> $cellNumberFieldFactory;
   private RequestFieldFactory<string> $labelFieldFactory;
@@ -15,16 +15,19 @@ class CreateCellLabelRequestFactory implements RequestFactory<CellLabelRequest> 
     $this->labelFieldFactory = $string_field_factory_builder->build();
   }
 
-  public function make(ImmMap<string, mixed> $raw_field_map): CellLabelRequest {
-    $cell_label_request_builder = new CellLabelRequestBuilder();
+  public function make(ImmMap<string, mixed> $raw_field_map): CreateCellLabelRequest {
+
+ob_start();
+var_dump($raw_field_map);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("CreateCellLabelRequestFactory::make() cell label");
+error_log($contents);
+
+    $cell_label_request_builder = new CreateCellLabelRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
-        case CellLabelRequest::CELL_NUMBER_KEY:
-          $cell_label_request_builder->setCellNumber(
-            $this->cellNumberFieldFactory->make($key, $value)
-          );
-          break;
-        case CellLabelRequest::LABEL_KEY:
+        case CreateCellLabelRequest::LABEL_KEY:
           $cell_label_request_builder->setLabel(
             $this->labelFieldFactory->make($key, $value)
           );

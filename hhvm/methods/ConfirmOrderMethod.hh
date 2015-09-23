@@ -34,8 +34,18 @@ class ConfirmOrderMethod {
         ->getWaitHandle()
         ->join();
 
-      // TODO handle case where no rsvd order exists
-      invariant($rsvd_order !== null, "Rsvd order can't be null");
+      // Fail if user provided invalid reserved order
+      if ($rsvd_order === null) {
+        throw new NonextantObjectException();
+      }
+
+      // Fail if user provided incorrect cell label count
+      if ($rsvd_order->getScopesCount() !== $cell_label_list->count()) {
+        throw new InvalidCellLabelCountException(
+          $rsvd_order->getScopesCount(),
+          new UnsignedInt($cell_label_list->count())
+        );
+      }
 
       // Insert new confirmed order
       $confirmed_order_insert_result = $this->confirmedOrderInsertQuery->insert(
@@ -59,7 +69,7 @@ class ConfirmOrderMethod {
 
       foreach ($cell_label_list as $cell_label_request) {
         $cell_label_field_map_list[] = ImmMap{
-          $this->cellLabelsTable->getCellNumberKey() => $cell_label_request->getCellNumber()->get()->getNumber(),
+          $this->cellLabelsTable->getConfirmedOrderIdKey() => $confirmed_order->getId()->getNumber(),
           $this->cellLabelsTable->getLabelKey() => $cell_label_request->getLabel()->get(),
         };
       } 

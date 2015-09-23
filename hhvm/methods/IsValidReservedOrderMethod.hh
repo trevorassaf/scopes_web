@@ -19,7 +19,6 @@ class IsValidReservedOrderMethod {
     UnsignedInt $num_requested_scopes,
     TimestampSegment $timestamp_segment
   ): bool {
-
     // Expand timestamp interval to sequence of single-day-time-segments
     $single_day_time_segment_sequence = $this->timestampSegmentExpander
       ->expand($timestamp_segment);

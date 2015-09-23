@@ -2,7 +2,6 @@
 
 class ObjectVectorRequestField<Ttype> {
 
-
   public function __construct(
     private string $key,
     private ImmVector<Ttype> $collection,
