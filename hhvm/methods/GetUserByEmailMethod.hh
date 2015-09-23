@@ -12,12 +12,20 @@ class GetUserByEmailMethod {
       $query_wait_handle = $this
         ->fetchUserByUniqueKeyQuery
         ->fetch(
-          ImmMap{$this->usersTable->getEmailKey() => $email}
+          ImmMap{$this->usersTable->getEmailKey() => $email->toString()}
         );  
       $user = $query_wait_handle
         ->getWaitHandle()
         ->join();
-      if ($user == null) {
+
+ob_start();
+var_dump($user);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("GetUserByEmailMethod::getUser() user:\n");
+error_log($contents);
+
+      if ($user === null) {
         throw new NonextantObjectException();
       }
       return $user;

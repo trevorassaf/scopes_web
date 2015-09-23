@@ -7,6 +7,6 @@ class JsonApiRequestDeserializer implements ApiRequestDeserializer {
     if ($json_object == false) {
       throw new MalformedApiRequestException();
     }
-    return $json_object;
+    return new ImmMap($json_object);
   }
 }

@@ -3,12 +3,18 @@
 function endpointTesterMain(): void {
   $url = "www.organicdump.com/scopes_web/hhvm/endpoints/endpoint.hh";
 
+  $get_user_payload = ImmMap{
+      "email" => "astrev@umich.edu",
+  };
+
+  $json_payload = json_encode($get_user_payload->toArray());
+
   $post_params = ImmMap{
     "api-type" => 1,
-    "payload" => array(
-      "email" => "astrev@umich.edu",
-    )
+    "payload" => $json_payload,
   };
+
+  var_dump($post_params);
 
   $curl = curl_init();
   curl_setopt_array(

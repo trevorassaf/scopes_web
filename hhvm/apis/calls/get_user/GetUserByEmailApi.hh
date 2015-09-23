@@ -10,6 +10,14 @@ class GetUserByEmailApi extends Api<GetUserByEmailRequest> {
   }
 
   protected function processRequestObject(GetUserByEmailRequest $request): ApiResult {
+
+ob_start();
+var_dump($request);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("GetUserByEmailApi::processRequestObject() request object:\n");
+error_log($contents);
+
     try {
       $user = $this->getUserByEmailMethod
         ->getUser(

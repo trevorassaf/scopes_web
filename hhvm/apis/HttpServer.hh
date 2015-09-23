@@ -9,6 +9,11 @@ class HttpServer {
 
   public function run(): void {
     $http_params = $this->httpParamsFetcher->fetch();
-    echo $this->apiRunner->run($http_params);
+    $result_str = $this->apiRunner->run($http_params);
+
+error_log("HttpServer::run() result string:\n");
+error_log($result_str);
+
+    echo $result_str;
   }
 }

@@ -2,27 +2,25 @@
 
 class ApiTypeFieldConverter implements RequestFieldTypeConverter<ApiType> {
 
+  private UnsignedIntFieldConverter $uintFieldConverter;
+
+  public function __construct() {
+    $this->uintFieldConverter = new UnsignedIntFieldConverter(); 
+  }
+
   public function convert(string $key, mixed $value): ApiType {
-    error_log("ApiTypeFieldConverter::convert()");
-    error_log(print_r($key, true));
-    error_log(print_r($value, true));
 
-    ob_start();
-    var_dump($key);
-    var_dump($value);
-    $contents = ob_get_contents();
-    ob_end_clean();
-    error_log($contents);
-
+    // Convert to uint
+    $uint_value = $this->uintFieldConverter->convert($key, $value);
+    
     // Validate int type
-    if (!is_numeric($value) || ApiType::isValid($value)) {
+    if (!ApiType::isValid($uint_value->getNumber())) {
       throw new RequestFieldTypeConversionException(
         RequestFieldType::API_TYPE,
         $key,
         $value
       );
     }
-
-    return ApiType::assert($value);
+    return ApiType::assert($uint_value->getNumber());
   }
 }

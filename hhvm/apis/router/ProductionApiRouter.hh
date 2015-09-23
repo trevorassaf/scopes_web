@@ -10,9 +10,14 @@ class ProductionApiRouter implements ApiRouter {
     ApiType $type,
     ImmMap<string, mixed> $raw_request_fields
   ): ApiResult {
-    error_log("ProductionApiRouter::route()");
-    error_log(print_r($type, true));
-    error_log(print_r($raw_request_fields, true));
+
+ob_start();
+var_dump($type);
+var_dump($raw_request_fields);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("ProductionApiRouter::route()");
+error_log($contents);
 
     // Perform route based on api-type
     $api = null;

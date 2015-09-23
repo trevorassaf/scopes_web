@@ -7,6 +7,7 @@ abstract class Api<Trequest> {
   ) {}
 
   public function processRequest(ImmMap<string, mixed> $raw_request_fields): ApiResult {
+
     try {
       $request = $this->requestFactory->make($raw_request_fields);
       return $this->processRequestObject($request);

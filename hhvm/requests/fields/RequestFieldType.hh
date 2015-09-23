@@ -11,4 +11,5 @@ enum RequestFieldType : int {
   API_TYPE = 0x7;
   VECTOR = 0x8;
   OBJECT_VECTOR = 0x9;
+  MAP = 0x10;
 }

@@ -11,19 +11,42 @@ class ApiRunner {
   ) {}
 
   public function run(ImmMap<string, mixed> $request_params): string {
-    // Debug: print http payload
-    error_log("HTTP FIELD PAYLOAD: \n" . print_r($request_params, true));
 
     try {
+      // Digest request params into request wrapper
       $request_wrapper = $this->requestWrapperFactory->make($request_params);
+      $api_raw_request_fields_string = $request_wrapper->getPayload()->get();
+      
+ob_start();
+var_dump($api_raw_request_fields_string);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("ApiRunner::run(): Raw request fields string\n");
+error_log($contents);
+
+      // Deserialize payload
       $api_raw_request_fields = $this
         ->apiRequestDeserializer
-        ->deserialize($request_wrapper->getPayload()->get());
+        ->deserialize(
+          $api_raw_request_fields_string
+        );
+
+ob_start();
+var_dump($api_raw_request_fields);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("ApiRunner::run(): Raw request fields\n");
+error_log($contents);
+
+      // Execute api call
       $api_result = $this->apiRouter->route(
         $request_wrapper->getApiType()->get(),
         $api_raw_request_fields
       );
+
+      // Serialize response
       return $this->apiResultSerializer->serialize($api_result);
+
     } catch (RequestException $ex) {
       return $this->displayRequestFieldErrors->get()
         ? $ex->getMessage()
