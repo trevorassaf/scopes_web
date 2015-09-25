@@ -3,7 +3,7 @@
 class UpdateConfirmedOrderApi extends Api<UpdateConfirmedOrderRequest> {
 
   public function __construct(
-    RequestFactory<UpdateConfirmedOrderRequest>  $request_factory,
+    RequestFactory<UpdateConfirmedOrderRequest> $request_factory,
     private UpdateConfirmedOrderMethod $updateMethod
   ) {
     parent::__construct($request_factory);
