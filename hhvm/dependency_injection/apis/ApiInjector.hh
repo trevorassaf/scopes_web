@@ -12,13 +12,16 @@ class ApiInjector {
 
   private ?UpdateConfirmedOrderApi $updateConfirmedOrderApi;
 
+  private ?UpdateCellLabelApi $updateCellLabelApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private LazyLoader<RequestFactory<CreateUserRequest>> $createUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUserByEmailRequest>> $getUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<ReserveOrderRequest>> $reserveOrderRequestFactoryLoader,
     private LazyLoader<RequestFactory<ConfirmOrderRequest>> $confirmOrderRequestFactoryLoader,
-    private LazyLoader<RequestFactory<UpdateConfirmedOrderRequest>> $updateConfirmedOrderRequestLoader
+    private LazyLoader<RequestFactory<UpdateConfirmedOrderRequest>> $updateConfirmedOrderRequestLoader,
+    private LazyLoader<RequestFactory<UpdateCellLabelRequest>> $updateCellLabelRequestLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -69,6 +72,16 @@ class ApiInjector {
       ); 
     }
     return $this->updateConfirmedOrderApi;
+  }
+
+  public function getUpdateCellLabelApi(): UpdateCellLabelApi {
+    if ($this->updateCellLabelApi === null) {
+      $this->updateCellLabelApi = new UpdateCellLabelApi(
+        $this->updateCellLabelRequestLoader->load(),
+        $this->methodInjector->getUpdateCellLabelMethod() 
+      ); 
+    }
+    return $this->updateCellLabelApi;
   }
 
 }

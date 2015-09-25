@@ -38,12 +38,16 @@ error_log($contents);
       case ApiType::UPDATE_CONFIRMED_ORDER:
         $api = $this->apiInjector->getUpdateConfirmedOrderApi();
         break;
+      case ApiType::UPDATE_CELL_LABEL:
+        $api = $this->apiInjector->getUpdateCellLabelApi(); 
+        break;
       default:
         // TODO return failed result
+        invariant(false, "unknown api type in api-router");
         break;
     }    
 
-    invariant($api !== null, "can't be null...");
+    invariant($api !== null, "api can't be null...");
 
     return $api->processRequest($raw_request_fields);
   }

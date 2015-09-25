@@ -35,6 +35,9 @@ class MethodInjector {
   private ?ConfirmOrderMethod $confirmOrderMethod;
   private ?UpdateConfirmedOrderMethod $updateConfirmedOrderMethod;
 
+  // Cell label methods
+  private ?UpdateCellLabelMethod $updateCellLabelMethod;
+
   private ?CreateReservedOrderPolicyMethod $createReservedOrderPolicyMethod;
 
   public function __construct(
@@ -220,6 +223,19 @@ class MethodInjector {
       );
     }
     return $this->updateConfirmedOrderMethod;
+  }
+
+  /**
+   * Cell label method
+   */
+  public function getUpdateCellLabelMethod(): UpdateCellLabelMethod {
+    if ($this->updateCellLabelMethod === null) {
+      $this->updateCellLabelMethod = new UpdateCellLabelMethod(
+        $this->queryInjector->getUpdateByIdQuery(),
+        $this->cellsLabelTableLoader->load() 
+      ); 
+    }
+    return $this->updateCellLabelMethod;
   }
 
   /**
