@@ -40,7 +40,7 @@ class UpdateConfirmedOrderRequest {
   }
 }
 
-class UpdateConfirmOrderRequestBuilder {
+class UpdateConfirmedOrderRequestBuilder {
   
   private ?RequestField<UnsignedInt> $confirmedOrderId;
   private ?RequestField<string> $title;
