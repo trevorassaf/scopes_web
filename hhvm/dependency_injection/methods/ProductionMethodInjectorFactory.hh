@@ -34,7 +34,8 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
       $hr_date_serializer_loader,
       $hr_timestamp_builder_loader,
       $date_to_week_day_converter_laoder,
-      $timestamp_segment_expander_loader
+      $timestamp_segment_expander_loader,
+      new ConfirmedOrdersTableLazyLoader()
     ); 
   }
 }

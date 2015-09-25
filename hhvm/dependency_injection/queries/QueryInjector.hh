@@ -2,6 +2,11 @@
 
 class QueryInjector {
 
+  // Update query
+  private ?UpdateQuery $updateQuery;
+  private ?UpdateByUniqueKeyQuery $updateByUniqueKeyQuery;
+  private ?UpdateByIdQuery $updateByIdQuery;
+
   // User queries
   private ?InsertQuery<User> $insertUserQuery;
   private ?InsertUserQuery $concreteInsertUserQuery;
@@ -91,6 +96,35 @@ class QueryInjector {
     private LazyLoader<ConcreteModelFactory<CellLabel>> $cellLabelModelFactoryLazyLoader,
     private LazyLoader<QueryExceptionFactory> $queryExceptionFactoryLazyLoader
   ) {}
+
+  public function getUpdateQuery(): UpdateQuery {
+    if ($this->updateQuery === null) {
+      $this->updateQuery = new UpdateQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->updateQuery;
+  }
+
+  public function getUpdateByUniqueKeyQuery(): UpdateByUniqueKeyQuery {
+    if ($this->updateByUniqueKeyQuery === null) {
+      $this->updateByUniqueKeyQuery = new UpdateByUniqueKeyQuery(
+        $this->getUpdateQuery(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load() 
+      );
+    }
+    return $this->updateByUniqueKeyQuery;
+  }
+
+  public function getUpdateByIdQuery(): UpdateByIdQuery {
+    if ($this->updateByIdQuery === null) {
+      $this->updateByIdQuery = new UpdateByIdQuery(
+        $this->getUpdateByUniqueKeyQuery()
+      ); 
+    }
+    return $this->updateByIdQuery;
+  }
 
   /**
    * User queries

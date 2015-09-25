@@ -33,6 +33,7 @@ class MethodInjector {
 
   // Confirm order method
   private ?ConfirmOrderMethod $confirmOrderMethod;
+  private ?UpdateConfirmedOrderMethod $updateConfirmedOrderMethod;
 
   private ?CreateReservedOrderPolicyMethod $createReservedOrderPolicyMethod;
 
@@ -50,7 +51,8 @@ class MethodInjector {
     private LazyLoader<DateSerializer> $dateSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
     private LazyLoader<DateToDayOfTheWeekConverter> $dateToDayOfTheWeekConverterLoader,
-    private LazyLoader<TimestampSegmentExpander> $timestampSegmentExpanderLoader
+    private LazyLoader<TimestampSegmentExpander> $timestampSegmentExpanderLoader,
+    private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -208,6 +210,16 @@ class MethodInjector {
       ); 
     }
     return $this->confirmOrderMethod;
+  }
+
+  public function getUpdateConfirmedOrderMethod(): UpdateConfirmedOrderMethod {
+    if ($this->updateConfirmedOrderMethod === null) {
+      $this->updateConfirmedOrderMethod = new UpdateConfirmedOrderMethod(
+        $this->queryInjector->getUpdateByIdQuery(),
+        $this->confirmedOrdersTableLoader->load()
+      );
+    }
+    return $this->updateConfirmedOrderMethod;
   }
 
   /**

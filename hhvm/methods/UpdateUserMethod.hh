@@ -3,7 +3,8 @@
 class UpdateUserMethod {
 
   public function __construct(
-    private UpdateByIdQuery  $updateQuery
+    private UpdateByIdQuery  $updateQuery,
+    private UsersTable $table
   ) {}
 
   public function update(
@@ -12,7 +13,11 @@ class UpdateUserMethod {
   ): void {
     try {
       $this->updateQuery
-        ->update($update_params, $id)
+        ->update(
+          $this->table,
+          $update_params,
+          $id
+        )
         ->getWaitHandle()
         ->join();
     } catch (QueryException $ex) {} 

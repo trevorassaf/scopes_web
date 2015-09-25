@@ -3,19 +3,19 @@
 class UpdateByIdQuery {
 
   public function __construct(
-    private UpdateByUniqueKeyQuery $updateByUniqueKeyQuery,
-    private Table $table
-
+    private UpdateByUniqueKeyQuery $updateByUniqueKeyQuery
   ) {}
 
   public async function update(
+    Table $table,
     ImmMap<string, mixed> $update_params,
     UnsignedInt $id
   ): Awaitable<void> {
     await $this->updateByUniqueKeyQuery->update(
+      $table,
       $update_params,
       ImmMap{
-        $this->table->getIdKey() => $id->getNumber(),
+        $table->getIdKey() => $id->getNumber(),
       }
     );
   }

@@ -10,12 +10,15 @@ class ApiInjector {
 
   private ?ConfirmOrderApi $confirmOrderApi;
 
+  private ?UpdateConfirmedOrderApi $updateConfirmedOrderApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private LazyLoader<RequestFactory<CreateUserRequest>> $createUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUserByEmailRequest>> $getUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<ReserveOrderRequest>> $reserveOrderRequestFactoryLoader,
     private LazyLoader<RequestFactory<ConfirmOrderRequest>> $confirmOrderRequestFactoryLoader,
+    private LazyLoader<RequestFactory<UpdateConfirmedOrderRequest>> $updateConfirmedOrderRequestLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -56,6 +59,16 @@ class ApiInjector {
       );        
     }
     return $this->confirmOrderApi;
+  }
+
+  public function getUpdateConfirmedOrderApi(): UpdateConfirmedOrderApi {
+    if ($this->updateConfirmedOrderApi === null) {
+      $this->updateConfirmedOrderApi = new UpdateConfirmedOrderApi(
+        $this->updateConfirmedOrderRequestLoader->load(),
+        $this->methodInjector->getUpdateConfirmedOrderMethod()
+      ); 
+    }
+    return $this->updateConfirmedOrderApi;
   }
 
 }

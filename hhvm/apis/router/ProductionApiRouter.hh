@@ -35,6 +35,9 @@ error_log($contents);
       case ApiType::CONFIRM_ORDER:
         $api = $this->apiInjector->getConfirmOrderApi();
         break;
+      case ApiType::UPDATE_CONFIRMED_ORDER:
+        $api = $this->apiInjector->getUpdateConfirmedOrderApi();
+        break;
       default:
         // TODO return failed result
         break;

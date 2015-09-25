@@ -6,24 +6,26 @@ class UpdateQuery {
 
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
-    private Table $table,
     private QueryExceptionFactory $queryExceptionFactory
   ) {}
 
   public async function updateAll(
+    Table $table,
     ImmMap<string, mixed> $new_values,
   ): Awaitable<void> {
     await $this->asyncMysqlConnection->query(
-      $this->createUpdateAllQuery($new_values)
+      $this->createUpdateAllQuery($table, $new_values)
     );
   }
 
   public async function update(
+    Table $table,
     ImmMap<string, mixed> $new_values,
     WhereClause $where_clause
   ): Awaitable<void> {
     // Serialize update query
     $updat_query_str = $this->createUpdateQuery(
+      $table,
       $new_values,
       $where_clause
     );
@@ -39,24 +41,27 @@ var_dump($updat_query_str);
   }
 
   private function createUpdateAllQuery(
+    Table $table,
     ImmMap<string, mixed> $new_values
   ): string {
-    return $this->createUpdateQueryHeader($new_values);
+    return $this->createUpdateQueryHeader($table, $new_values);
   }
   
   private function createUpdateQuery(
+    Table $table,
     ImmMap<string, mixed> $new_values,
     WhereClause $where_clause
   ): string {
-    return $this->createUpdateQueryHeader($new_values)
+    return $this->createUpdateQueryHeader($table, $new_values)
       . " WHERE " . $where_clause->serialize();
   }
 
   private function createUpdateQueryHeader(
+    Table $table,
     ImmMap<string, mixed> $new_values
   ): string {
     return
-      "UPDATE " . $this->table->getName() . " SET "
+      "UPDATE " . $table->getName() . " SET "
       . $this->createUpdatedFieldsClause($new_values);
   }
 
