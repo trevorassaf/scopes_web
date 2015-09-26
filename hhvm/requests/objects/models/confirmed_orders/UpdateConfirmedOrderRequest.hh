@@ -82,7 +82,7 @@ class UpdateConfirmedOrderRequestBuilder {
       );
     }
 
-    // Extrude request object and ensure fields are not null
+    // Extrude request object
     return new UpdateConfirmedOrderRequest(
       $this->confirmedOrderId,
       $this->title,
