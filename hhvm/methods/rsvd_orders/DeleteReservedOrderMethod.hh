@@ -10,10 +10,14 @@ class DeleteReservedOrderMethod {
     UnsignedInt $rsvd_order_id
   ): void {
     try {
+      // Attempt to delete rsvd order
       $this->deleteOrderQuery
         ->delete($rsvd_order_id)
         ->getWaitHandle()
         ->join(); 
-    } catch (QueryException $ex) {}
+
+    } catch (QueryException $ex) {
+      throw new FailedQueryMethodException($ex);
+    }
   }
 }

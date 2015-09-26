@@ -1,17 +1,16 @@
 <?hh // strict
 
-class DeleteQuery<Tmodel> {
+class DeleteQuery {
 
   public function __construct(
     private AsyncMysqlConnection $asyncMysqlConnection,
-    private Table $table,
     private QueryExceptionFactory $queryExceptionFactory
   ) {}
 
-  public async function deleteAll(): Awaitable<void> {
+  public async function deleteAll(Table $table): Awaitable<void> {
     try { 
       await $this->asyncMysqlConnection->query(
-        $this->createDeleteAllQuery()
+        $this->createDeleteAllQuery($table)
       ); 
     } catch (AsyncMysqlQueryException $ex) {
       throw $this->queryExceptionFactory->make($ex);
@@ -19,10 +18,11 @@ class DeleteQuery<Tmodel> {
   }
 
   public async function delete(
+    Table $table,
     WhereClause $where_clause 
   ): Awaitable<void> {
     // Serialize query string
-    $query_str = $this->createDeleteQuery($where_clause);
+    $query_str = $this->createDeleteQuery($table, $where_clause);
 
 var_dump($query_str);
 
@@ -35,16 +35,17 @@ var_dump($query_str);
   }
 
   private function createDeleteQuery(
+    Table $table,
     WhereClause $where_clause 
   ): string {
-    return $this->createDeleteQueryHeader() . $where_clause->serialize();
+    return $this->createDeleteQueryHeader($table) . $where_clause->serialize();
   }
 
-  private function createDeleteAllQuery(): string {
-    return $this->createDeleteQueryHeader();
+  private function createDeleteAllQuery(Table $table): string {
+    return $this->createDeleteQueryHeader($table);
   }
 
-  private function createDeleteQueryHeader(): string {
-    return "DELETE FROM " . $this->table->getName();
+  private function createDeleteQueryHeader(Table $table): string {
+    return "DELETE FROM " . $table->getName();
   }
 }

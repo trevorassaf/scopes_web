@@ -10,10 +10,14 @@ class DeleteConfirmedOrderMethod {
     UnsignedInt $confirmed_order_id
   ): void {
     try {
+      // Attempt to delete confirmed order
       $this->deleteOrderQuery
         ->delete($confirmed_order_id)
         ->getWaitHandle()
         ->join(); 
-    } catch (QueryException $ex) {}
+
+    } catch (QueryException $ex) {
+      throw new FailedQueryMethodException($ex);
+    }
   }
 }

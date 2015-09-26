@@ -1,20 +1,21 @@
 <?hh // strict
 
-class DeleteByIdQuery<Tmodel> {
+class DeleteByIdQuery {
 
   public function __construct(
-    private DeleteQuery<Tmodel> $deleteQuery,
-    private Table $table
+    private DeleteQuery $deleteQuery
   ) {}
 
   public async function delete(
+    Table $table,
     UnsignedInt $id
   ): Awaitable<void> {
     $where_clause_builder = new WhereClauseVectorBuilder();
     await $this->deleteQuery->delete(
+      $table,
       $where_clause_builder->setFirstClause(
         new EqualsWhereClause(
-          $this->table->getIdKey(),
+          $table->getIdKey(),
           (string)$id->getNumber()
         )
       )
