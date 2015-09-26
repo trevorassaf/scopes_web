@@ -1,6 +1,6 @@
 <?hh // strict
 
-class DeleteConfirmedOrderRequestFactory {
+class DeleteConfirmedOrderRequestFactory implements RequestFactory<DeleteConfirmedOrderRequest> {
 
   private RequestFieldFactory<UnsignedInt> $confirmedOrderIdFieldFactory;
 

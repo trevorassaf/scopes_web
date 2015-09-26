@@ -1,6 +1,6 @@
 <?hh // strict
 
-class DeleteCellLabelRequestFactory {
+class DeleteCellLabelRequestFactory implements RequestFactory<DeleteCellLabelRequest> {
 
   private RequestFieldFactory<UnsignedInt> $cellLabelIdFieldFactory;
 

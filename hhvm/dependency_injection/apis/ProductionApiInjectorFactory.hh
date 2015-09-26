@@ -23,7 +23,10 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         ),
         new ConfirmOrderRequestFactoryLazyLoader(),
         new UpdateConfirmedOrderRequestFactoryLazyLoader(),
-        new UpdateCellLabelRequestFactoryLazyLoader()
+        new UpdateCellLabelRequestFactoryLazyLoader(),
+        new DeleteCellLabelRequestFactoryLazyLoader(),
+        new DeleteReservedOrderRequestFactoryLazyLoader(),
+        new DeleteConfirmedOrderRequestFactoryLazyLoader()
       ); 
     }
     return $this->productionApiInjector;  

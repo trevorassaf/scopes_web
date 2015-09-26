@@ -14,6 +14,12 @@ class ApiInjector {
 
   private ?UpdateCellLabelApi $updateCellLabelApi;
 
+  private ?DeleteCellLabelApi $deleteCellLabelApi;
+
+  private ?DeleteConfirmedOrderApi $deleteConfirmedOrderApi;
+
+  private ?DeleteReservedOrderApi $deleteReservedOrderApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private LazyLoader<RequestFactory<CreateUserRequest>> $createUserRequestFactoryLoader,
@@ -21,7 +27,10 @@ class ApiInjector {
     private LazyLoader<RequestFactory<ReserveOrderRequest>> $reserveOrderRequestFactoryLoader,
     private LazyLoader<RequestFactory<ConfirmOrderRequest>> $confirmOrderRequestFactoryLoader,
     private LazyLoader<RequestFactory<UpdateConfirmedOrderRequest>> $updateConfirmedOrderRequestLoader,
-    private LazyLoader<RequestFactory<UpdateCellLabelRequest>> $updateCellLabelRequestLoader
+    private LazyLoader<RequestFactory<UpdateCellLabelRequest>> $updateCellLabelRequestLoader,
+    private LazyLoader<RequestFactory<DeleteCellLabelRequest>> $deleteCellLabelRequestLoader,
+    private LazyLoader<RequestFactory<DeleteReservedOrderRequest>> $deleteReservedOrderRequestLoader,
+    private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -82,6 +91,36 @@ class ApiInjector {
       ); 
     }
     return $this->updateCellLabelApi;
+  }
+  
+  public function getDeleteReservedOrderApi(): DeleteReservedOrderApi {
+    if ($this->deleteReservedOrderApi === null) {
+      $this->deleteReservedOrderApi = new DeleteReservedOrderApi(
+        $this->deleteReservedOrderRequestLoader->load(),
+        $this->methodInjector->getDeleteReservedOrderMethod()
+      ); 
+    }
+    return $this->deleteReservedOrderApi;
+  }
+  
+  public function getDeleteConfirmedOrderApi(): DeleteConfirmedOrderApi {
+    if ($this->deleteConfirmedOrderApi === null) {
+      $this->deleteConfirmedOrderApi = new DeleteConfirmedOrderApi(
+        $this->deleteConfirmedOrderRequestLoader->load(),
+        $this->methodInjector->getDeleteConfirmedOrderMethod()
+      ); 
+    }
+    return $this->deleteConfirmedOrderApi;
+  }
+
+  public function getDeleteCellLabelApi(): DeleteCellLabelApi {
+    if ($this->deleteCellLabelApi === null) {
+      $this->deleteCellLabelApi = new DeleteCellLabelApi(
+        $this->deleteCellLabelRequestLoader->load(),
+        $this->methodInjector->getDeleteCellLabelMethod()
+      ); 
+    }
+    return $this->deleteCellLabelApi;
   }
 
 }

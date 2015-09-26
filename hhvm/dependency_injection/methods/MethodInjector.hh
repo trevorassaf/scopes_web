@@ -30,13 +30,16 @@ class MethodInjector {
 
   // Reserve order method
   private ?ReserveOrderMethod $reserveOrderMethod;
+  private ?DeleteReservedOrderMethod $deleteReservedOrderMethod;
 
   // Confirm order method
   private ?ConfirmOrderMethod $confirmOrderMethod;
   private ?UpdateConfirmedOrderMethod $updateConfirmedOrderMethod;
+  private ?DeleteConfirmedOrderMethod $deleteConfirmedOrderMethod;
 
   // Cell label methods
   private ?UpdateCellLabelMethod $updateCellLabelMethod;
+  private ?DeleteCellLabelMethod $deleteCellLabelMethod;
 
   private ?CreateReservedOrderPolicyMethod $createReservedOrderPolicyMethod;
 
@@ -55,7 +58,8 @@ class MethodInjector {
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
     private LazyLoader<DateToDayOfTheWeekConverter> $dateToDayOfTheWeekConverterLoader,
     private LazyLoader<TimestampSegmentExpander> $timestampSegmentExpanderLoader,
-    private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLoader
+    private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLoader,
+    private LazyLoader<RsvdOrdersTable> $rsvdOrdersTableLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -199,6 +203,16 @@ class MethodInjector {
     return $this->reserveOrderMethod;
   }
 
+  public function getDeleteReservedOrderMethod(): DeleteReservedOrderMethod {
+    if ($this->deleteReservedOrderMethod === null) {
+      $this->deleteReservedOrderMethod = new DeleteReservedOrderMethod(
+        $this->queryInjector->getDeleteByIdQuery(),
+        $this->rsvdOrdersTableLoader->load()        
+      ); 
+    }
+    return $this->deleteReservedOrderMethod;
+  }
+
   /**
    * Confirm order method
    */
@@ -208,11 +222,22 @@ class MethodInjector {
         $this->queryInjector->getFetchRsvdOrderByIdQuery(),
         $this->queryInjector->getConcreteInsertConfirmedOrderQuery(),
         $this->queryInjector->getBatchInsertCellLabelsQuery(),
-        $this->queryInjector->getDeleteRsvdOrderByIdQuery(),
-        $this->cellsLabelTableLoader->load()
+        $this->queryInjector->getDeleteByIdQuery(),
+        $this->cellsLabelTableLoader->load(),
+        $this->rsvdOrdersTableLoader->load()
       ); 
     }
     return $this->confirmOrderMethod;
+  }
+  
+  public function getDeleteConfirmedOrderMethod(): DeleteConfirmedOrderMethod {
+    if ($this->deleteConfirmedOrderMethod === null) {
+      $this->deleteConfirmedOrderMethod = new DeleteConfirmedOrderMethod(
+        $this->queryInjector->getDeleteByIdQuery(),
+        $this->confirmedOrdersTableLoader->load()        
+      ); 
+    }
+    return $this->deleteConfirmedOrderMethod;
   }
 
   public function getUpdateConfirmedOrderMethod(): UpdateConfirmedOrderMethod {
@@ -236,6 +261,16 @@ class MethodInjector {
       ); 
     }
     return $this->updateCellLabelMethod;
+  }
+  
+  public function getDeleteCellLabelMethod(): DeleteCellLabelMethod {
+    if ($this->deleteCellLabelMethod === null) {
+      $this->deleteCellLabelMethod = new DeleteCellLabelMethod(
+        $this->queryInjector->getDeleteByIdQuery(),
+        $this->cellsLabelTableLoader->load()        
+      ); 
+    }
+    return $this->deleteCellLabelMethod;
   }
 
   /**

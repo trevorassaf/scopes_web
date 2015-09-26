@@ -3,14 +3,18 @@
 class DeleteCellLabelMethod {
 
   public function __construct(
-    private DeleteByIdQuery<CellLabel> $deleteByIdQuery,
+    private DeleteByIdQuery $deleteByIdQuery,
+    private CellLabelsTable $cellLabelsTable
   ) {}
 
   public function delete(UnsignedInt $id): void {
     try {
       // Attempt to delete cell label
       $this->deleteByIdQuery
-        ->delete($id)
+        ->delete(
+          $this->cellLabelsTable,
+          $id
+        )
         ->getWaitHandle()
         ->join();
        

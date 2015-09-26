@@ -41,6 +41,15 @@ error_log($contents);
       case ApiType::UPDATE_CELL_LABEL:
         $api = $this->apiInjector->getUpdateCellLabelApi(); 
         break;
+      case ApiType::DELETE_CELL_LABEL:
+        $api = $this->apiInjector->getDeleteCellLabelApi();
+        break;
+      case ApiType::DELETE_CONFIRMED_ORDER:
+        $api = $this->apiInjector->getDeleteConfirmedOrderApi();
+        break;
+      case ApiType::DELETE_RESERVED_ORDER:
+        $api = $this->apiInjector->getDeleteReservedOrderApi();
+        break;
       default:
         // TODO return failed result
         invariant(false, "unknown api type in api-router");

@@ -6,8 +6,9 @@ class ConfirmOrderMethod {
     private FetchByIdQuery<RsvdOrder> $fetchRsvdOrderQuery,
     private InsertConfirmedOrderQuery $confirmedOrderInsertQuery,
     private BatchInsertQuery<CellLabel> $cellLabelBatchInsertQuery,
-    private DeleteByIdQuery<RsvdOrder> $deleteRsvdOrderQuery,
-    private CellLabelsTable $cellLabelsTable
+    private DeleteByIdQuery $deleteByIdQuery,
+    private CellLabelsTable $cellLabelsTable,
+    private RsvdOrdersTable $rsvdOrdersTable
   ) {}
 
   public function confirm(
@@ -84,11 +85,10 @@ class ConfirmOrderMethod {
         );
 
       // Delete rsvd order
-      $delete_rsvd_order_query_handle = $this
-        ->deleteRsvdOrderQuery
-        ->delete(
-          $rsvd_order->getId() 
-        );
+      $delete_rsvd_order_query_handle = $this->deleteByIdQuery->delete(
+        $this->rsvdOrdersTable,
+        $rsvd_order->getId() 
+      );
 
       // Block until cell labels have been inserted
       // and rsvd orders have been deleted

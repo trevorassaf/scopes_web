@@ -2,6 +2,10 @@
 
 class QueryInjector {
 
+  // Delete query
+  private ?DeleteQuery $deleteQuery;
+  private ?DeleteByIdQuery $deleteByIdQuery;
+
   // Update query
   private ?UpdateQuery $updateQuery;
   private ?UpdateByUniqueKeyQuery $updateByUniqueKeyQuery;
@@ -50,9 +54,7 @@ class QueryInjector {
   private ?FetchReservedOrdersByTimeQuery $fetchRsvdOrdersByTimeQuery;
   private ?InsertQuery<RsvdOrder> $insertRsvdOrderQuery;
   private ?InsertReservedOrderQuery $concreteInsertRsvdOrderQuery;
-  private ?DeleteQuery<RsvdOrder> $deleteRsvdOrderQuery;
-  private ?DeleteByIdQuery<RsvdOrder> $deleteRsvdOrderByIdQuery;
-
+  
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
   private ?FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery;
@@ -504,25 +506,23 @@ class QueryInjector {
     return $this->concreteInsertRsvdOrderQuery;
   }
 
-  public function getDeleteRsvdOrderQuery(): DeleteQuery<RsvdOrder> {
-    if ($this->deleteRsvdOrderQuery === null) {
-      $this->deleteRsvdOrderQuery = new DeleteQuery(
+  public function getDeleteQuery(): DeleteQuery {
+    if ($this->deleteQuery === null) {
+      $this->deleteQuery = new DeleteQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
-        $this->rsvdOrdersTableLazyLoader->load(),
         $this->queryExceptionFactoryLazyLoader->load()
       ); 
     } 
-    return $this->deleteRsvdOrderQuery;
+    return $this->deleteQuery;
   }
 
-  public function getDeleteRsvdOrderByIdQuery(): DeleteByIdQuery<RsvdOrder> {
-    if ($this->deleteRsvdOrderByIdQuery === null) {
-      $this->deleteRsvdOrderByIdQuery = new DeleteByIdQuery(
-        $this->getDeleteRsvdOrderQuery(),
-        $this->rsvdOrdersTableLazyLoader->load()
+  public function getDeleteByIdQuery(): DeleteByIdQuery {
+    if ($this->deleteByIdQuery === null) {
+      $this->deleteByIdQuery = new DeleteByIdQuery(
+        $this->getDeleteQuery()
       ); 
     }
-   return $this->deleteRsvdOrderByIdQuery; 
+   return $this->deleteByIdQuery; 
   }
 
   /**
