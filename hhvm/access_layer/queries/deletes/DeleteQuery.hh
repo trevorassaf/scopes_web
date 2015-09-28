@@ -20,17 +20,20 @@ class DeleteQuery {
   public async function delete(
     Table $table,
     WhereClause $where_clause 
-  ): Awaitable<void> {
+  ): Awaitable<UnsignedInt> {
     // Serialize query string
     $query_str = $this->createDeleteQuery($table, $where_clause);
 
+// DEBUG: print delete query string
 var_dump($query_str);
 
     try {
-    // Execute delete query
-      $delete_query_result = await $this->asyncMysqlConnection->query($query_str); 
+      // Execute delete query
+      $delete_query_result = await $this->asyncMysqlConnection->query($query_str);
+      return new UnsignedInt($delete_query_result->numRowsAffected());
+
     } catch (AsyncMysqlQueryException $ex) {
-      $this->queryExceptionFactory->make($ex);  
+      throw $this->queryExceptionFactory->make($ex);  
     }
   }
 

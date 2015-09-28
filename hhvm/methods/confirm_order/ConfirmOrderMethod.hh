@@ -35,12 +35,12 @@ class ConfirmOrderMethod {
         throw new NonextantObjectException();
       }
 
-      ob_start();
-      var_dump($cell_label_list);
-      $contents = ob_get_contents();
-      ob_end_clean();
-      error_log("COnfirmOrderMethod::confirm() print cell label list");
-      error_log($contents);
+ob_start();
+var_dump($cell_label_list);
+$contents = ob_get_contents();
+ob_end_clean();
+error_log("COnfirmOrderMethod::confirm() print cell label list");
+error_log($contents);
 
       // Fail if provided number of cell labels does not equal
       // numer of scopes in reserved order 

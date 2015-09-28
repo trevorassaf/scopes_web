@@ -49,7 +49,7 @@ function initReservedOrders(MethodInjector $method_injector): void {
 
   $rsvd_order_1 = $reserve_order_method->reserve(
     new UnsignedInt(1),
-    new UnsignedInt(14),
+    new UnsignedInt(0),
     $time_segment
   );
   

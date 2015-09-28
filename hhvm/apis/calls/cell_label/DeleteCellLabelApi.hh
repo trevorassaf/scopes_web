@@ -12,8 +12,14 @@ class DeleteCellLabelApi extends Api<DeleteCellLabelRequest> {
   protected function processRequestObject(
     DeleteCellLabelRequest $delete_cell_label_request 
   ): ApiResult {
-    $this->deleteMethod->delete($delete_cell_label_request->getCellLabelId()->get()); 
-    return new SuccessfulApiResult(ApiType::DELETE_CELL_LABEL);
+    try {
+      $this->deleteMethod->delete($delete_cell_label_request->getCellLabelId()->get()); 
+      return new SuccessfulApiResult(ApiType::DELETE_CELL_LABEL);
+    } catch (NonextantObjectException $ex) {
+      return new FailedDeleteCellLabelApiResult(
+        FailedDeleteCellLabelApiResultType::NONEXTANT_CELL_LABEL
+      ); 
+    }
   }
 
   public function getApiType(): ApiType {

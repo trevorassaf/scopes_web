@@ -37,10 +37,14 @@ function endpointTesterMain(): void {
     ),
   };
 
-  $json_payload = json_encode($confirm_order_payload->toArray());
+  $delete_reserved_order = ImmMap{
+    "rid" => 2,
+  };
+
+  $json_payload = json_encode($delete_reserved_order->toArray());
 
   $post_params = ImmMap{
-    "api-type" => 3,
+    "api-type" => 0x7,
     "payload" => $json_payload,
   };
 
