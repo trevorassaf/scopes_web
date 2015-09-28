@@ -15,6 +15,7 @@ class DeleteCellLabelApi extends Api<DeleteCellLabelRequest> {
     try {
       $this->deleteMethod->delete($delete_cell_label_request->getCellLabelId()->get()); 
       return new SuccessfulApiResult(ApiType::DELETE_CELL_LABEL);
+
     } catch (NonextantObjectException $ex) {
       return new FailedDeleteCellLabelApiResult(
         FailedDeleteCellLabelApiResultType::NONEXTANT_CELL_LABEL
