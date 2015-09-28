@@ -11,6 +11,7 @@ enum ApiType : int as int {
   DELETE_CELL_LABEL = 0x6;
   DELETE_RESERVED_ORDER = 0x7;
   DELETE_CONFIRMED_ORDER = 0x8;
+  GET_USERS_CONFIRMED_ORDERS = 0x9;
 
   GENERAL = 0xffff;
 }

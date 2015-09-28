@@ -3,7 +3,7 @@
 class FetchUsersConfirmedOrdersQuery {
 
   public function __construct(
-    private FetchQuery<ConfirmedOrder> $fetchQuery,
+    private FetchQuery<ConfirmedOrder> $fetchConfirmedOrdersQuery,
     private ConfirmedOrdersTable $confirmedOrdersTable 
   ) {}
 
@@ -33,7 +33,7 @@ class FetchUsersConfirmedOrdersQuery {
         ->build()
     );
 
-    return await $this->fetchQuery->fetch(
+    return await $this->fetchConfirmedOrdersQuery->fetch(
       $fetch_params_builder
         ->setTable($this->confirmedOrdersTable)
         ->build()
