@@ -13,8 +13,11 @@ class DeleteConfirmedOrderApi extends Api<DeleteConfirmedOrderRequest> {
     DeleteConfirmedOrderRequest $delete_confirmed_order_request
   ): ApiResult {
     try {
+
+error_log("DeleteConfirmedOrderApi::processRequestObject()");
+
       $this->deleteMethod->delete($delete_confirmed_order_request->getConfirmedOrderId()->get());
-      return new SuccessfulApiResult(ApiType::DELETE_RESERVED_ORDER);
+      return new SuccessfulApiResult(ApiType::DELETE_CONFIRMED_ORDER);
 
     } catch (NonextantObjectException $ex) {
       return new FailedDeleteConfirmedOrderApiResult(

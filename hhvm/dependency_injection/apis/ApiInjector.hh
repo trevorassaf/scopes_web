@@ -20,6 +20,8 @@ class ApiInjector {
 
   private ?DeleteReservedOrderApi $deleteReservedOrderApi;
 
+  private ?GetUsersConfirmedOrdersApi $getUsersConfirmedOrdersApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private LazyLoader<RequestFactory<CreateUserRequest>> $createUserRequestFactoryLoader,
@@ -30,7 +32,8 @@ class ApiInjector {
     private LazyLoader<RequestFactory<UpdateCellLabelRequest>> $updateCellLabelRequestLoader,
     private LazyLoader<RequestFactory<DeleteCellLabelRequest>> $deleteCellLabelRequestLoader,
     private LazyLoader<RequestFactory<DeleteReservedOrderRequest>> $deleteReservedOrderRequestLoader,
-    private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader
+    private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader,
+    private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -121,6 +124,16 @@ class ApiInjector {
       ); 
     }
     return $this->deleteCellLabelApi;
+  }
+
+  public function getGetUsersConfirmedOrdersApi(): GetUsersConfirmedOrdersApi {
+    if ($this->getUsersConfirmedOrdersApi === null) {
+      $this->getUsersConfirmedOrdersApi = new GetUsersConfirmedOrdersApi(
+        $this->getUsersConfirmedOrdersRequestLoader->load(),
+        $this->methodInjector->getGetUsersConfirmedOrdersAndCellLabelMethod()
+      ); 
+    }
+    return $this->getUsersConfirmedOrdersApi;
   }
 
 }

@@ -50,6 +50,9 @@ error_log($contents);
       case ApiType::DELETE_RESERVED_ORDER:
         $api = $this->apiInjector->getDeleteReservedOrderApi();
         break;
+      case ApiType::GET_USERS_CONFIRMED_ORDERS:
+        $api = $this->apiInjector->getGetUsersConfirmedOrdersApi();
+        break;
       default:
         // TODO return failed result
         invariant(false, "unknown api type in api-router");

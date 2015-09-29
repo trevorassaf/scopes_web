@@ -16,6 +16,7 @@ class QueryInjector {
   private ?InsertUserQuery $concreteInsertUserQuery;
   private ?FetchQuery<User> $fetchUserQuery;
   private ?FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery;
+  private ?FetchByIdQuery<User> $fetchUserByIdQuery;
 
   // Regular Day Queries
   private ?InsertQuery<RegularWeekDay> $insertRegularWeekDayQuery;
@@ -60,6 +61,8 @@ class QueryInjector {
   private ?FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery;
   private ?InsertQuery<ConfirmedOrder> $insertConfirmedOrderQuery;
   private ?InsertConfirmedOrderQuery $concreteInsertConfirmedOrderQuery;
+  private ?FetchUsersConfirmedOrdersQuery $fetchUsersConfirmedOrdersQuery;
+  private ?FetchConfirmedOrderCellLabelsQuery $fetchConfirmedOrderCellLabelsQuery;
 
   // Reserved order policy queries
   private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
@@ -68,6 +71,7 @@ class QueryInjector {
 
   // Cell label queries
   private ?BatchInsertQuery<CellLabel> $batchInsertCellLabelQuery;
+  private ?FetchQuery<CellLabel> $fetchCellLabelQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -175,6 +179,16 @@ class QueryInjector {
       );
     }
     return $this->fetchUserByUniqueKeyQuery;
+  }
+
+  public function getFetchUserByIdQuery(): FetchByIdQuery<User> {
+    if ($this->fetchUserByIdQuery === null) {
+      $this->fetchUserByIdQuery = new FetchByIdQuery(
+        $this->getFetchUserByUniqueKeyQuery(),
+        $this->usersTableLazyLoader->load() 
+      );
+    }
+   return $this->fetchUserByIdQuery; 
   }
 
   /**
@@ -574,6 +588,26 @@ class QueryInjector {
     return $this->concreteInsertConfirmedOrderQuery;
   }
 
+  public function getFetchUsersConfirmedOrdersQuery(): FetchUsersConfirmedOrdersQuery {
+    if ($this->fetchUsersConfirmedOrdersQuery === null) {
+      $this->fetchUsersConfirmedOrdersQuery = new FetchUsersConfirmedOrdersQuery(
+        $this->getFetchConfirmedOrderQuery(),
+        $this->confirmedOrdersTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchUsersConfirmedOrdersQuery;
+  }
+
+  public function getFetchConfirmedOrderCellLabelsQuery(): FetchConfirmedOrderCellLabelsQuery {
+    if ($this->fetchConfirmedOrderCellLabelsQuery === null) {
+      $this->fetchConfirmedOrderCellLabelsQuery = new FetchConfirmedOrderCellLabelsQuery(
+        $this->getFetchCellLabelQuery(),
+        $this->cellLabelsTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchConfirmedOrderCellLabelsQuery;
+  }
+
   /**
    * Reserved order policy queries
    */
@@ -632,5 +666,16 @@ class QueryInjector {
       ); 
     } 
     return $this->batchInsertCellLabelQuery;
+  }
+
+  public function getFetchCellLabelQuery(): FetchQuery<CellLabel> {
+    if ($this->fetchCellLabelQuery === null) {
+      $this->fetchCellLabelQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->cellLabelModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchCellLabelQuery;
   }
 }

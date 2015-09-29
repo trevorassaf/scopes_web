@@ -21,7 +21,7 @@ class DeleteReservedOrderMethod {
         ->join(); 
 
       // Throw if we couldn't find a confirmed-order
-      if ($is_deleted) {
+      if (!$is_deleted) {
         throw new NonextantObjectException();
       }
 

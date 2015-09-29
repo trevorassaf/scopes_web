@@ -30,6 +30,6 @@ class DeleteByIdQuery {
       "Delete by id query must return either 1 or 0"
     );
 
-    return $num_rows_affected === 1;
+    return $num_rows_affected->getNumber() === 1;
   }
 }

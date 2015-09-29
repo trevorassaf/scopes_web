@@ -3,7 +3,7 @@
 class DeleteConfirmedOrderMethod {
 
   public function __construct(
-    private DeleteByIdQuery $deleteOrderQuery,
+    private DeleteByIdQuery $deleteByIdQuery,
     private ConfirmedOrdersTable $confirmedOrdersTable,
     private DeleteQuery $deleteQuery,
     private CellLabelsTable $cellLabelsTable
@@ -12,6 +12,7 @@ class DeleteConfirmedOrderMethod {
   public function delete(
     UnsignedInt $confirmed_order_id
   ): void {
+
     try {
       // Attempt to delete cell labels
       $where_clause_builder = new WhereClauseVectorBuilder();
@@ -27,10 +28,12 @@ class DeleteConfirmedOrderMethod {
               ) 
             )
             ->build()
-          );
+          )
+          ->getWaitHandle()
+          ->join();
 
       // Attempt to delete confirmed order
-      $is_deleted = $this->deleteOrderQuery
+      $is_deleted = $this->deleteByIdQuery
         ->delete(
           $this->confirmedOrdersTable,
           $confirmed_order_id
@@ -39,7 +42,7 @@ class DeleteConfirmedOrderMethod {
         ->join(); 
 
       // Throw if we couldn't find a confirmed-order
-      if ($is_deleted) {
+      if (!$is_deleted) {
         throw new NonextantObjectException();
       }
 
