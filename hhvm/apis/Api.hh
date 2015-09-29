@@ -13,9 +13,12 @@ abstract class Api<Trequest> {
       
       // Execute selected api call
       return $this->processRequestObject($request);
+
+    } catch (UnexpectedRequestFieldKeyException $ex) {
+        return new UnknownFailedApiResult(); 
    
     } catch (FailedQueryMethodException $ex) {
-      return new FailedQueryApiResult();
+      return new UnknownFailedApiResult();
     
     } catch (MethodException $ex) {
       return new UnknownFailedApiResult();
