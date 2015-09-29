@@ -12,11 +12,18 @@ class DeleteReservedOrderApi extends Api<DeleteReservedOrderRequest> {
   protected function processRequestObject(
     DeleteReservedOrderRequest $delete_reserved_order_request
   ): ApiResult {
-    $this->deleteMethod->delete($delete_reserved_order_request->getReservedOrderId()->get());
-    return new SuccessfulApiResult(ApiType::DELETE_RESERVED_ORDER);
+    try {
+      $this->deleteMethod->delete($delete_reserved_order_request->getReservedOrderId()->get());
+      return new SuccessfulApiResult(ApiType::DELETE_RESERVED_ORDER);
+
+    } catch (NonextantObjectException $ex) {
+      return new FailedDeleteReservedOrderApiResult(
+        FailedDeleteReservedOrderApiResultType::NONEXTANT_RESERVED_ORDER
+      );
+    }
   }
 
   public function getApiType(): ApiType {
-    return ApiType::DELETE_CELL_LABEL;
+    return ApiType::DELETE_RESERVED_ORDER;
   }
 }
