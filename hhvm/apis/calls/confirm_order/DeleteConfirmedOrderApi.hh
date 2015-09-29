@@ -24,6 +24,6 @@ class DeleteConfirmedOrderApi extends Api<DeleteConfirmedOrderRequest> {
   }
 
   public function getApiType(): ApiType {
-    return ApiType::DELETE_CELL_LABEL;
+    return ApiType::DELETE_CONFIRMED_ORDER;
   }
 }

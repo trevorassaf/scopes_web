@@ -234,7 +234,9 @@ class MethodInjector {
     if ($this->deleteConfirmedOrderMethod === null) {
       $this->deleteConfirmedOrderMethod = new DeleteConfirmedOrderMethod(
         $this->queryInjector->getDeleteByIdQuery(),
-        $this->confirmedOrdersTableLoader->load()        
+        $this->confirmedOrdersTableLoader->load(),
+        $this->queryInjector->getDeleteQuery(),
+        $this->cellsLabelTableLoader->load()
       ); 
     }
     return $this->deleteConfirmedOrderMethod;

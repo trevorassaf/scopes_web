@@ -12,13 +12,18 @@ class DeleteReservedOrderMethod {
   ): void {
     try {
       // Attempt to delete rsvd order
-      $this->deleteOrderQuery
+      $is_deleted = $this->deleteOrderQuery
         ->delete(
           $this->rsvdOrdersTable,
           $rsvd_order_id
         )
         ->getWaitHandle()
         ->join(); 
+
+      // Throw if we couldn't find a confirmed-order
+      if ($is_deleted) {
+        throw new NonextantObjectException();
+      }
 
     } catch (QueryException $ex) {
       throw new FailedQueryMethodException($ex);
