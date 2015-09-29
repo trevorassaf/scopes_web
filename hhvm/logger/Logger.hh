@@ -8,50 +8,29 @@ abstract class Logger {
 
   abstract protected function log(string $str): void;
 
-  public function debug(string $str): void {
+  public function debug(string $str, mixed $object=null): void {
     $log_str = $this->logSerializer->serialize(
       LogLevelType::DEBUG,
-      $str
+      $str,
+      $object
     );
     $this->log($log_str);
   }
 
-  public function debugObject(mixed $str): void {
-    $log_str = $this->logSerializer->serializeObject(
-      LogLevelType::DEBUG,
-      $str
-    );
-    $this->log($log_str);
-  }
-
-  public function info(string $str): void {
+  public function info(string $str, mixed $object=null): void {
     $log_str = $this->logSerializer->serialize(
       LogLevelType::INFO,
-      $str
-    );
-    $this->log($log_str);
-  }
-
-  public function infoObject(mixed $str): void {
-    $log_str = $this->logSerializer->serializeObject(
-      LogLevelType::INFO,
-      $str
+      $str,
+      $object
     );
     $this->log($log_str);
   }
   
-  public function error(string $str): void {
+  public function error(string $str, mixed $object=null): void {
     $log_str = $this->logSerializer->serialize(
       LogLevelType::ERROR,
-      $str
-    );
-    $this->log($log_str);
-  }
-
-  public function errorObject(mixed $str): void {
-    $log_str = $this->logSerializer->serializeObject(
-      LogLevelType::ERROR,
-      $str
+      $str,
+      $object
     );
     $this->log($log_str);
   }

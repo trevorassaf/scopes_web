@@ -8,12 +8,14 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
   protected ApiResultSerializer $apiResultSerializer;
   protected ApiRouter $apiRouter;
 
-  public function __construct() {
+  public function __construct(
+    private Logger $logger
+  ) {
     $this->displayRequestFieldErrors = new StaticServerState(false);
     $this->requestWrapperFactory = new RequestWrapperFactory();
     $this->apiRequestDeserializer = new JsonApiRequestDeserializer();
     $this->apiResultSerializer = new JsonApiResultSerializer();
-    $production_api_router_factory = new ProductionApiRouterFactory();
+    $production_api_router_factory = new ProductionApiRouterFactory($this->logger);
     $this->apiRouter = $production_api_router_factory->make();
   }
 
@@ -23,7 +25,8 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
       $this->displayRequestFieldErrors,
       $this->apiRequestDeserializer,
       $this->apiResultSerializer,
-      $this->apiRouter
+      $this->apiRouter,
+      $this->logger
     );
   }
 }

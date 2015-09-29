@@ -8,22 +8,20 @@ class ApiRunner {
     private ApiRequestDeserializer $apiRequestDeserializer,
     private ApiResultSerializer $apiResultSerializer,
     private ApiRouter $apiRouter,
+    private Logger $logger
   ) {}
 
   public function run(ImmMap<string, mixed> $request_params): string {
+    // Log field map from request payload
+    $this->logger->info("Request field map", $request_params);
+
+    $api_result = null;
 
     try {
       // Digest request params into request wrapper
       $request_wrapper = $this->requestWrapperFactory->make($request_params);
       $api_raw_request_fields_string = $request_wrapper->getPayload()->get();
       
-ob_start();
-var_dump($api_raw_request_fields_string);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("ApiRunner::run(): Raw request fields string\n");
-error_log($contents);
-
       // Deserialize payload
       $api_raw_request_fields = $this
         ->apiRequestDeserializer
@@ -31,27 +29,25 @@ error_log($contents);
           $api_raw_request_fields_string
         );
 
-ob_start();
-var_dump($api_raw_request_fields);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("ApiRunner::run(): Raw request fields\n");
-error_log($contents);
-
       // Execute api call
       $api_result = $this->apiRouter->route(
         $request_wrapper->getApiType()->get(),
         $api_raw_request_fields
       );
 
-      // Serialize response
-      return $this->apiResultSerializer->serialize($api_result);
-
     } catch (RequestException $ex) {
-      error_log($ex->getMessage());
-      return $this->displayRequestFieldErrors->get()
-        ? $ex->getMessage()
-        : "";
+      // Log all exceptions
+      $this->logger->info($ex->getMessage());
+
+      $api_result = new UnknownFailedApiResult();
+    } catch (Exception $ex) {
+      // Log all exceptions
+      $this->logger->error($ex->getMessage());
+
+      $api_result = new UnknownFailedApiResult();
     }
+
+    // Serialize response
+    return $this->apiResultSerializer->serialize($api_result);
   }
 }

@@ -5,6 +5,7 @@ class CreateUserApi extends Api<CreateUserRequest> {
   public function __construct(
     RequestFactory<CreateUserRequest> $request_factory,
     private CreateUserMethod $createUserMethod,
+    private Logger $logger
   ) {
     parent::__construct($request_factory);
   }
@@ -13,14 +14,10 @@ class CreateUserApi extends Api<CreateUserRequest> {
     CreateUserRequest $create_user_request
   ): ApiResult {
 
-ob_start();
-var_dump($create_user_request);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("CreateUserApi::processRequestObject()");
-error_log($contents);
-
     try {
+      // Log create user method call
+      $this->logger->info("Calling create user method from api...");
+
       // Execute create user method
       $user = $this->createUserMethod->createUser(
         $create_user_request->getFirstName()->get(),
@@ -32,6 +29,9 @@ error_log($contents);
       return new CreateUserApiResult($user->getId()); 
     
     } catch (DuplicateEmailException $ex) {
+      // Log duplicate email exception
+      $this->logger->error("Can't create user b/c provided email registered to existing user!");
+
       return new FailedCreateUserApiResult(
         CreateUserApiFailureType::DUPLICATE_EMAIL
       );

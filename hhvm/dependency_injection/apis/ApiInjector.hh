@@ -24,6 +24,7 @@ class ApiInjector {
 
   public function __construct(
     private MethodInjector $methodInjector,
+    private Logger $logger,
     private LazyLoader<RequestFactory<CreateUserRequest>> $createUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUserByEmailRequest>> $getUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<ReserveOrderRequest>> $reserveOrderRequestFactoryLoader,
@@ -40,7 +41,8 @@ class ApiInjector {
     if ($this->createUserApi == null) {
       $this->createUserApi = new CreateUserApi(
         $this->createUserRequestFactoryLoader->load(),
-        $this->methodInjector->getCreateUserMethod() 
+        $this->methodInjector->getCreateUserMethod(),
+        $this->logger
       ); 
     }
     return $this->createUserApi;
@@ -50,7 +52,8 @@ class ApiInjector {
     if ($this->getUserApi == null) {
       $this->getUserApi = new GetUserByEmailApi(
         $this->getUserRequestFactoryLoader->load(),
-        $this->methodInjector->getGetUserByEmailMethod() 
+        $this->methodInjector->getGetUserByEmailMethod(),
+        $this->logger
       );
     } 
     return $this->getUserApi;

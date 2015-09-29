@@ -4,7 +4,8 @@ class GetUserByEmailApi extends Api<GetUserByEmailRequest> {
 
   public function __construct(
     RequestFactory<GetUserByEmailRequest> $request_factory,
-    private GetUserByEmailMethod $getUserByEmailMethod
+    private GetUserByEmailMethod $getUserByEmailMethod,
+    private Logger $logger
   ) {
     parent::__construct($request_factory);
   }
@@ -18,6 +19,9 @@ class GetUserByEmailApi extends Api<GetUserByEmailRequest> {
 
     // Email doesn't identify user, so return non-extant object error
     if ($user === null) {
+      // Log nonextant user
+      $this->logger->info("User does not exist with email", $request->getEmail()->get());
+
       return new FailedGetUserByEmailApiResult(
         FailedGetUserByEmailApiResultType::NONEXTANT_OBJECT
       );

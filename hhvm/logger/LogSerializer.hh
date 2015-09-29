@@ -8,16 +8,20 @@ class LogSerializer {
     LogLevelType::ERROR => "Error",
   };
 
-  public function serialize(LogLevelType $level, string $str): string {
-    return "Logger::[" . self::$LOG_LEVEL_STRING_MAP[$level] . "]:: " . $str; 
+  public function serialize(LogLevelType $level, string $str, mixed $object=null): string {
+    $log_str = "Logger::[" . self::$LOG_LEVEL_STRING_MAP[$level] . "]:: " . $str;
+    if ($object !== null) {
+      $log_str .= ", " . $this->serializeObject($object);
+    }
+    return $log_str;
   }
 
-  public function serializeObject(LogLevelType $level, mixed $object): string {
+  private function serializeObject(mixed $object): string {
     ob_start();
     var_dump($object); 
     $contents = ob_get_contents();
     ob_end_clean();
 
-    return $this->serialize($level, $contents);
+    return $contents;
   }
 }

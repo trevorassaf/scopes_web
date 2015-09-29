@@ -3,21 +3,16 @@
 class ProductionApiRouter implements ApiRouter {
 
   public function __construct(
-    private ApiInjector $apiInjector
+    private ApiInjector $apiInjector,
+    private Logger $logger
   ) {}
 
   public function route(
     ApiType $type,
     ImmMap<string, mixed> $raw_request_fields
   ): ApiResult {
-
-ob_start();
-var_dump($type);
-var_dump($raw_request_fields);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("ProductionApiRouter::route()");
-error_log($contents);
+    // Log api type 
+    $this->logger->info("Routing api request", $type);
 
     // Perform route based on api-type
     $api = null;
@@ -54,8 +49,7 @@ error_log($contents);
         $api = $this->apiInjector->getGetUsersConfirmedOrdersApi();
         break;
       default:
-        // TODO return failed result
-        invariant(false, "unknown api type in api-router");
+        throw new Exception("Unhandled api type!");
         break;
     }    
 
