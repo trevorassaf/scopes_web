@@ -19,3 +19,44 @@
   - new orders
 9. How far in advance should an order be placed?
 10. How far in advance can an order be cancelled?
+11. Customer surveys?
+  - pre/post?
+  - mode? online/phone/email
+
+-------------------------------------------
+
+NOTES:
+1. Provide a survey at the end of the experiment
+  - goal of survey is to collect product feedback
+
+2. Read milipore patent and distinguish ourselves from
+    them.
+
+3. First one is free policy, funded by a grant! (market research, babay)
+
+4. TODO: look into storage prices
+
+6. basic package does not involve video editing/stictching/compilation
+
+-- look into 
+--------------------------------------------
+
+POST-CONVERSATION:
+
+1. Yes, with guest login
+2. 
+  a. Janice knows how to validate short-codes 
+  b. Would like to reimburse, but check process
+  c. 
+
+4. Charges:
+  - $30 per 4 scopes per hour ()
+  - video: first two weeks free, charge whatever amazon is charging us per gig
+
+5. 1 week
+
+7. availability must match tech's availabilities, but say yes
+
+8. Cancellation: 24 hrs before
+
+10. figure it out later
