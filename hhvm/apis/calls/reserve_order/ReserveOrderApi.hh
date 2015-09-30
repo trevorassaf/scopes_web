@@ -4,9 +4,13 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
 
   public function __construct(
     RequestFactory<ReserveOrderRequest> $request_factory,
-    private ReserveOrderMethod $reserveOrderMethod    
+    private ReserveOrderMethod $reserveOrderMethod,
+    private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

@@ -7,7 +7,10 @@ class CreateUserApi extends Api<CreateUserRequest> {
     private CreateUserMethod $createUserMethod,
     private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

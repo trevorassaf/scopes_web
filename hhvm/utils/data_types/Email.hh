@@ -4,9 +4,8 @@ class Email {
 
   private string $address;
 
-  public static function isValid(string $value): bool {
-    // TODO write this
-    return true;  
+  public static function isValid(string $email_str): bool {
+    return false != filter_var($email_str, FILTER_VALIDATE_EMAIL);
   }
 
   public function __construct(string $address) {

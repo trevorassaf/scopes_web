@@ -4,9 +4,13 @@ class DeleteConfirmedOrderApi extends Api<DeleteConfirmedOrderRequest> {
 
   public function __construct(
     RequestFactory<DeleteConfirmedOrderRequest> $request_factory,
-    private DeleteConfirmedOrderMethod $deleteMethod 
+    private DeleteConfirmedOrderMethod $deleteMethod,
+    private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

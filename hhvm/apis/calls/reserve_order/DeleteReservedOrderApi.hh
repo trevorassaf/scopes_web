@@ -4,9 +4,13 @@ class DeleteReservedOrderApi extends Api<DeleteReservedOrderRequest> {
 
   public function __construct(
     RequestFactory<DeleteReservedOrderRequest> $request_factory,
-    private DeleteReservedOrderMethod $deleteMethod 
+    private DeleteReservedOrderMethod $deleteMethod,
+    private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

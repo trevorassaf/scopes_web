@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../../vendor/autoload.php');
 function testGetUserEndpoint(): void {
 
   $get_user_payload = ImmMap{
-      "EMAIL" => "astrev@umich.edu",
+      "email" => "astrev@umich.edu",
   };
 
   $api_requester = new ApiRequester();

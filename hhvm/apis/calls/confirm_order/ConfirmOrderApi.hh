@@ -4,9 +4,13 @@ class ConfirmOrderApi extends Api<ConfirmOrderRequest> {
 
   public function __construct(
     RequestFactory<ConfirmOrderRequest> $request_factory,
-    private ConfirmOrderMethod $confirmOrderMethod
+    private ConfirmOrderMethod $confirmOrderMethod,
+    private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

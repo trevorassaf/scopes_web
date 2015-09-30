@@ -4,9 +4,13 @@ class UpdateCellLabelApi extends Api<UpdateCellLabelRequest> {
 
   public function __construct(
     RequestFactory<UpdateCellLabelRequest> $request_factory,
-    private UpdateCellLabelMethod $updateMethod
+    private UpdateCellLabelMethod $updateMethod,
+    private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

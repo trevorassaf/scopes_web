@@ -4,9 +4,13 @@ class GetUsersConfirmedOrdersApi extends Api<GetUsersConfirmedOrdersRequest> {
 
   public function __construct(
     RequestFactory<GetUsersConfirmedOrdersRequest> $request_factory,
-    private GetUsersConfirmedOrdersAndCellLabelsMethod $getUsersConfirmedOrdersAndCellLabelsMethod
+    private GetUsersConfirmedOrdersAndCellLabelsMethod $getUsersConfirmedOrdersAndCellLabelsMethod,
+    private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

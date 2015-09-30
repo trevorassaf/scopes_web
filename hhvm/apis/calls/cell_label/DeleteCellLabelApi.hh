@@ -4,9 +4,13 @@ class DeleteCellLabelApi extends Api<DeleteCellLabelRequest> {
 
   public function __construct(
     RequestFactory<DeleteCellLabelRequest> $request_factory,
-    private DeleteCellLabelMethod $deleteMethod
+    private DeleteCellLabelMethod $deleteMethod,
+    private Logger $logger
   ) {
-    parent::__construct($request_factory);
+    parent::__construct(
+      $request_factory,
+      $this->logger
+    );
   }
 
   protected function processRequestObject(

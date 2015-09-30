@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "933575b0d55969facf7f8a20d254f845",
+    "hash": "4f3db29035afe1c97a9b99266e7eb0fd",
     "packages": [
         {
             "name": "hackpack/hacktions",

@@ -8,7 +8,7 @@ function testCreateUserEndpoint(): void {
     "first-name" => "Trevor",
     "last-name" => "Assaf",
     "email" => "astrev@umich.edu",
-    "password-hash" => "brownpoopsbrownpoopsbrownpoopsbrownpoops",
+    "password-hash" => "password",
   };
 
   $api_requester = new ApiRequester();

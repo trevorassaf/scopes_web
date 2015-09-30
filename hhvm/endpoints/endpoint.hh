@@ -7,12 +7,21 @@ function main(): void {
   // Endpoint settings 
   date_default_timezone_set("America/Detroit");
   error_reporting(E_ALL); 
-  
-  $production_api_runner_factory = new ProductionApiRunnerFactory();
+
+  $logger_factory = new LocalLoggerFactory();
+  $logger = $logger_factory->make();
+
+  $production_api_runner_factory = new ProductionApiRunnerFactory(
+    $logger
+  );
+
+  // Start http server
   $http_server = new HttpServer(
     $production_api_runner_factory->make(),
-    new HttpParamsFetcher()
+    new HttpParamsFetcher(),
+    $logger
   );
+
   $http_server->run();
 }
 

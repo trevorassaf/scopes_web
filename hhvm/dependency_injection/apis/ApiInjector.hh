@@ -63,7 +63,8 @@ class ApiInjector {
     if ($this->reserveOrderApi === null) {
       $this->reserveOrderApi = new ReserveOrderApi(
         $this->reserveOrderRequestFactoryLoader->load(),
-        $this->methodInjector->getReserveOrderMethod()        
+        $this->methodInjector->getReserveOrderMethod(),
+        $this->logger
       ); 
     }
     return $this->reserveOrderApi;
@@ -73,7 +74,8 @@ class ApiInjector {
     if ($this->confirmOrderApi === null) {
       $this->confirmOrderApi = new ConfirmOrderApi(
         $this->confirmOrderRequestFactoryLoader->load(),
-        $this->methodInjector->getConfirmOrderMethod()
+        $this->methodInjector->getConfirmOrderMethod(),
+        $this->logger
       );        
     }
     return $this->confirmOrderApi;
@@ -83,7 +85,8 @@ class ApiInjector {
     if ($this->updateConfirmedOrderApi === null) {
       $this->updateConfirmedOrderApi = new UpdateConfirmedOrderApi(
         $this->updateConfirmedOrderRequestLoader->load(),
-        $this->methodInjector->getUpdateConfirmedOrderMethod()
+        $this->methodInjector->getUpdateConfirmedOrderMethod(),
+        $this->logger
       ); 
     }
     return $this->updateConfirmedOrderApi;
@@ -93,7 +96,8 @@ class ApiInjector {
     if ($this->updateCellLabelApi === null) {
       $this->updateCellLabelApi = new UpdateCellLabelApi(
         $this->updateCellLabelRequestLoader->load(),
-        $this->methodInjector->getUpdateCellLabelMethod() 
+        $this->methodInjector->getUpdateCellLabelMethod(),
+        $this->logger
       ); 
     }
     return $this->updateCellLabelApi;
@@ -103,7 +107,8 @@ class ApiInjector {
     if ($this->deleteReservedOrderApi === null) {
       $this->deleteReservedOrderApi = new DeleteReservedOrderApi(
         $this->deleteReservedOrderRequestLoader->load(),
-        $this->methodInjector->getDeleteReservedOrderMethod()
+        $this->methodInjector->getDeleteReservedOrderMethod(),
+        $this->logger
       ); 
     }
     return $this->deleteReservedOrderApi;
@@ -113,7 +118,8 @@ class ApiInjector {
     if ($this->deleteConfirmedOrderApi === null) {
       $this->deleteConfirmedOrderApi = new DeleteConfirmedOrderApi(
         $this->deleteConfirmedOrderRequestLoader->load(),
-        $this->methodInjector->getDeleteConfirmedOrderMethod()
+        $this->methodInjector->getDeleteConfirmedOrderMethod(),
+        $this->logger
       ); 
     }
     return $this->deleteConfirmedOrderApi;
@@ -123,7 +129,8 @@ class ApiInjector {
     if ($this->deleteCellLabelApi === null) {
       $this->deleteCellLabelApi = new DeleteCellLabelApi(
         $this->deleteCellLabelRequestLoader->load(),
-        $this->methodInjector->getDeleteCellLabelMethod()
+        $this->methodInjector->getDeleteCellLabelMethod(),
+        $this->logger
       ); 
     }
     return $this->deleteCellLabelApi;
@@ -133,7 +140,8 @@ class ApiInjector {
     if ($this->getUsersConfirmedOrdersApi === null) {
       $this->getUsersConfirmedOrdersApi = new GetUsersConfirmedOrdersApi(
         $this->getUsersConfirmedOrdersRequestLoader->load(),
-        $this->methodInjector->getGetUsersConfirmedOrdersAndCellLabelMethod()
+        $this->methodInjector->getGetUsersConfirmedOrdersAndCellLabelMethod(),
+        $this->logger
       ); 
     }
     return $this->getUsersConfirmedOrdersApi;

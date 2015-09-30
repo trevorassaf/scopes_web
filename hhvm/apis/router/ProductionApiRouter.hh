@@ -13,6 +13,7 @@ class ProductionApiRouter implements ApiRouter {
   ): ApiResult {
     // Log api type 
     $this->logger->info("Routing api request", $type);
+    $this->logger->info("Request payload", $raw_request_fields);
 
     // Perform route based on api-type
     $api = null;
