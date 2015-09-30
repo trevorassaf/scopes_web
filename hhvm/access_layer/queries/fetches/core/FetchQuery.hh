@@ -14,7 +14,7 @@ class FetchQuery<Tmodel> {
     // Serialize fetch query
     $query_str = $query_maker->serialize();
     
-var_dump($query_str);
+//var_dump($query_str);
 
     try {
       // Execute fetch query

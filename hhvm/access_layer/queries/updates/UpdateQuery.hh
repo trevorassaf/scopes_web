@@ -30,7 +30,7 @@ class UpdateQuery {
       $where_clause
     );
 
-var_dump($updat_query_str);
+//var_dump($updat_query_str);
 
     try {
       // Execute update query 

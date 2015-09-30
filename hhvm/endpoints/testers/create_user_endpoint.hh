@@ -5,10 +5,10 @@ require_once(dirname(__FILE__).'/../../vendor/autoload.php');
 function testCreateUserEndpoint(): void {
 
   $create_user_payload = ImmMap{
-    "first-name" => "Trevor",
-    "last-name" => "Assaf",
-    "email" => "astrev@umich.edu",
-    "password-hash" => "password",
+    "first-name" => "Alexis",
+    "last-name" => "Donneys",
+    "email" => "email@umich.edu",
+    "password-hash" => "somepassword",
   };
 
   $api_requester = new ApiRequester();

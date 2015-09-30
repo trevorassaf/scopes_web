@@ -25,7 +25,7 @@ class DeleteQuery {
     $query_str = $this->createDeleteQuery($table, $where_clause);
 
 // DEBUG: print delete query string
-var_dump($query_str);
+//var_dump($query_str);
 
     try {
       // Execute delete query

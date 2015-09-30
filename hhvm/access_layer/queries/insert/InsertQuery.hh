@@ -19,7 +19,7 @@ class InsertQuery<Tmodel> {
       $params
     );
 
-var_dump($query_str);
+//var_dump($query_str);
 
     try {
       // Execute insert query
