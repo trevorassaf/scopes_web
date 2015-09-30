@@ -20,6 +20,11 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         new HRTimeSerializer()
       );
 
+      $hr_timestamp_serializer_lazy_loader = new HRTimestampSerializerLazyLoader(
+        new HRDateSerializerLazyLoader(),
+        new HRTimeSerializerLazyLoader()
+      );
+
       $this->productionApiInjector = new ApiInjector(
         $production_method_injector_factory->get(),
         $this->logger,
@@ -34,7 +39,8 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         new DeleteCellLabelRequestFactoryLazyLoader(),
         new DeleteReservedOrderRequestFactoryLazyLoader(),
         new DeleteConfirmedOrderRequestFactoryLazyLoader(),
-        new GetUsersConfirmedOrdersRequestFactoryLazyLoader()
+        new GetUsersConfirmedOrdersRequestFactoryLazyLoader(),
+        $hr_timestamp_serializer_lazy_loader
       ); 
     }
     return $this->productionApiInjector;  

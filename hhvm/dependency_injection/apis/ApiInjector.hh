@@ -34,7 +34,8 @@ class ApiInjector {
     private LazyLoader<RequestFactory<DeleteCellLabelRequest>> $deleteCellLabelRequestLoader,
     private LazyLoader<RequestFactory<DeleteReservedOrderRequest>> $deleteReservedOrderRequestLoader,
     private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader,
-    private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader
+    private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader,
+    private LazyLoader<TimestampSerializer> $timestampSerializerLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -141,7 +142,8 @@ class ApiInjector {
       $this->getUsersConfirmedOrdersApi = new GetUsersConfirmedOrdersApi(
         $this->getUsersConfirmedOrdersRequestLoader->load(),
         $this->methodInjector->getGetUsersConfirmedOrdersAndCellLabelMethod(),
-        $this->logger
+        $this->logger,
+        $this->timestampSerializerLoader->load()
       ); 
     }
     return $this->getUsersConfirmedOrdersApi;
