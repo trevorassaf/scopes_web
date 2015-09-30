@@ -11,8 +11,9 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
   public function make(): ApiInjector {
     if ($this->productionApiInjector === null) {
       // Initialize all dependencies
-      $production_method_injector_factory = new ProductionMethodInjectorFactory();
-
+      $production_method_injector_factory = new ProductionMethodInjectorFactory(
+        $this->logger
+      );
 
       $hr_timestamp_serializer = new HRTimestampSerializer(
         new HRDateSerializer(),

@@ -15,15 +15,15 @@ class FetchReservedOrdersByTimeQuery {
     $where_clause_vector_builder = new WhereClauseVectorBuilder();
     $where_clause = $where_clause_vector_builder
       ->setFirstClause(
-        new GreaterThanOrEqualToWhereClause(
+        new LessThanWhereClause(
           $this->rsvdOrdersTable->getStartTimeKey(),
-          $this->timestampSerializer->serialize($interval->getStart())
+          $this->timestampSerializer->serialize($interval->getEnd())
         )
       )
       ->logicalAnd(
-        new LessThanOrEqualToWhereClause(
+        new GreaterThanWhereClause(
           $this->rsvdOrdersTable->getEndTimeKey(),
-          $this->timestampSerializer->serialize($interval->getEnd())
+          $this->timestampSerializer->serialize($interval->getStart())
         )
       )
       ->build();

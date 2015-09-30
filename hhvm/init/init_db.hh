@@ -7,7 +7,10 @@ function initDbMain(): void {
   date_default_timezone_set("America/Detroit");
 
   // Initialize model loader
-  $production_method_injector_factory = new ProductionMethodInjectorFactory();
+  $logger_factory = new LocalLoggerFactory();
+  $production_method_injector_factory = new ProductionMethodInjectorFactory(
+    $logger_factory->make()
+  );
   $method_injector = $production_method_injector_factory->get();
 
   // Insert initial records to database
@@ -16,7 +19,7 @@ function initDbMain(): void {
 
   // TEST: reserve method
   initRsvdOrderPolicy($method_injector);
-  initReservedOrders($method_injector);
+  //initReservedOrders($method_injector);
 }
 
 function initReservedOrders(MethodInjector $method_injector): void {

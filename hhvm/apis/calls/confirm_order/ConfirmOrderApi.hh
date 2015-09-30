@@ -16,6 +16,9 @@ class ConfirmOrderApi extends Api<ConfirmOrderRequest> {
   protected function processRequestObject(
     ConfirmOrderRequest $request
   ): ApiResult {
+    // Log confirm order call
+    $this->logger->info("Confirm order api call...");
+
     try {
       $confirmed_order = $this->confirmOrderMethod->confirm(
         $request->getRsvdOrderId()->get(),
@@ -26,22 +29,19 @@ class ConfirmOrderApi extends Api<ConfirmOrderRequest> {
         $request->getCellLabelRequests()->get()
       );
 
+      // Log confirm order request completed
+      $this->logger->info("Confirm order request completed!");
+
       return new ConfirmOrderApiResult($confirmed_order->getId());
 
     } catch (NonextantObjectException $ex) {
-
-error_log("ConfirmOrderApi::processRequestObject() NonextantObjectException catch");
-error_log($ex->getMessage());
-
+      $this->logger->info("Reserved order does not exist!");
       return new FailedConfirmOrderApiResult(
         FailedConfirmOrderApiResultType::NONEXTANT_RESERVED_ORDER
       );
 
     } catch (InvalidCellLabelCountException $ex) {
-
-error_log("ConfirmOrderApi::processRequestObject() FailedConfirmOrderApiResult catch");
-error_log($ex->getMessage());
-
+      $this->logger->info("Invalid cell label count! " . $ex->getMessage());
       return new FailedConfirmOrderApiResult(
         FailedConfirmOrderApiResultType::INVALID_CELL_LABEL_COUNT
       );

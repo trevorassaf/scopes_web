@@ -19,7 +19,7 @@ class CreateUserApi extends Api<CreateUserRequest> {
 
     try {
       // Log create user method call
-      $this->logger->info("Calling create user method from api...");
+      $this->logger->info("Create user api called...");
 
       // Execute create user method
       $user = $this->createUserMethod->createUser(

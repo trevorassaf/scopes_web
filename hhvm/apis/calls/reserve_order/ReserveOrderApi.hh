@@ -16,16 +16,38 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
   protected function processRequestObject(
     ReserveOrderRequest $request
   ): ApiResult {
-    // TODO error checking!
-    $rsvd_order = $this->reserveOrderMethod->reserve(
-      $request->getUserId()->get(),
-      $request->getScopesCount()->get(),
-      new TimestampSegment(
-        $request->getStartTime()->get(),
-        $request->getEndTime()->get()
-      )
-    ); 
-    return new ReserveOrderApiResult($rsvd_order->getId());
+    // Log reserve order call
+    $this->logger->info("Reserving order api called...");
+
+    // Reserve order
+    try {
+      $rsvd_order = $this->reserveOrderMethod->reserve(
+        $request->getUserId()->get(),
+        $request->getScopesCount()->get(),
+        new TimestampSegment(
+          $request->getStartTime()->get(),
+          $request->getEndTime()->get()
+        )
+      ); 
+
+      // Log that we've reserved the order
+      $this->logger->info("Reserved order request succeeded!");
+
+      return new ReserveOrderApiResult($rsvd_order->getId());
+
+    } catch (InvalidReservedOrderRequestException $ex) {
+      // Log that the reserved order is invalid 
+      $this->logger->info($ex->getMessage());
+      return new FailedReserveOrderApiResult(
+        FailedReserveOrderApiResultType::INVALID_ORDER
+      );
+    } catch (ConflictingReservedOrderRequestException $ex) {
+      // Log that the reserved order is conflicting 
+      $this->logger->info($ex->getMessage());
+      return new FailedReserveOrderApiResult(
+        FailedReserveOrderApiResultType::CONFLICTING_ORDER
+      );
+    }
   }
 
   public function getApiType(): ApiType {

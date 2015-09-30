@@ -5,7 +5,8 @@ class IsConflictingReservedOrderMethod {
   public function __construct(
     private FetchReservedOrdersByTimeQuery $fetchReservedOrdersByTimeQuery,
     private FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery,
-    private FetchSingletonQuery<ReservedOrderPolicy> $fetchReservedOrderPolicyQuery
+    private FetchSingletonQuery<ReservedOrderPolicy> $fetchReservedOrderPolicyQuery,
+    private Logger $logger
   ) {}
 
   public function check(
@@ -72,6 +73,30 @@ class IsConflictingReservedOrderMethod {
     UnsignedInt $max_scopes,
     UnsignedInt $scopes_count
   ): bool {
+
+    $timestamp_serializer = new HRTimestampSerializer(
+      new HRDateSerializer(),
+      new HRTimeSerializer()
+    );
+
+    foreach ($time_intervals as $order_interval) {
+      $this->logger->debug("Time interval-order", $order_interval->getScopesCount()->getNumber());
+      $this->logger->debug(
+        "Time interval-start",
+        $timestamp_serializer->serialize(
+          $order_interval->getTimestampSegment()->getStart())
+        );
+      $this->logger->debug(
+        "Time interval-end",
+        $timestamp_serializer->serialize(
+          $order_interval->getTimestampSegment()->getEnd())
+        );
+      $this->logger->debug("");
+    }
+    
+    $this->logger->debug("Max scopes", $max_scopes->getNumber());
+    $this->logger->debug("Scopes count", $scopes_count->getNumber());
+
     $available_scopes_count = $max_scopes->getNumber() - $scopes_count->getNumber();
 
     // Create priority queue that orders by end-time in ascending order.

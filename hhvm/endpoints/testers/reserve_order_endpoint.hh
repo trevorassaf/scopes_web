@@ -6,9 +6,9 @@ function testReserveOrderEndpoint(): void {
   
   $reserve_order_payload = ImmMap{
     "user-id" => 1,
-    "scopes-count" => 1,
-    "start-time"=> "2016-1-1 09:00:00",
-    "end-time"=> "2016-1-1 14:00:00",
+    "scopes-count" => 5,
+    "start-time"=> "2016-1-1 10:00:00",
+    "end-time"=> "2016-1-1 10:30:00",
   };
 
   $api_requester = new ApiRequester();

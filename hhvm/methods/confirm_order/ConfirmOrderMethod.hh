@@ -21,9 +21,7 @@ class ConfirmOrderMethod {
   ): ConfirmedOrder {
     try {
       // Fetch reserved order       
-      $fetch_result = $this->fetchRsvdOrderQuery->fetch(
-        $rsvd_order_id
-      );
+      $fetch_result = $this->fetchRsvdOrderQuery->fetch($rsvd_order_id);
 
       // Block until we fetch the reserved order 
       $rsvd_order = $fetch_result
@@ -34,13 +32,6 @@ class ConfirmOrderMethod {
       if ($rsvd_order === null) {
         throw new NonextantObjectException();
       }
-
-ob_start();
-var_dump($cell_label_list);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("COnfirmOrderMethod::confirm() print cell label list");
-error_log($contents);
 
       // Fail if provided number of cell labels does not equal
       // numer of scopes in reserved order 
@@ -53,7 +44,7 @@ error_log($contents);
 
       // Request passed checks! Insert new confirmed order...
       $confirmed_order_insert_result = $this->confirmedOrderInsertQuery->insert(
-        $rsvd_order->getId(),
+        $rsvd_order->getUserId(),
         $rsvd_order->getScopesCount(),
         $rsvd_order->getTimestampSegment()->getStart(),
         $rsvd_order->getTimestampSegment()->getEnd(),
@@ -70,12 +61,16 @@ error_log($contents);
       
       // Compose insert cell-labels query
       $cell_label_field_map_list = Vector{};
+      $cell_number = 0;
 
       foreach ($cell_label_list as $cell_label_request) {
         $cell_label_field_map_list[] = ImmMap{
           $this->cellLabelsTable->getConfirmedOrderIdKey() => $confirmed_order->getId()->getNumber(),
           $this->cellLabelsTable->getLabelKey() => $cell_label_request->getLabel()->get(),
+          $this->cellLabelsTable->getCellNumberKey() => $cell_number
         };
+
+        ++$cell_number;
       } 
 
       // Execute insert cell-labels query
@@ -84,17 +79,17 @@ error_log($contents);
           $cell_label_field_map_list->toImmVector()
         );
 
-      // Delete rsvd order
-      $delete_rsvd_order_query_handle = $this->deleteByIdQuery->delete(
-        $this->rsvdOrdersTable,
-        $rsvd_order->getId() 
-      );
-
       // Block until cell labels have been inserted
       // and rsvd orders have been deleted
       $cell_label_insert_query_handle
         ->getWaitHandle()
         ->join();
+
+      // Delete rsvd order
+      $delete_rsvd_order_query_handle = $this->deleteByIdQuery->delete(
+        $this->rsvdOrdersTable,
+        $rsvd_order->getId() 
+      );
 
       $delete_rsvd_order_query_handle
         ->getWaitHandle()

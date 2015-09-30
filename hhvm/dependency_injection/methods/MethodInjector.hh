@@ -60,7 +60,8 @@ class MethodInjector {
     private LazyLoader<DateToDayOfTheWeekConverter> $dateToDayOfTheWeekConverterLoader,
     private LazyLoader<TimestampSegmentExpander> $timestampSegmentExpanderLoader,
     private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLoader,
-    private LazyLoader<RsvdOrdersTable> $rsvdOrdersTableLoader
+    private LazyLoader<RsvdOrdersTable> $rsvdOrdersTableLoader,
+    private Logger $logger
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -163,7 +164,8 @@ class MethodInjector {
       $this->isConflictingReservedOrderMethod = new IsConflictingReservedOrderMethod(
         $this->queryInjector->getFetchRsvdOrdersByTimeQuery(),
         $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
-        $this->queryInjector->getFetchReservedOrderPolicyQuery()
+        $this->queryInjector->getFetchReservedOrderPolicyQuery(),
+        $this->logger
       ); 
     } 
     return $this->isConflictingReservedOrderMethod;

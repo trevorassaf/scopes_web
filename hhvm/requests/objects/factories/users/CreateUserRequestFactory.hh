@@ -14,6 +14,7 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
   const int EMAIL_MIN_LENGTH = 7;
   const int EMAIL_MAX_LENGTH = 200;
 
+  // Password constraints
   const int PASSWORD_HASH_MIN_LENGTH = 6;
   const int PASSWORD_HASH_MAX_LENGTH = 30;
 
@@ -39,8 +40,7 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
 
     // Create email field factory
     $email_field_factory_builder = new EmailRequestFieldFactoryBuilder();
-    $this->emailFieldFactory = $email_field_factory_builder
-        ->build();
+    $this->emailFieldFactory = $email_field_factory_builder->build();
     
     // Create password hash field factory
     $password_hash_field_factory_builder = new StringRequestFieldFactoryBuilder();

@@ -2,6 +2,9 @@
 
 class ReserveOrderRequestFactory implements RequestFactory<ReserveOrderRequest> {
 
+  // Scopes count constraints
+  const int SCOPES_COUNT_MIN_VALUE = 1;
+
   private RequestFieldFactory<UnsignedInt> $userIdFieldFactory;
   private RequestFieldFactory<UnsignedInt> $scopesCountFieldFactory;
   private RequestFieldFactory<Timestamp> $startTimeFieldFactory;
@@ -15,7 +18,15 @@ class ReserveOrderRequestFactory implements RequestFactory<ReserveOrderRequest> 
     $this->userIdFieldFactory = $uint_field_factory_builder->build();
 
     // Create scopes count field factory
-    $this->scopesCountFieldFactory = $uint_field_factory_builder->build();
+    $this->scopesCountFieldFactory = $uint_field_factory_builder
+      ->addConstraint(
+        new MinUnsignedIntValueConstraint(
+          new UnsignedInt(
+            self::SCOPES_COUNT_MIN_VALUE
+          )
+        )
+      )
+      ->build();
 
     // Create start time field factory
     $this->startTimeFieldFactory = $this->timestampRequestFieldFactoryBuilder->build();
@@ -25,14 +36,6 @@ class ReserveOrderRequestFactory implements RequestFactory<ReserveOrderRequest> 
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): ReserveOrderRequest {
-
-    ob_start();
-    var_dump($raw_field_map);
-    $contents = ob_get_contents();
-    ob_end_clean();
-    error_log("ReserveOrderRequestFactory::make() raw fields");
-    error_log($contents);
-
     $reserve_order_request_builder = new ReserveOrderRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {

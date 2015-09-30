@@ -116,7 +116,6 @@ class IsValidReservedOrderMethod {
             // Important: we could cache here, but there's not need to b/c 
             // the request is invalid at this point
             if ($regular_edges->isEmpty()) {
-              echo "Rsvd order request failed because regular edge doesn't exist\n";
               return false;
             }
             
@@ -168,7 +167,6 @@ class IsValidReservedOrderMethod {
         $timestamp_segment->toTimeSegment(),
         $allowed_time_intervals->toImmVector())
       ) {
-        echo "Rsvd order request does not satisfy allowed times!\n";
         return false; 
       }
     }

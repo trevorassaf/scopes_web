@@ -18,15 +18,15 @@ class FetchConfirmedOrdersByTimeQuery {
     $fetch_params_builder->setWhereClause(
       $where_clause_vector_builder
         ->setFirstClause(
-          new GreaterThanOrEqualToWhereClause(
+          new LessThanWhereClause(
             $this->confirmedOrdersTable->getStartTimeKey(),
-            $this->timestampSerializer->serialize($interval->getStart())
+            $this->timestampSerializer->serialize($interval->getEnd())
           )
         )
         ->logicalAnd(
-          new LessThanOrEqualToWhereClause(
+          new GreaterThanWhereClause(
             $this->confirmedOrdersTable->getEndTimeKey(),
-            $this->timestampSerializer->serialize($interval->getEnd())
+            $this->timestampSerializer->serialize($interval->getStart())
           )
         )
         ->build()

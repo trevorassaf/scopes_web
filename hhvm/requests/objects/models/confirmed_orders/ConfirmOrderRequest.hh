@@ -80,14 +80,6 @@ class ConfirmOrderRequestBuilder {
   }  
 
   public function setCellLabels(ObjectVectorRequestField<CreateCellLabelRequest> $cell_labels): this {
-
-    ob_start();
-    var_dump($cell_labels);
-    $contents = ob_get_contents();
-    ob_end_clean();
-    error_log("ConfirmOrderRequest::setCellLabels() cell labels");
-    error_log($contents);
-
     // Make sure each label is unique
     $label_set = Set{};
 

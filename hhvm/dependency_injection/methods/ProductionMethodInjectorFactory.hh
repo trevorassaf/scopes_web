@@ -2,6 +2,10 @@
 
 class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
 
+  public function __construct(
+    private Logger $logger
+  ) {}
+
   protected function make(): MethodInjector {
     $production_query_injector_factory = new ProductionQueryInjectorFactory();
     $hr_time_serializer_loader = new HRTimeSerializerLazyLoader();
@@ -36,7 +40,8 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
       $date_to_week_day_converter_laoder,
       $timestamp_segment_expander_loader,
       new ConfirmedOrdersTableLazyLoader(),
-      new ReservedOrdersTableLazyLoader()
+      new ReservedOrdersTableLazyLoader(),
+      $this->logger
     ); 
   }
 }

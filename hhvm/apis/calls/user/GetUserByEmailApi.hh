@@ -15,7 +15,7 @@ class GetUserByEmailApi extends Api<GetUserByEmailRequest> {
 
   protected function processRequestObject(GetUserByEmailRequest $request): ApiResult {
     // Log get user call
-    $this->logger->info("Get user by email api...");
+    $this->logger->info("Get user by email api called...");
     
     // Try to fetch user by email
     $user = $this->getUserByEmailMethod

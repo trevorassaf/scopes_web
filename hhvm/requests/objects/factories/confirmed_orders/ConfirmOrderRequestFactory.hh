@@ -34,16 +34,7 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): ConfirmOrderRequest {
-
-ob_start();
-var_dump($raw_field_map);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("ConfirmOrderRequestFactory::make() raw field map");
-error_log($contents);
-
     $confirmed_order_request_builder = new ConfirmOrderRequestBuilder();
-
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
         case ConfirmOrderRequest::RSVD_ORDER_ID_KEY:

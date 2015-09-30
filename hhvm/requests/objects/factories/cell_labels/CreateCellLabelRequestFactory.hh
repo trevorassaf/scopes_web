@@ -16,14 +16,6 @@ class CreateCellLabelRequestFactory implements RequestFactory<CreateCellLabelReq
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): CreateCellLabelRequest {
-
-ob_start();
-var_dump($raw_field_map);
-$contents = ob_get_contents();
-ob_end_clean();
-error_log("CreateCellLabelRequestFactory::make() cell label");
-error_log($contents);
-
     $cell_label_request_builder = new CreateCellLabelRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {

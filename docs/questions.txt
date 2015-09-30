@@ -1,0 +1,11 @@
+1. Do we want um-kerberos authentication
+  - limitation: only um people can use web service 
+
+2. How to deal with short codes
+  - what to do if a short code fails?
+  - when to charge?
+  - how to reimburse if an experiment fails?
+
+3. How to deliver videos?
+
+4. Charges?
