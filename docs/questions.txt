@@ -9,3 +9,13 @@
 3. How to deliver videos?
 
 4. Charges?
+  - do we charge for hosting videos?
+  - how long do we host for?
+
+5. How long after the experiment will the video be ready?
+6. How do we want to inform user that video is complete?
+7. Do we inform them that experiment has finished (before video is complete)?
+8. What events should admins be notified for?
+  - new orders
+9. How far in advance should an order be placed?
+10. How far in advance can an order be cancelled?
