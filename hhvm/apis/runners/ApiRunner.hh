@@ -20,19 +20,13 @@ class ApiRunner {
     try {
       // Digest request params into request wrapper
       $request_wrapper = $this->requestWrapperFactory->make($request_params);
-      $api_raw_request_fields_string = $request_wrapper->getPayload()->get();
+      $api_payload = $request_wrapper->getPayloadFieldMap();
       
-      // Deserialize payload
-      $api_raw_request_fields = $this
-        ->apiRequestDeserializer
-        ->deserialize(
-          $api_raw_request_fields_string
-        );
 
       // Execute api call
       $api_result = $this->apiRouter->route(
         $request_wrapper->getApiType()->get(),
-        $api_raw_request_fields
+        $api_payload
       );
 
     } catch (RequestException $ex) {

@@ -8,14 +8,11 @@ class ApiRequester {
     ApiType $type,
     ImmMap<string, mixed> $request
   ): string {
-    $json_payload = json_encode($request->toArray());
-    $post_params = ImmMap{
-      "api-type" => (int)$type,
-      "payload" => $json_payload,
-    };
+    $request_map = $request->toMap();
+    $request_map[RequestWrapper::API_TYPE_KEY] = (int)$type;
 
     echo "REQUEST FIELD MAP:\n";
-    var_dump($post_params);
+    var_dump($request_map);
     
     $curl = curl_init();
     curl_setopt_array(
@@ -25,7 +22,7 @@ class ApiRequester {
         CURLOPT_URL => self::URL,
         CURLOPT_USERAGENT => 'Testing scopes web',
         CURLOPT_POST => 1,
-        CURLOPT_POSTFIELDS => $post_params->toArray(),
+        CURLOPT_POSTFIELDS => $request_map->toArray(),
       )
     ); 
 
