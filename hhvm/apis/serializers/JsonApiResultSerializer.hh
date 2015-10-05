@@ -1,8 +1,8 @@
 <?hh // strict
 
-class JsonApiResultSerializer implements ApiResultSerializer {
+class JsonApiResultSerializer extends ApiResultSerializer{
 
-  public function serialize(ApiResult $result): string {
-    return json_encode($result, true);
+  public function __construct() {
+    parent::__construct(new JsonFieldMapSerializer());
   }
 }
