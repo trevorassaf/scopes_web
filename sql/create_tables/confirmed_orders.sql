@@ -12,6 +12,7 @@ CREATE TABLE ConfirmedOrders (
   endTime TIMESTAMP NOT NULL,
   title VARCHAR(40) NOT NULL,
   description VARCHAR(400) NOT NULL,
-  shortCode VARCHAR(40) NOT NULL,
+  shortCodeId INT UNSIGNED NOT NULL,
+  FOREIGN KEY(shortCodeId) REFERENCES ShortCodes(id),
   recordingDurationMinutes INT UNSIGNED NOT NULL
 );

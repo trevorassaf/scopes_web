@@ -4,18 +4,30 @@ use Scopes;
 
 
 -- Model tables
-drop table ReservedOrderPolicy;
-
+-- Available dates/times
 drop table IrregularDates;
 drop table IrregularTimes;
 drop table RegularWeekDays;
 drop table RegularTimes;
 drop table RegularWeekDayRegularTimeEdges;
 
+-- Confirmed orders
 drop table CellLabels;
+
+drop table ConfirmedOrdersWithValidatedShortCodes;
+
 drop table ConfirmedOrders;
+
+drop table ShortCodes;
+
+drop table OrderConfiguration;
+
+-- Reserved orders
 drop table RsvdOrders;
 
+drop table ReservedOrderPolicy;
+
+-- Users
 drop table UserUserPrivilegeEdges;
 drop table UserPrivileges;
 drop table Users;
