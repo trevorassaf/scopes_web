@@ -2,12 +2,17 @@
 
 class FailedConfirmOrderApiResult extends FailedApiResult {
 
-  public int $type;
+  const string TYPE_KEY = "type";
 
   public function __construct(
-    FailedConfirmOrderApiResultType $type
+    private FailedConfirmOrderApiResultType $type
   ) {
     parent::__construct(ApiType::CONFIRM_ORDER);
-    $this->type = (int)$type;
+  }
+
+  protected function getCustomResultFields(): ImmMap<string, mixed> {
+    return ImmMap{
+      self::TYPE_KEY => (int)$this->type,
+    };
   }
 }

@@ -1,13 +1,18 @@
 <?hh // strict
 
 class FailedReserveOrderApiResult extends FailedApiResult {
-
-  public int $type;
+  
+  const string TYPE_KEY = "type";
 
   public function __construct(
-    FailedReserveOrderApiResultType $type
+    private FailedReserveOrderApiResultType $type
   ) {
     parent::__construct(ApiType::RESERVE_ORDER);
-    $this->type = (int)$type;
+  }
+  
+  protected function getCustomResultFields(): ImmMap<string, mixed> {
+    return ImmMap{
+      self::TYPE_KEY => (int)$this->type,
+    };    
   }
 }

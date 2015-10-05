@@ -1,13 +1,13 @@
 <?hh // strict
 
-class ReserveOrderApiResult extends SuccessfulApiResult {
+class CreateUserApiResult extends SuccessfulApiResult {
 
   const string ID_KEY = "id";
 
   public function __construct(
     private UnsignedInt $id
   ) {
-    parent::__construct(ApiType::RESERVE_ORDER);
+    parent::__construct(ApiType::CREATE_USER);
   }
 
   protected function getCustomResultFields(): ImmMap<string, mixed> {

@@ -7,4 +7,8 @@ class SuccessfulApiResult extends ApiResult {
   ) {
     parent::__construct(true, $api_type);
   }
+
+  protected function getCustomResultFields(): ImmMap<string, mixed> {
+    return ImmMap{};
+  }
 }

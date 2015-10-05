@@ -2,12 +2,17 @@
 
 class FailedDeleteConfirmedOrderApiResult extends FailedApiResult {
 
-  public int $type;
+  const string TYPE_KEY = "type";
 
   public function __construct(
-    FailedDeleteConfirmedOrderApiResultType $type
+    private FailedDeleteConfirmedOrderApiResultType $type
   ) {
     parent::__construct(ApiType::DELETE_CONFIRMED_ORDER);
-    $this->type = (int)$type;
+  }
+
+  protected function getCustomResultFields(): ImmMap<string, mixed> {
+    return ImmMap{
+      self::TYPE_KEY => (int)$this->type,
+    };    
   }
 }

@@ -1,6 +1,6 @@
 <?hh // strict
 
-class FailedApiResult extends ApiResult {
+abstract class FailedApiResult extends ApiResult {
 
   public function __construct(
     ApiType $api_type

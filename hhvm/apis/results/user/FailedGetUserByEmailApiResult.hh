@@ -1,15 +1,15 @@
 <?hh // strict
 
-class FailedDeleteReservedOrderApiResult extends FailedApiResult {
-
+class FailedGetUserByEmailApiResult extends FailedApiResult {
+  
   const string TYPE_KEY = "type";
 
   public function __construct(
-    private FailedDeleteReservedOrderApiResultType $type
+    private FailedGetUserByEmailApiResultType $type
   ) {
-    parent::__construct(ApiType::DELETE_RESERVED_ORDER);
+    parent::__construct(ApiType::GET_USER);
   }
-  
+
   protected function getCustomResultFields(): ImmMap<string, mixed> {
     return ImmMap{
       self::TYPE_KEY => (int)$this->type,

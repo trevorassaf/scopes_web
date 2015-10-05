@@ -2,12 +2,17 @@
 
 class FailedDeleteCellLabelApiResult extends FailedApiResult {
 
-  public int $type;
+  const string TYPE_KEY = "type";
 
   public function __construct(
-    FailedDeleteCellLabelApiResultType $type
+    private FailedDeleteCellLabelApiResultType $type
   ) {
     parent::__construct(ApiType::DELETE_CELL_LABEL);
-    $this->type  = (int)$type;
+  }
+
+  protected function getCustomResultFields(): ImmMap<string, mixed> {
+    return ImmMap{
+      self::TYPE_KEY => (int)$this->type, 
+    };
   }
 }
