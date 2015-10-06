@@ -14,8 +14,10 @@ source create_tables/order_configuration.sql
 
 source create_tables/short_codes.sql
 source create_tables/confirmed_orders.sql
-source create_tables/confirmed_orders_with_validated_short_code.sql
-source create_tables/transacted_confirmed_orders.sql
+
+source create_tables/confirmed_order_short_code_validation_checks.sql
+source create_tables/confirmed_order_transactions.sql
+source create_tables/failed_confirmed_order_transactions.sql
 
 source create_tables/cell_labels.sql
 

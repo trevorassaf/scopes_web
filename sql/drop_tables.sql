@@ -12,8 +12,11 @@ drop table RegularWeekDayRegularTimeEdges;
 
 -- Confirmed orders
 drop table CellLabels;
-drop table TransactedConfirmedOrders;
-drop table ConfirmedOrdersWithValidatedShortCodes;
+
+drop table ConfirmedOrderTransactions;
+drop table ConfirmedOrderFailedTransactions;
+drop table ConfirmedOrderShortCodeValidationChecks;
+
 drop table ConfirmedOrders;
 drop table ShortCodes;
 drop table OrderConfiguration;
