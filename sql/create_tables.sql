@@ -13,10 +13,9 @@ source create_tables/rsvd_orders.sql
 source create_tables/order_configuration.sql
 
 source create_tables/short_codes.sql
-
 source create_tables/confirmed_orders.sql
-
 source create_tables/confirmed_orders_with_validated_short_code.sql
+source create_tables/transacted_confirmed_orders.sql
 
 source create_tables/cell_labels.sql
 

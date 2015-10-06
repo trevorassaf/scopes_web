@@ -1,6 +1,8 @@
 /* 
  * ConfirmedOrders table creation
  *  - m/m: users, o/m: CellLabel 
+ *  - Application layer responsibilities:
+ *    - 'shortCodeId' should belong to user indicated by 'userId'
  */
 CREATE TABLE ConfirmedOrders (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,

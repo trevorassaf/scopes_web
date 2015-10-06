@@ -2,7 +2,6 @@
 
 use Scopes;
 
-
 -- Model tables
 -- Available dates/times
 drop table IrregularDates;
@@ -13,18 +12,14 @@ drop table RegularWeekDayRegularTimeEdges;
 
 -- Confirmed orders
 drop table CellLabels;
-
+drop table TransactedConfirmedOrders;
 drop table ConfirmedOrdersWithValidatedShortCodes;
-
 drop table ConfirmedOrders;
-
 drop table ShortCodes;
-
 drop table OrderConfiguration;
 
 -- Reserved orders
 drop table RsvdOrders;
-
 drop table ReservedOrderPolicy;
 
 -- Users
