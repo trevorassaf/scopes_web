@@ -1,5 +1,5 @@
 /* 
- * Transacted confirmed orders table
+ * Failed transacted confirmed orders table
  */
 CREATE TABLE FailedConfirmedOrderTransactions (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
