@@ -15,7 +15,7 @@ class ConfirmOrderMethod {
     UnsignedInt $rsvd_order_id,
     string $title,
     string $description,
-    string $short_code,
+    UnsignedInt $short_code_id,
     UnsignedInt $recording_duration,
     ImmVector<CreateCellLabelRequest> $cell_label_list
   ): ConfirmedOrder {
@@ -50,7 +50,7 @@ class ConfirmOrderMethod {
         $rsvd_order->getTimestampSegment()->getEnd(),
         $title,
         $description,
-        $short_code,
+        $short_code_id,
         $recording_duration
       );
 

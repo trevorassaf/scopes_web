@@ -5,7 +5,7 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
   private RequestFieldFactory<UnsignedInt> $reserveOrderIdFieldFactory;
   private RequestFieldFactory<string> $titleFieldFactory;
   private RequestFieldFactory<string> $descriptionFieldFactory;
-  private RequestFieldFactory<string> $shortCodeFieldFactory;
+  private RequestFieldFactory<UnsignedInt> $shortCodeIdFieldFactory;
   private RequestFieldFactory<UnsignedInt> $recordingDurationFieldFactory;
   private ObjectVectorRequestFieldFactory<CreateCellLabelRequest> $cellLabelsRequestFieldFactory;
 
@@ -26,7 +26,7 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
     $this->descriptionFieldFactory = $string_field_factory_builder->build();
 
     // Create short coding field factory
-    $this->shortCodeFieldFactory = $string_field_factory_builder->build();
+    $this->shortCodeIdFieldFactory = $uint_field_factory_builder->build();
 
     // Create cell label request
     $cell_label_vector_factory_builder = new CreateCellLabelVectorRequestFieldFactoryBuilder();
@@ -53,8 +53,8 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
           );
           break;
         case ConfirmOrderRequest::SHORT_CODE_KEY:
-          $confirmed_order_request_builder->setShortCode(
-            $this->shortCodeFieldFactory->make($key, $value)
+          $confirmed_order_request_builder->setShortCodeId(
+            $this->shortCodeIdFieldFactory->make($key, $value)
           );
           break;
         case ConfirmOrderRequest::RECORDING_DURATION_KEY:

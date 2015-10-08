@@ -9,7 +9,7 @@ class ConfirmedOrder implements Model {
     private TimestampSegment $timestampSegment,
     private string $title,
     private string $description,
-    private string $shortCode,
+    private UnsignedInt $shortCodeId,
     private UnsignedInt $recordingDuration
   ) {}
 
@@ -38,8 +38,8 @@ class ConfirmedOrder implements Model {
     return $this->description;
   }
 
-  public function getShortCode(): string {
-    return $this->shortCode;
+  public function getShortCodeId(): UnsignedInt {
+    return $this->shortCodeId;
   }
 
   public function getRecordingDuration(): UnsignedInt {

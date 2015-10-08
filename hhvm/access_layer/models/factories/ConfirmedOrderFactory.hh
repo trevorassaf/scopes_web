@@ -21,7 +21,7 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
       ),
       (string)$params[$this->confirmedOrdersTable->getTitleKey()],
       (string)$params[$this->confirmedOrdersTable->getDescriptionKey()],
-      (string)$params[$this->confirmedOrdersTable->getShortCodeKey()],
+      new UnsignedInt((int)$params[$this->confirmedOrdersTable->getShortCodeIdKey()]),
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getRecordingDurationKey()])
     );
   }

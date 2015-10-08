@@ -24,7 +24,7 @@ class ConfirmOrderApi extends Api<ConfirmOrderRequest> {
         $request->getRsvdOrderId()->get(),
         $request->getTitle()->get(),
         $request->getDescription()->get(),
-        $request->getShortCode()->get(),
+        $request->getShortCodeId()->get(),
         $request->getRecordingDuration()->get(),
         $request->getCellLabelRequests()->get()
       );

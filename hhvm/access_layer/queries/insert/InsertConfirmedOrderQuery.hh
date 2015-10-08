@@ -15,7 +15,7 @@ class InsertConfirmedOrderQuery {
     Timestamp $end_time,
     string $title,
     string $description,
-    string $short_code,
+    UnsignedInt $short_code_id,
     UnsignedInt $recording_duration
   ): Awaitable<ConfirmedOrder> {
     return await $this->insertQuery->insert(
@@ -26,10 +26,9 @@ class InsertConfirmedOrderQuery {
         $this->confirmedOrdersTable->getEndTimeKey() => $this->timestampSerializer->serialize($end_time),
         $this->confirmedOrdersTable->getTitleKey() => $title,
         $this->confirmedOrdersTable->getDescriptionKey() => $description,
-        $this->confirmedOrdersTable->getShortCodeKey() => $short_code,
+        $this->confirmedOrdersTable->getShortCodeIdKey() => $short_code_id->getNumber(),
         $this->confirmedOrdersTable->getRecordingDurationKey() => $recording_duration->getNumber(),
       }
     );  
   }
-
 }

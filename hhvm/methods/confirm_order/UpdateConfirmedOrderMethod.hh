@@ -25,7 +25,7 @@ class UpdateConfirmedOrderMethod {
 
     $short_code_field = $request->getShortCode();
     if ($short_code_field !== null) {
-      $update_field_map[$this->table->getShortCodeKey()] = $short_code_field->get();
+      $update_field_map[$this->table->getShortCodeIdKey()] = $short_code_field->get();
     }
 
     $recording_duration_field = $request->getRecordingDuration();

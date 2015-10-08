@@ -9,6 +9,7 @@ class ConfirmedOrdersTable extends Table {
   const string END_TIME_KEY = "endTime";
   const string TITLE_KEY = "title";
   const string DESCRIPTION_KEY = "description";
+  const string SHORT_CODE_ID_KEY = "shortCodeId";
   const string RECORDING_DURATION_KEY = "recordingDurationMinutes";
 
   public function getName(): string {
@@ -37,6 +38,10 @@ class ConfirmedOrdersTable extends Table {
   
   public function getDescriptionKey(): string {
     return self::DESCRIPTION_KEY;
+  }
+
+  public function getShortCodeIdKey(): string {
+    return self::SHORT_CODE_ID_KEY;
   }
 
   public function getRecordingDurationKey(): string {

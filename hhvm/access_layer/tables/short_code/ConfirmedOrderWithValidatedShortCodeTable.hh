@@ -1,6 +1,6 @@
 <?hh // strict
 
-class ConfirmedOrderWithValidatedShortCode extends Table {
+class ConfirmedOrderWithValidatedShortCodeTable extends Table {
 
   const string TABLE_NAME = "ConfirmedOrderWithValidatedShortCode";
   const string CONFIRMED_ORDER_ID_KEY = "confirmedOrderId";

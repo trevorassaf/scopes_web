@@ -7,7 +7,7 @@ class ConfirmOrderRequest {
   const string RSVD_ORDER_ID_KEY = 'rid';
   const string TITLE_KEY = 'title';
   const string DESCRIPTION_KEY = 'desc';
-  const string SHORT_CODE_KEY = 'code';
+  const string SHORT_CODE_KEY = 'code-id';
   const string RECORDING_DURATION_KEY = 'duration';
   const string CELL_LABEL_REQUESTS_KEY = 'labels';
 
@@ -15,7 +15,7 @@ class ConfirmOrderRequest {
     private RequestField<UnsignedInt> $rsvdOrderId,
     private RequestField<string> $title,
     private RequestField<string> $description,
-    private RequestField<string> $shortCode,
+    private RequestField<UnsignedInt> $shortCodeId,
     private RequestField<UnsignedInt> $recordingDuration,
     private ObjectVectorRequestField<CreateCellLabelRequest> $cellLabelRequests
   ) {}
@@ -32,8 +32,8 @@ class ConfirmOrderRequest {
     return $this->description;
   }
 
-  public function getShortCode(): RequestField<string> {
-    return $this->shortCode;
+  public function getShortCodeId(): RequestField<UnsignedInt> {
+    return $this->shortCodeId;
   }
 
   public function getRecordingDuration(): RequestField<UnsignedInt> {
@@ -50,7 +50,7 @@ class ConfirmOrderRequestBuilder {
   private ?RequestField<UnsignedInt> $rsvdOrderId;
   private ?RequestField<string> $title;
   private ?RequestField<string> $description;
-  private ?RequestField<string> $shortCode;
+  private ?RequestField<UnsignedInt> $shortCodeId;
   private ?RequestField<UnsignedInt> $recordingDuration;
   private ?ObjectVectorRequestField<CreateCellLabelRequest> $cellLabels;
 
@@ -69,8 +69,8 @@ class ConfirmOrderRequestBuilder {
     return $this;
   }
   
-  public function setShortCode(RequestField<string> $short_code): this {
-    $this->shortCode = $short_code;
+  public function setShortCodeId(RequestField<UnsignedInt> $short_code_id): this {
+    $this->shortCodeId = $short_code_id;
     return $this;
   }
 
@@ -115,7 +115,7 @@ class ConfirmOrderRequestBuilder {
       $this->checkNotNull($this->rsvdOrderId, ConfirmOrderRequest::RSVD_ORDER_ID_KEY),
       $this->checkNotNull($this->title, ConfirmOrderRequest::TITLE_KEY),
       $this->checkNotNull($this->description, ConfirmOrderRequest::DESCRIPTION_KEY),
-      $this->checkNotNull($this->shortCode, ConfirmOrderRequest::SHORT_CODE_KEY),
+      $this->checkNotNull($this->shortCodeId, ConfirmOrderRequest::SHORT_CODE_KEY),
       $this->checkNotNull($this->recordingDuration, ConfirmOrderRequest::RECORDING_DURATION_KEY),
       $this->checkNotNull($this->cellLabels, ConfirmOrderRequest::CELL_LABEL_REQUESTS_KEY)
     );
