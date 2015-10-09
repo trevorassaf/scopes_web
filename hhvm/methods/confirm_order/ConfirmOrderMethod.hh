@@ -4,6 +4,7 @@ class ConfirmOrderMethod {
 
   public function __construct(
     private FetchByIdQuery<RsvdOrder> $fetchRsvdOrderQuery,
+    private FetchIsUserOwnedShortCodeQuery $fetchIsUserOwnedShortCodeQuery,
     private InsertConfirmedOrderQuery $confirmedOrderInsertQuery,
     private BatchInsertQuery<CellLabel> $cellLabelBatchInsertQuery,
     private DeleteByIdQuery $deleteByIdQuery,
@@ -31,6 +32,17 @@ class ConfirmOrderMethod {
       // Fail if we can't find reserved order
       if ($rsvd_order === null) {
         throw new NonextantObjectException();
+      }
+
+      // Fail if short code does not belong to this user
+      if (await $this->fetchIsUserOwnedShortCodeQuery->fetch(
+        $rsvd_order->getUserId(),
+        $short_code_id)
+      ) {
+        throw new UnownedShortCodeException(
+          $rsvd_order->getUserId(),
+          $short_code_id
+        );
       }
 
       // Fail if provided number of cell labels does not equal

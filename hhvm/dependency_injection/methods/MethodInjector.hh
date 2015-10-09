@@ -223,6 +223,7 @@ class MethodInjector {
     if ($this->confirmOrderMethod === null) {
       $this->confirmOrderMethod = new ConfirmOrderMethod(
         $this->queryInjector->getFetchRsvdOrderByIdQuery(),
+        $this->queryInjector->getFetchIsUserOwnedShortCodeQuery(),
         $this->queryInjector->getConcreteInsertConfirmedOrderQuery(),
         $this->queryInjector->getBatchInsertCellLabelsQuery(),
         $this->queryInjector->getDeleteByIdQuery(),

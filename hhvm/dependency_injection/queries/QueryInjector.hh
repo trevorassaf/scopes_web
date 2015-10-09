@@ -63,6 +63,9 @@ class QueryInjector {
   private ?InsertConfirmedOrderQuery $concreteInsertConfirmedOrderQuery;
   private ?FetchUsersConfirmedOrdersQuery $fetchUsersConfirmedOrdersQuery;
   private ?FetchConfirmedOrderCellLabelsQuery $fetchConfirmedOrderCellLabelsQuery;
+  private ?FetchIsUserOwnedShortCodeQuery $fetchIsUserOwnedShortCodeQuery;
+  private ?FetchUserShortCodesQuery $fetchUserShortCodesQuery;
+  private ?FetchQuery<ShortCode> $fetchShortCodesQuery;
 
   // Reserved order policy queries
   private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
@@ -100,7 +103,9 @@ class QueryInjector {
     private LazyLoader<ConcreteModelFactory<ReservedOrderPolicy>> $rsvdOrderPolicyModelFactoryLazyLoader,
     private LazyLoader<CellLabelsTable> $cellLabelsTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<CellLabel>> $cellLabelModelFactoryLazyLoader,
-    private LazyLoader<QueryExceptionFactory> $queryExceptionFactoryLazyLoader
+    private LazyLoader<QueryExceptionFactory> $queryExceptionFactoryLazyLoader,
+    private LazyLoader<ShortCodeTable> $shortCodeTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<ShortCode>> $shortCodeModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -606,6 +611,36 @@ class QueryInjector {
       ); 
     }
     return $this->fetchConfirmedOrderCellLabelsQuery;
+  }
+
+  public function getFetchShortCodesQuery(): FetchQuery<ShortCode> {
+    if ($this->fetchShortCodesQuery === null) {
+      $this->fetchShortCodesQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->shortCodeModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->fetchShortCodesQuery;
+  }
+
+  public function getFetchUserShortCodesQuery(): FetchUserShortCodesQuery {
+    if ($this->fetchUserShortCodesQuery === null) {
+      $this->fetchUserShortCodesQuery = new FetchUserShortCodesQuery(
+        $this->getFetchShortCodesQuery(),
+        $this->shortCodeTableLazyLoader->load()
+      );
+    }
+    return $this->fetchUserShortCodesQuery;
+  }
+
+  public function getFetchIsUserOwnedShortCodeQuery(): FetchIsUserOwnedShortCodeQuery {
+    if ($this->fetchIsUserOwnedShortCodeQuery === null) {
+      $this->fetchIsUserOwnedShortCodeQuery = new FetchIsUserOwnedShortCodeQuery(
+        $this->getFetchUserShortCodesQuery()
+      ); 
+    }
+    return $this->fetchIsUserOwnedShortCodeQuery;
   }
 
   /**
