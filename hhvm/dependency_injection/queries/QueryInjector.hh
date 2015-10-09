@@ -65,7 +65,10 @@ class QueryInjector {
   private ?FetchConfirmedOrderCellLabelsQuery $fetchConfirmedOrderCellLabelsQuery;
   private ?FetchIsUserOwnedShortCodeQuery $fetchIsUserOwnedShortCodeQuery;
   private ?FetchUserShortCodesQuery $fetchUserShortCodesQuery;
+  
+  // Short codes
   private ?FetchQuery<ShortCode> $fetchShortCodesQuery;
+  private ?InsertQuery<ShortCode> $insertShortCodeQuery;
 
   // Reserved order policy queries
   private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
@@ -622,6 +625,19 @@ class QueryInjector {
       );
     }
     return $this->fetchShortCodesQuery;
+  }
+
+  public function getInsertShortCodeQuery(): InsertQuery<ShortCode> {
+    if ($this->insertShortCodeQuery === null) {
+      $this->insertShortCodeQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->shortCodeTableLazyLoader->load(),
+        $this->shortCodeModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+   return $this->insertShortCodeQuery; 
   }
 
   public function getFetchUserShortCodesQuery(): FetchUserShortCodesQuery {

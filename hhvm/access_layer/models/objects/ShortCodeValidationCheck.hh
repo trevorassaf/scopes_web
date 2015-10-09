@@ -1,10 +1,10 @@
 <?hh // strict
 
-class ConfirmedOrderShortCodeValidationCheck implements Model {
+class ShortCodeValidationCheck implements Model {
 
   public function __construct(
     private UnsignedInt $id,
-    private UnsignedInt $confirmedOrderId,
+    private UnsignedInt $shortCodeId,
     private Timestamp $timeChecked,
     private bool $isValid
   ) {}
@@ -13,8 +13,8 @@ class ConfirmedOrderShortCodeValidationCheck implements Model {
     return $this->id;
   }
 
-  public function getConfirmedOrderId(): UnsignedInt {
-    return $this->confirmedOrderId;
+  public function getShortCodeId(): UnsignedInt {
+    return $this->shortCodeId;
   }
 
   public function getTimeChecked(): Timestamp {

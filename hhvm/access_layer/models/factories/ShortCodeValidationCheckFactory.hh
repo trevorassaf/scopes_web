@@ -1,19 +1,19 @@
 <?hh // strict
 
-class ConfirmedOrderShortCodeValidationCheckFactory extends ConcreteModelFactory<ConfirmedOrderShortCodeValidationCheck> {
+class ShortCodeValidationCheckFactory extends ConcreteModelFactory<ShortCodeValidationCheck> {
 
   public function __construct(
-    private ConfirmedOrderShortCodeValidationCheckTable $table,
+    private ShortCodeValidationCheckTable $table,
     private HRTimestampSerializer $hrTimestampSerializer
   ) {}
 
   public function extrudeWithId(
     UnsignedInt $id,
     ImmMap<string, mixed> $params
-  ): ConfirmedOrderShortCodeValidationCheck {
-    return new ConfirmedOrderShortCodeValidationCheck(
+  ): ShortCodeValidationCheck {
+    return new ShortCodeValidationCheck(
       $id,
-      new UnsignedInt((int)$params[$this->table->getConfirmedOrderIdKey()]),
+      new UnsignedInt((int)$params[$this->table->getShortCodeIdKey()]),
       $this->hrTimestampSerializer->deserialize(
         (string)$params[$this->table->getTimeCheckedKey()]
       ),

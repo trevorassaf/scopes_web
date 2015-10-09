@@ -1,9 +1,9 @@
 <?hh // strict
 
-class ConfirmedOrderShortCodeValidationCheckTable extends Table {
+class ShortCodeValidationCheckTable extends Table {
 
-  const string TABLE_NAME = "ConfirmedOrderShortCodeValidationChecks";
-  const string CONFIRMED_ORDER_ID_KEY = "confirmedOrderId";
+  const string TABLE_NAME = "ShortCodeValidationChecks";
+  const string SHORT_CODE_ID_KEY = "shortCodeId";
   const string TIME_CHECKED_KEY = "timeChecked";
   const string IS_VALID_KEY = "isValid";
 
@@ -11,8 +11,8 @@ class ConfirmedOrderShortCodeValidationCheckTable extends Table {
     return self::TABLE_NAME;
   }
 
-  public function getConfirmedOrderIdKey(): string {
-    return self::CONFIRMED_ORDER_ID_KEY;
+  public function getShortCodeIdKey(): string {
+    return self::SHORT_CODE_ID_KEY;
   }
 
   public function getTimeCheckedKey(): string {
