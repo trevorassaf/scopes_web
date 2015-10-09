@@ -15,7 +15,10 @@ drop table ConfirmedOrderTransactions;
 drop table ConfirmedOrderFailedTransactions;
 
 drop table CellLabels;
+drop table CompositeVideos;
 drop table EditedVideoOrders;
+
+drop table BasicVideos;
 drop table ConfirmedOrders;
 
 drop table OrderConfiguration;

@@ -16,7 +16,10 @@ source create_tables/rsvd_orders.sql
 source create_tables/order_configuration.sql
 
 source create_tables/confirmed_orders.sql
+source create_tables/basic_videos.sql
+
 source create_tables/edited_video_orders.sql
+source create_tables/composite_videos.sql
 source create_tables/cell_labels.sql
 
 source create_tables/confirmed_order_transactions.sql
