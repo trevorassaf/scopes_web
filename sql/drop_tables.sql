@@ -11,19 +11,22 @@ drop table RegularTimes;
 drop table RegularWeekDayRegularTimeEdges;
 
 -- Confirmed orders
-drop table CellLabels;
-
 drop table ConfirmedOrderTransactions;
 drop table ConfirmedOrderFailedTransactions;
-drop table ConfirmedOrderShortCodeValidationChecks;
 
+drop table CellLabels;
+drop table EditedVideoOrders;
 drop table ConfirmedOrders;
-drop table ShortCodes;
+
 drop table OrderConfiguration;
 
 -- Reserved orders
 drop table RsvdOrders;
 drop table ReservedOrderPolicy;
+
+-- Short Codes
+drop table ShortCodeValidationChecks;
+drop table ShortCodes;
 
 -- Users
 drop table UserUserPrivilegeEdges;

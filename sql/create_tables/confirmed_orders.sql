@@ -1,6 +1,8 @@
-/* 
+/** 
  * ConfirmedOrders table creation
- *  - m/m: users, o/m: CellLabel 
+ *  - Relationships:
+ *    - o/m: users  
+ *    - o/o: ConfirmedOrder
  *  - Application layer responsibilities:
  *    - 'shortCodeId' should belong to user indicated by 'userId'
  */
@@ -16,5 +18,5 @@ CREATE TABLE ConfirmedOrders (
   description VARCHAR(400) NOT NULL,
   shortCodeId INT UNSIGNED NOT NULL,
   FOREIGN KEY(shortCodeId) REFERENCES ShortCodes(id),
-  recordingDurationMinutes INT UNSIGNED NOT NULL
+  price DECIMAL(6,2) UNSIGNED NOT NULL
 );
