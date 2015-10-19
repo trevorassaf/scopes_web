@@ -28,7 +28,7 @@ class ApiInjector {
     private LazyLoader<RequestFactory<CreateUserRequest>> $createUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUserByEmailRequest>> $getUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<ReserveOrderRequest>> $reserveOrderRequestFactoryLoader,
-    private LazyLoader<RequestFactory<ConfirmOrderRequest>> $confirmOrderRequestFactoryLoader,
+    private LazyLoader<RequestFactory<ConfirmOrderApiRequest>> $confirmOrderRequestFactoryLoader,
     private LazyLoader<RequestFactory<UpdateConfirmedOrderRequest>> $updateConfirmedOrderRequestLoader,
     private LazyLoader<RequestFactory<UpdateCellLabelRequest>> $updateCellLabelRequestLoader,
     private LazyLoader<RequestFactory<DeleteCellLabelRequest>> $deleteCellLabelRequestLoader,

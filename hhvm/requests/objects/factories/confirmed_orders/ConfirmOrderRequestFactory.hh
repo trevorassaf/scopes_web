@@ -1,13 +1,12 @@
 <?hh // strict
 
-class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> {
+class ConfirmOrderApiRequestFactory implements RequestFactory<ConfirmOrderApiRequest> {
 
   private RequestFieldFactory<UnsignedInt> $reserveOrderIdFieldFactory;
   private RequestFieldFactory<string> $titleFieldFactory;
   private RequestFieldFactory<string> $descriptionFieldFactory;
   private RequestFieldFactory<UnsignedInt> $shortCodeIdFieldFactory;
-  private RequestFieldFactory<UnsignedInt> $recordingDurationFieldFactory;
-  private ObjectVectorRequestFieldFactory<CreateCellLabelRequest> $cellLabelsRequestFieldFactory;
+  private EditedVideoOrderApiRequestFactory $editedVideoOrderRequestFactory;
 
   public function __construct() {
     $uint_field_factory_builder = new UnsignedIntRequestFieldFactoryBuilder();
@@ -15,9 +14,6 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
 
     // Create reserve order id field factory 
     $this->reserveOrderIdFieldFactory = $uint_field_factory_builder->build();
-
-    // Create recording duration field factory
-    $this->recordingDurationFieldFactory = $uint_field_factory_builder->build();
 
     // Create title field factory
     $this->titleFieldFactory = $string_field_factory_builder->build();
@@ -28,43 +24,32 @@ class ConfirmOrderRequestFactory implements RequestFactory<ConfirmOrderRequest> 
     // Create short coding field factory
     $this->shortCodeIdFieldFactory = $uint_field_factory_builder->build();
 
-    // Create cell label request
-    $cell_label_vector_factory_builder = new CreateCellLabelVectorRequestFieldFactoryBuilder();
-    $this->cellLabelsRequestFieldFactory = $cell_label_vector_factory_builder->build();
+    // Create edited-video-order-request-factory
+    $this->editedVideoOrderRequestFactory = new EditedVideoOrderApiRequestFactory();
   }
 
-  public function make(ImmMap<string, mixed> $raw_field_map): ConfirmOrderRequest {
-    $confirmed_order_request_builder = new ConfirmOrderRequestBuilder();
+  public function make(ImmMap<string, mixed> $raw_field_map): ConfirmOrderApiRequest {
+    $confirmed_order_request_builder = new ConfirmOrderApiRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
-        case ConfirmOrderRequest::RSVD_ORDER_ID_KEY:
+        case ConfirmOrderApiRequest::RSVD_ORDER_ID_KEY:
           $confirmed_order_request_builder->setRsvdOrderId(
             $this->reserveOrderIdFieldFactory->make($key, $value)
           );
           break;
-        case ConfirmOrderRequest::TITLE_KEY:
+        case ConfirmOrderApiRequest::TITLE_KEY:
           $confirmed_order_request_builder->setTitle(
             $this->titleFieldFactory->make($key, $value)
           );
           break;
-        case ConfirmOrderRequest::DESCRIPTION_KEY:
+        case ConfirmOrderApiRequest::DESCRIPTION_KEY:
           $confirmed_order_request_builder->setDescription(
             $this->descriptionFieldFactory->make($key, $value)
           );
           break;
-        case ConfirmOrderRequest::SHORT_CODE_KEY:
+        case ConfirmOrderApiRequest::SHORT_CODE_KEY:
           $confirmed_order_request_builder->setShortCodeId(
             $this->shortCodeIdFieldFactory->make($key, $value)
-          );
-          break;
-        case ConfirmOrderRequest::RECORDING_DURATION_KEY:
-          $confirmed_order_request_builder->setRecordingDuration(
-            $this->recordingDurationFieldFactory->make($key, $value)
-          );
-          break;
-        case ConfirmOrderRequest::CELL_LABEL_REQUESTS_KEY:
-          $confirmed_order_request_builder->setCellLabels(
-            $this->cellLabelsRequestFieldFactory->make($key, $value)
           );
           break;
         default:

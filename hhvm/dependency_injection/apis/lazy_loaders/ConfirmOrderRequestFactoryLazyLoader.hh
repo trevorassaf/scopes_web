@@ -1,8 +1,8 @@
 <?hh // strict
 
-class ConfirmOrderRequestFactoryLazyLoader extends LazyLoader<ConfirmOrderRequestFactory> {
+class ConfirmOrderApiRequestFactoryLazyLoader extends LazyLoader<ConfirmOrderApiRequestFactory> {
 
-  protected function make(): ConfirmOrderRequestFactory {
-    return new ConfirmOrderRequestFactory();    
+  protected function make(): ConfirmOrderApiRequestFactory {
+    return new ConfirmOrderApiRequestFactory();    
   }
 }

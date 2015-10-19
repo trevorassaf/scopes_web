@@ -1,8 +1,8 @@
 <?hh // strict
 
-class CreateCellLabelVectorRequestFieldFactoryBuilder extends ObjectVectorRequestFieldFactoryBuilder<CreateCellLabelRequest> {
+class CreateCellLabelVectorApiRequestFieldFactoryBuilder extends ObjectVectorApiRequestFieldFactoryBuilder<CreateCellLabelApiRequest> {
 
   public function __construct() {
-    parent::__construct(new CreateCellLabelRequestFactory());
+    parent::__construct(new CreateCellLabelApiRequestFactory());
   }
 }

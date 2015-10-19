@@ -23,7 +23,7 @@ class DeleteConfirmedOrderMethod {
           $where_clause_builder
             ->setFirstClause(
               new EqualsWhereClause(
-                $this->cellLabelsTable->getConfirmedOrderIdKey(),
+                $this->cellLabelsTable->getEditedVideoOrderIdKey(),
                 $confirmed_order_id->getNumber()
               ) 
             )

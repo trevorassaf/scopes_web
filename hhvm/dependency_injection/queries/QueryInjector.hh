@@ -65,6 +65,10 @@ class QueryInjector {
   private ?FetchConfirmedOrderCellLabelsQuery $fetchConfirmedOrderCellLabelsQuery;
   private ?FetchIsUserOwnedShortCodeQuery $fetchIsUserOwnedShortCodeQuery;
   private ?FetchUserShortCodesQuery $fetchUserShortCodesQuery;
+
+  // Edited video order queries
+  private ?InsertQuery<EditedVideoOrder> $insertEditedVideoOrderQuery;
+  private ?InsertEditedVideoOrderQuery $concreteInsertEditedVideoOrderQuery;
   
   // Short codes
   private ?FetchQuery<ShortCode> $fetchShortCodesQuery;
@@ -108,7 +112,9 @@ class QueryInjector {
     private LazyLoader<ConcreteModelFactory<CellLabel>> $cellLabelModelFactoryLazyLoader,
     private LazyLoader<QueryExceptionFactory> $queryExceptionFactoryLazyLoader,
     private LazyLoader<ShortCodeTable> $shortCodeTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<ShortCode>> $shortCodeModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<ShortCode>> $shortCodeModelFactoryLazyLoader,
+    private LazyLoader<EditedVideoOrderTable> $editedVideoOrderTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<EditedVideoOrder>> $editedVideoOrderModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -614,6 +620,29 @@ class QueryInjector {
       ); 
     }
     return $this->fetchConfirmedOrderCellLabelsQuery;
+  }
+
+  public function getInsertEditedVideoOrderQuery(): InsertQuery<EditedVideoOrder> {
+    if ($this->insertEditedVideoOrderQuery === null) {
+      $this->insertEditedVideoOrderQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->editedVideoOrderTableLazyLoader->load(),
+        $this->editedVideoOrderModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertEditedVideoOrderQuery;
+  }
+
+  public function getConcreteInsertEditedVideoOrderQuery(): InsertEditedVideoOrderQuery {
+    if ($this->concreteInsertEditedVideoOrderQuery === null) {
+      $this->concreteInsertEditedVideoOrderQuery = new InsertEditedVideoOrderQuery(
+        $this->getInsertEditedVideoOrderQuery(),
+        $this->editedVideoOrderTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertEditedVideoOrderQuery;
   }
 
   public function getFetchShortCodesQuery(): FetchQuery<ShortCode> {

@@ -225,6 +225,7 @@ class MethodInjector {
         $this->queryInjector->getFetchRsvdOrderByIdQuery(),
         $this->queryInjector->getFetchIsUserOwnedShortCodeQuery(),
         $this->queryInjector->getConcreteInsertConfirmedOrderQuery(),
+        $this->queryInjector->getConcreteInsertEditedVideoOrderQuery(),
         $this->queryInjector->getBatchInsertCellLabelsQuery(),
         $this->queryInjector->getDeleteByIdQuery(),
         $this->cellsLabelTableLoader->load(),

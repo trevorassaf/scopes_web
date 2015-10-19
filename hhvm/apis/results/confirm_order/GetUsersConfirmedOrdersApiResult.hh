@@ -29,6 +29,7 @@ class GetUsersConfirmedOrdersApiResult extends SuccessfulApiResult {
 
   protected function getCustomResultFields(): ImmMap<string, mixed> {
     $order_vector = Vector{};
+    /*
     foreach ($this->orders as $order_with_cell_labels) {
       
       // Assemble cell label list payload for this order
@@ -58,7 +59,7 @@ class GetUsersConfirmedOrdersApiResult extends SuccessfulApiResult {
         self::CONFIRMED_ORDER_CELL_LABELS_KEY => $cell_label_vector->toImmVector()
       };
     }
-
+     */
     return ImmMap{
       self::CONFIRMED_ORDERS_LIST_KEY => $order_vector->toImmVector(),
     };

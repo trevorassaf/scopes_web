@@ -28,11 +28,6 @@ class UpdateConfirmedOrderMethod {
       $update_field_map[$this->table->getShortCodeIdKey()] = $short_code_field->get();
     }
 
-    $recording_duration_field = $request->getRecordingDuration();
-    if ($recording_duration_field !== null) {
-      $update_field_map[$this->table->getRecordingDurationKey()] = $recording_duration_field->get();
-    }
-
     // Update confirmed order object with provided fields
     try {
       $this->updateQuery
