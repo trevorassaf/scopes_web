@@ -93,6 +93,14 @@ class QueryInjector {
   private ?InsertQuery<CompositeVideo> $insertCompositeVideoQuery;
   private ?InsertCompositeVideoQuery $concreteInsertCompositeVideoQuery;
 
+  // Order Transactions
+  private ?FetchQuery<ConfirmedOrderTransaction> $fetchConfirmedOrderTransactionQuery;
+  private ?FetchConfirmedOrderTransactionQuery $concreteFetchConfirmedOrderTransactionQuery;
+  private ?InsertQuery<ConfirmedOrderTransaction> $insertConfirmedOrderTransactionQuery;
+  private ?FetchQuery<FailedConfirmedOrderTransaction> $fetchFailedConfirmedOrderTransactionQuery;
+  private ?FetchFailedConfirmedOrderTransactionQuery $concreteFetchFailedConfirmedOrderTransactionQuery;
+  private ?InsertQuery<FailedConfirmedOrderTransaction> $insertFailedConfirmedOrderTransactionQuery;
+
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
@@ -128,7 +136,11 @@ class QueryInjector {
     private LazyLoader<BasicVideosTable> $basicVideosTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<BasicVideo>> $basicVideoModelFactoryLazyLoader,
     private LazyLoader<CompositeVideoTable> $compositeVideoTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<CompositeVideo>> $compositeVideoModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<CompositeVideo>> $compositeVideoModelFactoryLazyLoader,
+    private LazyLoader<ConfirmedOrderTransactionTable> $confirmedOrderTransactionTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<ConfirmedOrderTransaction>> $confirmedOrderTransactionModelFactoryLazyLoader,
+    private LazyLoader<FailedConfirmedOrderTransactionTable> $failedConfirmedOrderTransactionTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<FailedConfirmedOrderTransaction>> $failedConfirmedOrderTransactionModelFactoryLazyLoader,
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -862,5 +874,76 @@ class QueryInjector {
       ); 
     }    
     return $this->concreteInsertCompositeVideoQuery;
+  }
+
+  /**
+   * Order Transactions
+   */
+  public function getFetchConfirmedOrderTransactionQuery(): FetchQuery<ConfirmedOrderTransaction> {
+    if ($this->fetchConfirmedOrderTransactionQuery === null) {
+      $this->fetchConfirmedOrderTransactionQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->confirmedOrderTransactionModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchConfirmedOrderTransactionQuery;
+  }
+
+  public function getConcreteFetchConfirmedOrderTransactionQuery(): FetchConfirmedOrderTransactionQuery {
+    if ($this->concreteFetchConfirmedOrderTransactionQuery === null) {
+      $this->concreteFetchConfirmedOrderTransactionQuery = new FetchConfirmedOrderTransactionQuery(
+        $this->getFetchConfirmedOrderTransactionQuery(),
+        $this->confirmedOrderTransactionTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteFetchConfirmedOrderTransactionQuery; 
+  }
+
+  public function getInsertConfirmedOrderTransactionQuery(): InsertQuery<ConfirmedOrderTransaction> {
+    if ($this->insertConfirmedOrderTransactionQuery === null) {
+      $this->insertConfirmedOrderTransactionQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->confirmedOrderTransactionTableLazyLoader->load(),
+        $this->confirmedOrderTransactionModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->insertConfirmedOrderTransactionQuery;
+  }
+
+  public function getFetchFailedConfirmedOrderTransactionQuery(): FetchQuery<FailedConfirmedOrderTransaction> {
+    if ($this->fetchFailedConfirmedOrderTransactionQuery === null) {
+      $this->fetchFailedConfirmedOrderTransactionQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->failedConfirmedOrderTransactionModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchFailedConfirmedOrderTransactionQuery;
+  }
+
+  public function getConcreteFetchFailedConfirmedOrderTransactionQuery(): FetchFailedConfirmedOrderTransactionQuery {
+    if ($this->concreteFetchFailedConfirmedOrderTransactionQuery === null) {
+      $this->concreteFetchFailedConfirmedOrderTransactionQuery = new FetchFailedConfirmedOrderTransactionQuery(
+        $this->getFetchFailedConfirmedOrderTransactionQuery(),
+        $this->failedConfirmedOrderTransactionTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteFetchFailedConfirmedOrderTransactionQuery; 
+  }
+  
+  public function getInsertFailedConfirmedOrderTransactionQuery(): InsertQuery<FailedConfirmedOrderTransaction> {
+    if ($this->insertFailedConfirmedOrderTransactionQuery === null) {
+      $this->insertFailedConfirmedOrderTransactionQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->failedConfirmedOrderTransactionTableLazyLoader->load(),
+        $this->failedConfirmedOrderTransactionModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->insertFailedConfirmedOrderTransactionQuery;
   }
 }
