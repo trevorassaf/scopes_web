@@ -3,7 +3,7 @@
 class CompositeVideoFactory extends ConcreteModelFactory<CompositeVideo> {
 
   public function __construct(
-    private TimestampSerializer $timestampSerializer,
+    private HRTimestampSerializer $timestampSerializer,
     private CompositeVideoTable $table
   ) {}
 
