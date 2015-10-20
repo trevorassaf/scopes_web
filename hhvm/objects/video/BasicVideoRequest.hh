@@ -1,0 +1,7 @@
+<?hh // strict
+
+class BasicVideoRequest {
+
+
+
+}

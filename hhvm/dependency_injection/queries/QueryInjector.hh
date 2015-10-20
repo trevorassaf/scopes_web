@@ -83,6 +83,14 @@ class QueryInjector {
   private ?BatchInsertQuery<CellLabel> $batchInsertCellLabelQuery;
   private ?FetchQuery<CellLabel> $fetchCellLabelQuery;
 
+  // Video queries
+  private ?FetchQuery<BasicVideo> $fetchBasicVideosQuery;
+  private ?FetchBasicVideosByOrderQuery $fetchBasicVideosByOrderQuery;
+  private ?BatchInsertQuery<BasicVideo> $batchInsertBasicVideosQuery;
+  private ?FetchQuery<CompositeVideo> $fetchCompositeVideosQuery;
+  private ?FetchCompositeVideoByOrderQuery $fetchCompositeVideoByOrderQuery;
+  private ?InsertQuery<CompositeVideo> $insertCompositeVideoQuery;
+
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
@@ -114,7 +122,11 @@ class QueryInjector {
     private LazyLoader<ShortCodeTable> $shortCodeTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<ShortCode>> $shortCodeModelFactoryLazyLoader,
     private LazyLoader<EditedVideoOrderTable> $editedVideoOrderTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<EditedVideoOrder>> $editedVideoOrderModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<EditedVideoOrder>> $editedVideoOrderModelFactoryLazyLoader,
+    private LazyLoader<BasicVideosTable> $basicVideosTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<BasicVideo>> $basicVideoModelFactoryLazyLoader,
+    private LazyLoader<CompositeVideoTable> $compositeVideoTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<CompositeVideo>> $compositeVideoModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -757,5 +769,75 @@ class QueryInjector {
       ); 
     }
     return $this->fetchCellLabelQuery;
+  }
+
+  /**
+   * Video queries
+   */
+  public function getFetchBasicVideosQuery(): FetchQuery<BasicVideo> {
+    if ($this->fetchBasicVideosQuery === null) {
+      $this->fetchBasicVideosQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->basicVideoModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchBasicVideosQuery;
+  }
+
+  public function getFetchBasicVideosByOrderQuery(): FetchBasicVideosByOrderQuery {
+    if ($this->fetchBasicVideosByOrderQuery === null) {
+      $this->fetchBasicVideosByOrderQuery = new FetchBasicVideosByOrderQuery(
+        $this->getFetchBasicVideosQuery(),
+        $this->basicVideosTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchBasicVideosByOrderQuery;
+  }
+
+  protected function getBatchInsertBasicVideosQuery(): BatchInsertQuery<BasicVideo> {
+    if ($this->batchInsertBasicVideosQuery === null) {
+      $this->batchInsertBasicVideosQuery = new BatchInsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->basicVideosTableLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load()
+      ); 
+    }
+    return $this->batchInsertBasicVideosQuery;
+  }
+
+  public function getFetchCompositeVideosQuery(): FetchQuery<CompositeVideo> {
+    if ($this->fetchCompositeVideosQuery === null) {
+      $this->fetchCompositeVideosQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->compositeVideoModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchCompositeVideosQuery;
+  }
+  
+  public function getFetchCompositeVideoByOrderQuery(): FetchCompositeVideoByOrderQuery {
+    if ($this->fetchCompositeVideoByOrderQuery === null) {
+      $this->fetchCompositeVideoByOrderQuery = new FetchCompositeVideoByOrderQuery(
+        $this->getFetchCompositeVideosQuery(),
+        $this->compositeVideoTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchCompositeVideoByOrderQuery;
+  }
+
+  public function getInsertComositeVideoQuery(): InsertQuery<CompositeVideo> {
+    if ($this->insertCompositeVideoQuery === null) {
+      $this->insertCompositeVideoQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->compositeVideoTableLazyLoader->load(),
+        $this->compositeVideoModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+         
+      ); 
+    }
+    return $this->insertCompositeVideoQuery;
   }
 }

@@ -8,7 +8,7 @@
  *        of that order
  *  - File-system asset:
  *    - parent-dir: assets/basic_videos/
- *    - file-name: 'id'.mp4
+ *    - file-name: system-file-hash('id').mp4
  */
 CREATE TABLE BasicVideos (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,

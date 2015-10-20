@@ -13,7 +13,7 @@ class CompositeVideoFactory extends ConcreteModelFactory<CompositeVideo> {
   ): CompositeVideo {
     return new CompositeVideo(
       $id,
-      new UnsignedInt((int)$params[$this->table->getConfirmedOrderIdKey()]),
+      new UnsignedInt((int)$params[$this->table->getEditedVideoOrderIdKey()]),
       $this->timestampSerializer->deserialize(
         (string)$params[$this->table->getExpirationTimeKey()]
       )

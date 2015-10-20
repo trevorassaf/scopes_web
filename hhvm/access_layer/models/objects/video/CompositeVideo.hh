@@ -4,7 +4,7 @@ class CompositeVideo implements Model {
 
   public function __construct(
     private UnsignedInt $id,
-    private UnsignedInt $confirmedOrderId,
+    private UnsignedInt $editedVideoOrderId,
     private Timestamp $expirationTime
   ) {}
   
@@ -12,8 +12,8 @@ class CompositeVideo implements Model {
     return $this->id;
   }
 
-  public function getConfirmedOrderId(): UnsignedInt {
-    return $this->confirmedOrderId;
+  public function getEditedVideoOrderId(): UnsignedInt {
+    return $this->editedVideoOrderId;
   }
 
   public function getExpirationTime(): Timestamp {
