@@ -812,8 +812,7 @@ class QueryInjector {
     if ($this->batchInsertBasicVideosByOrderQuery === null) {
         $this->batchInsertBasicVideosByOrderQuery = new BatchInsertBasicVideosByOrderQuery(
         $this->getBatchInsertBasicVideosQuery(),
-        $this->basicVideosTableLazyLoader->load(),
-        $this->timestampSerializerLazyLoader->load()
+        $this->basicVideosTableLazyLoader->load()
       ); 
     }
     return $this->batchInsertBasicVideosByOrderQuery;

@@ -98,7 +98,6 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       ),
       $basic_video_table_loader,
       new BasicVideoModelFactoryLazyLoader(
-        $timestamp_serializer_loader,
         $basic_video_table_loader
       ),
       $composite_video_table_loader,

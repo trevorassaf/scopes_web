@@ -10,7 +10,8 @@ class ConfirmedOrder implements Model {
     private string $title,
     private string $description,
     private UnsignedInt $shortCodeId,
-    private float $price
+    private float $price,
+    private Timestamp $expirationTimestamp
   ) {}
 
   public function getId(): UnsignedInt {
@@ -24,7 +25,6 @@ class ConfirmedOrder implements Model {
   public function getScopesCount(): UnsignedInt {
     return $this->scopesCount;
   }
-
 
   public function getTimestampSegment(): TimestampSegment {
     return $this->timestampSegment;
@@ -44,5 +44,9 @@ class ConfirmedOrder implements Model {
 
   public function getPrice(): float {
     return $this->price;
+  }
+
+  public function getExpirationTimestamp(): Timestamp {
+    return $this->expirationTimestamp;
   }
 }

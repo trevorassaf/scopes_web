@@ -4,8 +4,7 @@ class BatchInsertBasicVideosByOrderQuery {
 
   public function __construct(
     private BatchInsertQuery<BasicVideo> $batchInsertQuery,
-    private BasicVideosTable $basicVideosTable,
-    private HRTimestampSerializer $timestampSerializer
+    private BasicVideosTable $basicVideosTable
   ) {}
 
   public async function insert(
@@ -19,7 +18,7 @@ class BatchInsertBasicVideosByOrderQuery {
       $basic_videos[] = ImmMap{
         $this->basicVideosTable->getConfirmedOrderIdKey() => $confirmed_order_id->getNumber(),
         $this->basicVideosTable->getScopeIndexKey() => $scope_index,
-        $this->basicVideosTable->getExpirationTimeKey() => $this->timestampSerializer->serialize($request->getExpirationTime()),
+        $this->basicVideosTable->getTitleKey() => $request->getTitle(),
       };
 
       ++$scope_index;

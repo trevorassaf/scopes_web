@@ -6,7 +6,8 @@ class BasicVideo implements Model {
     private UnsignedInt $id,
     private UnsignedInt $confirmedOrderId,
     private UnsignedInt $scopeIndex,
-    private Timestamp $expirationTime
+    private string $title,
+    private UnsignedInt $duration
   ) {}
 
   public function getId(): UnsignedInt {
@@ -21,7 +22,11 @@ class BasicVideo implements Model {
     return $this->scopeIndex;
   }
 
-  public function getExpirationTime(): Timestamp {
-    return $this->expirationTime;
+  public function getTitle(): string {
+    return $this->title;
+  }
+
+  public function getDuration(): UnsignedInt {
+    return $this->duration;
   }
 }

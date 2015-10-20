@@ -23,7 +23,8 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
       (string)$params[$this->confirmedOrdersTable->getTitleKey()],
       (string)$params[$this->confirmedOrdersTable->getDescriptionKey()],
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getShortCodeIdKey()]),
-      (float)$params[$this->confirmedOrdersTable->getPriceKey()]
+      (float)$params[$this->confirmedOrdersTable->getPriceKey()],
+      $this->timestampSerializer->deserialize($this->confirmedOrdersTable->getExpirationTimestampKey())
     );
   }
 }

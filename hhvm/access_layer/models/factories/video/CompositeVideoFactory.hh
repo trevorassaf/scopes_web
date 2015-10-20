@@ -16,7 +16,8 @@ class CompositeVideoFactory extends ConcreteModelFactory<CompositeVideo> {
       new UnsignedInt((int)$params[$this->table->getEditedVideoOrderIdKey()]),
       $this->timestampSerializer->deserialize(
         (string)$params[$this->table->getExpirationTimeKey()]
-      )
+      ),
+      new UnsignedInt((int)$params[$this->table->getDurationKey()])
     );  
   }
 }

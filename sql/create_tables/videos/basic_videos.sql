@@ -17,5 +17,6 @@ CREATE TABLE BasicVideos (
   FOREIGN KEY(confirmedOrderId) REFERENCES ConfirmedOrders(id),
   scopeIndex INT UNSIGNED NOT NULL,
   UNIQUE KEY(confirmedOrderId, scopeIndex),
-  expirationTime TIMESTAMP NOT NULL
+  title VARCHAR(30) NOT NULL,
+  duration INT UNSIGNED NOT NULL
 );

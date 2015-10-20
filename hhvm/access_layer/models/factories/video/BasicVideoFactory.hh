@@ -3,7 +3,6 @@
 class BasicVideoFactory extends ConcreteModelFactory<BasicVideo> {
 
   public function __construct(
-    private HRTimestampSerializer $timestampSerializer,
     private BasicVideosTable $table
   ) {}
 
@@ -15,7 +14,8 @@ class BasicVideoFactory extends ConcreteModelFactory<BasicVideo> {
       $id,
       new UnsignedInt((int)$params[$this->table->getConfirmedOrderIdKey()]),
       new UnsignedInt((int)$params[$this->table->getScopeIndexKey()]),
-      $this->timestampSerializer->deserialize((string)$params[$this->table->getExpirationTimeKey()])
+      (string)$params[$this->table->getTitleKey()],
+      new UnsignedInt((int)$params[$this->table->getDurationKey()])
     );
   }
 }

@@ -3,10 +3,10 @@
 class CreateBasicVideoRequest {
 
   public function __construct(
-    private Timestamp $expirationTime
+    private string $title
   ) {}
 
-  public function getExpirationTime(): Timestamp {
-    return $this->expirationTime;
+  public function getTitle(): string {
+    return $this->title;
   }
 }
