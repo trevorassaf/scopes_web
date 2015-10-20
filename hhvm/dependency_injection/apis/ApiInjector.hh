@@ -35,7 +35,9 @@ class ApiInjector {
     private LazyLoader<RequestFactory<DeleteReservedOrderRequest>> $deleteReservedOrderRequestLoader,
     private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader,
     private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader,
-    private LazyLoader<TimestampSerializer> $timestampSerializerLoader
+    private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
+    private LazyLoader<TimestampBuilder> $timestampBuilder,
+    private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -65,7 +67,8 @@ class ApiInjector {
       $this->reserveOrderApi = new ReserveOrderApi(
         $this->reserveOrderRequestFactoryLoader->load(),
         $this->methodInjector->getReserveOrderMethod(),
-        $this->logger
+        $this->logger,
+        $this->timestampSegmentFactoryLoader->load()
       ); 
     }
     return $this->reserveOrderApi;
@@ -75,6 +78,7 @@ class ApiInjector {
     if ($this->confirmOrderApi === null) {
       $this->confirmOrderApi = new ConfirmOrderApi(
         $this->confirmOrderRequestFactoryLoader->load(),
+        $this->timestampBuilder->load(),
         $this->methodInjector->getConfirmOrderMethod(),
         $this->logger
       );        

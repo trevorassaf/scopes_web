@@ -4,11 +4,14 @@ class ReservedOrderModelFactoryLazyLoader extends LazyLoader<ConcreteModelFactor
 
   public function __construct(
     private ReservedOrdersTableLazyLoader $rsvdOrdersTableLazyLoader,
-    private LazyLoader<TimestampSerializer> $timestampSerializer
+    private LazyLoader<HRTimestampSerializer> $timestampSerializerLoader,
+    private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader
   ) {}
+
   protected function make(): ConcreteModelFactory<RsvdOrder>  {
     return new RsvdOrderFactory(
-      $this->timestampSerializer->load(),
+      $this->timestampSegmentFactoryLoader->load(),
+      $this->timestampSerializerLoader->load(),
       $this->rsvdOrdersTableLazyLoader->load() 
     );
   }

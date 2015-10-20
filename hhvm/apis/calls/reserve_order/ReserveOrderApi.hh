@@ -5,7 +5,8 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
   public function __construct(
     RequestFactory<ReserveOrderRequest> $request_factory,
     private ReserveOrderMethod $reserveOrderMethod,
-    private Logger $logger
+    private Logger $logger,
+    private TimestampSegmentFactory $timestampSegmentFactory
   ) {
     parent::__construct(
       $request_factory,
@@ -24,7 +25,7 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
       $rsvd_order = $this->reserveOrderMethod->reserve(
         $request->getUserId()->get(),
         $request->getScopesCount()->get(),
-        new TimestampSegment(
+        $this->timestampSegmentFactory->make(
           $request->getStartTime()->get(),
           $request->getEndTime()->get()
         )

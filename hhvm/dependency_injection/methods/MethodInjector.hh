@@ -61,7 +61,8 @@ class MethodInjector {
     private LazyLoader<TimestampSegmentExpander> $timestampSegmentExpanderLoader,
     private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLoader,
     private LazyLoader<RsvdOrdersTable> $rsvdOrdersTableLoader,
-    private Logger $logger
+    private Logger $logger,
+    private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -165,7 +166,8 @@ class MethodInjector {
         $this->queryInjector->getFetchRsvdOrdersByTimeQuery(),
         $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
         $this->queryInjector->getFetchReservedOrderPolicyQuery(),
-        $this->logger
+        $this->logger,
+        $this->timestampSegmentFactoryLoader->load()
       ); 
     } 
     return $this->isConflictingReservedOrderMethod;

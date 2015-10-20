@@ -3,7 +3,8 @@
 class RsvdOrderFactory extends ConcreteModelFactory<RsvdOrder> {
 
   public function __construct(
-    private TimestampSerializer $timestampSerializer,
+    private TimestampSegmentFactory $timestampSegmentFactory,
+    private HRTimestampSerializer $timestampSerializer,
     private RsvdOrdersTable $rsvdOrdersTable
   ) {}
 
@@ -15,7 +16,7 @@ class RsvdOrderFactory extends ConcreteModelFactory<RsvdOrder> {
       $id,
       new UnsignedInt((int)$params[$this->rsvdOrdersTable->getUserIdKey()]), 
       new UnsignedInt((int)$params[$this->rsvdOrdersTable->getScopesCountKey()]),
-      new TimestampSegment(
+      $this->timestampSegmentFactory->make(
         $this->timestampSerializer->deserialize((string)$params[$this->rsvdOrdersTable->getStartTimeKey()]),
         $this->timestampSerializer->deserialize((string)$params[$this->rsvdOrdersTable->getEndTimeKey()])
       )

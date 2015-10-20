@@ -47,17 +47,4 @@ class TimeSegment {
   public function getEnd(): Time {
     return $this->end;
   }
-
-  public function toTimestampSegment(Date $date): TimestampSegment {
-    return new TimestampSegment(
-      new Timestamp(
-        $date,
-        $this->start
-      ),
-      new Timestamp(
-        $date,
-        $this->end
-      )
-    );
-  }
 }

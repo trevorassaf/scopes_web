@@ -9,13 +9,38 @@ class ComputePriceOfConfirmedOrderMethod {
   ) {}
 
   public function computePrice(
-    CreateConfirmOrderRequest $create_confirm_order_request 
+    Timestamp $time_order_made,
+    UnsignedInt $number_of_scopes,
+    TimestampSegment $timestamp_segment,
+    ?CreateEditedVideoOrderRequest $edited_video_order
   ): UnsignedFloat {
-    $price = 0; 
+    $price = 0.0; 
 
-    // Fetch policies applicable to all common orders
+    //// Fetch policies applicable to all common orders
+    // Order price policy
     $fetch_order_policy_handle = $this->fetchOrderPricePolicyQuery->fetch(
-       
+      $time_order_made
     );
+
+    $order_price_policy = $fetch_order_policy_handle
+      ->getWaitHandle()
+      ->join();
+
+    // Video storage price policy
+    $fetch_video_storage_price_policy_handle = $this->fetchVideoStoragePricePolicyQuery->fetch(
+      $time_order_made
+    );
+
+    $video_storage_price_policy = $fetch_video_storage_price_policy_handle
+      ->getWaitHandle()
+      ->join();
+
+    //// Compute price of base order
+    // Calculate price for number of scopes/time used
+    $price += $order_price_policy->getPrice()->getNumber()
+      * (int)($number_of_scopes->getNumber() / 4)
+      * $timestamp_segment->getNumberOfHours()->getNumber();
+    
+    return new UnsignedFloat($price);
   }
 }

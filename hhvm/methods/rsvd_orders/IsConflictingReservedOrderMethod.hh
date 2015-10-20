@@ -6,7 +6,8 @@ class IsConflictingReservedOrderMethod {
     private FetchReservedOrdersByTimeQuery $fetchReservedOrdersByTimeQuery,
     private FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery,
     private FetchSingletonQuery<ReservedOrderPolicy> $fetchReservedOrderPolicyQuery,
-    private Logger $logger
+    private Logger $logger,
+    private TimestampSegmentFactory $timestampSegmentFactory
   ) {}
 
   public function check(
@@ -155,7 +156,7 @@ class IsConflictingReservedOrderMethod {
       
       if ($rsvd_order->getTimestampSegment()->getStart()->isBefore($confirmed_order->getTimestampSegment()->getStart())) {
         $time_intervals[] = new OrderTimestampSegment(
-          new TimestampSegment(
+          $this->timestampSegmentFactory->make(
             $rsvd_order->getTimestampSegment()->getStart(),
             $rsvd_order->getTimestampSegment()->getEnd()
           ),
@@ -164,7 +165,7 @@ class IsConflictingReservedOrderMethod {
         ++$rsvd_order_idx;
       } else {
         $time_intervals[] = new OrderTimestampSegment(
-          new TimestampSegment(
+          $this->timestampSegmentFactory->make(
             $confirmed_order->getTimestampSegment()->getStart(),
             $confirmed_order->getTimestampSegment()->getEnd()
           ),
@@ -180,7 +181,7 @@ class IsConflictingReservedOrderMethod {
     while ($rsvd_order_idx < $rsvd_orders->count()) {
       $rsvd_order = $rsvd_orders[$rsvd_order_idx];
       $time_intervals[] = new OrderTimestampSegment(
-        new TimestampSegment(
+        $this->timestampSegmentFactory->make(
           $rsvd_order->getTimestampSegment()->getStart(),
           $rsvd_order->getTimestampSegment()->getEnd()
         ),
@@ -193,7 +194,7 @@ class IsConflictingReservedOrderMethod {
     while ($confirmed_order_idx < $confirmed_orders->count()) {
       $confirmed_order = $confirmed_orders[$confirmed_order_idx];
       $time_intervals[] = new OrderTimestampSegment(
-        new TimestampSegment(
+        $this->timestampSegmentFactory->make(
           $confirmed_order->getTimestampSegment()->getStart(),
           $confirmed_order->getTimestampSegment()->getEnd()
         ),

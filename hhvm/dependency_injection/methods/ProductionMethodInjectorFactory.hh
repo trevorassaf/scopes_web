@@ -23,6 +23,10 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
     $timestamp_segment_expander_loader = new TimestampSegmentExpanderLazyLoader(
       $hr_date_serializer_loader
     );
+
+    $timestamp_segment_factory_lazy_loader = new TimestampSegmentFactoryLazyLoader(
+      $hr_timestamp_serializer_loader
+    );
     
     return new MethodInjector(
       $production_query_injector_factory->get(),
@@ -41,7 +45,8 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
       $timestamp_segment_expander_loader,
       new ConfirmedOrdersTableLazyLoader(),
       new ReservedOrdersTableLazyLoader(),
-      $this->logger
+      $this->logger,
+      $timestamp_segment_factory_lazy_loader
     ); 
   }
 }

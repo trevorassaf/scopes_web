@@ -13,6 +13,9 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $date_serializer_loader,
       $time_serializer_loader
     );
+    $timestamp_segment_factory_lazy_loader = new TimestampSegmentFactoryLazyLoader(
+      $timestamp_serializer_loader
+    );
 
     // Tables
     $users_table_loader = new UsersTableLazyLoader(); 
@@ -65,12 +68,14 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $rsvd_orders_table_loader,
       new ReservedOrderModelFactoryLazyLoader(
         $rsvd_orders_table_loader,
-        $timestamp_serializer_loader
+        $timestamp_serializer_loader,
+        $timestamp_segment_factory_lazy_loader
       ),
       $confirmed_orders_table_loader,
       new ConfirmedOrderModelFactoryLazyLoader(
         $confirmed_orders_table_loader,
-        $timestamp_serializer_loader
+        $timestamp_serializer_loader,
+        $timestamp_segment_factory_lazy_loader
       ),
       $rsvd_order_policy_table_loader,
       new ReservedOrderPolicyModelFactoryLazyLoader(
