@@ -87,16 +87,18 @@ class QueryInjector {
   private ?FetchQuery<BasicVideo> $fetchBasicVideosQuery;
   private ?FetchBasicVideosByOrderQuery $fetchBasicVideosByOrderQuery;
   private ?BatchInsertQuery<BasicVideo> $batchInsertBasicVideosQuery;
+  private ?BatchInsertBasicVideosByOrderQuery $batchInsertBasicVideosByOrderQuery;
   private ?FetchQuery<CompositeVideo> $fetchCompositeVideosQuery;
   private ?FetchCompositeVideoByOrderQuery $fetchCompositeVideoByOrderQuery;
   private ?InsertQuery<CompositeVideo> $insertCompositeVideoQuery;
+  private ?InsertCompositeVideoQuery $concreteInsertCompositeVideoQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
     private LazyLoader<DateSerializer> $dateSerializerLazyLoader,
     private LazyLoader<TimeSerializer> $timeSerializerLazyLoader,
-    private LazyLoader<TimestampSerializer> $timestampSerializerLazyLoader,
+    private LazyLoader<HRTimestampSerializer> $timestampSerializerLazyLoader,
     private LazyLoader<UsersTable> $usersTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<User>> $userModelFactoryLazyLoader,
     private LazyLoader<InsertQueryCreater> $insertQueryCreaterLazyLoader,
@@ -805,6 +807,17 @@ class QueryInjector {
     }
     return $this->batchInsertBasicVideosQuery;
   }
+  
+  public function getBatchInsertBasicVideosByOrderQuery(): BatchInsertBasicVideosByOrderQuery {
+    if ($this->batchInsertBasicVideosByOrderQuery === null) {
+        $this->batchInsertBasicVideosByOrderQuery = new BatchInsertBasicVideosByOrderQuery(
+        $this->getBatchInsertBasicVideosQuery(),
+        $this->basicVideosTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
+      ); 
+    }
+    return $this->batchInsertBasicVideosByOrderQuery;
+  }
 
   public function getFetchCompositeVideosQuery(): FetchQuery<CompositeVideo> {
     if ($this->fetchCompositeVideosQuery === null) {
@@ -827,7 +840,7 @@ class QueryInjector {
     return $this->fetchCompositeVideoByOrderQuery;
   }
 
-  public function getInsertComositeVideoQuery(): InsertQuery<CompositeVideo> {
+  public function getInsertCompositeVideoQuery(): InsertQuery<CompositeVideo> {
     if ($this->insertCompositeVideoQuery === null) {
       $this->insertCompositeVideoQuery = new InsertQuery(
         $this->asyncMysqlConnectionLazyLoader->load(),
@@ -839,5 +852,16 @@ class QueryInjector {
       ); 
     }
     return $this->insertCompositeVideoQuery;
+  }
+
+  public function getConcreteInsertCompositeVideoQuery(): InsertCompositeVideoQuery {
+    if ($this->concreteInsertCompositeVideoQuery === null) {
+      $this->concreteInsertCompositeVideoQuery = new InsertCompositeVideoQuery(
+        $this->getInsertCompositeVideoQuery(),
+        $this->compositeVideoTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
+      ); 
+    }    
+    return $this->concreteInsertCompositeVideoQuery;
   }
 }
