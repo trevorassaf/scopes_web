@@ -26,21 +26,26 @@ class ComputePriceOfConfirmedOrderMethod {
       ->getWaitHandle()
       ->join();
 
-    // Video storage price policy
-    $fetch_video_storage_price_policy_handle = $this->fetchVideoStoragePricePolicyQuery->fetch(
-      $time_order_made
-    );
-
-    $video_storage_price_policy = $fetch_video_storage_price_policy_handle
-      ->getWaitHandle()
-      ->join();
-
-    //// Compute price of base order
     // Calculate price for number of scopes/time used
     $price += $order_price_policy->getPrice()->getNumber()
       * (int)($number_of_scopes->getNumber() / 4)
       * $timestamp_segment->getNumberOfHours()->getNumber();
-    
+
+    // Apply price of edited video order
+    if ($edited_video_order !== null) {
+      // Fetch video editing price policy
+      $fetch_video_editing_price_policy_handle = $this->fetchVideoEditingPricePolicyQuery->fetch(
+        $time_order_made
+      );
+
+      $video_editing_price_policy = $fetch_video_editing_price_policy_handle
+        ->getWaitHandle()
+        ->join();
+
+      // Calculate price of edited video order
+      $price += $video_editing_price_policy->getPrice()->getNumber();
+    }
+
     return new UnsignedFloat($price);
   }
 }
