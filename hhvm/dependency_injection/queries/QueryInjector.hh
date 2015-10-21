@@ -100,6 +100,8 @@ class QueryInjector {
   private ?FetchQuery<FailedConfirmedOrderTransaction> $fetchFailedConfirmedOrderTransactionQuery;
   private ?FetchFailedConfirmedOrderTransactionQuery $concreteFetchFailedConfirmedOrderTransactionQuery;
   private ?InsertQuery<FailedConfirmedOrderTransaction> $insertFailedConfirmedOrderTransactionQuery;
+  private ?FetchQuery<OrderTransactionPolicy> $fetchOrderTransactionPolicyQuery;
+  private ?FetchOrderTransactionPolicyQuery $concreteFetchOrderTransactionPolicyQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -141,6 +143,8 @@ class QueryInjector {
     private LazyLoader<ConcreteModelFactory<ConfirmedOrderTransaction>> $confirmedOrderTransactionModelFactoryLazyLoader,
     private LazyLoader<FailedConfirmedOrderTransactionTable> $failedConfirmedOrderTransactionTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<FailedConfirmedOrderTransaction>> $failedConfirmedOrderTransactionModelFactoryLazyLoader,
+    private LazyLoader<OrderTransactionPolicyTable> $orderTransactionPolicyTableLazyLoader,
+    private LazyLoader<ModelFactory<OrderTransactionPolicy>> $orderTransactionPolicyModelFactoryLazyLoader,
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -945,5 +949,27 @@ class QueryInjector {
       );
     }
     return $this->insertFailedConfirmedOrderTransactionQuery;
+  }
+
+  public function getFetchOrderTransactionPolicyQuery(): FetchQuery<OrderTransactionPolicy> {
+    if ($this->fetchOrderTransactionPolicyQuery === null) {
+      $this->fetchOrderTransactionPolicyQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->orderTransactionPolicyModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchOrderTransactionPolicyQuery;
+  }
+
+  public function getConcreteFetchOrderTransactionPolicyQuery(): FetchOrderTransactionPolicyQuery {
+    if ($this->concreteFetchOrderTransactionPolicyQuery === null) {
+      $this->concreteFetchOrderTransactionPolicyQuery = new FetchOrderTransactionPolicyQuery(
+        $this->getFetchOrderTransactionPolicyQuery(),
+        $this->orderTransactionPolicyTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load() 
+      ); 
+    }
+    return $this->concreteFetchOrderTransactionPolicyQuery;
   }
 }
