@@ -72,6 +72,8 @@ class QueryInjector {
   
   // Short codes
   private ?FetchQuery<ShortCode> $fetchShortCodesQuery;
+  private ?FetchByUniqueKeyQuery<ShortCode> $fetchShortCodeByUniqueKeyQuery;
+  private ?FetchByIdQuery<ShortCode> $fetchShortCodeByIdQuery;
   private ?InsertQuery<ShortCode> $insertShortCodeQuery;
 
   // Reserved order policy queries
@@ -684,6 +686,27 @@ class QueryInjector {
       );
     }
     return $this->fetchShortCodesQuery;
+  }
+
+  public function getFetchShortCodeByUniqueKeyQuery(): FetchByUniqueKeyQuery<ShortCode> {
+    if ($this->fetchShortCodeByUniqueKeyQuery === null) {
+      $this->fetchShortCodeByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchShortCodesQuery(),
+        $this->shortCodeTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      );
+    }
+    return $this->fetchShortCodeByUniqueKeyQuery;
+  }
+
+  public function getFetchShortCodeByIdQuery(): FetchByIdQuery<ShortCode> {
+    if ($this->fetchShortCodeByIdQuery === null) {
+      $this->fetchShortCodeByIdQuery = new FetchByIdQuery(
+        $this->getFetchShortCodeByUniqueKeyQuery(),
+        $this->shortCodeTableLazyLoader->load() 
+      );
+    }
+    return $this->fetchShortCodeByIdQuery;
   }
 
   public function getInsertShortCodeQuery(): InsertQuery<ShortCode> {

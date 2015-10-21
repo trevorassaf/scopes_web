@@ -10,7 +10,7 @@ class ConfirmedOrder implements Model {
     private string $title,
     private string $description,
     private UnsignedInt $shortCodeId,
-    private float $price,
+    private UnsignedFloat $price,
     private Timestamp $expirationTimestamp
   ) {}
 
@@ -42,7 +42,7 @@ class ConfirmedOrder implements Model {
     return $this->shortCodeId;
   }
 
-  public function getPrice(): float {
+  public function getPrice(): UnsignedFloat {
     return $this->price;
   }
 

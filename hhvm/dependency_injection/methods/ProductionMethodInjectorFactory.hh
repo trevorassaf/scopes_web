@@ -46,7 +46,9 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
       new ConfirmedOrdersTableLazyLoader(),
       new ReservedOrdersTableLazyLoader(),
       $this->logger,
-      $timestamp_segment_factory_lazy_loader
+      $timestamp_segment_factory_lazy_loader,
+      new ConfirmedOrderTransactionTableLazyLoader(),
+      new FailedConfirmedOrderTransactionTableLazyLoader()
     ); 
   }
 }

@@ -42,7 +42,12 @@ class MethodInjector {
   private ?UpdateCellLabelMethod $updateCellLabelMethod;
   private ?DeleteCellLabelMethod $deleteCellLabelMethod;
 
+  // Policy methods
   private ?CreateReservedOrderPolicyMethod $createReservedOrderPolicyMethod;
+
+  // Transaction methods
+  private ?ExecuteTransactionsForTimeIntervalMethod $executeTransactionsForTimeIntervalMethod;
+  private ?ExecuteOrderTransactionMethod $executeOrderTransactionMethod;
 
   public function __construct(
     private QueryInjector $queryInjector,
@@ -53,7 +58,7 @@ class MethodInjector {
     private LazyLoader<IrregularDatesTable> $irregularDatesTableLoader,
     private LazyLoader<IrregularTimesTable> $irregularTimesTableLoader,
     private LazyLoader<CellLabelsTable> $cellsLabelTableLoader,
-    private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
+    private LazyLoader<HRTimestampSerializer> $timestampSerializerLoader,
     private LazyLoader<TimeSerializer> $timeSerializerLoader,
     private LazyLoader<DateSerializer> $dateSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
@@ -62,7 +67,9 @@ class MethodInjector {
     private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLoader,
     private LazyLoader<RsvdOrdersTable> $rsvdOrdersTableLoader,
     private Logger $logger,
-    private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader
+    private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
+    private LazyLoader<ConfirmedOrderTransactionTable> $confirmedOrderTransactionTableLoader,
+    private LazyLoader<FailedConfirmedOrderTransactionTable> $failedConfirmedOrderTransactionTableLoader
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -304,6 +311,39 @@ class MethodInjector {
       );
     }
     return $this->createReservedOrderPolicyMethod;
+  }
+
+  /**
+   * Transaction execution methods
+   */
+  public function getExecuteTransactionsForTimeIntervalMethod(): ExecuteTransactionsForTimeIntervalMethod {
+    if ($this->executeTransactionsForTimeIntervalMethod === null) {
+      $this->executeTransactionsForTimeIntervalMethod = new ExecuteTransactionsForTimeIntervalMethod(
+        $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
+        $this->queryInjector->getConcreteFetchConfirmedOrderTransactionQuery(),
+        $this->getExecuteOrderTransactionMethod(),
+        $this->logger,
+        $this->timestampBuilderLoader->load(),
+        $this->timestampSerializerLoader->load()
+      ); 
+    }
+    return $this->executeTransactionsForTimeIntervalMethod;
+  }
+
+  public function getExecuteOrderTransactionMethod(): ExecuteOrderTransactionMethod {
+    if ($this->executeOrderTransactionMethod === null) {
+      $this->executeOrderTransactionMethod = new ExecuteOrderTransactionMethod(
+        $this->logger,
+        $this->queryInjector->getFetchShortCodeByIdQuery(),
+        $this->queryInjector->getInsertConfirmedOrderTransactionQuery(),
+        $this->confirmedOrderTransactionTableLoader->load(),
+        $this->queryInjector->getInsertFailedConfirmedOrderTransactionQuery(),
+        $this->failedConfirmedOrderTransactionTableLoader->load(),
+        $this->timestampSerializerLoader->load(),
+        $this->timestampBuilderLoader->load()
+      ); 
+    }
+    return $this->executeOrderTransactionMethod;
   }
 
 }
