@@ -34,6 +34,8 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
     $confirmed_order_transaction_table_loader = new ConfirmedOrderTransactionTableLazyLoader();
     $failed_confirmed_order_transaction_table_loader = new FailedConfirmedOrderTransactionTableLazyLoader();
     $order_transaction_policy_table_loader = new OrderTransactionPolicyTableLazyLoader();
+    $completed_orders_table_loader = new CompletedOrdersTableLazyLoader();
+    $completed_basic_video_set_table_loader = new CompletedBasicVideoSetTableLazyLoader();
 
     return new QueryInjector(
       new AsyncMysqlConnectionLazyLoader(
@@ -122,6 +124,16 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       new OrderTransactionPolicyModelFactoryLazyLoader(
         $timestamp_serializer_loader,
         $order_transaction_policy_table_loader
+      ),
+      $completed_orders_table_loader,
+      new CompletedOrderModelFactoryLazyLoader(
+        $completed_orders_table_loader,
+        $timestamp_serializer_loader
+      ),
+      $completed_basic_video_set_table_loader,
+      new CompletedBasicVideoSetModelFactoryLazyLoader(
+        $completed_basic_video_set_table_loader,
+        $timestamp_serializer_loader
       )
     );
   }

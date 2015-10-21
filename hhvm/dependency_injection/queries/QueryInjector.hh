@@ -85,15 +85,21 @@ class QueryInjector {
   private ?BatchInsertQuery<CellLabel> $batchInsertCellLabelQuery;
   private ?FetchQuery<CellLabel> $fetchCellLabelQuery;
 
-  // Video queries
+  // Video packages
   private ?FetchQuery<BasicVideo> $fetchBasicVideosQuery;
   private ?FetchBasicVideosByOrderQuery $fetchBasicVideosByOrderQuery;
   private ?BatchInsertQuery<BasicVideo> $batchInsertBasicVideosQuery;
   private ?BatchInsertBasicVideosByOrderQuery $batchInsertBasicVideosByOrderQuery;
+
   private ?FetchQuery<CompositeVideo> $fetchCompositeVideosQuery;
   private ?FetchCompositeVideoByOrderQuery $fetchCompositeVideoByOrderQuery;
   private ?InsertQuery<CompositeVideo> $insertCompositeVideoQuery;
   private ?InsertCompositeVideoQuery $concreteInsertCompositeVideoQuery;
+
+  private ?FetchQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetQuery;
+  private ?FetchByUniqueKeyQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetByUniqueKeyQuery;
+  private ?FetchCompletedBasicVideoSetByConfirmedOrderQuery $fetchCompletedBasicVideoSetByConfirmedOrderQuery;
+  private ?InsertQuery<CompletedBasicVideoSet> $insertCompletedBasicVideoSetQuery;
 
   // Order Transactions
   private ?FetchQuery<ConfirmedOrderTransaction> $fetchConfirmedOrderTransactionQuery;
@@ -104,6 +110,12 @@ class QueryInjector {
   private ?InsertQuery<FailedConfirmedOrderTransaction> $insertFailedConfirmedOrderTransactionQuery;
   private ?FetchQuery<OrderTransactionPolicy> $fetchOrderTransactionPolicyQuery;
   private ?FetchOrderTransactionPolicyQuery $concreteFetchOrderTransactionPolicyQuery;
+
+  // Completed orders
+  private ?FetchQuery<CompletedOrder> $fetchCompletedOrderQuery;
+  private ?FetchByUniqueKeyQuery<CompletedOrder> $fetchCompletedOrderByUniqueKeyQuery;
+  private ?FetchCompletedOrderByConfirmedOrderQuery $fetchCompletedOrderByConfirmedOrderQuery;
+  private ?InsertQuery<CompletedOrder> $insertCompletedOrderQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -147,6 +159,10 @@ class QueryInjector {
     private LazyLoader<ConcreteModelFactory<FailedConfirmedOrderTransaction>> $failedConfirmedOrderTransactionModelFactoryLazyLoader,
     private LazyLoader<OrderTransactionPolicyTable> $orderTransactionPolicyTableLazyLoader,
     private LazyLoader<ModelFactory<OrderTransactionPolicy>> $orderTransactionPolicyModelFactoryLazyLoader,
+    private LazyLoader<CompletedOrdersTable> $completedOrdersTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<CompletedOrder>> $completedOrderModelFactoryLazyLoader,
+    private LazyLoader<CompletedBasicVideoSetTable> $completedBasicVideoSetTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<CompletedBasicVideoSet>> $completedBasicVideoSetModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -994,5 +1010,101 @@ class QueryInjector {
       ); 
     }
     return $this->concreteFetchOrderTransactionPolicyQuery;
+  }
+
+  /**
+   * Completed order queries
+   */
+  public function getFetchCompletedOrderQuery(): FetchQuery<CompletedOrder> {
+    if ($this->fetchCompletedOrderQuery === null) {
+      $this->fetchCompletedOrderQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->completedOrderModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedOrderQuery;
+  }
+
+  public function getFetchCompletedOrderByUniqueKeyQuery(): FetchByUniqueKeyQuery<CompletedOrder> {
+    if ($this->fetchCompletedOrderByUniqueKeyQuery === null) {
+      $this->fetchCompletedOrderByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchCompletedOrderQuery(),
+        $this->completedOrdersTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedOrderByUniqueKeyQuery;
+  }
+
+  public function getFetchCompletedOrderByConfirmedOrderQuery(): FetchCompletedOrderByConfirmedOrderQuery {
+    if ($this->fetchCompletedOrderByConfirmedOrderQuery === null) {
+      $this->fetchCompletedOrderByConfirmedOrderQuery = new FetchCompletedOrderByConfirmedOrderQuery(
+        $this->getFetchCompletedOrderByUniqueKeyQuery(),
+        $this->completedOrdersTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchCompletedOrderByConfirmedOrderQuery;
+  }
+
+  public function getInsertCompletedOrderQuery(): InsertQuery<CompletedOrder> {
+    if ($this->insertCompletedOrderQuery === null) {
+      $this->insertCompletedOrderQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->completedOrdersTableLazyLoader->load(),
+        $this->completedOrderModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertCompletedOrderQuery;
+  }
+
+  /**
+   * Completed video packages
+   */
+  public function getFetchCompletedBasicVideoSetQuery(): FetchQuery<CompletedBasicVideoSet> {
+    if ($this->fetchCompletedBasicVideoSetQuery === null) {
+      $this->fetchCompletedBasicVideoSetQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->completedBasicVideoSetModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->fetchCompletedBasicVideoSetQuery;
+  }
+
+  public function getInsertCompletedBasicVideoSetQuery(): InsertQuery<CompletedBasicVideoSet> {
+    if ($this->insertCompletedBasicVideoSetQuery === null) {
+      $this->insertCompletedBasicVideoSetQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->completedBasicVideoSetTableLazyLoader->load(),
+        $this->completedBasicVideoSetModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertCompletedBasicVideoSetQuery;
+  }
+
+  public function getFetchCompletedBasicVideoSetByUniqueKeyQuery(): FetchByUniqueKeyQuery<CompletedBasicVideoSet> {
+    if ($this->fetchCompletedBasicVideoSetByUniqueKeyQuery === null) {
+      $this->fetchCompletedBasicVideoSetByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchCompletedBasicVideoSetQuery(),
+        $this->completedBasicVideoSetTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchCompletedBasicVideoSetByUniqueKeyQuery;
+  }
+
+  public function getFetchCompletedBasicVideoSetByConfirmedOrderQuery(): FetchCompletedBasicVideoSetByConfirmedOrderQuery {
+    if ($this->fetchCompletedBasicVideoSetByConfirmedOrderQuery === null) {
+      $this->fetchCompletedBasicVideoSetByConfirmedOrderQuery = new FetchCompletedBasicVideoSetByConfirmedOrderQuery(
+        $this->getFetchCompletedBasicVideoSetByUniqueKeyQuery(),
+        $this->completedBasicVideoSetTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedBasicVideoSetByConfirmedOrderQuery;
   }
 }
