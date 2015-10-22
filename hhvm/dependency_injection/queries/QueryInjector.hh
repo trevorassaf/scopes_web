@@ -101,6 +101,11 @@ class QueryInjector {
   private ?FetchCompletedBasicVideoSetByCompletedOrderQuery $fetchCompletedBasicVideoSetByCompletedOrderQuery;
   private ?InsertQuery<CompletedBasicVideoSet> $insertCompletedBasicVideoSetQuery;
 
+  private ?FetchQuery<VideoUploadPolicy> $fetchVideoUploadPolicyQuery;
+  private ?InsertQuery<VideoUploadPolicy> $insertVideoUploadPolicyQuery;
+  private ?FetchQuery<VideoMimeType> $fetchVideoMimeTypesQuery;
+  private ?InsertQuery<VideoMimeType> $insertVideoMimeTypeQuery;
+
   // Order Transactions
   private ?FetchQuery<ConfirmedOrderTransaction> $fetchConfirmedOrderTransactionQuery;
   private ?FetchConfirmedOrderTransactionQuery $concreteFetchConfirmedOrderTransactionQuery;
@@ -116,6 +121,8 @@ class QueryInjector {
   private ?FetchByUniqueKeyQuery<CompletedOrder> $fetchCompletedOrderByUniqueKeyQuery;
   private ?FetchCompletedOrderByConfirmedOrderQuery $fetchCompletedOrderByConfirmedOrderQuery;
   private ?InsertQuery<CompletedOrder> $insertCompletedOrderQuery;
+
+
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -162,7 +169,11 @@ class QueryInjector {
     private LazyLoader<CompletedOrdersTable> $completedOrdersTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<CompletedOrder>> $completedOrderModelFactoryLazyLoader,
     private LazyLoader<CompletedBasicVideoSetTable> $completedBasicVideoSetTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<CompletedBasicVideoSet>> $completedBasicVideoSetModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<CompletedBasicVideoSet>> $completedBasicVideoSetModelFactoryLazyLoader,
+    private LazyLoader<VideoUploadPolicyTable> $videoUploadPolicyTableLazyLoader,
+    private LazyLoader<ModelFactory<VideoUploadPolicy>> $videoUploadPolicyModelFactoryLazyLoader,
+    private LazyLoader<VideoMimeTypesTable> $videoMimeTypesTable,
+    private LazyLoader<ConcreteModelFactory<VideoMimeType>> $videoMimeTypeModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -1106,5 +1117,27 @@ class QueryInjector {
       ); 
     }
     return $this->fetchCompletedBasicVideoSetByCompletedOrderQuery;
+  }
+  
+  public function getFetchVideoUploadPolicyQuery(): FetchQuery<VideoUploadPolicy> {
+    if ($this->fetchVideoUploadPolicyQuery === null) {
+      $this->fetchVideoUploadPolicyQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->videoUploadPolicyModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchVideoUploadPolicyQuery;
+  }
+
+  public function getFetchVideoMimeTypesQuery(): FetchQuery<VideoMimeType> {
+    if ($this->fetchVideoMimeTypesQuery === null) {
+      $this->fetchVideoMimeTypesQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->videoMimeTypeModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchVideoUploadPolicyQuery;
   }
 }
