@@ -13,7 +13,7 @@ class CompletedBasicVideoSetFactory extends ConcreteModelFactory<CompletedBasicV
   ): CompletedBasicVideoSet {
     return new CompletedBasicVideoSet(
       $id,
-      new UnsignedInt((int)$params[$this->table->getConfirmedOrderIdKey()]),
+      new UnsignedInt((int)$params[$this->table->getCompletedOrderIdKey()]),
       $this->timestampSerializer->deserialize((string)$params[$this->table->getTimeCompletedKey()]) 
     );
   }

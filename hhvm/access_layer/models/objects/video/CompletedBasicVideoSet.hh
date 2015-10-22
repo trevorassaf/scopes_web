@@ -4,7 +4,7 @@ class CompletedBasicVideoSet implements Model {
 
   public function __construct(
     private UnsignedInt $id,
-    private UnsignedInt $confirmedOrderId,
+    private UnsignedInt $completedOrderId,
     private Timestamp $timeCompleted
   ) {}
 
@@ -12,8 +12,8 @@ class CompletedBasicVideoSet implements Model {
     return $this->id;
   }
 
-  public function getConfirmedOrderId(): UnsignedInt {
-    return $this->confirmedOrderId;
+  public function getCompletedOrderId(): UnsignedInt {
+    return $this->completedOrderId;
   }
 
   public function getTimeCompleted(): Timestamp {
