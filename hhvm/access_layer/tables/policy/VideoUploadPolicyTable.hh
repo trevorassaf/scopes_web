@@ -7,9 +7,14 @@ class VideoUploadPolicyTable extends Table {
   const string BASIC_VIDEO_STORAGE_PATH_KEY = "basicVideoStoragePath";
   const string EDITED_VIDEO_STORAGE_PATH_KEY = "editedVideoStoragePath";
   const string TIME_ENACTED_KEY = "timeEnacted";
+  const string FILES_WEB_PARAM_KEY = "webFilesParamKey";
 
   public function getName(): string {
     return self::TABLE_NAME;
+  }
+
+  public function getWebFilesParamKey(): string {
+    return self::FILES_WEB_PARAM_KEY;
   }
 
   public function getMaxBytesKey(): string {

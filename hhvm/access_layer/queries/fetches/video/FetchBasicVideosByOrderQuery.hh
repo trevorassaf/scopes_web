@@ -19,7 +19,7 @@ class FetchBasicVideosByOrderQuery {
       $where_clause_vector_builder
         ->setFirstClause(
           new EqualsWhereClause(
-            $this->basicVideosTable->getConfirmedOrderIdKey(),
+            $this->basicVideosTable->getCompletedBasicVideoSetIdKey(),
             $order_id->getNumber()
           ) 
         )

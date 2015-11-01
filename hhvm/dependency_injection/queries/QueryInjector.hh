@@ -102,8 +102,10 @@ class QueryInjector {
   private ?InsertQuery<CompletedBasicVideoSet> $insertCompletedBasicVideoSetQuery;
 
   private ?FetchQuery<VideoUploadPolicy> $fetchVideoUploadPolicyQuery;
+  private ?FetchVideoUploadPolicyQuery $concreteFetchVideoUploadPolicyQuery;
   private ?InsertQuery<VideoUploadPolicy> $insertVideoUploadPolicyQuery;
   private ?FetchQuery<VideoMimeType> $fetchVideoMimeTypesQuery;
+  private ?FetchVideoMimeTypesQuery $concreteFetchVideoMimeTypesQuery;
   private ?InsertQuery<VideoMimeType> $insertVideoMimeTypeQuery;
 
   // Order Transactions
@@ -121,8 +123,6 @@ class QueryInjector {
   private ?FetchByUniqueKeyQuery<CompletedOrder> $fetchCompletedOrderByUniqueKeyQuery;
   private ?FetchCompletedOrderByConfirmedOrderQuery $fetchCompletedOrderByConfirmedOrderQuery;
   private ?InsertQuery<CompletedOrder> $insertCompletedOrderQuery;
-
-
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -172,7 +172,7 @@ class QueryInjector {
     private LazyLoader<ConcreteModelFactory<CompletedBasicVideoSet>> $completedBasicVideoSetModelFactoryLazyLoader,
     private LazyLoader<VideoUploadPolicyTable> $videoUploadPolicyTableLazyLoader,
     private LazyLoader<ModelFactory<VideoUploadPolicy>> $videoUploadPolicyModelFactoryLazyLoader,
-    private LazyLoader<VideoMimeTypesTable> $videoMimeTypesTable,
+    private LazyLoader<VideoMimeTypesTable> $videoMimeTypesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<VideoMimeType>> $videoMimeTypeModelFactoryLazyLoader
   ) {}
 
@@ -1130,6 +1130,17 @@ class QueryInjector {
     return $this->fetchVideoUploadPolicyQuery;
   }
 
+  public function getConcreteFetchVideoUploadPolicyQuery(): FetchVideoUploadPolicyQuery {
+    if ($this->concreteFetchVideoUploadPolicyQuery === null) {
+      $this->concreteFetchVideoUploadPolicyQuery = new FetchVideoUploadPolicyQuery(
+        $this->getFetchVideoUploadPolicyQuery(),
+        $this->videoUploadPolicyTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
+      ); 
+    }
+    return $this->concreteFetchVideoUploadPolicyQuery;
+  }
+
   public function getFetchVideoMimeTypesQuery(): FetchQuery<VideoMimeType> {
     if ($this->fetchVideoMimeTypesQuery === null) {
       $this->fetchVideoMimeTypesQuery = new FetchQuery(
@@ -1138,6 +1149,16 @@ class QueryInjector {
         $this->queryExceptionFactoryLazyLoader->load()
       ); 
     }
-    return $this->fetchVideoUploadPolicyQuery;
+    return $this->fetchVideoMimeTypesQuery;
+  }
+
+  public function getConcreteFetchVideoMimeTypesQuery(): FetchVideoMimeTypesQuery {
+    if ($this->concreteFetchVideoMimeTypesQuery === null) {
+      $this->concreteFetchVideoMimeTypesQuery = new FetchVideoMimeTypesQuery(
+        $this->getFetchVideoMimeTypesQuery(),
+        $this->videoMimeTypesTableLazyLoader->load()
+      );
+    }
+    return $this->concreteFetchVideoMimeTypesQuery;
   }
 }

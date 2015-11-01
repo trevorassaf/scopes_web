@@ -3,17 +3,18 @@
 class BasicVideosTable extends Table {
 
   const string TABLE_NAME = "BasicVideos";
-  const string CONFIRMED_ORDER_ID_KEY = "confirmedOrderId";
+  const string COMPLETED_BASIC_VIDEO_SET_ID_KEY = "completedBasicVideoSetId";
   const string SCOPE_INDEX_KEY = "scopeIndex";
   const string TITLE_KEY = "title";
   const string DURATION_KEY = "duration";
+  const string DESCRIPTION_KEY = "description";
 
   public function getName(): string {
     return self::TABLE_NAME;
   }
 
-  public function getConfirmedOrderIdKey(): string {
-    return self::CONFIRMED_ORDER_ID_KEY;
+  public function getCompletedBasicVideoSetIdKey(): string {
+    return self::COMPLETED_BASIC_VIDEO_SET_ID_KEY;
   }
 
   public function getScopeIndexKey(): string {
@@ -24,7 +25,11 @@ class BasicVideosTable extends Table {
     return self::TITLE_KEY;
   }
 
-  public function getDurationKey(): string {
+  public function getVideoDurationKey(): string {
     return self::DURATION_KEY;
+  }
+
+  public function getDescriptionKey(): string {
+    return self::DESCRIPTION_KEY;
   }
 }

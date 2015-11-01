@@ -2,19 +2,32 @@
 
 class UploadBasicVideosMethod {
 
+  const string FILE_EXTENSION_DELIMITER = ".";
+
+  const string BASIC_VIDEO_UPLOAD_KEY = "basic_video_file";
+
   public function __construct(
     private FetchCompletedBasicVideoSetByCompletedOrderQuery $fetchCompletedBasicVideoSetByCompletedOrderQuery,
     private FetchByIdQuery<CompletedOrder> $fetchCompletedOrderByIdQuery,
     private FetchByIdQuery<ConfirmedOrder> $fetchConfirmedOrderByIdQuery,
     private InsertQuery<BasicVideo> $insertBasicVideoQuery,
     private InsertQuery<CompletedBasicVideoSet> $insertCompletedBasicVideoSetQuery,
+    private FetchVideoUploadPolicyQuery $fetchVideoUploadPolicyQuery,
+    private FetchVideoMimeTypesQuery $fetchVideoMimeTypesQuery,
     private CompletedBasicVideoSetTable $completedBasicVideoSetTable,
+    private BasicVideosTable $basicVideosTable,
     private Logger $logger,
     private TimestampBuilder $timestampBuilder,
-    private HRTimestampSerializer $timestampSerializer
+    private HRTimestampSerializer $timestampSerializer,
+    private HRTimeSerializer $timeSerializer,
+    private HttpUploadedFilesFetcher $uploadedFilesFetcher
   ) {}
 
-  public function upload(UnsignedInt $completed_order_id): void {
+  public function upload(
+    UnsignedInt $user_agent_id,
+    UnsignedInt $completed_order_id,
+    ImmVector<CreateBasicVideoRequest> $create_basic_video_requests
+  ): void {
     // Log file upload
     $this->logger->info(
       "Uploading basic video set for CompletedOrder (id="
@@ -80,25 +93,160 @@ class UploadBasicVideosMethod {
       ->join();
 
     //// Upload videos to file system and place into db
-    $files = $this->getFiles();
+    // Load upload policy
+    $video_upload_policy_handle = $this->fetchVideoUploadPolicyQuery->fetch(
+      $upload_time
+    );
+
+    $video_upload_policy = $video_upload_policy_handle
+      ->getWaitHandle()
+      ->join();
+
+    //// Validate transfered files, insert metadata to db, move file to storage dir
+    $files = $this->uploadedFilesFetcher->fetch();
 
     // Fail if files not uploaded
-    if ($files === null || $files->isEmpty()) {
+    if ($files->isEmpty()) {
       $this->logger->info(
         "No video files found!"   
       );
 
-      throw new InvalidFileUploadException();   
+      throw new InvalidFileUploadException("No video files found!");   
     }
 
-    $scopes_count = $confirmed_order->getScopesCount();
+    // Fail if we receive unexpected number of multipart/formdata file labels
+    if ($files->count() !== 1) {
+      $this->logger->info(
+        "Expected 1 multipart/encoding-formdata categories, but received " . $files->count()
+      );  
 
+      throw new InvalidFileUploadException(
+        "Expected 1 multipart/encoding-formdata categories, but received " . $files->count()
+      );
+    }
+
+    // Fail if the top-level multipart/encoding-formdata file label is incorrectly named
+    $basic_videos_param_key = $video_upload_policy->getWebFilesParamKey();
+
+    if (!$files->containsKey($basic_videos_param_key)) {
+      $this->logger->info(
+        "Expected multipart/encoding-formdata category with name '" . $basic_videos_param_key . "', " .
+        "but received name '" . $basic_videos_param_key . "'"
+      );
+
+      throw new InvalidFileUploadException(
+        "Expected multipart/encoding-formdata category with name '" . $basic_videos_param_key . "', " .
+        "but received name '" . $basic_videos_param_key . "'"
+      );
+    }
+    
+    // Load approved mime types
+    $mime_types_handle = $this->fetchVideoMimeTypesQuery->fetch();
+
+    $mime_types = $mime_types_handle
+      ->getWaitHandle()
+      ->join();
+
+    // Extract basic videos 
+    $basic_uploaded_files = $files->at($basic_videos_param_key);
+
+    // Iterate through files and validate
+    $scopes_count = $confirmed_order->getScopesCount();
+    $max_video_size = $video_upload_policy->getMaxBytes();
+
+    foreach ($basic_uploaded_files as $file_name => $file) {
+      // Check for errors caught by php
+      if ($file->getErrorCode()->getNumber() !== 0) {
+        $this->logger->info(
+          "PHP file upload error with code " . $file->getErrorCode()->getNumber()
+        );
+
+        throw new InvalidFileUploadException(
+          "PHP file upload error with code " . $file->getErrorCode()->getNumber()
+        );
+      }
+
+      // Validate file size
+      if ($file->getSize()->greaterThan($max_video_size)) {
+        $this->logger->info(
+          "File size (" . $file->getSize()->getNumber() . "bytes) exceeds maximum "
+          . "allowed file size (" . $max_video_size->getNumber() . "bytes)"
+        ); 
+
+        throw new InvalidFileUploadException(
+          "File size (" . $file->getSize()->getNumber() . "bytes) exceeds maximum "
+          . "allowed file size (" . $max_video_size->getNumber() . "bytes)"
+        );
+      }
+
+      // Validate mime type
+      $finfo = finfo_open(FILEINFO_MIME_TYPE); 
+      $mime = finfo_file($finfo, $file->getTmpName());
+      finfo_close($finfo);
+
+      if (!$mime_types->containsKey($mime)) {
+        $this->logger->info("Invalid file mime type: " . $mime); 
+        throw new InvalidFileUploadException("Invalid file mime type: " . $mime);
+      }
+    }
+
+    /**
+     * At this point, the files have been validated and are ready to be moved 
+     * from temporary to permanent storage on the file system. 
+     */
     for ($i = 0; $i < $scopes_count->getNumber(); ++$i) {
-       
+      $basic_video_req = $create_basic_video_requests[$i];
+
+      // Register this basic video file with the db. We will derive the video's
+      // file-name from the record id
+      $insert_query_handle = $this->insertBasicVideoQuery->insert(
+        ImmMap{
+          $this->basicVideosTable->getCompletedBasicVideoSetIdKey() => $completed_order->getId()->getNumber(),
+          $this->basicVideosTable->getScopeIndexKey() => $i,
+          $this->basicVideosTable->getTitleKey() => $basic_video_req->getTitle(),
+          $this->basicVideosTable->getDescriptionKey() => $basic_video_req->getDescription(), 
+          $this->basicVideosTable->getVideoDurationKey() => $this->timeSerializer->serialize($basic_video_req->getVideoDuration()->getTimeDifference())
+        }
+      );  
+
+      $basic_video = $insert_query_handle
+        ->getWaitHandle()
+        ->join();
+
+      // Create target path
+      $uploaded_file = $files[$basic_videos_param_key][$basic_video_req->getFileName()];
+
+      $finfo = finfo_open(FILEINFO_MIME_TYPE); 
+      $mime = finfo_file($finfo, $uploaded_file->getTmpName());
+      finfo_close($finfo);
+
+      $target_path = $video_upload_policy->getBasicVideoStoragePath() . DIRECTORY_SEPARATOR
+          . (string)$basic_video->getId()->getNumber() . self::FILE_EXTENSION_DELIMITER . $mime;
+      
+      // Move the file from temp storage to permanent storage  
+      // Validate mime type
+      $upload_succeeded = move_uploaded_file(
+        $uploaded_file->getTmpName(),
+        $target_path 
+      );
+
+      if (!$upload_succeeded) {
+        $this->logger->info(
+          "Failed to move uploaded basic video file!"
+        );
+
+        throw new InvalidFileUploadException(
+          "Failed to move uploaded basic video file!"
+        );
+      }
     }
   }
 
-  private function getFiles(): ?ImmMap<string, mixed> {
+  private function makeUploadedFileKey(UnsignedInt $video_index): string {
+    return self::BASIC_VIDEO_UPLOAD_KEY . (string)$video_index->getNumber();
+  }
+
+  private function getFiles(): ?ImmMap<string, ImmMap<string, ImmVector<mixed>>> {
     // UNSAFE
     return $_FILES;
   }

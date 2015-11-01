@@ -21,6 +21,26 @@ class UnsignedInt {
   public function equals(UnsignedInt $other): bool {
     return $other->number === $this->number; 
   }
+  
+  public function lessThan(UnsignedInt $uint): bool {
+    return $this->number < $uint->getNumber();
+  }
+
+  public function lessThanOrEqualTo(
+    UnsignedInt $uint
+  ): bool {
+    return $this->number <= $uint->getNumber();
+  }
+
+  public function greaterThan(UnsignedInt $uint): bool {
+    return $this->number > $uint->getNumber();
+  }
+
+  public function greaterThanOrEqualTo(
+    UnsignedInt $uint
+  ): bool {
+    return $this->number >= $uint->getNumber();
+  }
 
   public function __construct(int $number) {
     if (!static::isUnsigned($number)) {

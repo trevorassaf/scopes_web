@@ -16,7 +16,7 @@ class BatchInsertBasicVideosByOrderQuery {
 
     foreach ($create_basic_video_requests as $request) {
       $basic_videos[] = ImmMap{
-        $this->basicVideosTable->getConfirmedOrderIdKey() => $confirmed_order_id->getNumber(),
+        $this->basicVideosTable->getCompletedBasicVideoSetIdKey() => $confirmed_order_id->getNumber(),
         $this->basicVideosTable->getScopeIndexKey() => $scope_index,
         $this->basicVideosTable->getTitleKey() => $request->getTitle(),
       };

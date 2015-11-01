@@ -12,6 +12,7 @@ class VideoUploadPolicyFactory implements ModelFactory<VideoUploadPolicy> {
   ): VideoUploadPolicy {
     return new VideoUploadPolicy(
       new UnsignedInt((int)$param_map[$this->videoUploadPolicyTable->getMaxBytesKey()]),
+      (string)$param_map[$this->videoUploadPolicyTable->getWebFilesParamKey()],
       (string)$param_map[$this->videoUploadPolicyTable->getBasicVideoStoragePathKey()],
       (string)$param_map[$this->videoUploadPolicyTable->getEditedVideoStoragePathKey()],
       $this->timestampSerializer->deserialize($this->videoUploadPolicyTable->getTimeEnactedKey())

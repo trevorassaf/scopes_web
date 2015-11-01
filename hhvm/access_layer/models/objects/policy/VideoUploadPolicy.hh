@@ -4,6 +4,7 @@ class VideoUploadPolicy {
 
   public function __construct(
     private UnsignedInt $maxBytes,
+    private string $webFilesParamKey,
     private string $basicVideoStoragePath,
     private string $editedVideoStoragePath,
     private Timestamp $timeEnacted
@@ -11,6 +12,10 @@ class VideoUploadPolicy {
 
   public function getMaxBytes(): UnsignedInt {
     return $this->maxBytes;
+  }
+
+  public function getWebFilesParamKey(): string {
+    return $this->webFilesParamKey;
   }
 
   public function getBasicVideoStoragePath(): string {

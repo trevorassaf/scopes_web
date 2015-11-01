@@ -26,6 +26,11 @@ class TimestampSegment {
   }
 
   public function getNumberOfHours(): UnsignedInt {
+    $time_difference = $this->getTimeDifference();
+    return $time_difference->getHour()->getNumber();
+  }
+
+  public function getTimeDifference(): Time {
     // Serialize timestamps
     $start_time_str = $this->timestampSerializer->serialize($this->start); 
     $end_time_str = $this->timestampSerializer->serialize($this->end); 
@@ -37,7 +42,13 @@ class TimestampSegment {
     // Calculate difference
     $time_difference = $end_time_date_time->diff($start_time_date_time);
     $hours = $time_difference->h + $time_difference->days * 24;
+    $minutes = $time_difference->m;
+    $seconds = $time_difference->s;
 
-    return new UnsignedInt($hours);
+    return new Time(
+      new Hour($hours),
+      new Minute($minutes),
+      new Second($seconds)
+    );
   }
 }
