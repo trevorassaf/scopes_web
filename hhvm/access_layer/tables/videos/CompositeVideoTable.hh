@@ -3,16 +3,18 @@
 class CompositeVideoTable extends Table {
 
   const string  TABLE_NAME = "CompositeVideos";
-  const string ORDER_ID_KEY = "editedVideoOrderId";
+  const string COMPLETED_VIDEO_ID_KEY = "completedCompositeVideoId";
   const string EXPIRATION_TIME_KEY = "expirationTime";
   const string DURATION_KEY = "duration";
+  const string TITLE_KEY = "title";
+  const string DESCRIPTION_KEY = "description";
 
   public function getName(): string {
     return self::TABLE_NAME;
   }
 
-  public function getEditedVideoOrderIdKey(): string {
-    return self::ORDER_ID_KEY;
+  public function getCompletedCompositeVideoIdKey(): string {
+    return self::COMPLETED_VIDEO_ID_KEY;
   }
 
   public function getExpirationTimeKey(): string {
@@ -21,5 +23,13 @@ class CompositeVideoTable extends Table {
 
   public function getDurationKey(): string {
     return self::DURATION_KEY;
+  }
+
+  public function getTitleKey(): string {
+    return self::TITLE_KEY;
+  }
+
+  public function getDescriptionKey(): string {
+    return self::DESCRIPTION_KEY;
   }
 }

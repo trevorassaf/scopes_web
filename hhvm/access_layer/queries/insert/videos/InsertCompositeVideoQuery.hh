@@ -14,7 +14,7 @@ class InsertCompositeVideoQuery {
   ): Awaitable<CompositeVideo> {
     return await $this->insertQuery->insert(
       ImmMap{
-        $this->compositeVideoTable->getEditedVideoOrderIdKey() => $edited_video_order_id->getNumber(),
+        $this->compositeVideoTable->getCompletedCompositeVideoIdKey() => $edited_video_order_id->getNumber(),
         $this->compositeVideoTable->getExpirationTimeKey() => $this->timestampSerializer->serialize($expiration_time),
       }
     ); 

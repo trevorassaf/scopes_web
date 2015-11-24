@@ -49,6 +49,9 @@ class ProductionApiRouter implements ApiRouter {
       case ApiType::GET_USERS_CONFIRMED_ORDERS:
         $api = $this->apiInjector->getGetUsersConfirmedOrdersApi();
         break;
+      case ApiType::UPLOAD_EDITED_VIDEO:
+        $api = $this->apiInjector->getUploadEditedVideoApi();
+        break;
       default:
         throw new Exception("Unhandled api type!");
         break;

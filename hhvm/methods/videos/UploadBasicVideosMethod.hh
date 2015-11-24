@@ -12,6 +12,7 @@ class UploadBasicVideosMethod {
     private FetchByIdQuery<ConfirmedOrder> $fetchConfirmedOrderByIdQuery,
     private InsertQuery<BasicVideo> $insertBasicVideoQuery,
     private InsertQuery<CompletedBasicVideoSet> $insertCompletedBasicVideoSetQuery,
+    private DeleteByIdQuery $deleteByIdQuery,
     private FetchVideoUploadPolicyQuery $fetchVideoUploadPolicyQuery,
     private FetchVideoMimeTypesQuery $fetchVideoMimeTypesQuery,
     private CompletedBasicVideoSetTable $completedBasicVideoSetTable,
@@ -27,13 +28,14 @@ class UploadBasicVideosMethod {
     UnsignedInt $user_agent_id,
     UnsignedInt $completed_order_id,
     ImmVector<CreateBasicVideoRequest> $create_basic_video_requests
-  ): void {
+  ): ImmVector<UnsignedInt> {
     // Log file upload
     $this->logger->info(
       "Uploading basic video set for CompletedOrder (id="
       . $completed_order_id->getNumber() . ")"
     );
 
+    //// Make sure that this order has been marked completed
     // Fetch completed order
     $fetch_completed_order_handle = $this->fetchCompletedOrderByIdQuery->fetch(
       $completed_order_id
@@ -45,10 +47,6 @@ class UploadBasicVideosMethod {
 
     // Check that completed order exists
     if ($completed_order === null) {
-      $this->logger->info(
-        "CompletedOrder (id=" . $completed_order_id->getNumber() . ") not found!"
-      );
-
       throw new NonextantObjectException(
         "CompletedOrder (id=" . $completed_order_id->getNumber() . ") not found!",
         ObjectType::COMPLETED_ORDER
@@ -66,17 +64,21 @@ class UploadBasicVideosMethod {
 
     // Check that confirmed order exists
     if ($confirmed_order === null) {
-      $this->logger->info(
-        "ConfirmedOrder (id=" . $completed_order->getConfirmedOrderId()->getNumber()
-        . ") not found!"
-      );
-
       throw new NonextantObjectException(
         "ConfirmedOrder (id=" . $completed_order->getConfirmedOrderId()->getNumber()
         . ") not found!",
         ObjectType::CONFIRMED_ORDER
       );
     }
+
+    // Make sure that the user linked with this session owns this order
+    if (!$user_agent_id->equals($confirmed_order->getUserId())) {
+      throw new InvalidFileUploadException(
+        "User associated with this session (id=" . $user_agent_id->getNumber() 
+        . ") does not own specified ConfirmedOrder (id=" . $confirmed_order->getId()->getNumber(). ")!"
+      );  
+    }
+
 
     // Register basic video set with db
     $upload_time = $this->timestampBuilder->now();
@@ -129,14 +131,9 @@ class UploadBasicVideosMethod {
     $basic_videos_param_key = $video_upload_policy->getWebFilesParamKey();
 
     if (!$files->containsKey($basic_videos_param_key)) {
-      $this->logger->info(
-        "Expected multipart/encoding-formdata category with name '" . $basic_videos_param_key . "', " .
-        "but received name '" . $basic_videos_param_key . "'"
-      );
-
       throw new InvalidFileUploadException(
         "Expected multipart/encoding-formdata category with name '" . $basic_videos_param_key . "', " .
-        "but received name '" . $basic_videos_param_key . "'"
+        "but received name '" . $files->keys()[0] . "'"
       );
     }
     
@@ -194,6 +191,8 @@ class UploadBasicVideosMethod {
      * At this point, the files have been validated and are ready to be moved 
      * from temporary to permanent storage on the file system. 
      */
+    $basic_video_id_list = Vector{};
+
     for ($i = 0; $i < $scopes_count->getNumber(); ++$i) {
       $basic_video_req = $create_basic_video_requests[$i];
 
@@ -205,7 +204,7 @@ class UploadBasicVideosMethod {
           $this->basicVideosTable->getScopeIndexKey() => $i,
           $this->basicVideosTable->getTitleKey() => $basic_video_req->getTitle(),
           $this->basicVideosTable->getDescriptionKey() => $basic_video_req->getDescription(), 
-          $this->basicVideosTable->getVideoDurationKey() => $this->timeSerializer->serialize($basic_video_req->getVideoDuration()->getTimeDifference())
+          $this->basicVideosTable->getVideoDurationKey() => $this->timeSerializer->serialize($basic_video_req->getVideoDuration())
         }
       );  
 
@@ -239,7 +238,12 @@ class UploadBasicVideosMethod {
           "Failed to move uploaded basic video file!"
         );
       }
+
+      // Prepare basic video id list
+      $basic_video_id_list[] = $basic_video->getId();
     }
+
+    return $basic_video_id_list->toImmVector();
   }
 
   private function makeUploadedFileKey(UnsignedInt $video_index): string {

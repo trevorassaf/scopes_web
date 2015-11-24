@@ -4,7 +4,7 @@ class CreateBasicVideoRequest {
 
   public function __construct(
     private string $title,
-    private TimestampSegment $videoDuration,
+    private Time $videoDuration,
     private string $fileName,
     private string $description
   ) {}
@@ -13,7 +13,7 @@ class CreateBasicVideoRequest {
     return $this->title;
   }
 
-  public function getVideoDuration(): TimestampSegment {
+  public function getVideoDuration(): Time {
     return $this->videoDuration;
   }
 

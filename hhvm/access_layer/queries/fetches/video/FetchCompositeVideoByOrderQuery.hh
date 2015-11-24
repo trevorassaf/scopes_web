@@ -19,7 +19,7 @@ class FetchCompositeVideoByOrderQuery {
       $where_clause_vector_builder
         ->setFirstClause(
           new EqualsWhereClause(
-            $this->compositeVideoTable->getEditedVideoOrderIdKey(),
+            $this->compositeVideoTable->getCompletedCompositeVideoIdKey(),
             $order_id->getNumber()
           ) 
         )

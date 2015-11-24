@@ -4,6 +4,7 @@ class CompositeVideoFactory extends ConcreteModelFactory<CompositeVideo> {
 
   public function __construct(
     private HRTimestampSerializer $timestampSerializer,
+    private HRTimeSerializer $timeSerializer,
     private CompositeVideoTable $table
   ) {}
 
@@ -13,11 +14,13 @@ class CompositeVideoFactory extends ConcreteModelFactory<CompositeVideo> {
   ): CompositeVideo {
     return new CompositeVideo(
       $id,
-      new UnsignedInt((int)$params[$this->table->getEditedVideoOrderIdKey()]),
+      new UnsignedInt((int)$params[$this->table->getCompletedCompositeVideoIdKey()]),
       $this->timestampSerializer->deserialize(
         (string)$params[$this->table->getExpirationTimeKey()]
       ),
-      new UnsignedInt((int)$params[$this->table->getDurationKey()])
+      $this->timeSerializer->deserialize(
+        (string)$params[$this->table->getDurationKey()]
+      )
     );  
   }
 }

@@ -110,6 +110,7 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $composite_video_table_loader,
       new CompositeVideoModelFactoryLazyLoader(
         $timestamp_serializer_loader,
+        $time_serializer_loader,
         $composite_video_table_loader
       ),
       $confirmed_order_transaction_table_loader,
