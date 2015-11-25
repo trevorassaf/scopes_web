@@ -1,6 +1,6 @@
 <?hh // strict
 
-class CreateUploadEditedVideoRequestFactory implements RequestFactory<CreateUploadEditedVideoApiRequest> {
+class CreateUploadEditedVideoApiRequestFactory implements RequestFactory<CreateUploadEditedVideoApiRequest> {
 
   const int TITLE_MAX_LENGTH_KEY = 10;
   const int DESCRIPTION_MAX_LENGTH_KEY = 100;

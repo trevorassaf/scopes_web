@@ -58,6 +58,8 @@ class QueryInjector {
   
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
+  private ?FetchByUniqueKeyQuery<ConfirmedOrder> $fetchConfirmedOrderByUniqueKeyQuery;
+  private ?FetchByIdQuery<ConfirmedOrder> $fetchConfirmedOrderByIdQuery;
   private ?FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery;
   private ?InsertQuery<ConfirmedOrder> $insertConfirmedOrderQuery;
   private ?InsertConfirmedOrderQuery $concreteInsertConfirmedOrderQuery;
@@ -69,7 +71,11 @@ class QueryInjector {
   // Edited video order queries
   private ?InsertQuery<EditedVideoOrder> $insertEditedVideoOrderQuery;
   private ?InsertEditedVideoOrderQuery $concreteInsertEditedVideoOrderQuery;
-  
+  private ?FetchQuery<EditedVideoOrder> $fetchEditedVideoOrderQuery;
+  private ?FetchByUniqueKeyQuery<EditedVideoOrder> $fetchEditedVideoOrderByUniqueKeyQuery;
+  private ?FetchByIdQuery<EditedVideoOrder> $fetchEditedVideoOrderByIdQuery;
+  private ?InsertQuery<CompletedCompositeVideo> $insertCompletedCompositeVideoQuery; 
+
   // Short codes
   private ?FetchQuery<ShortCode> $fetchShortCodesQuery;
   private ?FetchByUniqueKeyQuery<ShortCode> $fetchShortCodeByUniqueKeyQuery;
@@ -88,10 +94,13 @@ class QueryInjector {
   // Video packages
   private ?FetchQuery<BasicVideo> $fetchBasicVideosQuery;
   private ?FetchBasicVideosByOrderQuery $fetchBasicVideosByOrderQuery;
+  private ?InsertQuery<BasicVideo> $insertBasicVideoQuery;
   private ?BatchInsertQuery<BasicVideo> $batchInsertBasicVideosQuery;
   private ?BatchInsertBasicVideosByOrderQuery $batchInsertBasicVideosByOrderQuery;
 
   private ?FetchQuery<CompositeVideo> $fetchCompositeVideosQuery;
+  private ?FetchByUniqueKeyQuery<CompositeVideo> $fetchCompositeVideoByUniqueKeyQuery;
+  private ?FetchByIdQuery<CompositeVideo> $fetchCompositeVideoByIdQuery;
   private ?FetchCompositeVideoByOrderQuery $fetchCompositeVideoByOrderQuery;
   private ?InsertQuery<CompositeVideo> $insertCompositeVideoQuery;
   private ?InsertCompositeVideoQuery $concreteInsertCompositeVideoQuery;
@@ -121,6 +130,7 @@ class QueryInjector {
   // Completed orders
   private ?FetchQuery<CompletedOrder> $fetchCompletedOrderQuery;
   private ?FetchByUniqueKeyQuery<CompletedOrder> $fetchCompletedOrderByUniqueKeyQuery;
+  private ?FetchByIdQuery<CompletedOrder> $fetchCompletedOrderByIdQuery;
   private ?FetchCompletedOrderByConfirmedOrderQuery $fetchCompletedOrderByConfirmedOrderQuery;
   private ?InsertQuery<CompletedOrder> $insertCompletedOrderQuery;
 
@@ -173,7 +183,9 @@ class QueryInjector {
     private LazyLoader<VideoUploadPolicyTable> $videoUploadPolicyTableLazyLoader,
     private LazyLoader<ModelFactory<VideoUploadPolicy>> $videoUploadPolicyModelFactoryLazyLoader,
     private LazyLoader<VideoMimeTypesTable> $videoMimeTypesTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<VideoMimeType>> $videoMimeTypeModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<VideoMimeType>> $videoMimeTypeModelFactoryLazyLoader,
+    private LazyLoader<CompletedCompositeVideoTable> $completedCompositeVideoTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<CompletedCompositeVideo>> $completedCompositeVideoModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -626,6 +638,27 @@ class QueryInjector {
     return $this->fetchConfirmedOrderQuery;
   }
 
+  public function getFetchConfirmedOrderByUniqueKeyQuery(): FetchByUniqueKeyQuery<ConfirmedOrder> {
+    if ($this->fetchConfirmedOrderByUniqueKeyQuery === null) {
+      $this->fetchConfirmedOrderByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchConfirmedOrderQuery(),
+        $this->confirmedOrdersTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchConfirmedOrderByUniqueKeyQuery;
+  }
+
+  public function getFetchConfirmedOrderByIdQuery(): FetchByIdQuery<ConfirmedOrder> {
+    if ($this->fetchConfirmedOrderByIdQuery === null) {
+      $this->fetchConfirmedOrderByIdQuery = new FetchByIdQuery(
+        $this->getFetchConfirmedOrderByUniqueKeyQuery(),
+        $this->confirmedOrdersTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchConfirmedOrderByIdQuery;
+  }
+
   public function getFetchConfirmedOrdersByTimeQuery(): FetchConfirmedOrdersByTimeQuery {
     if ($this->fetchConfirmedOrdersByTimeQuery === null) {
       $this->fetchConfirmedOrdersByTimeQuery = new FetchConfirmedOrdersByTimeQuery(
@@ -681,6 +714,7 @@ class QueryInjector {
     return $this->fetchConfirmedOrderCellLabelsQuery;
   }
 
+  // Video queries
   public function getInsertEditedVideoOrderQuery(): InsertQuery<EditedVideoOrder> {
     if ($this->insertEditedVideoOrderQuery === null) {
       $this->insertEditedVideoOrderQuery = new InsertQuery(
@@ -702,6 +736,51 @@ class QueryInjector {
       ); 
     }
     return $this->concreteInsertEditedVideoOrderQuery;
+  }
+
+  public function getFetchEditedVideoOrderQuery(): FetchQuery<EditedVideoOrder> {
+    if ($this->fetchEditedVideoOrderQuery === null) {
+      $this->fetchEditedVideoOrderQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->editedVideoOrderModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchEditedVideoOrderQuery;
+  }
+
+  public function getFetchEditedVideoOrderByUniqueKeyQuery(): FetchByUniqueKeyQuery<EditedVideoOrder> {
+    if ($this->fetchEditedVideoOrderByUniqueKeyQuery === null) {
+      $this->fetchEditedVideoOrderByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchEditedVideoOrderQuery(),
+        $this->editedVideoOrderTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchEditedVideoOrderByUniqueKeyQuery;
+  }
+
+  public function getFetchEditedVideoOrderByIdQuery(): FetchByIdQuery<EditedVideoOrder> {
+    if ($this->fetchEditedVideoOrderByIdQuery === null) {
+      $this->fetchEditedVideoOrderByIdQuery = new FetchByIdQuery(
+        $this->getFetchEditedVideoOrderByUniqueKeyQuery(),
+        $this->editedVideoOrderTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchEditedVideoOrderByIdQuery;
+  }
+
+  public function getInsertCompletedCompositeVideoQuery(): InsertQuery<CompletedCompositeVideo> {
+    if ($this->insertCompletedCompositeVideoQuery === null) {
+      $this->insertCompletedCompositeVideoQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->completedCompositeVideoTableLazyLoader->load(),
+        $this->completedCompositeVideoModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertCompletedCompositeVideoQuery;
   }
 
   public function getFetchShortCodesQuery(): FetchQuery<ShortCode> {
@@ -863,6 +942,19 @@ class QueryInjector {
     return $this->fetchBasicVideosByOrderQuery;
   }
 
+  public function getInsertBasicVideoQuery(): InsertQuery<BasicVideo> {
+    if ($this->insertBasicVideoQuery === null) {
+      $this->insertBasicVideoQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->basicVideosTableLazyLoader->load(),
+        $this->basicVideoModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertBasicVideoQuery;
+  }
+
   protected function getBatchInsertBasicVideosQuery(): BatchInsertQuery<BasicVideo> {
     if ($this->batchInsertBasicVideosQuery === null) {
       $this->batchInsertBasicVideosQuery = new BatchInsertQuery(
@@ -893,6 +985,27 @@ class QueryInjector {
       ); 
     }
     return $this->fetchCompositeVideosQuery;
+  }
+
+  public function getFetchCompositeVideoByUniqueKeyQuery(): FetchByUniqueKeyQuery<CompositeVideo> {
+    if ($this->fetchCompositeVideoByUniqueKeyQuery === null) {
+      $this->fetchCompositeVideoByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchCompositeVideosQuery(),
+        $this->compositeVideoTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompositeVideoByUniqueKeyQuery; 
+  }
+
+  public function getFetchCompositeVideoByIdQuery(): FetchByIdQuery<CompositeVideo> {
+    if ($this->fetchCompositeVideoByIdQuery === null) {
+      $this->fetchCompositeVideoByIdQuery = new FetchByIdQuery(
+        $this->getFetchCompositeVideoByUniqueKeyQuery(),
+        $this->compositeVideoTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompositeVideoByIdQuery; 
   }
   
   public function getFetchCompositeVideoByOrderQuery(): FetchCompositeVideoByOrderQuery {
@@ -1048,6 +1161,16 @@ class QueryInjector {
     return $this->fetchCompletedOrderByUniqueKeyQuery;
   }
 
+  public function getFetchCompletedOrderByIdQuery(): FetchByIdQuery<CompletedOrder> {
+    if ($this->fetchCompletedOrderByIdQuery === null) {
+      $this->fetchCompletedOrderByIdQuery = new FetchByIdQuery(
+        $this->getFetchCompletedOrderByUniqueKeyQuery(),
+        $this->completedOrdersTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedOrderByIdQuery;
+  }
+
   public function getFetchCompletedOrderByConfirmedOrderQuery(): FetchCompletedOrderByConfirmedOrderQuery {
     if ($this->fetchCompletedOrderByConfirmedOrderQuery === null) {
       $this->fetchCompletedOrderByConfirmedOrderQuery = new FetchCompletedOrderByConfirmedOrderQuery(
@@ -1161,4 +1284,21 @@ class QueryInjector {
     }
     return $this->concreteFetchVideoMimeTypesQuery;
   }
+
+  public function getCompositeVideosTable(): CompositeVideoTable {
+    return $this->compositeVideoTableLazyLoader->load();
+  }
+
+  public function getCompletedCompositeVideoTable(): CompletedCompositeVideoTable {
+    return $this->completedCompositeVideoTableLazyLoader->load();
+  }
+
+  public function getCompletedBasicVideoSetTable(): CompletedBasicVideoSetTable {
+    return $this->completedBasicVideoSetTableLazyLoader->load();
+  }
+
+  public function getBasicVideosTable(): BasicVideosTable {
+    return $this->basicVideosTableLazyLoader->load();
+  }
+
 }

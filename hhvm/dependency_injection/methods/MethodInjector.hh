@@ -49,6 +49,10 @@ class MethodInjector {
   private ?ExecuteTransactionsForTimeIntervalMethod $executeTransactionsForTimeIntervalMethod;
   private ?ExecuteOrderTransactionMethod $executeOrderTransactionMethod;
 
+  // Video methods
+  private ?UploadBasicVideosMethod $uploadBasicVideosMethod;
+  private ?UploadEditedVideoMethod $uploadEditedVideoMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
@@ -59,7 +63,7 @@ class MethodInjector {
     private LazyLoader<IrregularTimesTable> $irregularTimesTableLoader,
     private LazyLoader<CellLabelsTable> $cellsLabelTableLoader,
     private LazyLoader<HRTimestampSerializer> $timestampSerializerLoader,
-    private LazyLoader<TimeSerializer> $timeSerializerLoader,
+    private LazyLoader<HRTimeSerializer> $timeSerializerLoader,
     private LazyLoader<DateSerializer> $dateSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
     private LazyLoader<DateToDayOfTheWeekConverter> $dateToDayOfTheWeekConverterLoader,
@@ -69,7 +73,8 @@ class MethodInjector {
     private Logger $logger,
     private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
     private LazyLoader<ConfirmedOrderTransactionTable> $confirmedOrderTransactionTableLoader,
-    private LazyLoader<FailedConfirmedOrderTransactionTable> $failedConfirmedOrderTransactionTableLoader
+    private LazyLoader<FailedConfirmedOrderTransactionTable> $failedConfirmedOrderTransactionTableLoader,
+    private HttpUploadedFilesFetcher $httpUploadedFilesFetcher
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -344,6 +349,53 @@ class MethodInjector {
       ); 
     }
     return $this->executeOrderTransactionMethod;
+  }
+
+  public function getUploadBasicVideosMethod(): UploadBasicVideosMethod {
+    if ($this->uploadBasicVideosMethod === null) {
+      $this->uploadBasicVideosMethod = new UploadBasicVideosMethod(
+        $this->queryInjector->getFetchCompletedBasicVideoSetByCompletedOrderQuery(),
+        $this->queryInjector->getFetchCompletedOrderByIdQuery(),
+        $this->queryInjector->getFetchConfirmedOrderByIdQuery(),
+        $this->queryInjector->getInsertBasicVideoQuery(),
+        $this->queryInjector->getInsertCompletedBasicVideoSetQuery(),
+        $this->queryInjector->getDeleteByIdQuery(),
+        $this->queryInjector->getConcreteFetchVideoUploadPolicyQuery(),
+        $this->queryInjector->getConcreteFetchVideoMimeTypesQuery(),
+        $this->queryInjector->getCompletedBasicVideoSetTable(),
+        $this->queryInjector->getBasicVideosTable(),
+        $this->logger,
+        $this->timestampBuilderLoader->load(),
+        $this->timestampSerializerLoader->load(),
+        $this->timeSerializerLoader->load(),
+        $this->httpUploadedFilesFetcher
+      );
+    }
+    return $this->uploadBasicVideosMethod;
+  }
+
+  public function getUploadEditedVideoMethod(): UploadEditedVideoMethod {
+    if ($this->uploadEditedVideoMethod === null) {
+      $this->uploadEditedVideoMethod = new UploadEditedVideoMethod(
+        $this->queryInjector->getFetchEditedVideoOrderByIdQuery(),
+        $this->queryInjector->getFetchConfirmedOrderByIdQuery(),
+        $this->queryInjector->getFetchCompletedOrderByConfirmedOrderQuery(),
+        $this->queryInjector->getFetchCompositeVideoByIdQuery(),
+        $this->queryInjector->getConcreteFetchVideoUploadPolicyQuery(),
+        $this->queryInjector->getInsertCompositeVideoQuery(),
+        $this->queryInjector->getInsertCompletedCompositeVideoQuery(),
+        $this->queryInjector->getDeleteByIdQuery(),
+        $this->queryInjector->getConcreteFetchVideoMimeTypesQuery(),
+        $this->queryInjector->getCompositeVideosTable(),
+        $this->queryInjector->getCompletedCompositeVideoTable(),
+        $this->logger,
+        $this->timestampBuilderLoader->load(),
+        $this->timestampSerializerLoader->load(),
+        $this->timeSerializerLoader->load(),
+        $this->httpUploadedFilesFetcher
+      ); 
+    }
+    return $this->uploadEditedVideoMethod;
   }
 
 }
