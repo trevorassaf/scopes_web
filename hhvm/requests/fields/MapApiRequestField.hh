@@ -2,7 +2,7 @@
 
 class MapApiRequestField<Tkey, Tvalue> {
   
-  private function __construct(
+  public function __construct(
     private string $key,
     private ImmMap<Tkey, Tvalue> $map,
     private ImmVector<MapApiRequestFieldConstraint> $constraintList

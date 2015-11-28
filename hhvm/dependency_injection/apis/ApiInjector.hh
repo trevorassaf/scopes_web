@@ -22,6 +22,8 @@ class ApiInjector {
 
   private ?GetUsersConfirmedOrdersApi $getUsersConfirmedOrdersApi;
 
+  private ?UploadBasicVideosApi $uploadBasicVideoApi;
+
   private ?UploadEditedVideoApi $uploadEditedVideoApi;
 
   public function __construct(
@@ -37,6 +39,7 @@ class ApiInjector {
     private LazyLoader<RequestFactory<DeleteReservedOrderRequest>> $deleteReservedOrderRequestLoader,
     private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader,
     private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader,
+    private LazyLoader<RequestFactory<CreateUploadBasicVideosApiRequest>> $createUploadBasicVideosApiRequestLoader,
     private LazyLoader<RequestFactory<CreateUploadEditedVideoApiRequest>> $createUploadEditedVideoApiRequestLoader,
     private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilder,
@@ -154,6 +157,17 @@ class ApiInjector {
       ); 
     }
     return $this->getUsersConfirmedOrdersApi;
+  }
+
+  public function getUploadBasicVideoApi(): UploadBasicVideosApi {
+    if ($this->uploadBasicVideoApi === null) {
+      $this->uploadBasicVideoApi = new UploadBasicVideosApi(
+        $this->createUploadBasicVideosApiRequestLoader->load(),
+        $this->methodInjector->getUploadBasicVideosMethod(),
+        $this->logger 
+      ); 
+    }
+    return $this->uploadBasicVideoApi;
   }
 
   public function getUploadEditedVideoApi() : UploadEditedVideoApi {

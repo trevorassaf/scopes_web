@@ -26,3 +26,44 @@ class CreateUploadBasicVideosApiRequest {
     return $this->basicVideos;
   }
 }
+
+class CreateUploadBasicVideosApiRequestBuilder {
+
+  private ?RequestField<UnsignedInt> $userId;
+  private ?RequestField<UnsignedInt> $completedOrderId;
+  private ?MapApiRequestField<string, BasicVideoApiRequest> $basicVideos;
+
+  public function setUserId(RequestField<UnsignedInt> $id): this {
+    $this->userId = $id;
+    return $this;
+  }
+
+  public function setCompletedOrderId(RequestField<UnsignedInt> $id): this {
+    $this->completedOrderId = $id;
+    return $this;
+  }
+
+  public function setBasicVideos(MapApiRequestField<string, BasicVideoApiRequest> $video_map): this {
+    $this->basicVideos = $video_map;
+    return $this;
+  }
+  
+  private function checkNotNull<T>(?T $field, string $key): T {
+    if ($field === null) {
+      throw new UnsetRequestFieldException(
+        CreateUploadBasicVideosApiRequest::REQUEST_OBJECT_NAME,
+        $key
+      );
+    }
+    return $field;
+  }
+
+  public function build(): CreateUploadBasicVideosApiRequest {
+    return new CreateUploadBasicVideosApiRequest(
+      $this->checkNotNull($this->userId, CreateUploadBasicVideosApiRequest::USER_ID_KEY),
+      $this->checkNotNull($this->completedOrderId, CreateUploadBasicVideosApiRequest::COMPLETED_ORDER_ID_KEY),
+      $this->checkNotNull($this->basicVideos, CreateUploadBasicVideosApiRequest::VIDEO_MAP_KEY)
+    ); 
+  }
+
+}
