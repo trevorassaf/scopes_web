@@ -134,6 +134,7 @@ class QueryInjector {
   private ?FetchByIdQuery<CompletedOrder> $fetchCompletedOrderByIdQuery;
   private ?FetchCompletedOrderByConfirmedOrderQuery $fetchCompletedOrderByConfirmedOrderQuery;
   private ?InsertQuery<CompletedOrder> $insertCompletedOrderQuery;
+  private ?InsertCompletedOrderQuery $concreteInsertCompletedOrderQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -1203,6 +1204,17 @@ class QueryInjector {
       ); 
     }
     return $this->insertCompletedOrderQuery;
+  }
+
+  public function getConcreteInsertCompletedOrderQuery(): InsertCompletedOrderQuery {
+    if ($this->concreteInsertCompletedOrderQuery === null) {
+      $this->concreteInsertCompletedOrderQuery = new InsertCompletedOrderQuery(
+        $this->getInsertCompletedOrderQuery(),
+        $this->completedOrdersTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertCompletedOrderQuery;
   }
 
   /**

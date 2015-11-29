@@ -26,6 +26,8 @@ class ApiInjector {
 
   private ?UploadEditedVideoApi $uploadEditedVideoApi;
 
+  private ?CompleteOrderApi $completeOrderApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private Logger $logger,
@@ -41,8 +43,9 @@ class ApiInjector {
     private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader,
     private LazyLoader<RequestFactory<CreateUploadBasicVideosApiRequest>> $createUploadBasicVideosApiRequestLoader,
     private LazyLoader<RequestFactory<CreateUploadEditedVideoApiRequest>> $createUploadEditedVideoApiRequestLoader,
+    private LazyLoader<RequestFactory<CompleteOrderApiRequest>> $completeOrderApiRequestLoader,
     private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
-    private LazyLoader<TimestampBuilder> $timestampBuilder,
+    private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
     private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader
   ) {}
 
@@ -84,7 +87,7 @@ class ApiInjector {
     if ($this->confirmOrderApi === null) {
       $this->confirmOrderApi = new ConfirmOrderApi(
         $this->confirmOrderRequestFactoryLoader->load(),
-        $this->timestampBuilder->load(),
+        $this->timestampBuilderLoader->load(),
         $this->methodInjector->getConfirmOrderMethod(),
         $this->logger
       );        
@@ -179,5 +182,17 @@ class ApiInjector {
       );
     }  
     return $this->uploadEditedVideoApi;   
+  }
+
+  public function getCompleteOrderApi(): CompleteOrderApi {
+    if ($this->completeOrderApi === null) {
+      $this->completeOrderApi = new CompleteOrderApi(
+        $this->completeOrderApiRequestLoader->load(),
+        $this->timestampBuilderLoader->load(),
+        $this->methodInjector->getCompleteOrderMethod(),
+        $this->logger
+      ); 
+    }
+    return $this->completeOrderApi;
   }
 }

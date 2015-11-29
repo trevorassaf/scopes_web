@@ -3,15 +3,13 @@
 class CompleteOrderMethod {
 
   public function __construct(
-    private InsertQuery<CompletedOrder> $insertCompletedOrderQuery,
+    private InsertCompletedOrderQuery $insertCompletedOrderQuery,
     private FetchByIdQuery<ConfirmedOrder> $fetchConfirmedOrderByIdQuery,
     private Logger $logger,
-    private CompletedOrdersTable $completedOrderTable,
-    private HRTimestampSerializer $timestampSerializer,
     private TimestampBuilder $timestampBuilder
   ) {}
 
-  public function completeOrder(UnsignedInt $confirmed_order_id): void {
+  public function completeOrder(UnsignedInt $confirmed_order_id): CompletedOrder {
     // Report that we're completing this order
     $this->logger->info("Completing ConfirmedOrder (id=" . $confirmed_order_id->getNumber() . ")");
 
@@ -41,13 +39,11 @@ class CompleteOrderMethod {
     $time_completed = $this->timestampBuilder->now(); 
 
     $insert_handle = $this->insertCompletedOrderQuery->insert(
-      ImmMap{
-        $this->completedOrderTable->getConfirmedOrderIdKey() => $confirmed_order_id->getNumber(),
-        $this->completedOrderTable->getTimeCompletedKey() => $this->timestampSerializer->serialize($time_completed)
-      }
+      $confirmed_order_id,
+      $time_completed
     );
 
-    $insert_handle
+    return $insert_handle
       ->getWaitHandle()
       ->join();
   }

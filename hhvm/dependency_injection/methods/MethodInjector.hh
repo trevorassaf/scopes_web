@@ -56,6 +56,9 @@ class MethodInjector {
   // Short code methods
   private ?CreateShortCodeMethod $createShortCodeMethod;
 
+  // Complete order methods
+  private ?CompleteOrderMethod $completeOrderMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
@@ -408,6 +411,18 @@ class MethodInjector {
       );
     }
     return $this->createShortCodeMethod;
+  }
+
+  public function getCompleteOrderMethod(): CompleteOrderMethod {
+    if ($this->completeOrderMethod === null) {
+      $this->completeOrderMethod = new CompleteOrderMethod(
+        $this->queryInjector->getConcreteInsertCompletedOrderQuery(),
+        $this->queryInjector->getFetchConfirmedOrderByIdQuery(),
+        $this->logger,
+        $this->timestampBuilderLoader->load()
+      ); 
+    }
+    return $this->completeOrderMethod;
   }
 
 }
