@@ -12,9 +12,6 @@ class ApiRunner {
   ) {}
 
   public function run(ImmMap<string, mixed> $request_params): string {
-    // Log field map from request payload
-    $this->logger->info("Request field map", $request_params);
-
     $api_result = null;
 
     try {

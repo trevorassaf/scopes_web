@@ -501,6 +501,8 @@ return array(
     'UserUserPrivilegeEdgesTable' => $baseDir . '/access_layer/tables/user/UserUserPrivilegeEdgesTable.hh',
     'UsersTable' => $baseDir . '/access_layer/tables/user/UsersTable.hh',
     'UsersTableLazyLoader' => $baseDir . '/dependency_injection/queries/lazy_loaders/users/UsersTableLazyLoader.hh',
+    'VectorApiRequestField' => $baseDir . '/requests/fields/VectorApiRequestField.hh',
+    'VectorApiRequestFieldFactory' => $baseDir . '/requests/fields/VectorApiRequestFieldFactory.hh',
     'VectorRequestFieldConstraint' => $baseDir . '/requests/fields/validators/constraints/VectorRequestFieldConstraint.hh',
     'VideoEditingPricePolicy' => $baseDir . '/access_layer/models/objects/policy/VideoEditingPricePolicy.hh',
     'VideoEditingPricePolicyFactory' => $baseDir . '/access_layer/models/factories/policy/VideoEditingPricePolicyFactory.hh',

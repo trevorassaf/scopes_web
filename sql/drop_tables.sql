@@ -27,6 +27,7 @@ drop table ConfirmedOrderFailedTransactions;
 drop table CellLabels;
 drop table EditedVideoOrders;
 
+drop table CompletedOrders;
 drop table ConfirmedOrders;
 
 drop table OrderConfiguration;

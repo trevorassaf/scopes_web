@@ -11,7 +11,7 @@ class CreateUploadBasicVideosApiRequest {
   public function __construct(
     private RequestField<UnsignedInt> $userId,
     private RequestField<UnsignedInt> $completedOrderId,
-    private MapApiRequestField<string, BasicVideoApiRequest> $basicVideos
+    private VectorApiRequestField<BasicVideoApiRequest> $basicVideos
   ) {}
 
   public function getUserId(): RequestField<UnsignedInt> {
@@ -22,7 +22,7 @@ class CreateUploadBasicVideosApiRequest {
     return $this->completedOrderId;
   }
 
-  public function getBasicVideos(): MapApiRequestField<string, BasicVideoApiRequest> {
+  public function getBasicVideos(): VectorApiRequestField<BasicVideoApiRequest> {
     return $this->basicVideos;
   }
 }
@@ -31,7 +31,7 @@ class CreateUploadBasicVideosApiRequestBuilder {
 
   private ?RequestField<UnsignedInt> $userId;
   private ?RequestField<UnsignedInt> $completedOrderId;
-  private ?MapApiRequestField<string, BasicVideoApiRequest> $basicVideos;
+  private ?VectorApiRequestField<BasicVideoApiRequest> $basicVideos;
 
   public function setUserId(RequestField<UnsignedInt> $id): this {
     $this->userId = $id;
@@ -43,7 +43,7 @@ class CreateUploadBasicVideosApiRequestBuilder {
     return $this;
   }
 
-  public function setBasicVideos(MapApiRequestField<string, BasicVideoApiRequest> $video_map): this {
+  public function setBasicVideos(VectorApiRequestField<BasicVideoApiRequest> $video_map): this {
     $this->basicVideos = $video_map;
     return $this;
   }
@@ -65,5 +65,4 @@ class CreateUploadBasicVideosApiRequestBuilder {
       $this->checkNotNull($this->basicVideos, CreateUploadBasicVideosApiRequest::VIDEO_MAP_KEY)
     ); 
   }
-
 }

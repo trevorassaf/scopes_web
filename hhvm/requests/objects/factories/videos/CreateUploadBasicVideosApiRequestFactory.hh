@@ -4,7 +4,7 @@ class CreateUploadBasicVideosApiRequestFactory implements RequestFactory<CreateU
 
   private RequestFieldFactory<UnsignedInt> $userIdFieldFactory;
   private RequestFieldFactory<UnsignedInt> $completedOrderIdFactory;
-  private MapApiRequestFieldFactory<string, BasicVideoApiRequest> $videoMapFactory;
+  private VectorApiRequestFieldFactory<BasicVideoApiRequest> $videoVectorFactory;
   
   public function __construct(
     private TimestampRequestFieldFactoryBuilder $timestampRequestFieldFactoryBuilder,
@@ -21,8 +21,7 @@ class CreateUploadBasicVideosApiRequestFactory implements RequestFactory<CreateU
     $basic_video_api_request_factory = new BasicVideoApiRequestFactory(
       $this->timeSerializer
     );
-    $this->videoMapFactory = new MapApiRequestFieldFactory(
-      $string_field_factory_builder->build(),
+    $this->videoVectorFactory = new VectorApiRequestFieldFactory(
       $basic_video_api_request_factory
     );
   }
@@ -43,7 +42,10 @@ class CreateUploadBasicVideosApiRequestFactory implements RequestFactory<CreateU
           break;
         case CreateUploadBasicVideosApiRequest::VIDEO_MAP_KEY:
           $request_builder->setBasicVideos(
-            $this->videoMapFactory->convert($key, $value)
+            $this->videoVectorFactory->convert(
+              $key,
+              $value
+            )
           );
           break;
         default:
