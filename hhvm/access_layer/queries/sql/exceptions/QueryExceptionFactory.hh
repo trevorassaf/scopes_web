@@ -17,7 +17,7 @@ class QueryExceptionFactory {
         );    
         break;
       default:
-        invariant(false, "shouldn't happen, we're not casing a query type");
+        invariant(false, "QueryExceptionFactory:: shouldn't happen, we're not catching query error " . (string)$exception->mysqlErrorCode() . ", with error string: " . $exception->mysqlErrorString());
         break;
     }
 

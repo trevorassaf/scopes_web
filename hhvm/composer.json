@@ -12,7 +12,8 @@
         "methods/",
         "requests/",
         "dependency_injection/",
-        "logger/"
+        "logger/",
+        "objects/"
     ]
   },
   "extra": {

@@ -27,7 +27,7 @@ class InsertConfirmedOrderQuery {
         $this->confirmedOrdersTable->getTitleKey() => $title,
         $this->confirmedOrdersTable->getDescriptionKey() => $description,
         $this->confirmedOrdersTable->getShortCodeIdKey() => $short_code_id->getNumber(),
-        $this->confirmedOrdersTable->getShortCodeIdKey() => $price->getNumber(),
+        $this->confirmedOrdersTable->getPriceKey() => $price->getNumber()
       }
     );  
   }

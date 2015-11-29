@@ -1,9 +1,13 @@
 #!/bin/bash
 
+pushd $(dirname ${BASH_SOURCE[0]}) > /dev/null
+
 # Initialize db
-cd sql/
+pushd sql/ > /dev/null
 mysql -u trevor -ppassword -e "source refresh_db.sql;"
-cd ../
+popd > /dev/null
 
 # Insert initial db data 
 hhvm hhvm/init/init_db.hh
+
+popd > /dev/null

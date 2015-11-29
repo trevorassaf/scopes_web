@@ -44,7 +44,7 @@ class ConfirmOrderMethod {
         ->getWaitHandle()
         ->join();
 
-      if ($is_user_owned_short_code) {
+      if (!$is_user_owned_short_code) {
         throw new UnownedShortCodeException(
           $rsvd_order->getUserId(),
           $short_code_id

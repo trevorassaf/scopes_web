@@ -20,6 +20,7 @@ class HRTimestampSerializer implements TimestampSerializer {
   }
 
   public function deserialize(string $timestamp_str): Timestamp {
+
     invariant($this->isValidString($timestamp_str), "timestamp is not valid!"); 
     $timestamp_tokens = explode(self::DELIMITER, $timestamp_str);
     return new Timestamp(

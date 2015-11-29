@@ -12,6 +12,7 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
     UnsignedInt $id,
     ImmMap<string, mixed> $params
   ): ConfirmedOrder {
+
     return new ConfirmedOrder(
       $id,
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getUserIdKey()]), 
@@ -23,8 +24,7 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
       (string)$params[$this->confirmedOrdersTable->getTitleKey()],
       (string)$params[$this->confirmedOrdersTable->getDescriptionKey()],
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getShortCodeIdKey()]),
-      new UnsignedFloat((float)$params[$this->confirmedOrdersTable->getPriceKey()]),
-      $this->timestampSerializer->deserialize($this->confirmedOrdersTable->getExpirationTimestampKey())
+      new UnsignedFloat((float)$params[$this->confirmedOrdersTable->getPriceKey()])
     );
   }
 }

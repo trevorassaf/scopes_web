@@ -10,8 +10,7 @@ class ConfirmedOrder implements Model {
     private string $title,
     private string $description,
     private UnsignedInt $shortCodeId,
-    private UnsignedFloat $price,
-    private Timestamp $expirationTimestamp
+    private UnsignedFloat $price
   ) {}
 
   public function getId(): UnsignedInt {
@@ -44,9 +43,5 @@ class ConfirmedOrder implements Model {
 
   public function getPrice(): UnsignedFloat {
     return $this->price;
-  }
-
-  public function getExpirationTimestamp(): Timestamp {
-    return $this->expirationTimestamp;
   }
 }

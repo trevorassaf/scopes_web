@@ -18,6 +18,5 @@ CREATE TABLE ConfirmedOrders (
   description VARCHAR(400) NOT NULL,
   shortCodeId INT UNSIGNED NOT NULL,
   FOREIGN KEY(shortCodeId) REFERENCES ShortCodes(id),
-  price DECIMAL(6,2) UNSIGNED NOT NULL,
-  basicVideosExpirationTime TIMESTAMP NOT NULL
+  price DECIMAL(6,2) UNSIGNED NOT NULL
 );
