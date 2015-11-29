@@ -53,6 +53,9 @@ class MethodInjector {
   private ?UploadBasicVideosMethod $uploadBasicVideosMethod;
   private ?UploadEditedVideoMethod $uploadEditedVideoMethod;
 
+  // Short code methods
+  private ?CreateShortCodeMethod $createShortCodeMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
@@ -396,6 +399,15 @@ class MethodInjector {
       ); 
     }
     return $this->uploadEditedVideoMethod;
+  }
+
+  public function getCreateShortCodeMethod(): CreateShortCodeMethod {
+    if ($this->createShortCodeMethod === null) {
+      $this->createShortCodeMethod = new CreateShortCodeMethod(
+        $this->queryInjector->getConcreteInsertShortCodeQuery()
+      );
+    }
+    return $this->createShortCodeMethod;
   }
 
 }

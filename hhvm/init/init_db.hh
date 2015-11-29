@@ -122,14 +122,23 @@ function initRsvdOrderPolicy(MethodInjector $method_injector): void {
 }
 
 function initUsers(MethodInjector $method_injector): void {
+  // Insert Admins 
   $create_user_method = $method_injector->getCreateUserMethod();
 
-  // Insert Admins 
-  $create_user_method->createUser(
+  $trevor = $create_user_method->createUser(
     "Trevor",
     "Assaf",
     new Email("astrev@umich.edu"),
     "password"
+  );
+
+  // Insert Short Codes
+  $trevors_short_code = "0xSHORT";
+  $create_short_code_method = $method_injector->getCreateShortCodeMethod();
+
+  $create_short_code_method->createShortCode(
+    $trevor->getId(),
+    $trevors_short_code
   );
 }
 

@@ -81,6 +81,7 @@ class QueryInjector {
   private ?FetchByUniqueKeyQuery<ShortCode> $fetchShortCodeByUniqueKeyQuery;
   private ?FetchByIdQuery<ShortCode> $fetchShortCodeByIdQuery;
   private ?InsertQuery<ShortCode> $insertShortCodeQuery;
+  private ?InsertShortCodeQuery $concreteInsertShortCodeQuery;
 
   // Reserved order policy queries
   private ?FetchSingletonQuery<ReservedOrderPolicy> $fetchSingletonRsvdOrderPolicyQuery;
@@ -827,6 +828,16 @@ class QueryInjector {
     }
    return $this->insertShortCodeQuery; 
   }
+
+  public function getConcreteInsertShortCodeQuery(): InsertShortCodeQuery {
+    if ($this->concreteInsertShortCodeQuery === null) {
+      $this->concreteInsertShortCodeQuery = new InsertShortCodeQuery(
+        $this->getInsertShortCodeQuery(),
+        $this->shortCodeTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertShortCodeQuery;
+  } 
 
   public function getFetchUserShortCodesQuery(): FetchUserShortCodesQuery {
     if ($this->fetchUserShortCodesQuery === null) {

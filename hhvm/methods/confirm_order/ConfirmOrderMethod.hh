@@ -35,10 +35,16 @@ class ConfirmOrderMethod {
       // Fail if short code does not belong to this user
       $short_code_id = $create_confirm_order_request->getShortCodeId();
 
-      if (await $this->fetchIsUserOwnedShortCodeQuery->fetch(
+      $fetch_is_user_owned_short_code_handle = $this->fetchIsUserOwnedShortCodeQuery->fetch(
         $rsvd_order->getUserId(),
-        $short_code_id)
-      ) {
+        $short_code_id
+      );
+
+      $is_user_owned_short_code = $fetch_is_user_owned_short_code_handle
+        ->getWaitHandle()
+        ->join();
+
+      if ($is_user_owned_short_code) {
         throw new UnownedShortCodeException(
           $rsvd_order->getUserId(),
           $short_code_id

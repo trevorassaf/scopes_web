@@ -121,6 +121,7 @@ return array(
     'CreateUserRequestBuilder' => $baseDir . '/requests/objects/models/users/CreateUserRequest.hh',
     'CreateUserRequestFactory' => $baseDir . '/requests/objects/factories/users/CreateUserRequestFactory.hh',
     'CreateUserRequestFactoryLazyLoader' => $baseDir . '/dependency_injection/apis/lazy_loaders/CreateUserRequestFactoryLazyLoader.hh',
+    'DLogger' => $baseDir . '/logger/DLogger.hh',
     'Date' => $baseDir . '/utils/data_types/chronos/date/objects/Date.hh',
     'DateBuilder' => $baseDir . '/utils/data_types/chronos/date/objects/DateBuilder.hh',
     'DateSegment' => $baseDir . '/utils/data_types/chronos/date/objects/DateSegment.hh',

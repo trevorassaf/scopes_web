@@ -8,25 +8,7 @@ function testConfirmOrderEndpoint(): void {
     "rid" => 1,
     "title" => "Title",
     "desc" => "descriptiondescription",
-    "code" => "0xC5ghY",
-    "duration" => 4,
-    "labels" => array(
-      array(
-        "label" => "dmfo1",
-      ),
-      array(
-        "label" => "dmfo2",
-      ),
-      array(
-        "label" => "dmfo3",
-      ),
-      array(
-        "label" => "dmfo4",
-      ),
-      array(
-        "label" => "dmfo5",
-      )
-    ),
+    "code-id" => 1,
   };
 
   $api_requester = new ApiRequester();

@@ -15,12 +15,12 @@ abstract class ApiResult {
 
     // Ensure custom result fields don't contain top-level result fields
     invariant(
-      $custom_result_fields->containsKey(self::IS_SUCCESSFUL_KEY),
+      !$custom_result_fields->containsKey(self::IS_SUCCESSFUL_KEY),
       "ApiResult can't contain " . self::IS_SUCCESSFUL_KEY
     );
 
     invariant(
-      $custom_result_fields->containsKey(self::API_TYPE_KEY),
+      !$custom_result_fields->containsKey(self::API_TYPE_KEY),
       "ApiResult can't contain " . self::API_TYPE_KEY
     );
 
