@@ -1,7 +1,8 @@
 <?hh // strict
 
 enum UserPrivilegeType: int { 
-  ADMIN = 0;
+  ADMIN = 0x0;
+  DEVELOPER = 0x1;
 }
 
 class UserPrivilege implements Model {

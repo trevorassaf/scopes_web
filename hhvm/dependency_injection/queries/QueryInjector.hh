@@ -17,6 +17,10 @@ class QueryInjector {
   private ?FetchQuery<User> $fetchUserQuery;
   private ?FetchByUniqueKeyQuery<User> $fetchUserByUniqueKeyQuery;
   private ?FetchByIdQuery<User> $fetchUserByIdQuery;
+  private ?FetchQuery<UserUserPrivilegeEdge> $fetchUserUserPrivilegeEdgesQuery;
+  private ?FetchUsersPrivilegesQuery $fetchUsersPrivilegesQuery;
+  private ?InsertQuery<UserPrivilege> $insertUserPrivilegeQuery;
+  private ?InsertQuery<UserUserPrivilegeEdge> $insertUserUserPrivilegeEdgeQuery;
 
   // Regular Day Queries
   private ?InsertQuery<RegularWeekDay> $insertRegularWeekDayQuery;
@@ -187,7 +191,9 @@ class QueryInjector {
     private LazyLoader<VideoMimeTypesTable> $videoMimeTypesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<VideoMimeType>> $videoMimeTypeModelFactoryLazyLoader,
     private LazyLoader<CompletedCompositeVideoTable> $completedCompositeVideoTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<CompletedCompositeVideo>> $completedCompositeVideoModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<CompletedCompositeVideo>> $completedCompositeVideoModelFactoryLazyLoader,
+    private LazyLoader<UserUserPrivilegeEdgesTable> $userUserPrivilegeEdgesTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<UserUserPrivilegeEdge>> $userUserPrivilegeEdgeModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -276,6 +282,31 @@ class QueryInjector {
       );
     }
    return $this->fetchUserByIdQuery; 
+  }
+
+  public function getFetchUserUserPrivilegeEdgesQuery(): FetchQuery<UserUserPrivilegeEdge> {
+    if ($this->fetchUserUserPrivilegeEdgesQuery === null) {
+      $this->fetchUserUserPrivilegeEdgesQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->userUserPrivilegeEdgeModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchUserUserPrivilegeEdgesQuery;
+  }
+
+  public function getFetchUsersPrivilegesQuery(): FetchUsersPrivilegesQuery {
+    if ($this->fetchUsersPrivilegesQuery === null) {
+      $this->fetchUsersPrivilegesQuery = new FetchUsersPrivilegesQuery(
+        $this->getFetchUserUserPrivilegeEdgesQuery(),
+        $this->userUserPrivilegeEdgesTableLazyLoader->load() 
+      ); 
+    }
+    return $this->fetchUsersPrivilegesQuery;
+  }
+
+  public function getInsertUserPrivilegeQuery(): InsertQuery<UserPrivilege> {
+    
   }
 
   /**

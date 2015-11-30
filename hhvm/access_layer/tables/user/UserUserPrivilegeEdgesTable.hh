@@ -1,12 +1,12 @@
 <?hh // strict
 
-class UserUserPrivilegeEdgesTable {
+class UserUserPrivilegeEdgesTable extends Table {
 
   const string TABLE_NAME = "UserUserPrivilegeEdges";
   const string USER_ID_KEY = "userId";
   const string USER_PRIVILEGE_ID_KEY = "userPrivilegeId";
 
-  public function getTableName(): string {
+  public function getName(): string {
     return self::TABLE_NAME;
   }
 

@@ -39,6 +39,7 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
     $video_upload_policy_table_loader = new VideoUploadPolicyTableLazyLoader();
     $video_mime_type_table_loader = new VideoMimeTypesTableLazyLoader();
     $completed_composite_video_table_loader = new CompletedCompositeVideoTableLazyLoader();
+    $user_user_privilege_edges_table_loader = new UserUserPrivilegeEdgesTableLazyLoader();
 
     return new QueryInjector(
       new AsyncMysqlConnectionLazyLoader(
@@ -152,6 +153,10 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       new CompletedCompositeVideoModelFactoryLazyLoader(
         $completed_composite_video_table_loader,
         $timestamp_serializer_loader
+      ),
+      $user_user_privilege_edges_table_loader,
+      new UserUserPrivilegeEdgeModelFactoryLazyLoader(
+        $user_user_privilege_edges_table_loader
       )
     );
   }
