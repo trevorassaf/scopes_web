@@ -4,8 +4,9 @@ class MethodInjector {
 
   // User methods
   private ?CreateUserMethod $createUserMethod;
-
   private ?GetUserByEmailMethod $getUserByEmailMethod;
+  private ?AssignUserPrivilegesMethod $assignUserPrivilegesMethod;
+  private ?CreateUserPrivilegesMethod $createUserPrivilegesMethod;
 
   // Regular week day methods
   private ?CreateRegularWeekDayMethod $createRegularWeekDayMethod;
@@ -425,4 +426,21 @@ class MethodInjector {
     return $this->completeOrderMethod;
   }
 
+  public function getAssignUserPrivilegesMethod(): AssignUserPrivilegesMethod {
+    if ($this->assignUserPrivilegesMethod === null) {
+      $this->assignUserPrivilegesMethod = new AssignUserPrivilegesMethod(
+        $this->queryInjector->getConcreteInsertUserUserPrivilegeEdgeQuery()
+      ); 
+    }
+    return $this->assignUserPrivilegesMethod;
+  }
+
+  public function getCreateUserPrivilegesMethod(): CreateUserPrivilegesMethod {
+    if ($this->createUserPrivilegesMethod === null) {
+      $this->createUserPrivilegesMethod = new CreateUserPrivilegesMethod(
+        $this->queryInjector->getConcreteInsertUserPrivilegeQuery()
+      ); 
+    }
+    return $this->createUserPrivilegesMethod;
+  }
 }

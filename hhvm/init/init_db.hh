@@ -14,6 +14,7 @@ function initDbMain(): void {
   $method_injector = $production_method_injector_factory->get();
 
   // Insert initial records to database
+  initUserPrivileges($method_injector);
   initUsers($method_injector);
   initRegularWeekDaysAndTimes($method_injector);
 
@@ -123,6 +124,8 @@ function initRsvdOrderPolicy(MethodInjector $method_injector): void {
 
 function initUserPrivileges(MethodInjector $method_injector): void {
   // Insert user privileges
+  $create_privileges_method = $method_injector->getCreateUserPrivilegesMethod();
+  $create_privileges_method->createUserPrivileges();
 }
 
 function initUsers(MethodInjector $method_injector): void {
@@ -143,6 +146,17 @@ function initUsers(MethodInjector $method_injector): void {
   $create_short_code_method->createShortCode(
     $trevor->getId(),
     $trevors_short_code
+  );
+
+  // Assign default privileges for 'trevor'
+  $assign_privileges_method = $method_injector->getAssignUserPrivilegesMethod();
+  $assign_privileges_method->assignPrivileges(
+    $trevor->getId(),
+    ImmSet{
+      UserPrivilegeType::ADMIN,
+      UserPrivilegeType::DEVELOPER,
+      UserPrivilegeType::TECHNICIAN
+    }
   );
 }
 
