@@ -121,6 +121,10 @@ function initRsvdOrderPolicy(MethodInjector $method_injector): void {
   $create_rsvd_order_policy_method->create(new UnsignedInt(16));
 }
 
+function initUserPrivileges(MethodInjector $method_injector): void {
+  // Insert user privileges
+}
+
 function initUsers(MethodInjector $method_injector): void {
   // Insert Admins 
   $create_user_method = $method_injector->getCreateUserMethod();

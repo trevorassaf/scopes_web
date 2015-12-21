@@ -21,6 +21,8 @@ class QueryInjector {
   private ?FetchUsersPrivilegesQuery $fetchUsersPrivilegesQuery;
   private ?InsertQuery<UserPrivilege> $insertUserPrivilegeQuery;
   private ?InsertQuery<UserUserPrivilegeEdge> $insertUserUserPrivilegeEdgeQuery;
+  private ?InsertUserPrivilegeQuery $concreteInsertUserPrivilegeQuery;
+  private ?InsertUserUserPrivilegeEdgeQuery $concreteInsertUserUserPrivilegeEdgeQuery;
 
   // Regular Day Queries
   private ?InsertQuery<RegularWeekDay> $insertRegularWeekDayQuery;
@@ -193,7 +195,9 @@ class QueryInjector {
     private LazyLoader<CompletedCompositeVideoTable> $completedCompositeVideoTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<CompletedCompositeVideo>> $completedCompositeVideoModelFactoryLazyLoader,
     private LazyLoader<UserUserPrivilegeEdgesTable> $userUserPrivilegeEdgesTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<UserUserPrivilegeEdge>> $userUserPrivilegeEdgeModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<UserUserPrivilegeEdge>> $userUserPrivilegeEdgeModelFactoryLazyLoader,
+    private LazyLoader<UserPrivilegesTable> $userPrivilegesTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<UserPrivilege>> $userPrivilegeModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -306,7 +310,49 @@ class QueryInjector {
   }
 
   public function getInsertUserPrivilegeQuery(): InsertQuery<UserPrivilege> {
-    
+    if ($this->insertUserPrivilegeQuery === null) {
+      $this->insertUserPrivilegeQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->userPrivilegesTableLazyLoader->load(),
+        $this->userPrivilegeModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertUserPrivilegeQuery;  
+  }
+
+  public function getConcreteInsertUserPrivilegeQuery(): InsertUserPrivilegeQuery {
+    if ($this->concreteInsertUserPrivilegeQuery === null) {
+      $this->concreteInsertUserPrivilegeQuery = new InsertUserPrivilegeQuery(
+        $this->getInsertUserPrivilegeQuery(),
+        $this->userPrivilegesTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertUserPrivilegeQuery;
+  }
+
+  public function getInsertUserUserPrivilegeEdgeQuery(): InsertQuery<UserUserPrivilegeEdge> {
+    if ($this->insertUserUserPrivilegeEdgeQuery === null) {
+      $this->insertUserUserPrivilegeEdgeQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->userUserPrivilegeEdgesTableLazyLoader->load(),
+        $this->userUserPrivilegeEdgeModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertUserUserPrivilegeEdgeQuery;
+  }
+
+  public function getConcreteInsertUserUserPrivilegeEdgeQuery(): InsertUserUserPrivilegeEdgeQuery {
+    if ($this->concreteInsertUserUserPrivilegeEdgeQuery === null) {
+      $this->concreteInsertUserUserPrivilegeEdgeQuery = new InsertUserUserPrivilegeEdgeQuery(
+        $this->getInsertUserUserPrivilegeEdgeQuery(),
+        $this->userUserPrivilegeEdgesTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertUserUserPrivilegeEdgeQuery;
   }
 
   /**

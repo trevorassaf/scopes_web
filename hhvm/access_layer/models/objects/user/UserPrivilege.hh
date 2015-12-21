@@ -3,6 +3,7 @@
 enum UserPrivilegeType: int { 
   ADMIN = 0x0;
   DEVELOPER = 0x1;
+  TECHNICIAN = 0x2;
 }
 
 class UserPrivilege implements Model {
