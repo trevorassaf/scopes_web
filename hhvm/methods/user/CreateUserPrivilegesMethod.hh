@@ -23,7 +23,7 @@ class CreateUserPrivilegesMethod {
     } catch (QueryException $ex) {
       switch ($ex->getErrorType()) {
         case QueryErrorType::DUPLICATE_KEY:
-          throw new DuplicateEmailException();
+          throw new DuplicateUserPrivilegeException();
           break;
         default:
           throw new FailedQueryMethodException($ex);

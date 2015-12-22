@@ -7,6 +7,7 @@ class MethodInjector {
   private ?GetUserByEmailMethod $getUserByEmailMethod;
   private ?AssignUserPrivilegesMethod $assignUserPrivilegesMethod;
   private ?CreateUserPrivilegesMethod $createUserPrivilegesMethod;
+  private ?CheckUserPrivilegeMethod $checkUserPrivilegeMethod;
 
   // Regular week day methods
   private ?CreateRegularWeekDayMethod $createRegularWeekDayMethod;
@@ -442,5 +443,15 @@ class MethodInjector {
       ); 
     }
     return $this->createUserPrivilegesMethod;
+  }
+
+  public function getCheckUserPrivilegeMethod(): CheckUserPrivilegeMethod {
+    if ($this->checkUserPrivilegeMethod === null) {
+      $this->checkUserPrivilegeMethod = new CheckUserPrivilegeMethod(
+        $this->queryInjector->getFetchUserByIdQuery(),
+        $this->queryInjector->getFetchUsersPrivilegesQuery()
+      ); 
+    }
+    return $this->checkUserPrivilegeMethod;
   }
 }
