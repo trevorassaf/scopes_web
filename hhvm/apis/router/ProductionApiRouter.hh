@@ -58,6 +58,9 @@ class ProductionApiRouter implements ApiRouter {
       case ApiType::COMPLETE_ORDER:
         $api = $this->apiInjector->getCompleteOrderApi();
         break;
+      case ApiType::GET_ALL_USERS:
+        $api = $this->apiInjector->getGetAllUsersApi();
+        break;
       default:
         throw new Exception("Unhandled api type!");
         break;

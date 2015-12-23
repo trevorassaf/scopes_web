@@ -5,6 +5,7 @@ class MethodInjector {
   // User methods
   private ?CreateUserMethod $createUserMethod;
   private ?GetUserByEmailMethod $getUserByEmailMethod;
+  private ?GetAllUsersMethod $getAllUsersMethod;
   private ?AssignUserPrivilegesMethod $assignUserPrivilegesMethod;
   private ?CreateUserPrivilegesMethod $createUserPrivilegesMethod;
   private ?CheckUserPrivilegeMethod $checkUserPrivilegeMethod;
@@ -104,6 +105,16 @@ class MethodInjector {
       ); 
     }
     return $this->getUserByEmailMethod; 
+  }
+
+  public function getGetAllUsersMethod(): GetAllUsersMethod {
+    if ($this->getAllUsersMethod === null) {
+      $this->getAllUsersMethod = new GetAllUsersMethod(
+        $this->queryInjector->getFetchUserQuery(),
+        $this->usersTableLoader->load() 
+      ); 
+    }
+    return $this->getAllUsersMethod;
   }
 
   /**

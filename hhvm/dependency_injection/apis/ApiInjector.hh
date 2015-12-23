@@ -28,6 +28,8 @@ class ApiInjector {
 
   private ?CompleteOrderApi $completeOrderApi;
 
+  private ?GetAllUsersApi $getAllUsersApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private Logger $logger,
@@ -46,7 +48,8 @@ class ApiInjector {
     private LazyLoader<RequestFactory<CompleteOrderApiRequest>> $completeOrderApiRequestLoader,
     private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
-    private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader
+    private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
+    private LazyLoader<RequestFactory<GetAllUsersApiRequest>> $getAllUsersApiRequestFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -194,5 +197,16 @@ class ApiInjector {
       ); 
     }
     return $this->completeOrderApi;
+  }
+
+  public function getGetAllUsersApi(): GetAllUsersApi {
+    if ($this->getAllUsersApi === null) {
+      $this->getAllUsersApi = new GetAllUsersApi(
+        $this->getAllUsersApiRequestFactoryLoader->load(),
+        $this->methodInjector->getGetAllUsersMethod(),
+        $this->logger
+      ); 
+    }
+    return $this->getAllUsersApi;
   }
 }
