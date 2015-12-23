@@ -25,8 +25,7 @@ class CreateUserApi extends Api<CreateUserRequest> {
       $user = $this->createUserMethod->createUser(
         $create_user_request->getFirstName()->get(),
         $create_user_request->getLastName()->get(),
-        $create_user_request->getEmail()->get(),
-        $create_user_request->getPasswordHash()->get()
+        $create_user_request->getEmail()->get()
       );
 
       return new CreateUserApiResult($user->getId()); 

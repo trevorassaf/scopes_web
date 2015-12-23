@@ -69,11 +69,6 @@ class CreateUserRequestFactory implements RequestFactory<CreateUserRequest> {
             $this->emailFieldFactory->make($key, $value)
           );
           break;
-        case CreateUserRequest::PASSWORD_HASH_KEY:
-          $create_user_request_builder->setPasswordHash(
-            $this->passwordHashFieldFactory->make($key, $value)
-          );
-          break;
         default:
           throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
           break;

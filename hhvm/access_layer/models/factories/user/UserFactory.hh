@@ -16,7 +16,6 @@ class UserFactory extends ConcreteModelFactory<User> {
       (string)$params[$this->usersTable->getFirstNameKey()],
       (string)$params[$this->usersTable->getLastNameKey()],
       new Email((string)$params[$this->usersTable->getEmailKey()]),
-      (string)$params[$this->usersTable->getPasswordHashKey()],
       $this->timestampSerializer->deserialize((string)$params[$this->usersTable->getTimeJoinedKey()])
     );
   } 

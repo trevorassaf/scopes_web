@@ -11,8 +11,7 @@ class CreateUserMethod {
   public function createUser(
     string $first_name,
     string $last_name,
-    Email $email,
-    string $password_hash
+    Email $email
   ): User {
     try {
       // Attempt insert
@@ -20,7 +19,6 @@ class CreateUserMethod {
         $first_name,
         $last_name,
         $email,
-        $password_hash,
         $this->timestampBuilder->now()
       );
 

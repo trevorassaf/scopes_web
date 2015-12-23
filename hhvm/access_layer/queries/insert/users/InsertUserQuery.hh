@@ -12,7 +12,6 @@ class InsertUserQuery {
     string $first_name,
     string $last_name,
     Email $email,
-    string $password_hash,
     Timestamp $time_joined
   ): Awaitable<User> {
     return await $this->insertQuery->insert(
@@ -20,7 +19,6 @@ class InsertUserQuery {
         $this->usersTable->getFirstNameKey() => $first_name,
         $this->usersTable->getLastNameKey() => $last_name,
         $this->usersTable->getEmailKey() => $email->toString(),
-        $this->usersTable->getPasswordHashKey() => $password_hash,
         $this->usersTable->getTimeJoinedKey() => $this->timestampSerializer->serialize($time_joined),
       }
     );

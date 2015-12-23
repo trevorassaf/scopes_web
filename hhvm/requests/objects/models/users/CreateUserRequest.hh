@@ -7,13 +7,11 @@ class CreateUserRequest {
   const string FIRST_NAME_KEY = "first-name";
   const string LAST_NAME_KEY = "last-name";
   const string EMAIL_KEY = "email";
-  const string PASSWORD_HASH_KEY = "password-hash";
 
   public function __construct(
     private RequestField<string> $firstName,
     private RequestField<string> $lastName,
-    private RequestField<Email> $email,
-    private RequestField<string> $passwordHash
+    private RequestField<Email> $email
   ) {}
 
   public function getFirstName(): RequestField<string> {
@@ -27,10 +25,6 @@ class CreateUserRequest {
   public function getEmail(): RequestField<Email> {
     return $this->email;
   }
-  
-  public function getPasswordHash(): RequestField<string> {
-    return $this->passwordHash;
-  }
 }
 
 class CreateUserRequestBuilder {
@@ -38,7 +32,6 @@ class CreateUserRequestBuilder {
   private ?RequestField<string> $firstName;
   private ?RequestField<string> $lastName;
   private ?RequestField<Email> $email;
-  private ?RequestField<string> $passwordHash;
 
   public function setFirstName(
     RequestField<string> $first_name
@@ -61,13 +54,6 @@ class CreateUserRequestBuilder {
     return $this;
   }
   
-  public function setPasswordHash(
-    RequestField<string> $password_hash
-  ): this {
-    $this->passwordHash = $password_hash; 
-    return $this;
-  }
-
   public function build(): CreateUserRequest {
     // Check for missing request keys
     if ($this->firstName == null) {
@@ -88,19 +74,12 @@ class CreateUserRequestBuilder {
         CreateUserRequest::EMAIL_KEY
       ); 
     }
-    if ($this->passwordHash == null) {
-      throw new UnsetRequestFieldException(
-        CreateUserRequest::REQUEST_OBJECT_NAME,
-        CreateUserRequest::PASSWORD_HASH_KEY
-      ); 
-    }
     
     // Extrude request object
     return new CreateUserRequest(
       $this->firstName,
       $this->lastName,
-      $this->email,
-      $this->passwordHash
+      $this->email
     );
   }
 }
