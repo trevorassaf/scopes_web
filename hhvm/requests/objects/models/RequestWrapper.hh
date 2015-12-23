@@ -4,7 +4,7 @@ class RequestWrapper {
 
   const string REQUEST_OBJECT_NAME = "RequestWrapper";
 
-  const string API_TYPE_KEY = "api-type";
+  const string API_TYPE_KEY = "api_type";
 
   public function __construct(
     private RequestField<ApiType> $apiType,

@@ -1,0 +1,33 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <div id='response'></div>
+    <script>
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+          document.getElementById('response').innerHTML = xhttp.responseText; 
+        }
+      };
+
+      xhttp.open(
+        "POST",
+        "../../hhvm/endpoints/endpoint.hh",
+        true 
+      );
+
+      // var payload = JSON.stringify({
+      //   api_type: 1,       
+      //   email: 'astrev@umich.edu'
+      // });
+
+      xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+      var payload = encodeURI("api_type=1&email=astrev@umich.edu");
+      console.log(payload);
+      xhttp.send(payload);
+
+    </script>
+  </body>
+</html>

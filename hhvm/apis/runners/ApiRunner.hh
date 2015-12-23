@@ -1,4 +1,4 @@
-<?hh // strict
+<?hh // decl 
 
 class ApiRunner {
 
