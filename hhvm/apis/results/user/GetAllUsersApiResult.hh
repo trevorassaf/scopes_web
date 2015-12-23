@@ -11,8 +11,12 @@ class GetAllUsersApiResult extends SuccessfulApiResult {
   }
 
   protected function getCustomResultFields(): ImmMap<string, mixed> {
+    $user_result_list = Vector{};
+    foreach ($this->userList as $user) {
+      $user_result_list[] = $user->getResultFields(); 
+    }
     return ImmMap{
-      self::USERS_LIST_KEY => $this->userList
+      self::USERS_LIST_KEY => $user_result_list->toImmVector(),
     }; 
   }
 }

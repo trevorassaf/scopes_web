@@ -1,0 +1,64 @@
+<html>
+  <body>
+    <div id='response'></div>
+    First Name: <input type='text' id='first-name' />
+    Last Name: <input type='text' id='last-name' />
+    Email: <input type='text' id='email'>
+    <button type='button' id='create-user-btn'>Create User</button>
+
+
+    <div id='users'></div>
+    <script>
+
+      function getAllUsers() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById('users').innerHTML = xhttp.responseText; 
+          }
+        };
+
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = encodeURI("api_type=13");
+        console.log(payload);
+        xhttp.send(payload);
+      }
+
+      getAllUsers();
+      
+      document.getElementById('create-user-btn').onclick = function() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState  == 4 && xhttp.status == 200) {
+            document.getElementById('response').innerHTML = xhttp.responseText;
+            getAllUsers();
+          }
+        };
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = "api_type=0";
+        payload += "&first-name=" + document.getElementById('first-name').value;
+        payload += "&last-name=" + document.getElementById('last-name').value;
+        payload += "&email=" + document.getElementById('email').value;
+        payload = encodeURI(payload);
+
+        console.log(payload);
+        xhttp.send(payload);
+      };
+
+    </script>
+  </body>
+</html>

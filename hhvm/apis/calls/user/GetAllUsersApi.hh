@@ -22,6 +22,7 @@ class GetAllUsersApi extends Api<GetAllUsersApiRequest> {
 
     // Execute get all users method
     $user_list = $this->getAllUsersMethod->get();
+
     $user_result_list = Vector{};
     foreach ($user_list as $user) {
       $user_result_list[] = new UserResult(
