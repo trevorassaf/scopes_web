@@ -19,6 +19,7 @@ class InsertUserQuery {
         $this->usersTable->getFirstNameKey() => $first_name,
         $this->usersTable->getLastNameKey() => $last_name,
         $this->usersTable->getEmailKey() => $email->toString(),
+        $this->usersTable->getIsActiveKey() => true,
         $this->usersTable->getTimeJoinedKey() => $this->timestampSerializer->serialize($time_joined),
       }
     );

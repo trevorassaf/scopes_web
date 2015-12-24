@@ -16,6 +16,7 @@ enum ApiType : int as int {
   UPLOAD_EDITED_VIDEO = 0xB;
   COMPLETE_ORDER = 0xC;
   GET_ALL_USERS = 0xD;
+  DEACTIVATE_USER = 0xE;
 
   GENERAL = 0xFFFFFF;
 }

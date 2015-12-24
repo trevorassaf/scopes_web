@@ -7,6 +7,7 @@ class User implements Model {
       private string $firstName,
       private string $lastName,
       private Email $email,
+      private bool $isActive,
       private Timestamp $timeJoined
   ) {}
 
@@ -24,6 +25,10 @@ class User implements Model {
 
   public function getEmail(): Email {
     return $this->email;
+  }
+
+  public function isActive(): bool {
+    return $this->isActive;
   }
 
   public function getTimeJoined(): Timestamp {

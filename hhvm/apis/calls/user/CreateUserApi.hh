@@ -16,7 +16,6 @@ class CreateUserApi extends Api<CreateUserRequest> {
   protected function processRequestObject(
     CreateUserRequest $create_user_request
   ): ApiResult {
-
     try {
       // Log create user method call
       $this->logger->info("Create user api called...");

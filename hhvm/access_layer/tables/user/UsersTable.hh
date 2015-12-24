@@ -6,6 +6,7 @@ class UsersTable extends Table {
   const string FIRST_NAME_KEY = "firstName";
   const string LAST_NAME_KEY = "lastName";
   const string EMAIL_KEY = "email";
+  const string IS_ACTIVE_KEY = "isActive";
   const string TIME_JOINED_KEY = "timeJoined";
   
   public function getName(): string {
@@ -22,6 +23,10 @@ class UsersTable extends Table {
 
   public function getEmailKey(): string {
     return self::EMAIL_KEY;
+  }
+
+  public function getIsActiveKey(): string {
+    return self::IS_ACTIVE_KEY;
   }
 
   public function getTimeJoinedKey(): string {
