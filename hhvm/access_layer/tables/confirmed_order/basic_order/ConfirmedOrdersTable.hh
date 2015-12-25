@@ -11,6 +11,7 @@ class ConfirmedOrdersTable extends Table {
   const string DESCRIPTION_KEY = "description";
   const string SHORT_CODE_ID_KEY = "shortCodeId";
   const string PRICE_KEY = "price";
+  const string TIME_ORDERED_KEY = "timeOrdered";
 
   public function getName(): string {
     return self::TABLE_NAME;
@@ -46,5 +47,9 @@ class ConfirmedOrdersTable extends Table {
 
   public function getPriceKey(): string {
     return self::PRICE_KEY;
+  }
+
+  public function getTimeOrderedKey(): string {
+    return self::TIME_ORDERED_KEY;
   }
 }

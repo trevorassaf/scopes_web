@@ -15,7 +15,8 @@ class BasicVideoFactory extends ConcreteModelFactory<BasicVideo> {
       new UnsignedInt((int)$params[$this->table->getCompletedBasicVideoSetIdKey()]),
       new UnsignedInt((int)$params[$this->table->getScopeIndexKey()]),
       (string)$params[$this->table->getTitleKey()],
-      new UnsignedInt((int)$params[$this->table->getVideoDurationKey()])
+      new UnsignedInt((int)$params[$this->table->getVideoDurationKey()]),
+      new UnsignedInt((int)$params[$this->table->getMimeIdKey()])
     );
   }
 }

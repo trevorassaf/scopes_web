@@ -3,7 +3,6 @@
 class UploadBasicVideosMethod {
 
   const string FILE_EXTENSION_DELIMITER = ".";
-
   const string BASIC_VIDEO_UPLOAD_KEY = "basic_video_file";
 
   public function __construct(
@@ -78,7 +77,6 @@ class UploadBasicVideosMethod {
         . ") does not own specified ConfirmedOrder (id=" . $confirmed_order->getId()->getNumber(). ")!"
       );  
     }
-
 
     // Register basic video set with db
     $upload_time = $this->timestampBuilder->now();
@@ -200,7 +198,7 @@ class UploadBasicVideosMethod {
       // file-name from the record id
       $insert_query_handle = $this->insertBasicVideoQuery->insert(
         ImmMap{
-          $this->basicVideosTable->getCompletedBasicVideoSetIdKey() => $completed_order->getId()->getNumber(),
+          $this->basicVideosTable->getCompletedBasicVideoSetIdKey() => $basic_video_set->getId()->getNumber(),
           $this->basicVideosTable->getScopeIndexKey() => $i,
           $this->basicVideosTable->getTitleKey() => $basic_video_req->getTitle(),
           $this->basicVideosTable->getDescriptionKey() => $basic_video_req->getDescription(), 

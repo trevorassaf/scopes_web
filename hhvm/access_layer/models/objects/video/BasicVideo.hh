@@ -4,18 +4,19 @@ class BasicVideo implements Model {
 
   public function __construct(
     private UnsignedInt $id,
-    private UnsignedInt $confirmedOrderId,
+    private UnsignedInt $completedBasicVideoSetId,
     private UnsignedInt $scopeIndex,
     private string $title,
-    private UnsignedInt $duration
+    private UnsignedInt $duration,
+    private UnsignedInt $mimeId
   ) {}
 
   public function getId(): UnsignedInt {
     return $this->id;
   }
 
-  public function getConfirmedOrderId(): UnsignedInt {
-    return $this->confirmedOrderId;
+  public function getCompletedBasicVideoSetId(): UnsignedInt {
+    return $this->completedBasicVideoSetId;
   }
 
   public function getScopeIndex(): UnsignedInt {
@@ -28,5 +29,9 @@ class BasicVideo implements Model {
 
   public function getDuration(): UnsignedInt {
     return $this->duration;
+  }
+
+  public function getMimeId(): UnsignedInt {
+    return $this->mimeId;
   }
 }

@@ -18,5 +18,7 @@ CREATE TABLE BasicVideos (
   scopeIndex INT UNSIGNED NOT NULL,
   UNIQUE KEY(confirmedOrderId, scopeIndex),
   title VARCHAR(30) NOT NULL,
-  duration INT UNSIGNED NOT NULL
+  duration INT UNSIGNED NOT NULL,
+  mimeId INT UNSIGNED NOT NULL,
+  FOREIGN KEY(mimeId) REFERENCES VideoMimeTypes(id)
 );
