@@ -11,7 +11,7 @@ class DeleteCompositeVideoMethod {
   ) {}
 
   public function delete(
-    Timestamp $time_ordered,
+    VideoUploadPolicy $video_upload_policy,
     UnsignedInt $composite_video_id
   ): void {
     // Fetch composite video
@@ -28,13 +28,13 @@ class DeleteCompositeVideoMethod {
     }
 
     $this->deleteWithCompositeVideo(
-      $time_ordered,
+      $video_upload_policy,
       $composite_video
     );
   }
 
   public function deleteWithCompositeVideo(
-    Timestamp $time_ordered,
+    VideoUploadPolicy $video_upload_policy,
     CompositeVideo $composite_video
   ): void {
     // Delete composite video record
@@ -46,9 +46,9 @@ class DeleteCompositeVideoMethod {
     $delete_handle->getWaitHandle()->join();
 
     // Delete composite video file
-    $composite_video_path = $this->makeCompositeVideoPathMethod->makePath(
-      $time_ordered,
-      $composite_video
+    $composite_video_path = $this->makeCompositeVideoPathMethod->makePathWithPolicy(
+      $composite_video,
+      $video_upload_policy
     );
 
     $this->deleteFileMethod->delete($composite_video_path);

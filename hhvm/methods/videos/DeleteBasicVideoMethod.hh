@@ -39,7 +39,7 @@ class DeleteBasicVideoMethod {
     ); 
   }
 
-  private function deleteWithVideoAndPolicy(
+  public function deleteWithVideoAndPolicy(
     BasicVideo $basic_video,
     VideoUploadPolicy $video_policy
   ): void {

@@ -5,7 +5,8 @@ class DeleteCompositeVideoByConfirmedOrderMethod {
   public function __construct(
     private DeleteCompositeVideoMethod $deleteCompositeVideoMethod,
     private FetchCompositeVideoFromConfirmedOrderQuery $fetchCompositeVideoFromConfirmedOrderQuery,
-    private FetchByIdQuery<ConfirmedOrder> $fetchConfirmedOrderByIdQuery
+    private FetchByIdQuery<ConfirmedOrder> $fetchConfirmedOrderByIdQuery,
+    private FetchVideoUploadPolicyQuery $fetchVideoUploadPolicyQuery
   ) {}
 
   public function delete(UnsignedInt $confirmed_order_id): void {
@@ -19,9 +20,24 @@ class DeleteCompositeVideoByConfirmedOrderMethod {
       ->join();
 
     if ($confirmed_order === null) {
-      throw new NonextantObjectException();
+      return;
     }
-    
+
+    // Fetch corresponding video policy
+    $fetch_policy_handle = $this->fetchVideoUploadPolicyQuery->fetch(
+      $confirmed_order->getTimeOrdered()
+    );
+
+    $this->deleteWithPolicy(
+      $confirmed_order->getId(),
+      $fetch_policy_handle->getWaitHandle()->join()
+    );
+  }
+
+  public function deleteWithPolicy(
+    UnsignedInt $confirmed_order_id,
+    VideoUploadPolicy $video_upload_policy
+  ): void {
     // Fetch composite video using confirmed order
     $fetch_composite_video_handle = $this->fetchCompositeVideoFromConfirmedOrderQuery->fetch(
       $confirmed_order_id
@@ -32,12 +48,12 @@ class DeleteCompositeVideoByConfirmedOrderMethod {
       ->join();
 
     if ($composite_video === null) {
-      throw new NonextantObjectException();
+      return;
     }
 
     // Delete composite video
     $this->deleteCompositeVideoMethod->deleteWithCompositeVideo(
-      $confirmed_order->getTimeOrdered(),
+      $video_upload_policy,
       $composite_video
     );
   }

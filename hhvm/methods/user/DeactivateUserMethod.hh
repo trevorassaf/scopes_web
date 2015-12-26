@@ -9,7 +9,9 @@ class DeactivateUserMethod {
     private DeleteUsersRsvdOrdersMethod $deleteUsersRsvdOrdersMethod,
     private DeleteUsersFutureConfirmedOrdersMethod $deleteUsersConfirmedOrdersMethod,
     private FetchUsersConfirmedOrdersQuery $fetchUsersConfirmedOrdersQuery,
-    private DeleteBasicVideoGroupMethod $deleteBasicVideoGroupMethod
+    private DeleteBasicVideoGroupMethod $deleteBasicVideoGroupMethod,
+    private DeleteCompositeVideoByConfirmedOrderMethod $deleteCompositeVideoByConfirmedOrderMethod,
+    private FetchVideoUploadPolicyQuery $fetchVideoUploadPolicyQuery
   ) {}
 
   public function deactivate(UnsignedInt $user_id): void {
@@ -51,9 +53,27 @@ class DeactivateUserMethod {
 
       // Delete basic-videos and edited-videos
       foreach ($remaining_confirmed_orders as $order) {
-        $this->deleteBasicVideoGroupMethod->delete($order->getId());
+        // Fetch video upload policy for this order
+        $fetch_video_upload_policy_handle = $this->fetchVideoUploadPolicyQuery->fetch(
+          $order->getTimeOrdered()
+        );        
+
+        $video_policy = $fetch_video_upload_policy_handle
+          ->getWaitHandle()
+          ->join(); 
+
+        // Delete basic video files
+        $this->deleteBasicVideoGroupMethod->deleteWithPolicy(
+          $order->getId(),
+          $video_policy
+        );
+
+        // Delete composite video file
+        $this->deleteCompositeVideoByConfirmedOrderMethod->deleteWithPolicy(
+          $order->getId(),
+          $video_policy
+        );
       }
-      
 
     } catch (QueryException $ex) {
       throw new FailedQueryMethodException($ex);
