@@ -8,6 +8,7 @@ class CompositeVideoTable extends Table {
   const string DURATION_KEY = "duration";
   const string TITLE_KEY = "title";
   const string DESCRIPTION_KEY = "description";
+  const string MIME_ID_KEY = "mimeId";
 
   public function getName(): string {
     return self::TABLE_NAME;
@@ -31,5 +32,9 @@ class CompositeVideoTable extends Table {
 
   public function getDescriptionKey(): string {
     return self::DESCRIPTION_KEY;
+  }
+
+  public function getMimeIdKey(): string {
+    return self::MIME_ID_KEY;
   }
 }

@@ -6,7 +6,8 @@ class CompositeVideo implements Model {
     private UnsignedInt $id,
     private UnsignedInt $completedCompositeVideoId,
     private Timestamp $expirationTime,
-    private Time $duration
+    private Time $duration,
+    private UnsignedInt $mimeId
   ) {}
   
   public function getId(): UnsignedInt {
@@ -23,5 +24,9 @@ class CompositeVideo implements Model {
 
   public function getDuration(): Time {
     return $this->duration;
+  }
+
+  public function getMimeId(): UnsignedInt {
+    return $this->mimeId;
   }
 }

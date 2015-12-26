@@ -20,7 +20,8 @@ class CompositeVideoFactory extends ConcreteModelFactory<CompositeVideo> {
       ),
       $this->timeSerializer->deserialize(
         (string)$params[$this->table->getDurationKey()]
-      )
+      ),
+      new UnsignedInt((int)$params[$this->table->getMimeIdKey()]),
     );  
   }
 }

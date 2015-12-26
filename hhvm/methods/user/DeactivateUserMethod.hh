@@ -7,7 +7,9 @@ class DeactivateUserMethod {
     private UpdateByIdQuery $updateByIdQuery,
     private UsersTable $usersTable,
     private DeleteUsersRsvdOrdersMethod $deleteUsersRsvdOrdersMethod,
-    private DeleteUsersFutureConfirmedOrdersMethod $deleteUsersConfirmedOrdersMethod
+    private DeleteUsersFutureConfirmedOrdersMethod $deleteUsersConfirmedOrdersMethod,
+    private FetchUsersConfirmedOrdersQuery $fetchUsersConfirmedOrdersQuery,
+    private DeleteBasicVideoGroupMethod $deleteBasicVideoGroupMethod
   ) {}
 
   public function deactivate(UnsignedInt $user_id): void {
@@ -38,7 +40,20 @@ class DeactivateUserMethod {
       $this->deleteUsersRsvdOrdersMethod->delete($user_id);
       $this->deleteUsersConfirmedOrdersMethod->delete($user_id);
 
-      // Delete assets: basic-videos, edited-videos, etc
+      // Fetch remaining confirmed orders (those that have already transpired)
+      $fetch_remaining_confirmed_orders_handle = $this->fetchUsersConfirmedOrdersQuery->fetch(
+        $user_id
+      );
+
+      $remaining_confirmed_orders = $fetch_remaining_confirmed_orders_handle
+        ->getWaitHandle()
+        ->join();
+
+      // Delete basic-videos and edited-videos
+      foreach ($remaining_confirmed_orders as $order) {
+        $this->deleteBasicVideoGroupMethod->delete($order->getId());
+      }
+      
 
     } catch (QueryException $ex) {
       throw new FailedQueryMethodException($ex);

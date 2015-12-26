@@ -6,7 +6,7 @@ class VideoUploadPolicy {
     private UnsignedInt $maxBytes,
     private string $webFilesParamKey,
     private string $basicVideoStoragePath,
-    private string $editedVideoStoragePath,
+    private string $compositeVideoStoragePath,
     private Timestamp $timeEnacted
   ) {}
 
@@ -22,8 +22,8 @@ class VideoUploadPolicy {
     return $this->basicVideoStoragePath;
   }
   
-  public function getEditedVideoStoragePath(): string {
-    return $this->editedVideoStoragePath;
+  public function getCompositeVideoStoragePath(): string {
+    return $this->compositeVideoStoragePath;
   }
 
   public function getTimeEnacted(): Timestamp {

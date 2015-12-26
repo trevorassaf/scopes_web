@@ -200,7 +200,7 @@ class UploadEditedVideoMethod {
 
       //// Move video file to permanent storage
       // Create target path
-      $target_path = $video_upload_policy->getEditedVideoStoragePath() . DIRECTORY_SEPARATOR
+      $target_path = $video_upload_policy->getCompositeVideoStoragePath() . DIRECTORY_SEPARATOR
         . (string)$composite_video->getId()->getNumber() . self::FILE_EXTENSION_DELIMITER . $mime;
 
       $upload_succeeded = move_uploaded_file(
