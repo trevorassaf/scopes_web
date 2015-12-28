@@ -17,6 +17,7 @@ enum ApiType : int as int {
   COMPLETE_ORDER = 0xC;
   GET_ALL_USERS = 0xD;
   DEACTIVATE_USER = 0xE;
+  GET_USERS_RSVD_ORDERS = 0xF;
 
-  GENERAL = 0xFFFFFF;
+  GENERAL = 0xFFFF;
 }

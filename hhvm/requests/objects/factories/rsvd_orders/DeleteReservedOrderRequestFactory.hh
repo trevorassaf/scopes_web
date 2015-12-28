@@ -5,7 +5,7 @@ class DeleteReservedOrderRequestFactory implements RequestFactory<DeleteReserved
   private RequestFieldFactory<UnsignedInt> $reserveOrderIdFieldFactory;
 
   public function __construct() {
-    // Create call label id field factory
+    // Create reserved order id field factory
     $uint_field_factory_builder = new UnsignedIntRequestFieldFactoryBuilder();
     $this->reserveOrderIdFieldFactory = $uint_field_factory_builder->build();
   }
