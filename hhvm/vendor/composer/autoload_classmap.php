@@ -79,6 +79,7 @@ return array(
     'ComputePriceOfConfirmedOrderMethod' => $baseDir . '/methods/confirm_order/ComputePriceOfConfirmedOrderMethod.hh',
     'ConcreteModelFactory' => $baseDir . '/access_layer/models/factories/core/ConcreteModelFactory.hh',
     'ConfirmOrderApi' => $baseDir . '/apis/calls/confirm_order/ConfirmOrderApi.hh',
+    'ConfirmOrderApiObject' => $baseDir . '/apis/results/confirm_order/ConfirmOrderApiObject.hh',
     'ConfirmOrderApiRequest' => $baseDir . '/requests/objects/models/confirmed_orders/ConfirmOrderApiRequest.hh',
     'ConfirmOrderApiRequestBuilder' => $baseDir . '/requests/objects/models/confirmed_orders/ConfirmOrderApiRequest.hh',
     'ConfirmOrderApiRequestFactory' => $baseDir . '/requests/objects/factories/confirmed_orders/ConfirmOrderRequestFactory.hh',

@@ -41,6 +41,7 @@ class MethodInjector {
   private ?UpdateConfirmedOrderMethod $updateConfirmedOrderMethod;
   private ?DeleteConfirmedOrderMethod $deleteConfirmedOrderMethod;
   private ?GetUsersConfirmedOrdersAndCellLabelsMethod $getUsersConfirmedOrdersAndCellLabelsMethod;
+  private ?GetUsersConfirmedOrdersMethod $getUsersConfirmedOrdersMethod;
 
   // Cell label methods
   private ?UpdateCellLabelMethod $updateCellLabelMethod;
@@ -310,6 +311,16 @@ class MethodInjector {
       ); 
     }
     return $this->getUsersConfirmedOrdersAndCellLabelsMethod;
+  }
+
+  public function getGetUsersConfirmedOrdersMethod(): GetUsersConfirmedOrdersMethod {
+    if ($this->getUsersConfirmedOrdersMethod === null) {
+      $this->getUsersConfirmedOrdersMethod = new GetUsersConfirmedOrdersMethod(
+        $this->queryInjector->getFetchUserByIdQuery(),
+        $this->queryInjector->getFetchUsersConfirmedOrdersQuery() 
+      ); 
+    }
+    return $this->getUsersConfirmedOrdersMethod;
   }
 
   /**

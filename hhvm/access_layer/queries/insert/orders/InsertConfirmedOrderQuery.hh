@@ -16,7 +16,8 @@ class InsertConfirmedOrderQuery {
     string $title,
     string $description,
     UnsignedInt $short_code_id,
-    UnsignedFloat $price
+    UnsignedFloat $price,
+    Timestamp $time_ordered
   ): Awaitable<ConfirmedOrder> {
     return await $this->insertQuery->insert(
       ImmMap{
@@ -27,7 +28,8 @@ class InsertConfirmedOrderQuery {
         $this->confirmedOrdersTable->getTitleKey() => $title,
         $this->confirmedOrdersTable->getDescriptionKey() => $description,
         $this->confirmedOrdersTable->getShortCodeIdKey() => $short_code_id->getNumber(),
-        $this->confirmedOrdersTable->getPriceKey() => $price->getNumber()
+        $this->confirmedOrdersTable->getPriceKey() => $price->getNumber(),
+        $this->confirmedOrdersTable->getTimeOrderedKey() => $this->timestampSerializer->serialize($time_ordered),
       }
     );  
   }

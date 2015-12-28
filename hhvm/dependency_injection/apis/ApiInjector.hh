@@ -157,7 +157,7 @@ class ApiInjector {
     if ($this->getUsersConfirmedOrdersApi === null) {
       $this->getUsersConfirmedOrdersApi = new GetUsersConfirmedOrdersApi(
         $this->getUsersConfirmedOrdersRequestLoader->load(),
-        $this->methodInjector->getGetUsersConfirmedOrdersAndCellLabelMethod(),
+        $this->methodInjector->getGetUsersConfirmedOrdersMethod(),
         $this->logger,
         $this->timestampSerializerLoader->load()
       ); 

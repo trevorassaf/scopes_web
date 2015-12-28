@@ -5,7 +5,7 @@
       Title: <input type='text' id='title' />
       Description: <input type='text' id='desc' />
       Short code id: <input type='text' id='short-code' />
-      <button type='button' id='confirm-order-butn'>Confirm Order</button>
+      <button type='button' id='confirm-order-btn'>Confirm Order</button>
     </div>
 
     <div id='user-form'>
@@ -19,8 +19,9 @@
 
     <script>
       function getUsersConfirmedOrders() {
-        var user_id = document.getElementById('user-id').innerHTML;
+        var user_id = document.getElementById('user-id').value;
 
+        console.log(user_id);
         if (user_id == '') {
           return; 
         }
@@ -46,7 +47,7 @@
       };
 
       function confirmOrder() {
-        var user_id = document.getElementById('user-id').innerHTML;
+        var user_id = document.getElementById('user-id').value;
 
         if (user_id == '') {
           return; 
@@ -56,7 +57,7 @@
         xhttp.onreadystatechange = function() {
           if (xhttp.readyState == 4 && xhttp.status == 200) {
             document.getElementById('response').innerHTML = xhttp.responseText;
-            getUsersRsvdOrders(); 
+            getUsersConfirmedOrders(); 
           }
         };
 
@@ -68,18 +69,18 @@
 
         xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-        var payload = "api_type=2&user-id=" + user_id;
+        var payload = "api_type=3";
 
-        var rsvd_order_id = document.getElementById('rid').innerHTML;
+        var rsvd_order_id = document.getElementById('rid').value;
         payload += "&rid=" + rsvd_order_id;
 
-        var title = document.getElementById('title').innerHTML;
+        var title = document.getElementById('title').value;
         payload += "&title=" + title;
 
-        var description = document.getElementById('description').innerHTML;
+        var description = document.getElementById('desc').value;
         payload += "&desc=" + description;
 
-        var short_code_id = document.getElementById('short-code').innerHTML;
+        var short_code_id = document.getElementById('short-code').value;
         payload += "&code-id=" + short_code_id;
 
         payload = encodeURI(payload);
@@ -92,7 +93,7 @@
         getUsersConfirmedOrders();
       };      
 
-      document.getElementById().onclick = function() {
+      document.getElementById('confirm-order-btn').onclick = function() {
         confirmOrder();
       };
       

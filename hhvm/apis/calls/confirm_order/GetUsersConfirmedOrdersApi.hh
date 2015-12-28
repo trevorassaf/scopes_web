@@ -4,7 +4,7 @@ class GetUsersConfirmedOrdersApi extends Api<GetUsersConfirmedOrdersRequest> {
 
   public function __construct(
     RequestFactory<GetUsersConfirmedOrdersRequest> $request_factory,
-    private GetUsersConfirmedOrdersAndCellLabelsMethod $getUsersConfirmedOrdersAndCellLabelsMethod,
+    private GetUsersConfirmedOrdersMethod $getUsersConfirmedOrdersMethod,
     private Logger $logger,
     private TimestampSerializer $timestampSerializer
   ) {
@@ -21,14 +21,28 @@ class GetUsersConfirmedOrdersApi extends Api<GetUsersConfirmedOrdersRequest> {
     $this->logger->info("Get user's confirmed orders api call...");
 
     try {
-    // Fetch confirmed orders w/cell-label
-    $confirmed_orders_with_cell_label_list = $this->getUsersConfirmedOrdersAndCellLabelsMethod
-      ->get($request->getUserId()->get());
+      // Fetch confirmed orders w/cell-label
+      $confirmed_orders_list = $this->getUsersConfirmedOrdersMethod
+        ->get($request->getUserId()->get());
 
-    return new GetUsersConfirmedOrdersApiResult(
-      $confirmed_orders_with_cell_label_list,
-      $this->timestampSerializer
-    );
+      // Prepare data to send back to client
+      $confirmed_order_api_object_list = Vector{};
+
+      foreach ($confirmed_orders_list as $confirmed_order) {
+        $confirmed_order_api_object_list[] = new ConfirmOrderApiObject(
+          $confirmed_order->getId()->getNumber(),
+          $confirmed_order->getScopesCount()->getNumber(),
+          $this->timestampSerializer->serialize($confirmed_order->getTimestampSegment()->getStart()),
+          $this->timestampSerializer->serialize($confirmed_order->getTimestampSegment()->getEnd()),
+          $confirmed_order->getTitle(),
+          $confirmed_order->getDescription(),
+          $this->timestampSerializer->serialize($confirmed_order->getTimeOrdered())
+        );
+      }
+
+      return new GetUsersConfirmedOrdersApiResult(
+        $confirmed_order_api_object_list->toImmVector()
+      );
 
     } catch (NonextantObjectException $ex) {
       // Log that requested user does not exist!

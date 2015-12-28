@@ -60,7 +60,8 @@ class ConfirmOrderMethod {
         $create_confirm_order_request->getTitle(),
         $create_confirm_order_request->getDescription(),
         $short_code_id,
-        new UnsignedFloat(0.0)
+        new UnsignedFloat(0.0),
+        $create_confirm_order_request->getTimeOrderMade()
       );
 
       // Block until insert completes
