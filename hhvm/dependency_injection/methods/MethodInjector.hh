@@ -34,6 +34,7 @@ class MethodInjector {
   // Reserve order method
   private ?ReserveOrderMethod $reserveOrderMethod;
   private ?DeleteReservedOrderMethod $deleteReservedOrderMethod;
+  private ?GetUsersReservedOrdersMethod $getUsersReservedOrdersMethod;
 
   // Confirm order method
   private ?ConfirmOrderMethod $confirmOrderMethod;
@@ -226,7 +227,7 @@ class MethodInjector {
   }
 
   /**
-   * Reserve order method
+   * Reserve order methods
    */
   public function getReserveOrderMethod(): ReserveOrderMethod {
     if ($this->reserveOrderMethod === null) {
@@ -249,8 +250,18 @@ class MethodInjector {
     return $this->deleteReservedOrderMethod;
   }
 
+  public function getGetUsersReservedOrdersMethod(): GetUsersReservedOrdersMethod {
+    if ($this->getUsersReservedOrdersMethod === null) {
+      $this->getUsersReservedOrdersMethod = new GetUsersReservedOrdersMethod(
+        $this->queryInjector->getFetchUsersReservedOrdersQuery(),
+        $this->queryInjector->getFetchUserByIdQuery() 
+      );
+    }
+    return $this->getUsersReservedOrdersMethod;
+  }
+
   /**
-   * Confirm order method
+   * Confirm order methods
    */
   public function getConfirmOrderMethod(): ConfirmOrderMethod {
     if ($this->confirmOrderMethod === null) {

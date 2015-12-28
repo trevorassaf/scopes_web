@@ -2,33 +2,32 @@
 
 class ApiInjector {
 
+  // User apis
   private ?CreateUserApi $createUserApi;
-
   private ?GetUserByEmailApi $getUserApi;
+  private ?GetAllUsersApi $getAllUsersApi;
 
+  // Reserved order apis
   private ?ReserveOrderApi $reserveOrderApi;
-
-  private ?ConfirmOrderApi $confirmOrderApi;
-
-  private ?UpdateConfirmedOrderApi $updateConfirmedOrderApi;
-
-  private ?UpdateCellLabelApi $updateCellLabelApi;
-
-  private ?DeleteCellLabelApi $deleteCellLabelApi;
-
-  private ?DeleteConfirmedOrderApi $deleteConfirmedOrderApi;
-
   private ?DeleteReservedOrderApi $deleteReservedOrderApi;
+  private ?GetUsersReservedOrdersApi $getUsersReservedOrdersApi;
 
+  // Confirmed order apis
+  private ?ConfirmOrderApi $confirmOrderApi;
+  private ?UpdateConfirmedOrderApi $updateConfirmedOrderApi;
+  private ?DeleteConfirmedOrderApi $deleteConfirmedOrderApi;
   private ?GetUsersConfirmedOrdersApi $getUsersConfirmedOrdersApi;
 
-  private ?UploadBasicVideosApi $uploadBasicVideoApi;
-
-  private ?UploadEditedVideoApi $uploadEditedVideoApi;
-
+  // Completed order apis
   private ?CompleteOrderApi $completeOrderApi;
 
-  private ?GetAllUsersApi $getAllUsersApi;
+  // Cell label apis
+  private ?UpdateCellLabelApi $updateCellLabelApi;
+  private ?DeleteCellLabelApi $deleteCellLabelApi;
+
+  // Video apis
+  private ?UploadBasicVideosApi $uploadBasicVideoApi;
+  private ?UploadEditedVideoApi $uploadEditedVideoApi;
 
   public function __construct(
     private MethodInjector $methodInjector,
@@ -49,7 +48,8 @@ class ApiInjector {
     private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
     private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
-    private LazyLoader<RequestFactory<GetAllUsersApiRequest>> $getAllUsersApiRequestFactoryLoader
+    private LazyLoader<RequestFactory<GetAllUsersApiRequest>> $getAllUsersApiRequestFactoryLoader,
+    private LazyLoader<RequestFactory<GetUsersReservedOrdersApiRequest>> $getUsersReservedOrdersApiRequestFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -208,5 +208,16 @@ class ApiInjector {
       ); 
     }
     return $this->getAllUsersApi;
+  }
+
+  public function getGetUsersReservedOrdersApi(): GetUsersReservedOrdersApi {
+    if ($this->getUsersReservedOrdersApi === null) {
+      $this->getUsersReservedOrdersApi = new GetUsersReservedOrdersApi(
+        $this->getUsersReservedOrdersApiRequestFactoryLoader->load(),
+        $this->methodInjector->getGetUsersReservedOrdersMethod(),
+        $this->logger
+      ); 
+    }
+    return $this->getUsersReservedOrdersApi;
   }
 }

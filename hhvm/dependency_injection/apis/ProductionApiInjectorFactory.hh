@@ -73,7 +73,8 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         $hr_timestamp_serializer_lazy_loader,
         $timestamp_builder_lazy_loader,
         $timestamp_segment_factory_lazy_loader,
-        new GetAllUsersApiRequestFactoryLazyLoader()
+        new GetAllUsersApiRequestFactoryLazyLoader(),
+        new GetUsersReservedOrdersApiRequestFactoryLazyLoader()
       ); 
     }
     return $this->productionApiInjector;  

@@ -61,6 +61,7 @@ class QueryInjector {
   private ?FetchReservedOrdersByTimeQuery $fetchRsvdOrdersByTimeQuery;
   private ?InsertQuery<RsvdOrder> $insertRsvdOrderQuery;
   private ?InsertReservedOrderQuery $concreteInsertRsvdOrderQuery;
+  private ?FetchUsersReservedOrdersQuery $fetchUsersReservedOrdersQuery;
   
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
@@ -684,6 +685,17 @@ class QueryInjector {
     return $this->concreteInsertRsvdOrderQuery;
   }
 
+  public function getFetchUsersReservedOrdersQuery(): FetchUsersReservedOrdersQuery {
+    if ($this->fetchUsersReservedOrdersQuery === null) {
+      $this->fetchUsersReservedOrdersQuery = new FetchUsersReservedOrdersQuery(
+        $this->getFetchRsvdOrderQuery(),
+        $this->rsvdOrdersTableLazyLoader->load() 
+      );
+    }
+    return $this->fetchUsersReservedOrdersQuery;
+  }
+
+  // Delete queries
   public function getDeleteQuery(): DeleteQuery {
     if ($this->deleteQuery === null) {
       $this->deleteQuery = new DeleteQuery(
