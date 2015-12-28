@@ -45,7 +45,7 @@ class ApiInjector {
     private LazyLoader<RequestFactory<CreateUploadBasicVideosApiRequest>> $createUploadBasicVideosApiRequestLoader,
     private LazyLoader<RequestFactory<CreateUploadEditedVideoApiRequest>> $createUploadEditedVideoApiRequestLoader,
     private LazyLoader<RequestFactory<CompleteOrderApiRequest>> $completeOrderApiRequestLoader,
-    private LazyLoader<TimestampSerializer> $timestampSerializerLoader,
+    private LazyLoader<HRTimestampSerializer> $timestampSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
     private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
     private LazyLoader<RequestFactory<GetAllUsersApiRequest>> $getAllUsersApiRequestFactoryLoader,
@@ -215,7 +215,8 @@ class ApiInjector {
       $this->getUsersReservedOrdersApi = new GetUsersReservedOrdersApi(
         $this->getUsersReservedOrdersApiRequestFactoryLoader->load(),
         $this->methodInjector->getGetUsersReservedOrdersMethod(),
-        $this->logger
+        $this->logger,
+        $this->timestampSerializerLoader->load()
       ); 
     }
     return $this->getUsersReservedOrdersApi;

@@ -1,0 +1,117 @@
+<html>
+  <body>
+    <div id='new-rsvd-order-form'>
+      Scopes count: <input type='text' id='scopes-count' />
+      Start time: <input type='text' id='start-time' />
+      End time: <input type='text' id='end-time' />
+      <button type='button' id='new-rsvd-order-btn'>Reserve Order</button>
+    </div>
+
+    <div id='user-form'>
+      User id: <input type='text' id='user-id' />
+      <button type='button' id='user-btn'>Get Reserved Orders</button>
+    </div>
+
+    <div id='rsvd-orders'></div>
+
+    Response payload: <br/>
+    <div id='response'></div>
+
+    <script>
+      function getUsersRsvdOrders() {
+        var user_id = document.getElementById('user-id').innerHTML;
+
+        if (user_id == '') {
+          return; 
+        }
+        
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById('rsvd-orders').innerHTML = xhttp.responseText; 
+          }
+        };
+
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = encodeURI("api_type=15&uid=" + user_id);
+        console.log(payload);
+        xhttp.send(payload);
+      };
+
+      function newRsvdOrder() {
+        var user_id = document.getElementById('user-id').innerHTML;
+
+        if (user_id == '') {
+          return; 
+        }
+        
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            getUsersRsvdOrders(); 
+            document.getElementById('response').innerHTML = xhttp.responseText;
+          }
+        };
+
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = "api_type=2&user-id=" + user_id;
+
+        // Scopes count
+        var scopes_count = document.getElementById('scopes-count').innerHTML;
+
+        if (scopes_count == '') {
+          return;
+        }
+
+        payload += "&scopes-count=" + scopes_count;
+
+        // Start time
+        var start_time = document.getElementById('start-time').innerHTML;
+
+        if (start_time == '') {
+          return;
+        }
+
+        payload += "&start-time=" + start_time;
+
+        // End time
+        var end_time = document.getElementById('end-time').innerHTML;
+
+        if (end_time == '') {
+          return;
+        }
+
+        payload += "&end-time=" + end_time;
+
+        payload = encodeURI(payload);
+        console.log(payload);
+        xhttp.send(payload);
+      }; 
+
+      // Bind button handlers to buttons
+      document.getElementById('user-btn').onclick = function() {
+        getUsersRsvdOrders();  
+      };
+
+      document.getElementById('new-rsvd-order-btn').onclick = function() {
+        newRsvdOrder();  
+      };
+
+    </script>
+
+  </body>
+</html>

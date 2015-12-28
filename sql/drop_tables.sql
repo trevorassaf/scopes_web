@@ -9,9 +9,9 @@ drop table CompletedBasicVideoSet;
 drop table CompletedEditedVideo;
 drop table CompositeVideos;
 drop table VideoEditingPricePolicy;
-drop table VideoMimeTypes;
 drop table VideoStoragePricePolicy;
 drop table VideoUploadPolicy;
+drop table VideoMimeTypes;
 
 -- Available dates/times
 drop table IrregularDates;

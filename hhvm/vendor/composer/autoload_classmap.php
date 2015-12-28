@@ -473,6 +473,7 @@ return array(
     'ReserveOrderRequestBuilder' => $baseDir . '/requests/objects/models/rsvd_orders/ReserveOrderRequest.hh',
     'ReserveOrderRequestFactory' => $baseDir . '/requests/objects/factories/rsvd_orders/ReserveOrderRequestFactory.hh',
     'ReserveOrderRequestFactoryLazyLoader' => $baseDir . '/dependency_injection/apis/lazy_loaders/ReserveOrderRequestFactoryLazyLoader.hh',
+    'ReservedOrderApiObject' => $baseDir . '/apis/results/reserve_order/ReservedOrderApiObject.hh',
     'ReservedOrderModelFactoryLazyLoader' => $baseDir . '/dependency_injection/queries/lazy_loaders/orders/ReservedOrderModelFactoryLazyLoader.hh',
     'ReservedOrderPolicy' => $baseDir . '/access_layer/models/objects/rsvd_order/ReservedOrderPolicy.hh',
     'ReservedOrderPolicyFactory' => $baseDir . '/access_layer/models/factories/rsvd_order/ReservedOrderPolicyFactory.hh',

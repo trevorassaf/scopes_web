@@ -1,0 +1,102 @@
+<html>
+  <body>
+    <div id='confirm-order-form'>
+      Reserved order id: <input type='text' id='rid' />
+      Title: <input type='text' id='title' />
+      Description: <input type='text' id='desc' />
+      Short code id: <input type='text' id='short-code' />
+      <button type='button' id='confirm-order-butn'>Confirm Order</button>
+    </div>
+
+    <div id='user-form'>
+      User id: <input type='text' id='user-id' />
+      <button type='button' id='get-confirmed-orders-btn'>Get Confirmed Orders</button>
+    </div>
+
+    <div id='confirmed-orders'></div>
+    
+    <div id='response'></div>
+
+    <script>
+      function getUsersConfirmedOrders() {
+        var user_id = document.getElementById('user-id').innerHTML;
+
+        if (user_id == '') {
+          return; 
+        }
+        
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById('confirmed-orders').innerHTML = xhttp.responseText; 
+          }
+        };
+
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = encodeURI("api_type=9&uid=" + user_id);
+        console.log(payload);
+        xhttp.send(payload);
+      };
+
+      function confirmOrder() {
+        var user_id = document.getElementById('user-id').innerHTML;
+
+        if (user_id == '') {
+          return; 
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById('response').innerHTML = xhttp.responseText;
+            getUsersRsvdOrders(); 
+          }
+        };
+
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = "api_type=2&user-id=" + user_id;
+
+        var rsvd_order_id = document.getElementById('rid').innerHTML;
+        payload += "&rid=" + rsvd_order_id;
+
+        var title = document.getElementById('title').innerHTML;
+        payload += "&title=" + title;
+
+        var description = document.getElementById('description').innerHTML;
+        payload += "&desc=" + description;
+
+        var short_code_id = document.getElementById('short-code').innerHTML;
+        payload += "&code-id=" + short_code_id;
+
+        payload = encodeURI(payload);
+        console.log(payload);
+        xhttp.send(payload);
+      };
+
+      // Bind button handlers to button press
+      document.getElementById('get-confirmed-orders-btn').onclick = function() {
+        getUsersConfirmedOrders();
+      };      
+
+      document.getElementById().onclick = function() {
+        confirmOrder();
+      };
+      
+    </script>
+
+  </body>
+</html>
