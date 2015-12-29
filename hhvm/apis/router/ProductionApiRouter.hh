@@ -64,6 +64,9 @@ class ProductionApiRouter implements ApiRouter {
       case ApiType::GET_USERS_RSVD_ORDERS:
         $api = $this->apiInjector->getGetUsersReservedOrdersApi();
         break;
+      case ApiType::GET_USERS_COMPLETED_ORDERS:
+        $api = $this->apiInjector->getGetUsersCompletedOrdersApi();
+        break;
       default:
         throw new Exception("Unhandled api type!");
         break;

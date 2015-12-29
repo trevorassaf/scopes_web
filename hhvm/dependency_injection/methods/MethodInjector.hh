@@ -63,6 +63,7 @@ class MethodInjector {
 
   // Complete order methods
   private ?CompleteOrderMethod $completeOrderMethod;
+  private ?GetUsersCompletedOrdersMethod $getUsersCompletedOrdersMethod;
 
   public function __construct(
     private QueryInjector $queryInjector,
@@ -448,6 +449,9 @@ class MethodInjector {
     return $this->createShortCodeMethod;
   }
 
+  /**
+   * Completed order methods
+   */
   public function getCompleteOrderMethod(): CompleteOrderMethod {
     if ($this->completeOrderMethod === null) {
       $this->completeOrderMethod = new CompleteOrderMethod(
@@ -458,6 +462,17 @@ class MethodInjector {
       ); 
     }
     return $this->completeOrderMethod;
+  }
+
+  public function getGetUsersCompletedOrdersMethod(): GetUsersCompletedOrdersMethod {
+    if ($this->getUsersCompletedOrdersMethod === null) {
+      $this->getUsersCompletedOrdersMethod = new GetUsersCompletedOrdersMethod(
+        $this->queryInjector->getFetchUserByIdQuery(),
+        $this->queryInjector->getFetchUsersConfirmedOrdersQuery(),
+        $this->queryInjector->getFetchCompletedOrderByConfirmedOrderQuery() 
+      ); 
+    }
+    return $this->getUsersCompletedOrdersMethod;
   }
 
   public function getAssignUserPrivilegesMethod(): AssignUserPrivilegesMethod {

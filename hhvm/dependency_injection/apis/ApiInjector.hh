@@ -20,6 +20,7 @@ class ApiInjector {
 
   // Completed order apis
   private ?CompleteOrderApi $completeOrderApi;
+  private ?GetUsersCompletedOrdersApi $getUsersCompletedOrdersApi;
 
   // Cell label apis
   private ?UpdateCellLabelApi $updateCellLabelApi;
@@ -49,7 +50,8 @@ class ApiInjector {
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
     private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
     private LazyLoader<RequestFactory<GetAllUsersApiRequest>> $getAllUsersApiRequestFactoryLoader,
-    private LazyLoader<RequestFactory<GetUsersReservedOrdersApiRequest>> $getUsersReservedOrdersApiRequestFactoryLoader
+    private LazyLoader<RequestFactory<GetUsersReservedOrdersApiRequest>> $getUsersReservedOrdersApiRequestFactoryLoader,
+    private LazyLoader<RequestFactory<GetUsersCompletedOrdersApiRequest>> $getUsersCompletedOrdersApiRequestFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -197,6 +199,18 @@ class ApiInjector {
       ); 
     }
     return $this->completeOrderApi;
+  }
+
+  public function getGetUsersCompletedOrdersApi(): GetUsersCompletedOrdersApi {
+    if ($this->getUsersCompletedOrdersApi === null) {
+      $this->getUsersCompletedOrdersApi = new GetUsersCompletedOrdersApi(
+        $this->getUsersCompletedOrdersApiRequestFactoryLoader->load(),
+        $this->methodInjector->getGetUsersCompletedOrdersMethod(),
+        $this->logger,
+        $this->timestampSerializerLoader->load()  
+      );
+    }
+    return $this->getUsersCompletedOrdersApi;
   }
 
   public function getGetAllUsersApi(): GetAllUsersApi {
