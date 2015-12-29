@@ -35,7 +35,6 @@ class UploadBasicVideosApi extends Api<CreateUploadBasicVideosApiRequest> {
 
       // Execute upload basic video method
       $basic_video_id_list = $this->uploadBasicVideosMethod->upload(
-        $request->getUserId()->get(),
         $request->getCompletedOrderId()->get(),
         $basic_video_request_list->toImmVector()
       );

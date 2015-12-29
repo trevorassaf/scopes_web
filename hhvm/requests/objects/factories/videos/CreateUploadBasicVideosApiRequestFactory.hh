@@ -30,11 +30,6 @@ class CreateUploadBasicVideosApiRequestFactory implements RequestFactory<CreateU
     $request_builder = new CreateUploadBasicVideosApiRequestBuilder(); 
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
-        case CreateUploadBasicVideosApiRequest::USER_ID_KEY:
-          $request_builder->setUserId(
-            $this->userIdFieldFactory->make($key, $value)
-          );
-          break;
         case CreateUploadBasicVideosApiRequest::COMPLETED_ORDER_ID_KEY:
           $request_builder->setCompletedOrderId(
             $this->completedOrderIdFactory->make($key, $value)

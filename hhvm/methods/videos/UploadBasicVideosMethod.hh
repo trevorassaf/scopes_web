@@ -24,7 +24,6 @@ class UploadBasicVideosMethod {
   ) {}
 
   public function upload(
-    UnsignedInt $user_agent_id,
     UnsignedInt $completed_order_id,
     ImmVector<CreateBasicVideoRequest> $create_basic_video_requests
   ): ImmVector<UnsignedInt> {
@@ -71,12 +70,14 @@ class UploadBasicVideosMethod {
     }
 
     // Make sure that the user linked with this session owns this order
+    /*
     if (!$user_agent_id->equals($confirmed_order->getUserId())) {
       throw new InvalidFileUploadException(
         "User associated with this session (id=" . $user_agent_id->getNumber() 
         . ") does not own specified ConfirmedOrder (id=" . $confirmed_order->getId()->getNumber(). ")!"
       );  
     }
+     */
 
     // Register basic video set with db
     $upload_time = $this->timestampBuilder->now();

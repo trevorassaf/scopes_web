@@ -15,7 +15,50 @@
     <script>
       function uploadBasicVideo() {
         var basic_video_files = document.getElementById('basic-video-file');
-         
+
+        if (basic_video_files.files.length === 0) {
+          console.log("No files selected!");
+          return;
+        }
+
+        var form_data = new FormData();
+        form_data.append('api_type', '10');
+
+        form_data.append("video", basic_video_files.files[0]); 
+        console.log(form_data);
+
+        var completed_order_id = document.getElementById('cid');
+        if (completed_order_id == '') {
+          console.log('Completed order id not set!');
+          return;
+        }
+        form_data.append('cid', completed_order_id);
+        
+        var title = document.getElementById('title');
+        if (title == '') {
+          console.log('Title not set!');
+        }
+        form_data.append('title', title);
+
+        var duration = document.getElementById('duration');
+        if (duration == '') {
+          console.log('Duration not set!');
+        }
+        form_data.append('duration', title);
+        
+        var file_name = document.getElementById('file-name');
+        if (file_name == '') {
+          console.log('File-name not set!');
+        }
+        
+        var description = document.getElementById('description');
+        if (description == '') {
+          console.log('Description not set!');
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open('POST', '../../hhvm/endpoints/endpoint.hh');
+        xhttp.send(form_data);
       };
 
       document.getElementById('upload-basic-video-btn').onclick = function() {

@@ -12,7 +12,10 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
     private Logger $logger
   ) {
     $this->displayRequestFieldErrors = new StaticServerState(false);
-    $this->requestWrapperFactory = new RequestWrapperFactory();
+    $json_field_map_serializer = new JsonFieldMapSerializer();
+    $this->requestWrapperFactory = new RequestWrapperFactory(
+      $json_field_map_serializer
+    );
     $this->apiRequestDeserializer = new JsonApiRequestDeserializer();
     $this->apiResultSerializer = new JsonApiResultSerializer();
     $production_api_router_factory = new ProductionApiRouterFactory($this->logger);
