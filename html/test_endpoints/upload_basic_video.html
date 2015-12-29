@@ -1,0 +1,27 @@
+<html>
+  <body>
+    <div id='upload-video-form'>
+      Completed order id: <input type='text' id='cid' />
+      Title: <input type='text' id='title' />
+      Duration: <input type='text' id='duration' />
+      File name: <input type='text' id='file-name' />
+      Description: <input type='text' id='description' />
+      Video: <input type='file' id='basic-video-file' />
+      <button type='button' id='upload-basic-video-btn'>Upload Basic Video</button>
+    </div>
+
+    <div id='basic-videos'></div>
+
+    <script>
+      function uploadBasicVideo() {
+        var basic_video_files = document.getElementById('basic-video-file');
+         
+      };
+
+      document.getElementById('upload-basic-video-btn').onclick = function() {
+        uploadBasicVideo();  
+      };
+
+    </script>
+  </body>
+</html>
