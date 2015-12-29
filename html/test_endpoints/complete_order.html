@@ -1,0 +1,85 @@
+<html>
+  <body>
+    <div id='complete-order-form'>
+      Confirmed order id: <input type='text' id='cid' />  
+      <button type='button' id='complete-order-btn'>Complete Order</button>
+    </div>
+    
+    <div id='get-completed-orders-form'>
+      User id: <input type='text' id='uid' />  
+      <button type='button' id='get-completed-orders-btn'>Get Completed Orders</button>
+    </div>
+
+    <div id='completed-orders'></div>
+    
+    <div id='response'></div>
+
+    <script>
+      function getUsersCompletedOrders() {
+        var user_id  = document.getElementById('uid').value; 
+        if (user_id == '') {
+          console.log("User id not set!");
+          return;
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById('completed-orders').innerHTML = xhttp.responseText; 
+          }
+        };
+        
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = encodeURI("api_type=16&uid=" + user_id);
+        console.log(payload);
+        xhttp.send(payload);
+      }; 
+
+      function completeOrder() {
+        var confirmed_order_id = document.getElementById('cid').value; 
+        if (confirmed_order_id == '') {
+          console.log('Confirmed order id not set!');
+          return;
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById('response').innerHTML = xhttp.responseText;
+            getUsersCompletedOrders();
+          }
+        };
+
+        xhttp.open(
+          "POST",
+          "../../hhvm/endpoints/endpoint.hh",
+          true 
+        );
+
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var payload = "api_type=12&cid=" + confirmed_order_id;
+        payload = encodeURI(payload);
+        console.log(payload);
+        xhttp.send(payload);
+      };
+
+      document.getElementById('complete-order-btn').onclick = function() {
+        completeOrder();  
+      };
+
+      document.getElementById('get-completed-orders-btn').onclick = function() {
+        console.log('Get completed orders button pressed!');
+        getUsersCompletedOrders();  
+      };
+
+    </script>
+  </body>
+</html>

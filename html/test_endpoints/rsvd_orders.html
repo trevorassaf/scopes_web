@@ -19,7 +19,7 @@
 
     <script>
       function getUsersRsvdOrders() {
-        var user_id = document.getElementById('user-id').innerHTML;
+        var user_id = document.getElementById('user-id').value;
 
         if (user_id == '') {
           return; 
@@ -46,7 +46,7 @@
       };
 
       function newRsvdOrder() {
-        var user_id = document.getElementById('user-id').innerHTML;
+        var user_id = document.getElementById('user-id').value;
 
         if (user_id == '') {
           return; 
@@ -71,7 +71,7 @@
         var payload = "api_type=2&user-id=" + user_id;
 
         // Scopes count
-        var scopes_count = document.getElementById('scopes-count').innerHTML;
+        var scopes_count = document.getElementById('scopes-count').value;
 
         if (scopes_count == '') {
           return;
@@ -80,7 +80,7 @@
         payload += "&scopes-count=" + scopes_count;
 
         // Start time
-        var start_time = document.getElementById('start-time').innerHTML;
+        var start_time = document.getElementById('start-time').value;
 
         if (start_time == '') {
           return;
@@ -89,7 +89,7 @@
         payload += "&start-time=" + start_time;
 
         // End time
-        var end_time = document.getElementById('end-time').innerHTML;
+        var end_time = document.getElementById('end-time').value;
 
         if (end_time == '') {
           return;
