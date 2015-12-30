@@ -17,101 +17,93 @@
     Response payload: <br/>
     <div id='response'></div>
 
-    <script>
-      function getUsersRsvdOrders() {
-        var user_id = document.getElementById('user-id').value;
+    <script type='text/javascript' src='../../js/network/core/scopes_network.js'></script>
+    <script type='text/javascript' src='../../js/network/api/scopes_api.js'></script>
+    <script type='text/javascript' src='../../js/network/api/reserve_order_api.js'></script>
+    <script type='text/javascript' src='../../js/network/api/get_users_reserved_orders_api.js'></script>
 
+    <script type='text/javascript'>
+      function reserveOrder() {
+        var reserve_order_api = new ReserveOrderApi(ScopesNetwork);
+
+        // Validate parameters
+        var user_id = document.getElementById('user-id').value;
         if (user_id == '') {
-          return; 
+          alert('User id not set!');
+          return;
+        }
+
+        var scopes_count = document.getElementById('scopes-count').value;
+        if (scopes_count == '') {
+          alert('Scopes count not set!');
+          return;
+        }
+
+        var start_time = document.getElementById('start-time').value;
+        if (start_time == '') {
+          alert('Start time not set!');
+          return;
         }
         
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (xhttp.readyState == 4 && xhttp.status == 200) {
-            document.getElementById('rsvd-orders').innerHTML = xhttp.responseText; 
-          }
-        };
+        var end_time = document.getElementById('end-time').value;
+        if (end_time == '') {
+          alert('End time not set!');
+          return;
+        }
 
-        xhttp.open(
-          "POST",
-          "../../hhvm/endpoints/endpoint.hh",
-          true 
-        );
-
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        var payload = encodeURI("api_type=15&uid=" + user_id);
-        console.log(payload);
-        xhttp.send(payload);
+        // Execute request
+        reserve_order_api 
+          .setUserId(user_id)
+          .setScopesCount(scopes_count)
+          .setStartTime(start_time)
+          .setEndTime(end_time)
+          .setSuccessfulCallback(
+            function(response) {
+              console.log("Successful! " + response.responseText);    
+            }    
+          )
+          .setFailedCallback(
+            function(response) {
+              console.log("Failed! " + response.responseText);    
+            }
+          )
+          .send();
       };
 
-      function newRsvdOrder() {
+      function getReservedOrders() {
+        var get_orders_api = new GetUsersReservedOrdersApi(ScopesNetwork);
+
+        // Validate parameters
         var user_id = document.getElementById('user-id').value;
-
         if (user_id == '') {
-          return; 
-        }
-        
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (xhttp.readyState == 4 && xhttp.status == 200) {
-            getUsersRsvdOrders(); 
-            document.getElementById('response').innerHTML = xhttp.responseText;
-          }
-        };
-
-        xhttp.open(
-          "POST",
-          "../../hhvm/endpoints/endpoint.hh",
-          true 
-        );
-
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        var payload = "api_type=2&user-id=" + user_id;
-
-        // Scopes count
-        var scopes_count = document.getElementById('scopes-count').value;
-
-        if (scopes_count == '') {
+          alert('User id not set!');
           return;
         }
 
-        payload += "&scopes-count=" + scopes_count;
-
-        // Start time
-        var start_time = document.getElementById('start-time').value;
-
-        if (start_time == '') {
-          return;
-        }
-
-        payload += "&start-time=" + start_time;
-
-        // End time
-        var end_time = document.getElementById('end-time').value;
-
-        if (end_time == '') {
-          return;
-        }
-
-        payload += "&end-time=" + end_time;
-
-        payload = encodeURI(payload);
-        console.log(payload);
-        xhttp.send(payload);
-      }; 
+        // Execute request
+        get_orders_api
+          .setUserId(user_id)
+          .setSuccessfulCallback(
+            function(response) {
+              console.log("Successful! " + response.responseText);    
+            }    
+          )
+          .setFailedCallback(
+            function(response) {
+              console.log("Failed! " + response.responseText);    
+            }
+          )
+          .send();
+      }
 
       // Bind button handlers to buttons
       document.getElementById('user-btn').onclick = function() {
-        getUsersRsvdOrders();  
+        getReservedOrders();  
       };
 
       document.getElementById('new-rsvd-order-btn').onclick = function() {
-        newRsvdOrder();  
+        reserveOrder();  
       };
-
     </script>
-
   </body>
 </html>

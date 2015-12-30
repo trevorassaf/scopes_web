@@ -14,7 +14,11 @@
     
     <div id='response'></div>
 
-    <script>
+    <script type='text/javascript' src='../../js/network/core/scopes_network.js'></script>
+    <script type='text/javascript' src='../../js/network/api/scopes_api.js'></script>
+    <script type='text/javascript' src='../../js/network/api/get_users_completed_orders_api.js'></script>
+    <script type='text/javascript' src='../../js/network/api/complete_order_api.js'></script>
+    <script type='text/javascript'>
       function getUsersCompletedOrders() {
         var user_id  = document.getElementById('uid').value; 
         if (user_id == '') {
@@ -22,24 +26,20 @@
           return;
         }
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (xhttp.readyState == 4 && xhttp.status == 200) {
-            document.getElementById('completed-orders').innerHTML = xhttp.responseText; 
-          }
-        };
-        
-        xhttp.open(
-          "POST",
-          "../../hhvm/endpoints/endpoint.hh",
-          true 
-        );
-
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        var payload = encodeURI("api_type=16&uid=" + user_id);
-        console.log(payload);
-        xhttp.send(payload);
+        var get_completed_orders_api = new GetUsersCompletedOrdersApi(ScopesNetwork);
+        get_completed_orders_api
+          .setUserId(user_id)
+          .setSuccessfulCallback(
+            function(response) {
+              console.log("Success! " + response.responseText); 
+            }     
+          )
+          .setFailedCallback(
+            function(response) {
+              console.log("Failed! " + response.responseText); 
+            }     
+          )
+          .send();
       }; 
 
       function completeOrder() {
@@ -49,26 +49,20 @@
           return;
         }
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (xhttp.readyState == 4 && xhttp.status == 200) {
-            document.getElementById('response').innerHTML = xhttp.responseText;
-            getUsersCompletedOrders();
-          }
-        };
-
-        xhttp.open(
-          "POST",
-          "../../hhvm/endpoints/endpoint.hh",
-          true 
-        );
-
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        var payload = "api_type=12&cid=" + confirmed_order_id;
-        payload = encodeURI(payload);
-        console.log(payload);
-        xhttp.send(payload);
+        var complete_order_api = new CompleteOrderApi(ScopesNetwork);
+        complete_order_api
+          .setConfirmedOrderId(confirmed_order_id)
+          .setSuccessfulCallback(
+            function(response) {
+              console.log("Success! " + response.responseText); 
+            }     
+          )
+          .setFailedCallback(
+            function(response) {
+              console.log("Failed! " + response.responseText); 
+            }     
+          )
+          .send();
       };
 
       document.getElementById('complete-order-btn').onclick = function() {
@@ -76,7 +70,6 @@
       };
 
       document.getElementById('get-completed-orders-btn').onclick = function() {
-        console.log('Get completed orders button pressed!');
         getUsersCompletedOrders();  
       };
 
