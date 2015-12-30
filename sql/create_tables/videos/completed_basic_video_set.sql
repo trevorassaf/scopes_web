@@ -6,6 +6,6 @@ CREATE TABLE CompletedBasicVideoSets (
   PRIMARY KEY(id),
   completedOrderId INT UNSIGNED NOT NULL,
   FOREIGN KEY(completedOrderId) REFERENCES CompletedOrders(id),
-  UNIQUE KEY(confirmedOrderId),
+  UNIQUE KEY(completedOrderId),
   timeCompleted TIMESTAMP NOT NULL
 );

@@ -13,10 +13,10 @@
 CREATE TABLE BasicVideos (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   PRIMARY KEY(id),
-  completedBasicVideoSets INT UNSIGNED NOT NULL,
-  FOREIGN KEY(completedBasicVideoSets) REFERENCES CompletedBasicVideoSets(id),
+  completedBasicVideoSetId INT UNSIGNED NOT NULL,
+  FOREIGN KEY(completedBasicVideoSetId) REFERENCES CompletedBasicVideoSets(id),
   scopeIndex INT UNSIGNED NOT NULL,
-  UNIQUE KEY(confirmedOrderId, scopeIndex),
+  UNIQUE KEY(completedBasicVideoSetId, scopeIndex),
   title VARCHAR(30) NOT NULL,
   duration INT UNSIGNED NOT NULL,
   mimeId INT UNSIGNED NOT NULL,
