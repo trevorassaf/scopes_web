@@ -21,26 +21,29 @@ class RequestWrapperFactory implements RequestFactory<RequestWrapper> {
     $request_wrapper_builder = new RequestWrapperBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
-      case RequestWrapper::API_TYPE_KEY:
-        $request_wrapper_builder->setApiType(
-          $this->apiTypeFieldFactory->make($key, $value)
-        );
-        break;
-      case RequestWrapper::PAYLOAD_KEY:
-        // Verify that serialized payload is a string
-        $payload_string_request_field = $this->payloadStringFieldFactory->make($key, $value);
-        $payload_str = $payload_string_request_field->get();
+        case RequestWrapper::API_TYPE_KEY:
+          $request_wrapper_builder->setApiType(
+            $this->apiTypeFieldFactory->make($key, $value)
+          );
+          break;
+        case RequestWrapper::PAYLOAD_KEY:
+          // Verify that serialized payload is a string
+          $payload_string_request_field = $this->payloadStringFieldFactory->make($key, $value);
+          $payload_str = $payload_string_request_field->get();
 
-        try {
-          // Deserialize payload string
-          $deserialized_payload = $this->fieldMapSerializer->deserialize($payload_str);
+          try {
+            // Deserialize payload string
+            $deserialized_payload = $this->fieldMapSerializer->deserialize($payload_str);
 
-          // Set payload request object
-          $request_wrapper_builder->setPayload($deserialized_payload);
-        } catch (FailedDeserializationException $ex) {
-          throw new InvalidPayloadException($payload_str);
-        } 
-        break;
+            // Set payload request object
+            $request_wrapper_builder->setPayload($deserialized_payload);
+          } catch (FailedDeserializationException $ex) {
+            throw new InvalidPayloadException($payload_str);
+          } 
+          break;
+        default:
+          throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
+          break;
       }
     }
 

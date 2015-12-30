@@ -3,7 +3,7 @@
 class JsonFieldMapSerializer implements FieldMapSerializer {
 
   public function serialize(ImmMap<string, mixed> $field_map): string {
-    $result = json_encode($field_map);
+    $result = json_encode($field_map->toArray(), true);
     if ($result === null) {
       throw new FailedSerializationException($field_map);
     }
@@ -11,11 +11,12 @@ class JsonFieldMapSerializer implements FieldMapSerializer {
   }  
 
   public function deserialize(string $serialized_field_map): ImmMap<string, mixed> {
-    $result = json_decode($serialized_field_map);
+    DLogger::log($serialized_field_map);
+    $result = json_decode($serialized_field_map, true);
     if ($result === null) {
       throw new FailedDeserializationException($serialized_field_map);
     }
 
-    return $result;
+    return new ImmMap($result);
   }
 }

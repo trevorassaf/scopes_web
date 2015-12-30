@@ -9,56 +9,74 @@
 
     <div id='users'></div>
 
-    <script>
+    <script type='text/javascript' src='../../js/scopes_network.js'></script>
+    <script type='text/javascript' src='../../js/scopes_api.js'></script>
+    <script type='text/javascript' src='../../js/get_all_users_api.js'></script>
+    <script type='text/javascript' src='../../js/create_user_api.js'></script>
+
+    <script type='text/javascript'>
+
       function getAllUsers() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (xhttp.readyState == 4 && xhttp.status == 200) {
-            document.getElementById('users').innerHTML = xhttp.responseText; 
-          }
+        // Assemble api payload
+        var successful_callback = function(xhttp) {
+          console.log("Successful response! " + xhttp.responseText);  
+        };
+        var failed_callback = function(xhttp) {
+          console.log("Failed response! " + xhttp.responseText);  
         };
 
-        xhttp.open(
-          "POST",
-          "../../hhvm/endpoints/endpoint.hh",
-          true 
-        );
+        var get_all_users_api = new GetAllUsersApi(ScopesNetwork);
+        get_all_users_api
+          .setSuccessfulCallback(successful_callback)
+          .setFailedCallback(failed_callback)
+          .send();
 
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        var payload = encodeURI("api_type=13");
-        console.log(payload);
-        xhttp.send(payload);
-      }
+      }       
 
       getAllUsers();
-      
-      document.getElementById('create-user-btn').onclick = function() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (xhttp.readyState  == 4 && xhttp.status == 200) {
-            document.getElementById('response').innerHTML = xhttp.responseText;
-            getAllUsers();
-          }
+
+      function createUser() {
+        var create_user_api = new CreateUserApi(ScopesNetwork); 
+
+        var first_name = document.getElementById('first-name').value;
+        if (first_name == '') {
+          alert('First name not set!');
+          return;
+        }
+
+        var last_name = document.getElementById('last-name').value;
+        if (last_name == '') {
+          alert('Last name not set!');
+          return;
+        }
+
+        var email = document.getElementById('email').value;
+        if (email == '') {
+          alert('Email not set!');
+          return;
+        }
+
+        var successful_callback = function(response) {
+          console.log("Success! " + response.responseText);
         };
-        xhttp.open(
-          "POST",
-          "../../hhvm/endpoints/endpoint.hh",
-          true 
-        );
+        
+        var failed_callback = function(response) {
+          console.log("Failed! " + response.responseText);
+        };
 
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        // Send request
+        create_user_api
+          .setFirstName(first_name)
+          .setLastName(last_name)
+          .setEmail(email)
+          .setSuccessfulCallback(successful_callback)
+          .setFailedCallback(failed_callback)
+          .send();
+      }
 
-        var payload = "api_type=0";
-        payload += "&first-name=" + document.getElementById('first-name').value;
-        payload += "&last-name=" + document.getElementById('last-name').value;
-        payload += "&email=" + document.getElementById('email').value;
-        payload = encodeURI(payload);
-
-        console.log(payload);
-        xhttp.send(payload);
+      document.getElementById('create-user-btn').onclick = function() {
+        createUser();
       };
-
     </script>
   </body>
 </html>
