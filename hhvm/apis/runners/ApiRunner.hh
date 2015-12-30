@@ -32,8 +32,12 @@ class ApiRunner {
 
       $api_result = new UnknownFailedApiResult();
     } catch (Exception $ex) {
+
       // Log all exceptions
-      $this->logger->error($ex->getMessage());
+      $this->logger->error(
+        "Exception message and trace: " . $ex->getMessage()
+          . ", " . $ex->getTraceAsString()
+      );
 
       $api_result = new UnknownFailedApiResult();
     }

@@ -1,16 +1,18 @@
 <?hh // strict
 
-class VideoUploadPolicyFactory implements ModelFactory<VideoUploadPolicy> {
+class VideoUploadPolicyFactory extends ConcreteModelFactory<VideoUploadPolicy> {
 
   public function __construct(
     private HRTimestampSerializer $timestampSerializer,
     private VideoUploadPolicyTable $videoUploadPolicyTable
   ) {}
 
-  public function extrude(
+  public function extrudeWithId(
+    UnsignedInt $id,
     ImmMap<string, mixed> $param_map
   ): VideoUploadPolicy {
     return new VideoUploadPolicy(
+      $id,
       new UnsignedInt((int)$param_map[$this->videoUploadPolicyTable->getMaxBytesKey()]),
       (string)$param_map[$this->videoUploadPolicyTable->getWebFilesParamKey()],
       (string)$param_map[$this->videoUploadPolicyTable->getBasicVideoStoragePathKey()],

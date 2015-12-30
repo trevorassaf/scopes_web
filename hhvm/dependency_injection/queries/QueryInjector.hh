@@ -121,6 +121,7 @@ class QueryInjector {
   private ?FetchQuery<VideoUploadPolicy> $fetchVideoUploadPolicyQuery;
   private ?FetchVideoUploadPolicyQuery $concreteFetchVideoUploadPolicyQuery;
   private ?InsertQuery<VideoUploadPolicy> $insertVideoUploadPolicyQuery;
+  private ?InsertVideoUploadPolicyQuery $concreteInsertVideoUploadPolicyQuery;
   private ?FetchQuery<VideoMimeType> $fetchVideoMimeTypesQuery;
   private ?FetchVideoMimeTypesQuery $concreteFetchVideoMimeTypesQuery;
   private ?InsertQuery<VideoMimeType> $insertVideoMimeTypeQuery;
@@ -190,7 +191,7 @@ class QueryInjector {
     private LazyLoader<CompletedBasicVideoSetTable> $completedBasicVideoSetTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<CompletedBasicVideoSet>> $completedBasicVideoSetModelFactoryLazyLoader,
     private LazyLoader<VideoUploadPolicyTable> $videoUploadPolicyTableLazyLoader,
-    private LazyLoader<ModelFactory<VideoUploadPolicy>> $videoUploadPolicyModelFactoryLazyLoader,
+    private LazyLoader<ConcreteModelFactory<VideoUploadPolicy>> $videoUploadPolicyModelFactoryLazyLoader,
     private LazyLoader<VideoMimeTypesTable> $videoMimeTypesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<VideoMimeType>> $videoMimeTypeModelFactoryLazyLoader,
     private LazyLoader<CompletedCompositeVideoTable> $completedCompositeVideoTableLazyLoader,
@@ -1374,6 +1375,30 @@ class QueryInjector {
       ); 
     }
     return $this->concreteFetchVideoUploadPolicyQuery;
+  }
+
+  public function getInsertVideoUploadPolicyQuery(): InsertQuery<VideoUploadPolicy> {
+    if ($this->insertVideoUploadPolicyQuery === null) {
+      $this->insertVideoUploadPolicyQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->videoUploadPolicyTableLazyLoader->load(),
+        $this->videoUploadPolicyModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertVideoUploadPolicyQuery;
+  }
+
+  public function getConcreteInsertVideoUploadPolicyQuery(): InsertVideoUploadPolicyQuery {
+    if ($this->concreteInsertVideoUploadPolicyQuery === null) {
+      $this->concreteInsertVideoUploadPolicyQuery = new InsertVideoUploadPolicyQuery(
+        $this->getInsertVideoUploadPolicyQuery(),
+        $this->videoUploadPolicyTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load() 
+      ); 
+    }
+    return $this->concreteInsertVideoUploadPolicyQuery;
   }
 
   public function getFetchVideoMimeTypesQuery(): FetchQuery<VideoMimeType> {

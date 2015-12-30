@@ -1,14 +1,19 @@
 <?hh // strict
 
-class VideoUploadPolicy {
+class VideoUploadPolicy implements Model {
 
   public function __construct(
+    private UnsignedInt $id,
     private UnsignedInt $maxBytes,
     private string $webFilesParamKey,
     private string $basicVideoStoragePath,
     private string $compositeVideoStoragePath,
     private Timestamp $timeEnacted
   ) {}
+  
+  public function getId(): UnsignedInt {
+    return $this->id;
+  }
 
   public function getMaxBytes(): UnsignedInt {
     return $this->maxBytes;

@@ -49,6 +49,7 @@ class MethodInjector {
 
   // Policy methods
   private ?CreateReservedOrderPolicyMethod $createReservedOrderPolicyMethod;
+  private ?MakeVideoUploadPolicyMethod $makeVideoUploadPolicyMethod;
 
   // Transaction methods
   private ?ExecuteTransactionsForTimeIntervalMethod $executeTransactionsForTimeIntervalMethod;
@@ -358,6 +359,16 @@ class MethodInjector {
       );
     }
     return $this->createReservedOrderPolicyMethod;
+  }
+
+  public function getMakeVideoUploadPolicyMethod(): MakeVideoUploadPolicyMethod {
+    if ($this->makeVideoUploadPolicyMethod === null) {
+      $this->makeVideoUploadPolicyMethod = new MakeVideoUploadPolicyMethod(
+        $this->queryInjector->getConcreteInsertVideoUploadPolicyQuery(),
+        $this->timestampBuilderLoader->load()
+      ); 
+    }
+    return $this->makeVideoUploadPolicyMethod;
   }
 
   /**
