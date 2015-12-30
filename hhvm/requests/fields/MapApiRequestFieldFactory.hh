@@ -8,9 +8,6 @@ class MapApiRequestFieldFactory<Tkey, Tvalue> implements RequestFieldTypeConvert
   ) {}
 
   public function convert(string $map_key, mixed $map_payload): MapApiRequestField<Tkey, Tvalue> {
-
-    DLogger::log($map_key, $map_payload);
-
     // Validate map value
     if (!is_array($map_payload)) {
       throw new RequestFieldTypeConversionException(

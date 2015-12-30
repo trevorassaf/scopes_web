@@ -12,7 +12,10 @@
 
     <div id='basic-videos'></div>
 
-    <script>
+    <script type='text/javascript' src='../../js/network/core/scopes_network.js'></script>
+    <script type='text/javascript' src='../../js/network/api/scopes_api.js'></script>
+    <script type='text/javascript' src='../../js/network/api/upload_basic_video_api.js'></script>
+    <script type='text/javascript'>
       function uploadBasicVideo() {
         var basic_video_files = document.getElementById('basic-video-file');
 
@@ -27,44 +30,56 @@
         form_data.append("video", basic_video_files.files[0]); 
         console.log(form_data);
 
-        var completed_order_id = document.getElementById('cid');
+        var completed_order_id = document.getElementById('cid').value;
         if (completed_order_id == '') {
           console.log('Completed order id not set!');
           return;
         }
-        form_data.append('cid', completed_order_id);
         
-        var title = document.getElementById('title');
+        var title = document.getElementById('title').value;
         if (title == '') {
           console.log('Title not set!');
         }
-        form_data.append('title', title);
 
-        var duration = document.getElementById('duration');
+        var duration = document.getElementById('duration').value;
         if (duration == '') {
           console.log('Duration not set!');
         }
-        form_data.append('duration', title);
         
-        var file_name = document.getElementById('file-name');
+        var file_name = document.getElementById('file-name').value;
         if (file_name == '') {
           console.log('File-name not set!');
         }
         
-        var description = document.getElementById('description');
+        var description = document.getElementById('description').value;
         if (description == '') {
           console.log('Description not set!');
         }
 
+        var video = {
+          'title': title,
+          'duration': duration,
+          'filename': file_name,
+          'description': description
+        };
+
+        var payload = {
+          'cid': completed_order_id,
+          'videos': [video]
+        };
+
+        var payload_str = JSON.stringify(payload);
+        form_data.append('payload', payload_str);
+
         var xhttp = new XMLHttpRequest();
         xhttp.open('POST', '../../hhvm/endpoints/endpoint.hh');
+        //xhttp.setRequestHeader("Content-Type", "multipart/form-data");
         xhttp.send(form_data);
       };
 
       document.getElementById('upload-basic-video-btn').onclick = function() {
         uploadBasicVideo();  
       };
-
     </script>
   </body>
 </html>

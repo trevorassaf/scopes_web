@@ -11,7 +11,6 @@ class JsonFieldMapSerializer implements FieldMapSerializer {
   }  
 
   public function deserialize(string $serialized_field_map): ImmMap<string, mixed> {
-    DLogger::log($serialized_field_map);
     $result = json_decode($serialized_field_map, true);
     if ($result === null) {
       throw new FailedDeserializationException($serialized_field_map);

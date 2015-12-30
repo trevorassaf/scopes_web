@@ -17,8 +17,9 @@ class VectorApiRequestFieldFactory<Tvalue> implements RequestFieldTypeConverter<
       );
     }
 
-    $processed_vector_payload = new ImmVector($vector_payload);
 
+    $processed_vector_payload = new ImmVector($vector_payload);
+    
     // Convert "payload" to ImmVector<Tvalue>
     $vector_result = Vector{};
 
@@ -32,9 +33,8 @@ class VectorApiRequestFieldFactory<Tvalue> implements RequestFieldTypeConverter<
         );
       }
 
-      $vector_result[] = $this->valueFactory->make(
-        new ImmMap($field_value)
-      );
+      $field_value_map = new ImmMap($field_value);
+      $vector_result[] = $this->valueFactory->make($field_value_map);
     }
 
     return new VectorApiRequestField(

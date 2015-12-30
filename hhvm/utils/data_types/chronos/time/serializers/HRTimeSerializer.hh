@@ -31,7 +31,7 @@ class HRTimeSerializer implements TimeSerializer {
     if (count($time_tokens) != 3) {
       return false;
     }
-
+    
     // Verify unsigned ints
     foreach ($time_tokens as $token) {
       if (!UnsignedInt::isValidString($token)) {

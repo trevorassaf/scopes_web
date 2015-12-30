@@ -10,6 +10,7 @@ class RequestFieldTypeConversionException extends RequestException {
     RequestFieldType::STRING => "String",
     RequestFieldType::EMAIL => "Email",
     RequestFieldType::TIMESTAMP => "Timestamp",
+    RequestFieldType::TIME => "Time",
   };
 
   public function __construct(
