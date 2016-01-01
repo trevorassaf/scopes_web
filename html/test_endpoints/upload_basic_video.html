@@ -6,7 +6,7 @@
       Title: <input type='text' id='title' />
       Duration: <input type='text' id='duration' />
       File name: <input type='text' id='file-name' />
-      Video1: <input type='file' id='basic-video-file1' />
+      Video1: <input type='file' id='basic-video' />
       <button type='button' id='upload-basic-video-btn'>Upload Basic Video</button>
     </div>
 
@@ -17,18 +17,11 @@
     <script type='text/javascript' src='../../js/network/api/upload_basic_video_api.js'></script>
     <script type='text/javascript'>
       function uploadBasicVideo() {
-        var basic_video_files1 = document.getElementById('basic-video-file1');
-
-        if (basic_video_files1.files.length === 0) {
+        var basic_video_file = document.getElementById('basic-video'); 
+        if (basic_video_file.files.length === 0) {
           console.log("No files selected!");
           return;
         }
-
-        var form_data = new FormData();
-        form_data.append('api_type', '10');
-
-        form_data.append("video", basic_video_files1.files[0]); 
-        console.log(form_data);
 
         var completed_order_id = document.getElementById('cid').value;
         if (completed_order_id == '') {
@@ -41,7 +34,7 @@
           console.log('Scope index not set!');
           return;
         }
-        
+
         var title = document.getElementById('title').value;
         if (title == '') {
           console.log('Title not set!');
@@ -53,29 +46,33 @@
           console.log('Duration not set!');
           return;
         }
-        
+
         var file_name = document.getElementById('file-name').value;
         if (file_name == '') {
           console.log('File-name not set!');
           return;
         }
 
-        var payload = {
-          'cid': completed_order_id,
-          'scope-index': scope_index,
-          'title': title,
-          'duration': duration,
-          'filename': file_name
-        };
-
-        var payload_str = JSON.stringify(payload);
-        form_data.append('payload', payload_str);
-
-        var xhttp = new XMLHttpRequest();
-        xhttp.open('POST', '../../hhvm/endpoints/endpoint.hh');
-        //xhttp.setRequestHeader("Content-Type", "multipart/form-data");
-        xhttp.send(form_data);
-      };
+        var upload_basic_video_api = new UploadBasicVideoApi(ScopesNetwork);
+        upload_basic_video_api
+          .setFile(basic_video_file.files[0])
+          .setCompletedOrderId(completed_order_id)
+          .setScopeIndex(scope_index)
+          .setTitle(title)
+          .setDuration(duration)
+          .setFileName(file_name)
+          .setSuccessfulCallback(
+            function(response) {
+              console.log("Success! " + response.responseText);
+            }    
+          )
+          .setFailedCallback(
+            function(response) {
+              console.log("Failed! " + response.responseText);
+            }    
+          )
+          .send();
+      }
 
       document.getElementById('upload-basic-video-btn').onclick = function() {
         uploadBasicVideo();  

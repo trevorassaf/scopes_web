@@ -13,6 +13,7 @@ function ScopesApi(network_module) {
   this.isAsync = true;
   this.successfulCallback = function() {};
   this.failedCallback = function() {};
+  this.uploadedFile = null;
 }
 
 ScopesApi.prototype.setIsAsync = function(is_async) {
@@ -30,12 +31,18 @@ ScopesApi.prototype.setFailedCallback = function(callback) {
   return this;
 }
 
+ScopesApi.prototype.setFile = function(file) {
+  this.uploadedFile = file;
+  return this;
+}
+
 ScopesApi.prototype.send = function() {
   return this.networkModule.request(
     this.apiType,
     this.data,
     this.isAsync,
     this.successfulCallback,
-    this.failedCallback
+    this.failedCallback,
+    this.uploadedFile
   );    
 }

@@ -6,6 +6,8 @@ var ScopesNetwork = (function() {
 
   var PAYLOAD_KEY = "payload";
 
+  var VIDEO_UPLOAD_KEY = "video";
+
   var HTTP_REQUEST_TYPE = "POST";
 
   var CONTENT_TYPE_KEY = "Content-Type";
@@ -37,8 +39,16 @@ var ScopesNetwork = (function() {
      * @param bool is_async: is request synchronous
      * @param function(XMLHttpRequest xhttp) successful_callback: callback function for when request finishes successfully
      * @param function(XMLHttpRequest xhttp) failed_callback: callback function for when request finishes with failure
+     * @param File upload_file: optional file upload parameter
      */
-    request: function(api_type, payload_fields, is_async, successful_callback, failed_callback) {
+    request: function(
+     api_type,
+     payload_fields,
+     is_async,
+     successful_callback,
+     failed_callback,
+     upload_file
+   ) {
       var xhttp = new XMLHttpRequest(); 
       
       // Bind callbacks
@@ -63,31 +73,31 @@ var ScopesNetwork = (function() {
 
       console.log(ENDPOINT_PATH);
 
-      // Bind http content type
-      xhttp.setRequestHeader(
-        CONTENT_TYPE_KEY,
-        WWW_FORM_URLENCODED_CONTENT_TYPE
-      );
-
       // Assemble payload
       var serialized_payload = JSON.stringify(payload_fields);
 
-      var request_data = {};
-      request_data[API_TYPE_KEY] = api_type;
-      request_data[PAYLOAD_KEY] = serialized_payload;
+      var form_data = new FormData();
+      
+      if (upload_file != null) {
+        form_data.append(VIDEO_UPLOAD_KEY, upload_file);
+        console.log(VIDEO_UPLOAD_KEY);
+        console.log(upload_file);
+      }
 
-      console.log(request_data);
+      form_data.append(API_TYPE_KEY, api_type);
+      form_data.append(PAYLOAD_KEY, serialized_payload);
 
-      var request_string = urlEncodeRequestObject(request_data);
-      console.log(request_string);
+console.log(API_TYPE_KEY);
+console.log(api_type);
+console.log(PAYLOAD_KEY);
+console.log(serialized_payload);
 
       // Execute request 
-      xhttp.send(request_string);
+      xhttp.send(form_data);
 
       if (!is_async) {
         return xhttp.responseText;
       }
     }  
   }
-
 }());
