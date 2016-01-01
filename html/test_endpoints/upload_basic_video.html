@@ -2,11 +2,11 @@
   <body>
     <div id='upload-video-form'>
       Completed order id: <input type='text' id='cid' />
+      Scope index: <input type='text' id='scope-index' />
       Title: <input type='text' id='title' />
       Duration: <input type='text' id='duration' />
       File name: <input type='text' id='file-name' />
-      Description: <input type='text' id='description' />
-      Video: <input type='file' id='basic-video-file' />
+      Video1: <input type='file' id='basic-video-file1' />
       <button type='button' id='upload-basic-video-btn'>Upload Basic Video</button>
     </div>
 
@@ -17,9 +17,9 @@
     <script type='text/javascript' src='../../js/network/api/upload_basic_video_api.js'></script>
     <script type='text/javascript'>
       function uploadBasicVideo() {
-        var basic_video_files = document.getElementById('basic-video-file');
+        var basic_video_files1 = document.getElementById('basic-video-file1');
 
-        if (basic_video_files.files.length === 0) {
+        if (basic_video_files1.files.length === 0) {
           console.log("No files selected!");
           return;
         }
@@ -27,7 +27,7 @@
         var form_data = new FormData();
         form_data.append('api_type', '10');
 
-        form_data.append("video", basic_video_files.files[0]); 
+        form_data.append("video", basic_video_files1.files[0]); 
         console.log(form_data);
 
         var completed_order_id = document.getElementById('cid').value;
@@ -35,37 +35,37 @@
           console.log('Completed order id not set!');
           return;
         }
+
+        var scope_index = document.getElementById('scope-index').value;
+        if (scope_index == '') {
+          console.log('Scope index not set!');
+          return;
+        }
         
         var title = document.getElementById('title').value;
         if (title == '') {
           console.log('Title not set!');
+          return;
         }
 
         var duration = document.getElementById('duration').value;
         if (duration == '') {
           console.log('Duration not set!');
+          return;
         }
         
         var file_name = document.getElementById('file-name').value;
         if (file_name == '') {
           console.log('File-name not set!');
+          return;
         }
-        
-        var description = document.getElementById('description').value;
-        if (description == '') {
-          console.log('Description not set!');
-        }
-
-        var video = {
-          'title': title,
-          'duration': duration,
-          'filename': file_name,
-          'description': description
-        };
 
         var payload = {
           'cid': completed_order_id,
-          'videos': [video]
+          'scope-index': scope_index,
+          'title': title,
+          'duration': duration,
+          'filename': file_name
         };
 
         var payload_str = JSON.stringify(payload);

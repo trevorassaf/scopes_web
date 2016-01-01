@@ -8,9 +8,9 @@ class BasicVideoPathFormatMethod {
   public function make(
     string $parent_dir,
     UnsignedInt $basic_video_id,
-    string $mime_type
+    string $file_extension
   ): string {
     return $parent_dir . self::DIRECTORY_PATH_DELIMITER .
-      (string)$basic_video_id->getNumber() . self::MIME_TYPE_DELIMITER . $mime_type;
+      (string)$basic_video_id->getNumber() . self::MIME_TYPE_DELIMITER . $file_extension;
   }
 }

@@ -12,7 +12,8 @@ class VideoMimeTypeFactory extends ConcreteModelFactory<VideoMimeType> {
   ): VideoMimeType {
     return new VideoMimeType(
       $id,
-      (string)$params[$this->videoMimeTypesTable->getMimeTypeKey()]
+      (string)$params[$this->videoMimeTypesTable->getFileExtensionKey()],
+      (string)$params[$this->videoMimeTypesTable->getHttpApplicationMimeTypeKey()],
     );
   }
 }

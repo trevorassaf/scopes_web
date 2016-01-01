@@ -3,14 +3,12 @@
 class CompletedBasicVideoSetModelFactoryLazyLoader extends LazyLoader<ConcreteModelFactory<CompletedBasicVideoSet>> {
 
   public function __construct(
-    private LazyLoader<CompletedBasicVideoSetTable> $completedBasicVideoSetTableLoader,
-    private LazyLoader<HRTimestampSerializer> $timestampSerializerLoader
+    private LazyLoader<CompletedBasicVideoSetTable> $completedBasicVideoSetTableLoader
   ) {}
 
   protected function make(): ConcreteModelFactory<CompletedBasicVideoSet> {
     return new CompletedBasicVideoSetFactory(
-      $this->completedBasicVideoSetTableLoader->load(),
-      $this->timestampSerializerLoader->load()
+      $this->completedBasicVideoSetTableLoader->load()
     );
   }
 }

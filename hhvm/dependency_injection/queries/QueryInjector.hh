@@ -1422,6 +1422,19 @@ class QueryInjector {
     return $this->concreteFetchVideoMimeTypesQuery;
   }
 
+  public function getInsertVideoMimeTypeQuery(): InsertQuery<VideoMimeType> {
+    if ($this->insertVideoMimeTypeQuery === null) {
+      $this->insertVideoMimeTypeQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->videoMimeTypesTableLazyLoader->load(),
+        $this->videoMimeTypeModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertVideoMimeTypeQuery;
+  }
+
   public function getCompositeVideosTable(): CompositeVideoTable {
     return $this->compositeVideoTableLazyLoader->load();
   }

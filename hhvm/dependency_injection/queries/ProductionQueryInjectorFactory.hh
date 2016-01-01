@@ -108,7 +108,8 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       ),
       $basic_video_table_loader,
       new BasicVideoModelFactoryLazyLoader(
-        $basic_video_table_loader
+        $basic_video_table_loader,
+        $timestamp_serializer_loader
       ),
       $composite_video_table_loader,
       new CompositeVideoModelFactoryLazyLoader(
@@ -138,8 +139,7 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       ),
       $completed_basic_video_set_table_loader,
       new CompletedBasicVideoSetModelFactoryLazyLoader(
-        $completed_basic_video_set_table_loader,
-        $timestamp_serializer_loader
+        $completed_basic_video_set_table_loader
       ),
       $video_upload_policy_table_loader,
       new VideoUploadPolicyModelFactoryLazyLoader(

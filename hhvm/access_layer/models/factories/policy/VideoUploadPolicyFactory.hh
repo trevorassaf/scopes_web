@@ -17,7 +17,7 @@ class VideoUploadPolicyFactory extends ConcreteModelFactory<VideoUploadPolicy> {
       (string)$param_map[$this->videoUploadPolicyTable->getWebFilesParamKey()],
       (string)$param_map[$this->videoUploadPolicyTable->getBasicVideoStoragePathKey()],
       (string)$param_map[$this->videoUploadPolicyTable->getEditedVideoStoragePathKey()],
-      $this->timestampSerializer->deserialize($this->videoUploadPolicyTable->getTimeEnactedKey())
+      $this->timestampSerializer->deserialize((string)$param_map[$this->videoUploadPolicyTable->getTimeEnactedKey()])
     );
   }
 }

@@ -20,5 +20,7 @@ CREATE TABLE BasicVideos (
   title VARCHAR(30) NOT NULL,
   duration INT UNSIGNED NOT NULL,
   mimeId INT UNSIGNED NOT NULL,
-  FOREIGN KEY(mimeId) REFERENCES VideoMimeTypes(id)
+  FOREIGN KEY(mimeId) REFERENCES VideoMimeTypes(id),
+  uploadTime TIMESTAMP NOT NULL,
+  hasVideo BIT(1) NOT NULL
 );

@@ -1,5 +1,5 @@
 <?hh // strict
 
-enum UploadBasicVideosApiFailureType : int {
+enum UploadBasicVideoApiFailureType : int {
   GENERAL_ERROR = 0x0;
 }

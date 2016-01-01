@@ -3,7 +3,7 @@
 class HRTimeSerializer implements TimeSerializer {
 
   const string DELIMITER = ":";
-  const string FORMAT = "H:m:s";
+  const string FORMAT = "H:i:s";
 
   public function getFormat(): string {
     return self::FORMAT;

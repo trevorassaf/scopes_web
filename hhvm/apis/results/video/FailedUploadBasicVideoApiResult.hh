@@ -1,13 +1,13 @@
 <?hh // strict
 
-class FailedUploadBasicVideosApiResult extends FailedApiResult {
+class FailedUploadBasicVideoApiResult extends FailedApiResult {
 
   const string TYPE_KEY = "type";
 
   public function __construct(
-    private UploadBasicVideosApiFailureType $type
+    private UploadBasicVideoApiFailureType $type
   ) {
-    parent::__construct(ApiType::UPLOAD_BASIC_VIDEOS);
+    parent::__construct(ApiType::UPLOAD_BASIC_VIDEO);
   }
 
   protected function getCustomResultFields(): ImmMap<string, mixed> {

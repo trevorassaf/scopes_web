@@ -48,6 +48,7 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
       $this->productionApiInjector = new ApiInjector(
         $production_method_injector_factory->get(),
         $this->logger,
+        new HttpUploadedFilesFetcher(),
         new CreateUserRequestFactoryLazyLoader(), 
         new GetUserByEmailRequestFactoryLazyLoader(), 
         new ReserveOrderRequestFactoryLazyLoader(
@@ -60,11 +61,6 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         new DeleteReservedOrderRequestFactoryLazyLoader(),
         new DeleteConfirmedOrderRequestFactoryLazyLoader(),
         new GetUsersConfirmedOrdersRequestFactoryLazyLoader(),
-        new CreateUploadBasicVideosApiRequestFactoryLazyLoader(
-          $timestamp_request_field_factory_builder_lazy_loader,
-          $time_request_field_factory_builder_lazy_loader,
-          $hr_time_serializer_lazy_loader
-        ),
         new CreateUploadEditedVideoApiRequestFactoryLazyLoader(
           $timestamp_request_field_factory_builder_lazy_loader,
           $time_request_field_factory_builder_lazy_loader
@@ -75,7 +71,10 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         $timestamp_segment_factory_lazy_loader,
         new GetAllUsersApiRequestFactoryLazyLoader(),
         new GetUsersReservedOrdersApiRequestFactoryLazyLoader(),
-        new GetUsersCompletedOrdersApiRequestFactoryLazyLoader()
+        new GetUsersCompletedOrdersApiRequestFactoryLazyLoader(),
+        new UploadBasicVideoApiRequestFactoryLazyLoader(
+          $hr_time_serializer_lazy_loader
+        )
       ); 
     }
     return $this->productionApiInjector;  

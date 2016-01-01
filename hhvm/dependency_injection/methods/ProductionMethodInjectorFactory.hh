@@ -49,7 +49,8 @@ class ProductionMethodInjectorFactory extends SingletonMethodInjectorFactory {
       $timestamp_segment_factory_lazy_loader,
       new ConfirmedOrderTransactionTableLazyLoader(),
       new FailedConfirmedOrderTransactionTableLazyLoader(),
-      new HttpUploadedFilesFetcher()
+      new HttpUploadedFilesFetcher(),
+      new VideoMimeTypesTable()
     ); 
   }
 }

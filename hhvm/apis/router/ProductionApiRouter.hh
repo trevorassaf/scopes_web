@@ -49,7 +49,7 @@ class ProductionApiRouter implements ApiRouter {
       case ApiType::GET_USERS_CONFIRMED_ORDERS:
         $api = $this->apiInjector->getGetUsersConfirmedOrdersApi();
         break;
-      case ApiType::UPLOAD_BASIC_VIDEOS:
+      case ApiType::UPLOAD_BASIC_VIDEO:
         $api = $this->apiInjector->getUploadBasicVideoApi();
         break;
       case ApiType::UPLOAD_EDITED_VIDEO:

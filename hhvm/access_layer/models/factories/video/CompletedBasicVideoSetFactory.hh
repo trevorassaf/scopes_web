@@ -3,8 +3,7 @@
 class CompletedBasicVideoSetFactory extends ConcreteModelFactory<CompletedBasicVideoSet> {
 
   public function __construct(
-    private CompletedBasicVideoSetTable $table,
-    private HRTimestampSerializer $timestampSerializer
+    private CompletedBasicVideoSetTable $table
   ) {}
 
   public function extrudeWithId(
@@ -13,8 +12,7 @@ class CompletedBasicVideoSetFactory extends ConcreteModelFactory<CompletedBasicV
   ): CompletedBasicVideoSet {
     return new CompletedBasicVideoSet(
       $id,
-      new UnsignedInt((int)$params[$this->table->getCompletedOrderIdKey()]),
-      $this->timestampSerializer->deserialize((string)$params[$this->table->getTimeCompletedKey()]) 
+      new UnsignedInt((int)$params[$this->table->getCompletedOrderIdKey()])
     );
   }
 }

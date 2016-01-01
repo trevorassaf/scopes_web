@@ -50,7 +50,7 @@ class MakeBasicVideoPathMethod {
       return $this->basicVideoPathFormatMethod->make(
         $video_policy->getBasicVideoStoragePath(),
         $basic_video->getId(),
-        $mime_type->getMimeType()
+        $mime_type->getFileExtension()
       ); 
     
     } catch (QueryException $ex) {

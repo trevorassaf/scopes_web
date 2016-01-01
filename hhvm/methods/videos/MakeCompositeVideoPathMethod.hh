@@ -50,7 +50,7 @@ class MakeCompositeVideoPathMethod {
       return $this->compositeVideoPathFormatMethod->make(
         $video_policy->getCompositeVideoStoragePath(),
         $composite_video->getId(),
-        $mime_type->getMimeType()
+        $mime_type->getFileExtension()
       ); 
     
     } catch (QueryException $ex) {

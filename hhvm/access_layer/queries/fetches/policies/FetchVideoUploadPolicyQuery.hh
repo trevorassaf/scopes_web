@@ -14,12 +14,13 @@ class FetchVideoUploadPolicyQuery {
     $fetch_params_builder = new FetchParamsBuilder();
 
     // Build where clause: select all records
+    $serialized_timestamp = $this->timestampSerializer->serialize($timestamp);
     $where_clause_vector_builder = new WhereClauseVectorBuilder();
     $fetch_params_builder->setWhereClause(
       $where_clause_vector_builder->setFirstClause(
         new LessThanWhereClause(
           $this->videoUploadPolicyTable->getTimeEnactedKey(),
-          $this->timestampSerializer->serialize($timestamp)
+          $serialized_timestamp 
         )
       )
       ->build()
@@ -38,7 +39,14 @@ class FetchVideoUploadPolicyQuery {
       $fetch_params_builder
         ->setTable($this->videoUploadPolicyTable)
         ->build()
-    );
+      );
+
+    if (count($policy_list) === 0) {
+      throw new QueryException(
+        QueryErrorType::NONEXTANT_RECORD,
+        "Record doesn't exist for timestamp: " . $serialized_timestamp
+      );
+    }
 
     return $policy_list[0];
   }

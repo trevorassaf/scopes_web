@@ -113,26 +113,25 @@ class UploadEditedVideoMethod {
       throw new InvalidFileUploadException("No video files found!");   
     }
 
-    // Fail if we receive unexpected number of multipart/formdata file labels
+    // Fail if we receive unexpected number of files 
     if ($files->count() !== 1) {
       throw new InvalidFileUploadException(
-        "Expected 1 multipart/encoding-formdata categories, but received " . $files->count()
+        "Expected 1 file, but received " . $files->count()
       );
     }
 
-    // Fail if the top-level multipart/encoding-formdata file label is incorrectly named
+    // Fail if the top-level file label is incorrectly named
     $edited_videos_param_key = $video_upload_policy->getWebFilesParamKey();
 
     if (!$files->containsKey($edited_videos_param_key)) {
       throw new InvalidFileUploadException(
-        "Expected multipart/encoding-formdata category with name '" . $edited_videos_param_key . "', " .
-        "but received name '" . $files->keys()[0] . "'"
+        "Expected 1 file with name '" . $edited_videos_param_key . "', " .
+        "but instead received file with name '" . $files->keys()[0] . "'"
       );
     }
 
     // Validate php file upload 
-    $composite_uploaded_file = $files->at($edited_videos_param_key);
-    $file = $composite_uploaded_file->toImmVector()[0];
+    $file = $files->at($edited_videos_param_key);
 
     if ($file->getErrorCode()->getNumber() !== 0) {
       throw new InvalidFileUploadException(

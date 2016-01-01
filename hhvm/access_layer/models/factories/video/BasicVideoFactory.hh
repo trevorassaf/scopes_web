@@ -3,7 +3,8 @@
 class BasicVideoFactory extends ConcreteModelFactory<BasicVideo> {
 
   public function __construct(
-    private BasicVideosTable $table
+    private BasicVideosTable $table,
+    private HRTimestampSerializer $timestampSerializer
   ) {}
 
   public function extrudeWithId(
@@ -16,7 +17,9 @@ class BasicVideoFactory extends ConcreteModelFactory<BasicVideo> {
       new UnsignedInt((int)$params[$this->table->getScopeIndexKey()]),
       (string)$params[$this->table->getTitleKey()],
       new UnsignedInt((int)$params[$this->table->getVideoDurationKey()]),
-      new UnsignedInt((int)$params[$this->table->getMimeIdKey()])
+      new UnsignedInt((int)$params[$this->table->getMimeIdKey()]),
+      $this->timestampSerializer->deserialize((string)$params[$this->table->getUploadTimeKey()]),
+      (bool)$params[$this->table->getHasVideoKey()]
     );
   }
 }

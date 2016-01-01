@@ -27,12 +27,13 @@ class ApiInjector {
   private ?DeleteCellLabelApi $deleteCellLabelApi;
 
   // Video apis
-  private ?UploadBasicVideosApi $uploadBasicVideoApi;
+  private ?UploadBasicVideoApi $uploadBasicVideoApi;
   private ?UploadEditedVideoApi $uploadEditedVideoApi;
 
   public function __construct(
     private MethodInjector $methodInjector,
     private Logger $logger,
+    private HttpUploadedFilesFetcher $httpUploadedFileFetcher,
     private LazyLoader<RequestFactory<CreateUserRequest>> $createUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUserByEmailRequest>> $getUserRequestFactoryLoader,
     private LazyLoader<RequestFactory<ReserveOrderRequest>> $reserveOrderRequestFactoryLoader,
@@ -43,7 +44,6 @@ class ApiInjector {
     private LazyLoader<RequestFactory<DeleteReservedOrderRequest>> $deleteReservedOrderRequestLoader,
     private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader,
     private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader,
-    private LazyLoader<RequestFactory<CreateUploadBasicVideosApiRequest>> $createUploadBasicVideosApiRequestLoader,
     private LazyLoader<RequestFactory<CreateUploadEditedVideoApiRequest>> $createUploadEditedVideoApiRequestLoader,
     private LazyLoader<RequestFactory<CompleteOrderApiRequest>> $completeOrderApiRequestLoader,
     private LazyLoader<HRTimestampSerializer> $timestampSerializerLoader,
@@ -51,7 +51,8 @@ class ApiInjector {
     private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
     private LazyLoader<RequestFactory<GetAllUsersApiRequest>> $getAllUsersApiRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUsersReservedOrdersApiRequest>> $getUsersReservedOrdersApiRequestFactoryLoader,
-    private LazyLoader<RequestFactory<GetUsersCompletedOrdersApiRequest>> $getUsersCompletedOrdersApiRequestFactoryLoader
+    private LazyLoader<RequestFactory<GetUsersCompletedOrdersApiRequest>> $getUsersCompletedOrdersApiRequestFactoryLoader,
+    private LazyLoader<RequestFactory<UploadBasicVideoApiRequest>> $uploadBasicVideoApiRequestFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -167,12 +168,13 @@ class ApiInjector {
     return $this->getUsersConfirmedOrdersApi;
   }
 
-  public function getUploadBasicVideoApi(): UploadBasicVideosApi {
+  public function getUploadBasicVideoApi(): UploadBasicVideoApi {
     if ($this->uploadBasicVideoApi === null) {
-      $this->uploadBasicVideoApi = new UploadBasicVideosApi(
-        $this->createUploadBasicVideosApiRequestLoader->load(),
-        $this->methodInjector->getUploadBasicVideosMethod(),
-        $this->logger 
+      $this->uploadBasicVideoApi = new UploadBasicVideoApi(
+        $this->uploadBasicVideoApiRequestFactoryLoader->load(),
+        $this->methodInjector->getUploadBasicVideoMethod(),
+        $this->logger,
+        $this->httpUploadedFileFetcher
       ); 
     }
     return $this->uploadBasicVideoApi;

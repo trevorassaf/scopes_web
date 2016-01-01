@@ -2,10 +2,34 @@
 
 require_once(dirname(__FILE__).'/../vendor/autoload.php');
 
-function initDbMain(): void {
-  // Set server timezone
-  date_default_timezone_set("America/Detroit");
+defined("NUM_ARGS") ? null : define("NUM_ARGS", 2);
 
+function initDbMain($argv, $argc): void {
+  //// Validate script arguments ////
+  // Argument count
+  if ($argc !== NUM_ARGS) {
+    echo "ERROR: Invalid argument count. Expected number of args: " . NUM_ARGS
+      . ", provided number of args: " . $argc;
+    return;
+  }
+
+  // First argument: absolute system path to project root directory
+  $project_root_dir = $argv[1];
+  if (!file_exists($project_root_dir)) {
+    echo "ERROR: Invalid path to project root: " . $project_root_dir;
+    return;
+  }
+
+  if (!is_dir($project_root_dir)) {
+    echo "ERROR: Project root path must be a directory: " . $project_root_dir;
+    return;
+  }
+
+  //// Configure system settings ///
+  // Set server timezone
+  date_default_timezone_set("America/Los_Angeles");
+
+  //// Initialize scopes web server ////
   // Initialize model loader
   $logger_factory = new LocalLoggerFactory();
   $production_method_injector_factory = new ProductionMethodInjectorFactory(
@@ -13,67 +37,42 @@ function initDbMain(): void {
   );
   $method_injector = $production_method_injector_factory->get();
 
+  // Init policies
+  initRsvdOrderPolicy($method_injector);
+  initVideoUploadPolicy($method_injector, $project_root_dir);
+  initVideoMimeTypes($method_injector);
+
   // Insert initial records to database
   initUserPrivileges($method_injector);
   initUsers($method_injector);
   initRegularWeekDaysAndTimes($method_injector);
-
-  // TEST: reserve method
-  initRsvdOrderPolicy($method_injector);
-  //initReservedOrders($method_injector);
 }
 
-function initReservedOrders(MethodInjector $method_injector): void {
-  
-  $reserve_order_method = $method_injector->getReserveOrderMethod();
+function initVideoMimeTypes($method_injector): void {
+  $create_video_mime_method = $method_injector->getCreateVideoMimeTypeMethod();
 
-  // Reserve orders for first user
-  $date_builder = new DateBuilder();
-  $time_builder = new TimeBuilder();
+  $create_video_mime_method->create("mp4", "video/mp4");
+  $create_video_mime_method->create("mov", "video/quicktime");
+  $create_video_mime_method->create("avi", "video/x-msvideo");
+  $create_video_mime_method->create("wmv", "video/x-ms-wmv");
+  $create_video_mime_method->create("pdf", "application/pdf");
+  $create_video_mime_method->create("docx", "application/word");
+  $create_video_mime_method->create("text", "text/plain");
+}
 
-  $start_time = new Timestamp(
-    $date_builder
-      ->setYear(Year::fromInt(2015))
-      ->setMonth(Month::fromInt(8))
-      ->setDay(Day::fromInt(1))
-      ->build(),
-    $time_builder
-      ->setHour(Hour::fromInt(9))
-      ->build()
-  );
-  
-  $end_time = new Timestamp(
-    $date_builder->build(),
-    $time_builder
-      ->setHour(Hour::fromInt(17))
-      ->build()
-    );
+function initVideoUploadPolicy(MethodInjector $method_injector, string $project_root_dir): void {
+  $make_video_upload_policy_method = $method_injector->getMakeVideoUploadPolicyMethod(); 
 
-  $time_segment = new TimestampSegment($start_time, $end_time);
+  $max_bytes = new UnsignedInt(0x1000000); // 1 Gigabyte (TODO will need to enlarge later)
+  $basic_video_storage_path = $project_root_dir . "/files/basic_videos/";
+  $edited_video_storage_path = $project_root_dir. "/files/edited_videos/";
+  $web_files_param_key = "web-files-param-key";
 
-  $rsvd_order_1 = $reserve_order_method->reserve(
-    new UnsignedInt(1),
-    new UnsignedInt(0),
-    $time_segment
-  );
-  
-  $rsvd_order_2 = $reserve_order_method->reserve(
-    new UnsignedInt(1),
-    new UnsignedInt(2),
-    $time_segment
-  );
-
-  // Confirm orders
-  $cell_label_requests = Vector{};
-
-  $confirm_order_method = $method_injector->getConfirmOrderMethod();
-  $confirmed_order = $confirm_order_method->confirm(
-    $rsvd_order_1->getId(),
-    "Title",
-    "description blahblahblah",
-    "shortcode",
-    new UnsignedInt(90),
-    $cell_label_requests->toImmVector()
+  $make_video_upload_policy_method->make(
+    $max_bytes,
+    $basic_video_storage_path,
+    $edited_video_storage_path,
+    $web_files_param_key  
   );
 }
 
@@ -135,8 +134,7 @@ function initUsers(MethodInjector $method_injector): void {
   $trevor = $create_user_method->createUser(
     "Trevor",
     "Assaf",
-    new Email("astrev@umich.edu"),
-    "password"
+    new Email("astrev@umich.edu")
   );
 
   // Insert Short Codes
@@ -160,4 +158,4 @@ function initUsers(MethodInjector $method_injector): void {
   );
 }
 
-initDbMain();
+initDbMain($argv, $argc);

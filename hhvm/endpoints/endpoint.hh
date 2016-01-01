@@ -5,7 +5,7 @@ require_once(dirname(__FILE__).'/../vendor/autoload.php');
 function main(): void {
   
   // Endpoint settings 
-  date_default_timezone_set("America/Detroit");
+  date_default_timezone_set("America/Los_Angeles");
   error_reporting(E_ALL); 
 
   $logger_factory = new LocalLoggerFactory();

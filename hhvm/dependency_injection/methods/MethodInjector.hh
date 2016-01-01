@@ -56,8 +56,10 @@ class MethodInjector {
   private ?ExecuteOrderTransactionMethod $executeOrderTransactionMethod;
 
   // Video methods
-  private ?UploadBasicVideosMethod $uploadBasicVideosMethod;
+  private ?UploadBasicVideoMethod $uploadBasicVideoMethod;
+  private ?BasicVideoPathFormatMethod $basicVideoPathFormatMethod;
   private ?UploadEditedVideoMethod $uploadEditedVideoMethod;
+  private ?CreateVideoMimeTypeMethod $createVideoMimeTypeMethod;
 
   // Short code methods
   private ?CreateShortCodeMethod $createShortCodeMethod;
@@ -87,7 +89,8 @@ class MethodInjector {
     private LazyLoader<TimestampSegmentFactory> $timestampSegmentFactoryLoader,
     private LazyLoader<ConfirmedOrderTransactionTable> $confirmedOrderTransactionTableLoader,
     private LazyLoader<FailedConfirmedOrderTransactionTable> $failedConfirmedOrderTransactionTableLoader,
-    private HttpUploadedFilesFetcher $httpUploadedFilesFetcher
+    private HttpUploadedFilesFetcher $httpUploadedFilesFetcher,
+    private VideoMimeTypesTable $videoMimeTypesTable
   ) {}
 
   public function getCreateUserMethod(): CreateUserMethod {
@@ -404,9 +407,9 @@ class MethodInjector {
     return $this->executeOrderTransactionMethod;
   }
 
-  public function getUploadBasicVideosMethod(): UploadBasicVideosMethod {
-    if ($this->uploadBasicVideosMethod === null) {
-      $this->uploadBasicVideosMethod = new UploadBasicVideosMethod(
+  public function getUploadBasicVideoMethod(): UploadBasicVideoMethod {
+    if ($this->uploadBasicVideoMethod === null) {
+      $this->uploadBasicVideoMethod = new UploadBasicVideoMethod(
         $this->queryInjector->getFetchCompletedBasicVideoSetByCompletedOrderQuery(),
         $this->queryInjector->getFetchCompletedOrderByIdQuery(),
         $this->queryInjector->getFetchConfirmedOrderByIdQuery(),
@@ -421,10 +424,17 @@ class MethodInjector {
         $this->timestampBuilderLoader->load(),
         $this->timestampSerializerLoader->load(),
         $this->timeSerializerLoader->load(),
-        $this->httpUploadedFilesFetcher
+        $this->getBasicVideoPathFormatMethod()
       );
     }
-    return $this->uploadBasicVideosMethod;
+    return $this->uploadBasicVideoMethod;
+  }
+
+  public function getBasicVideoPathFormatMethod(): BasicVideoPathFormatMethod {
+    if ($this->basicVideoPathFormatMethod === null) {
+      $this->basicVideoPathFormatMethod = new BasicVideoPathFormatMethod();  
+    }
+    return $this->basicVideoPathFormatMethod;
   }
 
   public function getUploadEditedVideoMethod(): UploadEditedVideoMethod {
@@ -449,6 +459,16 @@ class MethodInjector {
       ); 
     }
     return $this->uploadEditedVideoMethod;
+  }
+
+  public function getCreateVideoMimeTypeMethod(): CreateVideoMimeTypeMethod {
+    if ($this->createVideoMimeTypeMethod === null) {
+      $this->createVideoMimeTypeMethod = new CreateVideoMimeTypeMethod(
+        $this->queryInjector->getInsertVideoMimeTypeQuery(),
+        $this->videoMimeTypesTable
+      ); 
+    }
+    return $this->createVideoMimeTypeMethod;
   }
 
   public function getCreateShortCodeMethod(): CreateShortCodeMethod {
