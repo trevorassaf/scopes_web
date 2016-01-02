@@ -9,13 +9,13 @@ function main(): void {
   error_reporting(E_ALL); 
 
   // Initialize api runner factory
-  $production_api_runner_factory = new ProductionApiRunnerFactory();
+  $api_runner_factory = new DevApiRunnerFactory();
 
   // Start http server
   $http_server = new HttpServer(
-    $production_api_runner_factory->make(),
+    $api_runner_factory->make(),
     new HttpParamsFetcher(),
-    $production_api_runner_factory->getLogger()
+    $api_runner_factory->getLogger()
   );
 
   $http_server->run();

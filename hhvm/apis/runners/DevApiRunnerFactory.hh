@@ -1,9 +1,9 @@
 <?hh // strict
 
-class ProductionApiRunnerFactory implements ApiRunnerFactory {
+class DevApiRunnerFactory implements ApiRunnerFactory {
 
   private Logger $logger;
-  private ProductionSessionDataFetcherFactory $productionSessionDataFetcherFactory;
+  private DevSessionDataFetcherFactory $devSessionDataFetcherFactory;
   private ServerState<bool> $displayRequestFieldErrors;
   private RequestFactory<RequestWrapper> $requestWrapperFactory;
   private ApiRequestDeserializer $apiRequestDeserializer;
@@ -22,21 +22,20 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
       new HRTimeSerializer()
     );
 
+    $timestamp_builder = new TimestampBuilder($timestamp_serializer);
+
     // Initialize session handlers
-    $this->productionSessionDataFetcherFactory = new ProductionSessionDataFetcherFactory(
-      $this->logger,
-      $timestamp_serializer
+    $this->devSessionDataFetcherFactory = new DevSessionDataFetcherFactory(
+      $timestamp_builder
     );
 
     // Initialize api injector 
-    $api_injector_factory = new ProductionApiInjectorFactory(
-      $this->logger
-    );
+    $api_injector_factory = new ProductionApiInjectorFactory($this->logger);
 
     $this->apiInjector = $api_injector_factory->get();
 
     // Initialize request/result handlers 
-    $this->displayRequestFieldErrors = new StaticServerState(false);
+    $this->displayRequestFieldErrors = new StaticServerState(true);
 
     $json_field_map_serializer = new JsonFieldMapSerializer();
     $this->requestWrapperFactory = new RequestWrapperFactory(
@@ -63,7 +62,7 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
       $this->apiResultSerializer,
       $this->apiRouter,
       $this->logger,
-      $this->productionSessionDataFetcherFactory->get(),
+      $this->devSessionDataFetcherFactory->get(),
       $method_injector->getGetUserAgentMethod()
     );
   }
