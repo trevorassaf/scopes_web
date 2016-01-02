@@ -2,5 +2,5 @@
 
 interface ApiInjectorFactory {
 
-  public function make(): ApiInjector;
+  public function get(): ApiInjector;
 }

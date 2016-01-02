@@ -2,6 +2,6 @@
 
 interface ApiRouterFactory {
 
-  public function make(): ApiRouter;
+  public function get(): ApiRouter;
 
 }

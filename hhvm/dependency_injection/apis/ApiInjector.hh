@@ -237,4 +237,8 @@ class ApiInjector {
     }
     return $this->getUsersReservedOrdersApi;
   }
+
+  public function getMethodInjector(): MethodInjector {
+    return $this->methodInjector;
+  }
 }

@@ -8,13 +8,9 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
     private Logger $logger
   ) {}
 
-  public function make(): ApiInjector {
+  public function get(): ApiInjector {
     if ($this->productionApiInjector === null) {
-      // Initialize all dependencies
-      $production_method_injector_factory = new ProductionMethodInjectorFactory(
-        $this->logger
-      );
-
+      //// Initialize all dependencies ////
       // Chronos dependencies
       $hr_time_serializer = new HRTimeSerializer();
       $hr_time_serializer_lazy_loader = new HRTimeSerializerLazyLoader();
@@ -45,8 +41,13 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         $hr_time_serializer_lazy_loader
       );
 
+      // Initialize method injector
+      $method_injector_factory = new ProductionMethodInjectorFactory($this->logger);
+      $method_injector = $method_injector_factory->get();
+
+      // Create api injector
       $this->productionApiInjector = new ApiInjector(
-        $production_method_injector_factory->get(),
+        $method_injector,
         $this->logger,
         new HttpUploadedFilesFetcher(),
         new CreateUserRequestFactoryLazyLoader(), 

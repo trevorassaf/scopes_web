@@ -8,18 +8,14 @@ function main(): void {
   date_default_timezone_set("America/Los_Angeles");
   error_reporting(E_ALL); 
 
-  $logger_factory = new LocalLoggerFactory();
-  $logger = $logger_factory->make();
-
-  $production_api_runner_factory = new ProductionApiRunnerFactory(
-    $logger
-  );
+  // Initialize api runner factory
+  $production_api_runner_factory = new ProductionApiRunnerFactory();
 
   // Start http server
   $http_server = new HttpServer(
     $production_api_runner_factory->make(),
     new HttpParamsFetcher(),
-    $logger
+    $production_api_runner_factory->getLogger()
   );
 
   $http_server->run();
