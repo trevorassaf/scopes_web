@@ -14,12 +14,10 @@ class DeleteConfirmedOrderApi extends Api<DeleteConfirmedOrderRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     DeleteConfirmedOrderRequest $delete_confirmed_order_request
   ): ApiResult {
     try {
-
-error_log("DeleteConfirmedOrderApi::processRequestObject()");
-
       $this->deleteMethod->delete($delete_confirmed_order_request->getConfirmedOrderId()->get());
       return new SuccessfulApiResult(ApiType::DELETE_CONFIRMED_ORDER);
 

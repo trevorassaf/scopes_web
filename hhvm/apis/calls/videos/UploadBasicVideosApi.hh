@@ -15,6 +15,7 @@ class UploadBasicVideoApi extends Api<UploadBasicVideoApiRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     UploadBasicVideoApiRequest $request
   ): ApiResult {
 

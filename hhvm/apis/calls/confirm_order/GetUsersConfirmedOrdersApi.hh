@@ -15,6 +15,7 @@ class GetUsersConfirmedOrdersApi extends Api<GetUsersConfirmedOrdersRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     GetUsersConfirmedOrdersRequest $request
   ): ApiResult {
     // Log get users confirmed order api call

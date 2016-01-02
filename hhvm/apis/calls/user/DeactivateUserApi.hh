@@ -14,6 +14,7 @@ class DeactivateUserApi extends Api<DeactivateUserApiRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     DeactivateUserApiRequest $deactivate_user_api_request
   ): ApiResult {
     try {

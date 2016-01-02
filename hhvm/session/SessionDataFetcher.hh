@@ -15,7 +15,6 @@ class SessionDataFetcher {
       $raw_session->containsKey($this->sessionKeys->getUserAgentIdKey()) &&
       $raw_session->containsKey($this->sessionKeys->getExpirationTimeKey()) &&
       $raw_session->containsKey($this->sessionKeys->getInitiationTimeKey());
-
   }
 
   public function getSession(): SessionData {

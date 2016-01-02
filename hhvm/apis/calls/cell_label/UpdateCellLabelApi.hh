@@ -14,6 +14,7 @@ class UpdateCellLabelApi extends Api<UpdateCellLabelRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     UpdateCellLabelRequest $request
   ): ApiResult {
     $this->updateMethod->update($request);

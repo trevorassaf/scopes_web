@@ -14,6 +14,7 @@ class CreateUserApi extends Api<CreateUserRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     CreateUserRequest $create_user_request
   ): ApiResult {
     try {

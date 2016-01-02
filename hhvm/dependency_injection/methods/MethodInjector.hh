@@ -10,6 +10,9 @@ class MethodInjector {
   private ?CreateUserPrivilegesMethod $createUserPrivilegesMethod;
   private ?CheckUserPrivilegeMethod $checkUserPrivilegeMethod;
 
+  // User agent methods
+  private ?GetUserAgentMethod $getUserAgentMethod;
+
   // Regular week day methods
   private ?CreateRegularWeekDayMethod $createRegularWeekDayMethod;
 
@@ -532,5 +535,15 @@ class MethodInjector {
       ); 
     }
     return $this->checkUserPrivilegeMethod;
+  }
+
+  public function getGetUserAgentMethod(): GetUserAgentMethod {
+    if ($this->getUserAgentMethod === null) {
+      $this->getUserAgentMethod = new GetUserAgentMethod(
+        $this->queryInjector->getFetchUserByIdQuery(),
+        $this->queryInjector->getFetchUsersPrivilegesQuery()
+      ); 
+    }
+    return $this->getUserAgentMethod;
   }
 }

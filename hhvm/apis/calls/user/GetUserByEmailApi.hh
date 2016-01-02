@@ -13,7 +13,10 @@ class GetUserByEmailApi extends Api<GetUserByEmailRequest> {
     );
   }
 
-  protected function processRequestObject(GetUserByEmailRequest $request): ApiResult {
+  protected function processRequestObject(
+    UserAgent $user_agent,
+    GetUserByEmailRequest $request
+  ): ApiResult {
     // Log get user call
     $this->logger->info("Get user by email api called...");
     

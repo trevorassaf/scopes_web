@@ -14,6 +14,7 @@ class DeleteCellLabelApi extends Api<DeleteCellLabelRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     DeleteCellLabelRequest $delete_cell_label_request 
   ): ApiResult {
     try {

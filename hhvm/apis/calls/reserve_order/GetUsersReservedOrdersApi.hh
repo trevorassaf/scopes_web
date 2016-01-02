@@ -15,6 +15,7 @@ class GetUsersReservedOrdersApi extends Api<GetUsersReservedOrdersApiRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     GetUsersReservedOrdersApiRequest $request
   ): ApiResult {
     try {

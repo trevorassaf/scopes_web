@@ -8,21 +8,35 @@ class ApiRunner {
     private ApiRequestDeserializer $apiRequestDeserializer,
     private ApiResultSerializer $apiResultSerializer,
     private ApiRouter $apiRouter,
-    private Logger $logger
+    private Logger $logger,
+    private SessionDataFetcher $sessionDataFetcher,
+    private GetUserAgentMethod $getUserAgentMethod
   ) {}
 
   public function run(ImmMap<string, mixed> $request_params): string {
     $api_result = null;
 
     try {
+      // Fetch and validate session 
+      if (!$this->sessionDataFetcher->hasSession()) {
+        $this->logger->info("Session does not exist!"); 
+        return new FailedApiResult(GeneralApiFailureType::INVALID_SESSION);
+      }
+
+      // Fetch user data
+      $session_data = $this->sessionDataFetcher->getSession();
+      $user_agent = $this->getUserAgentMethod->get(
+        $session_data->getUser()->getiId()
+      );
+
       // Digest request params into request wrapper
       $request_wrapper = $this->requestWrapperFactory->make($request_params);
       $api_payload = $request_wrapper->getPayloadFieldMap();
-      
 
       // Execute api call
       $api_result = $this->apiRouter->route(
         $request_wrapper->getApiType()->get(),
+        $user_agent,
         $api_payload
       );
 

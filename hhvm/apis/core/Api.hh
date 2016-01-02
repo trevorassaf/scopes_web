@@ -7,11 +7,14 @@ abstract class Api<Trequest> {
     private Logger $logger
   ) {}
 
-  public function processRequest(ImmMap<string, mixed> $raw_request_fields): ApiResult {
+  public function processRequest(
+    UserAgent $user_agent,
+    ImmMap<string, mixed> $raw_request_fields
+  ): ApiResult {
     try {
       // Execute selected api call
       $request = $this->requestFactory->make($raw_request_fields);
-      return $this->processRequestObject($request);
+      return $this->processRequestObject($user_agent, $request);
     
     } catch (UnsetRequestFieldException $ex) {
       // Log unset request field exception  
@@ -35,7 +38,10 @@ abstract class Api<Trequest> {
     }
   }
 
-  abstract protected function processRequestObject(Trequest $request_object): ApiResult;
+  abstract protected function processRequestObject(
+    UserAgent $user_agent,
+    Trequest $request_object
+  ): ApiResult;
 
   abstract public function getApiType(): ApiType;
 }

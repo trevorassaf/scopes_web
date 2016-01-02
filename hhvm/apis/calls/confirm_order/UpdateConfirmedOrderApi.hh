@@ -14,6 +14,7 @@ class UpdateConfirmedOrderApi extends Api<UpdateConfirmedOrderRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     UpdateConfirmedOrderRequest $request
   ): ApiResult {
     $this->updateMethod->update($request);

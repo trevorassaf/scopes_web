@@ -14,9 +14,9 @@ class UploadEditedVideoApi extends Api<CreateUploadEditedVideoApiRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     CreateUploadEditedVideoApiRequest $request
   ): ApiResult {
-
     try {
       // Log upload edited videos api request
       $this->logger->info("Upload edited video api claled...");

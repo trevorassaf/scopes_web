@@ -9,7 +9,9 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
   protected ApiRouter $apiRouter;
 
   public function __construct(
-    private Logger $logger
+    private Logger $logger,
+    private SessionDataFetcher $sessionDataFetcher,
+    private GetUserAgentMethod $getUserAgentMethod
   ) {
     $this->displayRequestFieldErrors = new StaticServerState(false);
     $json_field_map_serializer = new JsonFieldMapSerializer();
@@ -29,7 +31,9 @@ class ProductionApiRunnerFactory implements ApiRunnerFactory {
       $this->apiRequestDeserializer,
       $this->apiResultSerializer,
       $this->apiRouter,
-      $this->logger
+      $this->logger,
+      $this->sessionDataFetcher,
+      $this->getUserAgentMethod 
     );
   }
 }

@@ -15,6 +15,7 @@ class ReserveOrderApi extends Api<ReserveOrderRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     ReserveOrderRequest $request
   ): ApiResult {
     // Log reserve order call

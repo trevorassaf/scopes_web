@@ -15,6 +15,7 @@ class ConfirmOrderApi extends Api<ConfirmOrderApiRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     ConfirmOrderApiRequest $request
   ): ApiResult {
     // Log confirm order call

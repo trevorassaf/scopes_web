@@ -14,12 +14,10 @@ class DeleteReservedOrderApi extends Api<DeleteReservedOrderRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     DeleteReservedOrderRequest $delete_reserved_order_request
   ): ApiResult {
     try {
-
-error_log("DeleteReservedOrderApi::processRequestObject()");
-
       $this->deleteMethod->delete($delete_reserved_order_request->getReservedOrderId()->get());
       return new SuccessfulApiResult(ApiType::DELETE_RESERVED_ORDER);
 

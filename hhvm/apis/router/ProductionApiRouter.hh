@@ -9,9 +9,10 @@ class ProductionApiRouter implements ApiRouter {
 
   public function route(
     ApiType $type,
+    UserAgent $user_agent,
     ImmMap<string, mixed> $raw_request_fields
   ): ApiResult {
-    // Log api type 
+    // Log api type  and request payload
     $this->logger->info("Routing api request", $type);
     $this->logger->info("Request payload", $raw_request_fields);
 
@@ -74,6 +75,9 @@ class ProductionApiRouter implements ApiRouter {
 
     invariant($api !== null, "api can't be null...");
 
-    return $api->processRequest($raw_request_fields);
+    return $api->processRequest(
+      $user_agent,
+      $raw_request_fields
+    );
   }
 }

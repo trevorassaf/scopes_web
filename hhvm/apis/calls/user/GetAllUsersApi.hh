@@ -14,6 +14,7 @@ class GetAllUsersApi extends Api<GetAllUsersApiRequest> {
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     GetAllUsersApiRequest $request_object
   ): ApiResult {
 

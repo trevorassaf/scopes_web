@@ -15,6 +15,7 @@ class CompleteOrderApi extends Api<CompleteOrderApiRequest>{
   }
 
   protected function processRequestObject(
+    UserAgent $user_agent,
     CompleteOrderApiRequest $request
   ): ApiResult {
     // Log complete order call
