@@ -1,6 +1,6 @@
 <?hh // strict
 
-class DeleteBasicVideoApiRequestFactory {
+class DeleteBasicVideoApiRequestFactory implements RequestFactory<DeleteBasicVideoApiRequest> {
 
   private RequestFieldFactory<UnsignedInt> $basicVideoIdFactory;
   private RequestFieldFactory<bool> $blockIfNotDownloadedFactory;
@@ -28,6 +28,9 @@ class DeleteBasicVideoApiRequestFactory {
           $request_builder->setBlockIfNotDownloaded(
             $this->blockIfNotDownloadedFactory->make($key, $value)
           );
+          break;
+        default:
+          throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
           break;
       }
     }

@@ -2,6 +2,9 @@
 
 class MethodInjector {
 
+  // File methodds
+  private ?DeleteFileMethod $deleteFileMethod;
+
   // User methods
   private ?CreateUserMethod $createUserMethod;
   private ?GetUserByEmailMethod $getUserByEmailMethod;
@@ -63,6 +66,10 @@ class MethodInjector {
   private ?BasicVideoPathFormatMethod $basicVideoPathFormatMethod;
   private ?UploadEditedVideoMethod $uploadEditedVideoMethod;
   private ?CreateVideoMimeTypeMethod $createVideoMimeTypeMethod;
+  private ?MarkBasicVideoDownloadedMethod $markBasicVideoDownloadedMethod;
+  private ?IsBasicVideoDownloadedMethod $isBasicVideoDownloadedMethod;
+  private ?DeleteBasicVideoMethod $deleteBasicVideoMethod;
+  private ?MakeBasicVideoPathMethod $makeBasicVideoPathMethod;
 
   // Short code methods
   private ?CreateShortCodeMethod $createShortCodeMethod;
@@ -545,5 +552,59 @@ class MethodInjector {
       ); 
     }
     return $this->getUserAgentMethod;
+  }
+
+  public function getMarkBasicVideoDownloadedMethod(): MarkBasicVideoDownloadedMethod {
+    if ($this->markBasicVideoDownloadedMethod === null) {
+      $this->markBasicVideoDownloadedMethod = new MarkBasicVideoDownloadedMethod(
+        $this->queryInjector->getConcreteInsertBasicVideoDownloadReceiptQuery(),
+        $this->timestampBuilderLoader->load()
+      ); 
+    }
+    return $this->markBasicVideoDownloadedMethod;
+  }
+
+  public function getIsBasicVideoDownloadedMethod(): IsBasicVideoDownloadedMethod {
+    if ($this->isBasicVideoDownloadedMethod === null) {
+      $this->isBasicVideoDownloadedMethod = new IsBasicVideoDownloadedMethod(
+        $this->queryInjector->getFetchDownloadReceiptsForBasicVideoQuery() 
+      ); 
+    }
+    return $this->isBasicVideoDownloadedMethod;
+  }
+
+  public function getDeleteBasicVideoMethod(): DeleteBasicVideoMethod {
+    if ($this->deleteBasicVideoMethod === null) {
+      $this->deleteBasicVideoMethod = new DeleteBasicVideoMethod(
+        $this->queryInjector->getFetchBasicVideoByIdQuery(),
+        $this->queryInjector->getFetchCompletedBasicVideoSetByIdQuery(),
+        $this->queryInjector->getFetchCompletedOrderByIdQuery(),
+        $this->queryInjector->getFetchConfirmedOrderByIdQuery(),
+        $this->queryInjector->getConcreteFetchVideoUploadPolicyQuery(),
+        $this->queryInjector->getDeleteByIdQuery(),
+        $this->queryInjector->getBasicVideosTable(),
+        $this->getMakeBasicVideoPathMethod(),
+        $this->getDeleteFileMethod()
+      );
+    }
+    return $this->deleteBasicVideoMethod;
+  }
+
+  public function getMakeBasicVideoPathMethod(): MakeBasicVideoPathMethod {
+    if ($this->makeBasicVideoPathMethod === null) {
+      $this->makeBasicVideoPathMethod = new MakeBasicVideoPathMethod(
+        $this->queryInjector->getConcreteFetchVideoUploadPolicyQuery(),
+        $this->getBasicVideoPathFormatMethod(),
+        $this->queryInjector->getFetchVideoMimeTypeByIdQuery() 
+      ); 
+    }
+    return $this->makeBasicVideoPathMethod;
+  }
+
+  public function getDeleteFileMethod(): DeleteFileMethod {
+    if ($this->deleteFileMethod === null) {
+      $this->deleteFileMethod = new DeleteFileMethod(); 
+    }
+    return $this->deleteFileMethod;
   }
 }

@@ -75,7 +75,9 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         new GetUsersCompletedOrdersApiRequestFactoryLazyLoader(),
         new UploadBasicVideoApiRequestFactoryLazyLoader(
           $hr_time_serializer_lazy_loader
-        )
+        ),
+        new MarkBasicVideoDownloadedApiRequestLazyLoader(),
+        new DeleteBasicVideoApiRequestFactoryLazyLoader()
       ); 
     }
     return $this->productionApiInjector;  

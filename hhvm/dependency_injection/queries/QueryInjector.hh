@@ -101,6 +101,8 @@ class QueryInjector {
 
   // Video packages
   private ?FetchQuery<BasicVideo> $fetchBasicVideosQuery;
+  private ?FetchByUniqueKeyQuery<BasicVideo> $fetchBasicVideoByUniqueKeyQuery;
+  private ?FetchByIdQuery<BasicVideo> $fetchBasicVideoByIdQuery;
   private ?FetchBasicVideosByOrderQuery $fetchBasicVideosByOrderQuery;
   private ?InsertQuery<BasicVideo> $insertBasicVideoQuery;
   private ?BatchInsertQuery<BasicVideo> $batchInsertBasicVideosQuery;
@@ -115,6 +117,7 @@ class QueryInjector {
 
   private ?FetchQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetQuery;
   private ?FetchByUniqueKeyQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetByUniqueKeyQuery;
+  private ?FetchByIdQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetByIdQuery;
   private ?FetchCompletedBasicVideoSetByCompletedOrderQuery $fetchCompletedBasicVideoSetByCompletedOrderQuery;
   private ?InsertQuery<CompletedBasicVideoSet> $insertCompletedBasicVideoSetQuery;
 
@@ -123,8 +126,16 @@ class QueryInjector {
   private ?InsertQuery<VideoUploadPolicy> $insertVideoUploadPolicyQuery;
   private ?InsertVideoUploadPolicyQuery $concreteInsertVideoUploadPolicyQuery;
   private ?FetchQuery<VideoMimeType> $fetchVideoMimeTypesQuery;
+  private ?FetchByUniqueKeyQuery<VideoMimeType> $fetchVideoMimeTypeByUniqueKeyQuery;
+  private ?FetchByIdQuery<VideoMimeType> $fetchVideoMimeTypeByIdQuery;
   private ?FetchVideoMimeTypesQuery $concreteFetchVideoMimeTypesQuery;
   private ?InsertQuery<VideoMimeType> $insertVideoMimeTypeQuery;
+
+  // Basic video read receipts
+  private ?FetchDownloadReceiptsForBasicVideoQuery $fetchDownloadReceiptsForBasicVideoQuery;
+  private ?FetchQuery<BasicVideoDownloadReceipt> $fetchBasicVideoDownloadReceiptQuery;
+  private ?InsertQuery<BasicVideoDownloadReceipt> $insertBasicVideoDownloadReceiptQuery;
+  private ?InsertBasicVideoDownloadReceiptQuery $concreteInsertBasicVideoDownloadReceiptQuery;
 
   // Order Transactions
   private ?FetchQuery<ConfirmedOrderTransaction> $fetchConfirmedOrderTransactionQuery;
@@ -199,7 +210,9 @@ class QueryInjector {
     private LazyLoader<UserUserPrivilegeEdgesTable> $userUserPrivilegeEdgesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<UserUserPrivilegeEdge>> $userUserPrivilegeEdgeModelFactoryLazyLoader,
     private LazyLoader<UserPrivilegesTable> $userPrivilegesTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<UserPrivilege>> $userPrivilegeModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<UserPrivilege>> $userPrivilegeModelFactoryLazyLoader,
+    private LazyLoader<BasicVideoDownloadReceiptsTable> $basicVideoDownloadReceiptsTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<BasicVideoDownloadReceipt>> $basicVideoDownloadReceiptModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -1078,6 +1091,37 @@ class QueryInjector {
     return $this->batchInsertBasicVideosByOrderQuery;
   }
 
+  public function getFetchBasicVideoByUniqueKeyQuery(): FetchByUniqueKeyQuery<BasicVideo> {
+    if ($this->fetchBasicVideoByUniqueKeyQuery === null) {
+      $this->fetchBasicVideoByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchBasicVideosQuery(),
+        $this->basicVideosTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchBasicVideoByUniqueKeyQuery;
+  }
+
+  public function getFetchBasicVideoByIdQuery(): FetchByIdQuery<BasicVideo> {
+    if ($this->fetchBasicVideoByIdQuery === null) {
+      $this->fetchBasicVideoByIdQuery = new FetchByIdQuery(
+        $this->getFetchBasicVideoByUniqueKeyQuery(),
+        $this->basicVideosTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchBasicVideoByIdQuery;
+  }
+
+  public function getFetchCompletedBasicVideoSetByIdQuery(): FetchByIdQuery<CompletedBasicVideoSet> {
+    if ($this->fetchCompletedBasicVideoSetByIdQuery === null) {
+      $this->fetchCompletedBasicVideoSetByIdQuery = new FetchByIdQuery(
+        $this->getFetchCompletedBasicVideoSetByUniqueKeyQuery(),
+        $this->completedBasicVideoSetTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedBasicVideoSetByIdQuery;
+  }
+
   public function getFetchCompositeVideosQuery(): FetchQuery<CompositeVideo> {
     if ($this->fetchCompositeVideosQuery === null) {
       $this->fetchCompositeVideosQuery = new FetchQuery(
@@ -1412,6 +1456,27 @@ class QueryInjector {
     return $this->fetchVideoMimeTypesQuery;
   }
 
+  public function getFetchVideoMimeTypeByUniqueKeyQuery(): FetchByUniqueKeyQuery<VideoMimeType> {
+    if ($this->fetchVideoMimeTypeByUniqueKeyQuery === null) {
+      $this->fetchVideoMimeTypeByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchVideoMimeTypesQuery(),
+        $this->videoMimeTypesTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchVideoMimeTypeByUniqueKeyQuery;
+  }
+
+  public function getFetchVideoMimeTypeByIdQuery(): FetchByIdQuery<VideoMimeType> {
+    if ($this->fetchVideoMimeTypeByIdQuery === null) {
+      $this->fetchVideoMimeTypeByIdQuery = new FetchByIdQuery(
+        $this->getFetchVideoMimeTypeByUniqueKeyQuery(),
+        $this->videoMimeTypesTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchVideoMimeTypeByIdQuery;
+  }
+
   public function getConcreteFetchVideoMimeTypesQuery(): FetchVideoMimeTypesQuery {
     if ($this->concreteFetchVideoMimeTypesQuery === null) {
       $this->concreteFetchVideoMimeTypesQuery = new FetchVideoMimeTypesQuery(
@@ -1435,6 +1500,51 @@ class QueryInjector {
     return $this->insertVideoMimeTypeQuery;
   }
 
+  public function getFetchDownloadReceiptsForBasicVideoQuery(): FetchDownloadReceiptsForBasicVideoQuery {
+    if ($this->fetchDownloadReceiptsForBasicVideoQuery === null) {
+      $this->fetchDownloadReceiptsForBasicVideoQuery = new FetchDownloadReceiptsForBasicVideoQuery(
+        $this->getFetchBasicVideoDownloadReceiptsQuery(),
+        $this->basicVideoDownloadReceiptsTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchDownloadReceiptsForBasicVideoQuery;
+  }
+
+  public function getFetchBasicVideoDownloadReceiptsQuery(): FetchQuery<BasicVideoDownloadReceipt> {
+    if ($this->fetchBasicVideoDownloadReceiptQuery === null) {
+      $this->fetchBasicVideoDownloadReceiptQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->basicVideoDownloadReceiptModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchBasicVideoDownloadReceiptQuery;
+  }
+
+  public function getInsertBasicVideoDownloadReceiptQuery(): InsertQuery<BasicVideoDownloadReceipt> {
+    if ($this->insertBasicVideoDownloadReceiptQuery === null) {
+      $this->insertBasicVideoDownloadReceiptQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->basicVideoDownloadReceiptsTableLazyLoader->load(),
+        $this->basicVideoDownloadReceiptModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertBasicVideoDownloadReceiptQuery;
+  }
+
+  public function getConcreteInsertBasicVideoDownloadReceiptQuery(): InsertBasicVideoDownloadReceiptQuery {
+    if ($this->concreteInsertBasicVideoDownloadReceiptQuery === null) {
+      $this->concreteInsertBasicVideoDownloadReceiptQuery = new InsertBasicVideoDownloadReceiptQuery(
+        $this->getInsertBasicVideoDownloadReceiptQuery(),
+        $this->basicVideoDownloadReceiptsTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()  
+      ); 
+    }
+    return $this->concreteInsertBasicVideoDownloadReceiptQuery;
+  }
+
   public function getCompositeVideosTable(): CompositeVideoTable {
     return $this->compositeVideoTableLazyLoader->load();
   }
@@ -1451,4 +1561,7 @@ class QueryInjector {
     return $this->basicVideosTableLazyLoader->load();
   }
 
+  public function getBasicVideoDownloadReceiptsTable(): BasicVideoDownloadReceiptsTable {
+    return $this->basicVideoDownloadReceiptsTableLazyLoader->load();
+  }
 }

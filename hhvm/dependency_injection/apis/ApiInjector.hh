@@ -30,6 +30,10 @@ class ApiInjector {
   private ?UploadBasicVideoApi $uploadBasicVideoApi;
   private ?UploadEditedVideoApi $uploadEditedVideoApi;
 
+  // Video downlaod receipts
+  private ?MarkBasicVideoDownloadedApi $markBasicVideoDownloadedApi;
+  private ?DeleteBasicVideoApi $deleteBasicVideoApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private Logger $logger,
@@ -52,7 +56,9 @@ class ApiInjector {
     private LazyLoader<RequestFactory<GetAllUsersApiRequest>> $getAllUsersApiRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUsersReservedOrdersApiRequest>> $getUsersReservedOrdersApiRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetUsersCompletedOrdersApiRequest>> $getUsersCompletedOrdersApiRequestFactoryLoader,
-    private LazyLoader<RequestFactory<UploadBasicVideoApiRequest>> $uploadBasicVideoApiRequestFactoryLoader
+    private LazyLoader<RequestFactory<UploadBasicVideoApiRequest>> $uploadBasicVideoApiRequestFactoryLoader,
+    private LazyLoader<RequestFactory<MarkBasicVideoDownloadedApiRequest>> $markBasicVideoDownloadedApiRequestLoader,
+    private LazyLoader<RequestFactory<DeleteBasicVideoApiRequest>> $deleteBasicVideoApiRequestLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -236,6 +242,29 @@ class ApiInjector {
       ); 
     }
     return $this->getUsersReservedOrdersApi;
+  }
+
+  public function getMarkBasicVideoDownloadedApi(): MarkBasicVideoDownloadedApi {
+    if ($this->markBasicVideoDownloadedApi === null) {
+      $this->markBasicVideoDownloadedApi = new MarkBasicVideoDownloadedApi(
+        $this->markBasicVideoDownloadedApiRequestLoader->load(),
+        $this->logger,
+        $this->methodInjector->getMarkBasicVideoDownloadedMethod() 
+      ); 
+    }
+    return $this->markBasicVideoDownloadedApi;
+  }
+
+  public function getDeleteBasicVideoApi(): DeleteBasicVideoApi {
+    if ($this->deleteBasicVideoApi === null) {
+      $this->deleteBasicVideoApi = new DeleteBasicVideoApi(
+        $this->deleteBasicVideoApiRequestLoader->load(),
+        $this->logger,
+        $this->methodInjector->getDeleteBasicVideoMethod(),
+        $this->methodInjector->getIsBasicVideoDownloadedMethod() 
+      ); 
+    }
+    return $this->deleteBasicVideoApi;
   }
 
   public function getMethodInjector(): MethodInjector {
