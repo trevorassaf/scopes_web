@@ -4,6 +4,7 @@ use Scopes;
 
 -- Model tables
 -- Video
+drop table BasicVideoDownloadReceipts;
 drop table BasicVideos;
 drop table CompletedBasicVideoSet;
 drop table CompletedEditedVideo;

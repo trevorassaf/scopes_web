@@ -5,6 +5,9 @@ class DeleteBasicVideoMethod {
   public function __construct(
     private FetchByIdQuery<BasicVideo> $fetchVideoByIdQuery,
     private FetchByIdQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetByIdQuery,
+    private FetchByIdQuery<CompletedOrder> $fetchCompletedOrderByIdQuery,
+    private FetchByIdQuery<ConfirmedOrder> $fetchConfirmedOrderByIdQuery,
+    private FetchVideoUploadPolicyQuery $fetchVideoUploadPolicyQuery,
     private DeleteByIdQuery $deleteByIdQuery,
     private BasicVideosTable $basicVideosTable,
     private MakeBasicVideoPathMethod $makeBasicVideoPathMethod,
@@ -23,6 +26,64 @@ class DeleteBasicVideoMethod {
       if ($video === null) {
         throw new NonextantObjectException(); // Basic Video
       }
+
+      // Fetch completed basic video set
+      $fetch_video_set_handle = $this->fetchCompletedBasicVideoSetByIdQuery->fetch(
+        $video->getCompletedBasicVideoSetId()
+      ); 
+
+      $video_set = $fetch_video_set_handle
+        ->getWaitHandle()
+        ->join();
+
+      if ($video_set === null) {
+        throw new NonextantObjectException(); // Completed basic video set
+      }
+
+      // Fetch completed order
+      $fetch_completed_order_query = $this->fetchCompletedOrderByIdQuery->fetch(
+        $video_set->getCompletedOrderId()
+      );
+
+      $completed_order = $fetch_completed_order_query
+        ->getWaitHandle()
+        ->join();
+
+      if ($completed_order === null) {
+        throw new NonextantObjectException(); // Completed order
+      }
+
+      // Fetch confirmed order
+      $fetch_confirmed_order_query = $fetch_confirmed_order_query
+        ->getWaitHandle()
+        ->join();
+
+      $confirmed_order = $fetch_confirmed_order_query
+        ->getWaitHandle()
+        ->join();
+
+      if ($confirmed_order === null) {
+        throw new NonextantObjectException(); // Confirmed order
+      }
+
+      // Fetch video policy
+      $fetch_policy_query = $this->fetchVideoUploadPolicyQuery->fetch(
+        $confirmed_order->getTimeOrdered()
+      );
+
+      $upload_policy = $fetch_policy_query
+        ->getWaitHandle()
+        ->join();
+
+      if ($upload_policy === null) {
+        throw new NonextantObjectException(); // Upload policy
+      }
+
+      // Perform delete operation
+      $this->deleteWithVideoAndPolicy(
+        $video,
+        $upload_policy
+      );
 
     } catch (QueryException $ex) {
       throw new FailedQueryMethodException($ex);

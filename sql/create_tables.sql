@@ -36,6 +36,7 @@ source create_tables/chronos/regular_week_day_regular_time_edges.sql
 source create_tables/videos/video_mime_types.sql
 source create_tables/videos/completed_basic_video_set.sql
 source create_tables/videos/basic_videos.sql
+source create_tables/videos/basic_video_download_receipts.sql
 source create_tables/videos/completed_edited_video.sql
 source create_tables/videos/composite_videos.sql
 source create_tables/videos/video_editing_price_policy.sql
