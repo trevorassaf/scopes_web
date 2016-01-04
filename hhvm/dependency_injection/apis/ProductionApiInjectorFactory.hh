@@ -62,7 +62,7 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         new DeleteReservedOrderRequestFactoryLazyLoader(),
         new DeleteConfirmedOrderRequestFactoryLazyLoader(),
         new GetUsersConfirmedOrdersRequestFactoryLazyLoader(),
-        new CreateUploadEditedVideoApiRequestFactoryLazyLoader(
+        new UploadEditedVideoApiRequestFactoryLazyLoader(
           $timestamp_request_field_factory_builder_lazy_loader,
           $time_request_field_factory_builder_lazy_loader
         ),

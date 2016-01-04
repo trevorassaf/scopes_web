@@ -3,7 +3,6 @@
 class UploadBasicVideoApiRequest {
 
   const string REQUEST_OBJECT_NAME = "UploadBasicVideo";
-
   const string COMPLETED_ORDER_ID_KEY = "cid";
   const string SCOPE_INDEX_KEY = "scope-index";
   const string TITLE_KEY = "title";

@@ -1,14 +1,15 @@
 <?hh // strict
 
-class CreateUploadEditedVideoApiRequest {
+class UploadEditedVideoApiRequest {
   
   const string REQUEST_OBJECT_NAME = "UploadEditedVideo";
-  const string USER_ID_KEY = "user-id";
-  const string EDITED_VIDEO_ORDER_ID_KEY = "edited-video-order-id";
-  const string VIDEO_DURATION_KEY = "video-duration";
+  const string USER_ID_KEY = "uid";
+  const string EDITED_VIDEO_ORDER_ID_KEY = "eid";
+  const string VIDEO_DURATION_KEY = "duration";
   const string TITLE_KEY = "title";
   const string DESCRIPTION_KEY = "description";
   const string EXPIRATION_TIME_KEY = "expiration-time";
+  const string VIDEO_KEY = "video";
 
   public function __construct(
     private RequestField<UnsignedInt> $userId,
@@ -44,7 +45,7 @@ class CreateUploadEditedVideoApiRequest {
   }
 }
 
-class CreateUploadEditedVideoApiRequestBuilder {
+class UploadEditedVideoApiRequestBuilder {
 
   private ?RequestField<UnsignedInt> $userId;
   private ?RequestField<UnsignedInt> $editedVideoOrderId;
@@ -86,21 +87,21 @@ class CreateUploadEditedVideoApiRequestBuilder {
   private function checkNotNull<T>(?T $field, string $key): T {
     if ($field === null) {
       throw new UnsetRequestFieldException(
-        CreateUploadEditedVideoApiRequest::REQUEST_OBJECT_NAME,
+        UploadEditedVideoApiRequest::REQUEST_OBJECT_NAME,
         $key
       );
     }
     return $field;
   }
 
-  public function build(): CreateUploadEditedVideoApiRequest {
-    return new CreateUploadEditedVideoApiRequest(
-      $this->checkNotNull($this->userId, CreateUploadEditedVideoApiRequest::USER_ID_KEY),
-      $this->checkNotNull($this->editedVideoOrderId, CreateUploadEditedVideoApiRequest::EDITED_VIDEO_ORDER_ID_KEY),
-      $this->checkNotNull($this->videoDuration, CreateUploadEditedVideoApiRequest::VIDEO_DURATION_KEY),
-      $this->checkNotNull($this->title, CreateUploadEditedVideoApiRequest::TITLE_KEY),
-      $this->checkNotNull($this->description, CreateUploadEditedVideoApiRequest::DESCRIPTION_KEY),
-      $this->checkNotNull($this->expirationTime, CreateUploadEditedVideoApiRequest::EXPIRATION_TIME_KEY)
+  public function build(): UploadEditedVideoApiRequest {
+    return new UploadEditedVideoApiRequest(
+      $this->checkNotNull($this->userId, UploadEditedVideoApiRequest::USER_ID_KEY),
+      $this->checkNotNull($this->editedVideoOrderId, UploadEditedVideoApiRequest::EDITED_VIDEO_ORDER_ID_KEY),
+      $this->checkNotNull($this->videoDuration, UploadEditedVideoApiRequest::VIDEO_DURATION_KEY),
+      $this->checkNotNull($this->title, UploadEditedVideoApiRequest::TITLE_KEY),
+      $this->checkNotNull($this->description, UploadEditedVideoApiRequest::DESCRIPTION_KEY),
+      $this->checkNotNull($this->expirationTime, UploadEditedVideoApiRequest::EXPIRATION_TIME_KEY)
     );
   }
 }

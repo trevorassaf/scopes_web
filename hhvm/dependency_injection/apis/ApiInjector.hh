@@ -48,7 +48,7 @@ class ApiInjector {
     private LazyLoader<RequestFactory<DeleteReservedOrderRequest>> $deleteReservedOrderRequestLoader,
     private LazyLoader<RequestFactory<DeleteConfirmedOrderRequest>> $deleteConfirmedOrderRequestLoader,
     private LazyLoader<RequestFactory<GetUsersConfirmedOrdersRequest>> $getUsersConfirmedOrdersRequestLoader,
-    private LazyLoader<RequestFactory<CreateUploadEditedVideoApiRequest>> $createUploadEditedVideoApiRequestLoader,
+    private LazyLoader<RequestFactory<UploadEditedVideoApiRequest>> $uploadEditedVideoApiRequestLoader,
     private LazyLoader<RequestFactory<CompleteOrderApiRequest>> $completeOrderApiRequestLoader,
     private LazyLoader<HRTimestampSerializer> $timestampSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
@@ -189,9 +189,10 @@ class ApiInjector {
   public function getUploadEditedVideoApi() : UploadEditedVideoApi {
     if ($this->uploadEditedVideoApi === null) {
       $this->uploadEditedVideoApi = new UploadEditedVideoApi(
-        $this->createUploadEditedVideoApiRequestLoader->load(),
+        $this->uploadEditedVideoApiRequestLoader->load(),
         $this->methodInjector->getUploadEditedVideoMethod(),
-        $this->logger  
+        $this->logger,
+        $this->httpUploadedFileFetcher
       );
     }  
     return $this->uploadEditedVideoApi;   

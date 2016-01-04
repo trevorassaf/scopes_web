@@ -34,9 +34,9 @@ class UploadBasicVideoApi extends Api<UploadBasicVideoApiRequest> {
         );
       }
 
-      // Fail if video file parameter key is incorrect
+      // Fail if basic video file parameter key is incorrect
       if (!$uploaded_files->containsKey(UploadBasicVideoApiRequest::VIDEO_KEY)) {
-        $this->logger->info("Invalid parameter key for uploaded video: " . $uploaded_files->keys()[0]);
+        $this->logger->info("Invalid parameter key for uploaded basic video: " . $uploaded_files->keys()[0]);
         return new FailedUploadBasicVideoApiResult(
           UploadBasicVideoApiFailureType::GENERAL_ERROR
         );

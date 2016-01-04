@@ -1,6 +1,6 @@
 <?hh // strict
 
-class CreateUploadEditedVideoApiRequestFactory implements RequestFactory<CreateUploadEditedVideoApiRequest> {
+class UploadEditedVideoApiRequestFactory implements RequestFactory<UploadEditedVideoApiRequest> {
 
   const int TITLE_MAX_LENGTH_KEY = 10;
   const int DESCRIPTION_MAX_LENGTH_KEY = 100;
@@ -37,36 +37,36 @@ class CreateUploadEditedVideoApiRequestFactory implements RequestFactory<CreateU
     $this->expirationTimeFieldFactory = $this->timestampRequestFieldFactoryBuilder->build();
   }
 
-  public function make(ImmMap<string, mixed> $raw_field_map): CreateUploadEditedVideoApiRequest {
-    $request_builder = new CreateUploadEditedVideoApiRequestBuilder();
+  public function make(ImmMap<string, mixed> $raw_field_map): UploadEditedVideoApiRequest {
+    $request_builder = new UploadEditedVideoApiRequestBuilder();
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
-        case CreateUploadEditedVideoApiRequest::USER_ID_KEY:
+        case UploadEditedVideoApiRequest::USER_ID_KEY:
           $request_builder->setUserId(
             $this->userIdFieldFactory->make($key, $value)
           );
           break;
-        case CreateUploadEditedVideoApiRequest::EDITED_VIDEO_ORDER_ID_KEY:
+        case UploadEditedVideoApiRequest::EDITED_VIDEO_ORDER_ID_KEY:
           $request_builder->setEditedVideoOrderId(
             $this->editedVideoOrderIdFieldFactory->make($key, $value)
           );
           break;
-        case CreateUploadEditedVideoApiRequest::VIDEO_DURATION_KEY:
+        case UploadEditedVideoApiRequest::VIDEO_DURATION_KEY:
           $request_builder->setVideoDuration(
             $this->videoDurationFieldFactory->make($key, $value)
           );
           break;
-        case CreateUploadEditedVideoApiRequest::TITLE_KEY:
+        case UploadEditedVideoApiRequest::TITLE_KEY:
           $request_builder->setTitle(
             $this->titleFieldFactory->make($key, $value)
           );
           break;
-        case CreateUploadEditedVideoApiRequest::DESCRIPTION_KEY:
+        case UploadEditedVideoApiRequest::DESCRIPTION_KEY:
           $request_builder->setDescription(
             $this->descriptionFieldFactory->make($key, $value)
           );
           break;
-        case CreateUploadEditedVideoApiRequest::EXPIRATION_TIME_KEY:
+        case UploadEditedVideoApiRequest::EXPIRATION_TIME_KEY:
           $request_builder->setExpirationTime(
             $this->expirationTimeFieldFactory->make($key, $value)
           );

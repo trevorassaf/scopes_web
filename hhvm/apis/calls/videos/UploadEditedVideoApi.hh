@@ -1,11 +1,12 @@
 <?hh // strict
 
-class UploadEditedVideoApi extends Api<CreateUploadEditedVideoApiRequest> {
+class UploadEditedVideoApi extends Api<UploadEditedVideoApiRequest> {
 
   public function __construct(
-    RequestFactory<CreateUploadEditedVideoApiRequest> $request_factory,
+    RequestFactory<UploadEditedVideoApiRequest> $request_factory,
     private UploadEditedVideoMethod $uploadEditedVideoMethod,
-    private Logger $logger
+    private Logger $logger,
+    private HttpUploadedFilesFetcher $uploadedFilesFetcher
   ) {
     parent::__construct(
       $request_factory,
@@ -15,11 +16,30 @@ class UploadEditedVideoApi extends Api<CreateUploadEditedVideoApiRequest> {
 
   protected function processRequestObject(
     UserAgent $user_agent,
-    CreateUploadEditedVideoApiRequest $request
+    UploadEditedVideoApiRequest $request
   ): ApiResult {
     try {
       // Log upload edited videos api request
       $this->logger->info("Upload edited video api claled...");
+
+      // Fetch uploaded files
+      $uploaded_files = $this->uploadedFilesFetcher->fetch();
+      
+      // Fail if we receive unexpected number of files 
+      if ($uploaded_files->count() !== 1) {
+        $this->logger->info("Expected 1 uploaded file, but received " . $uploaded_files->count());  
+        return new FailedUploadEditedVideoApiResult(
+          UploadEditedVideoApiFailureType::GENERAL_ERROR
+        );
+      }
+      
+      // Fail if edited video file parameter key is incorrect
+      if (!$uploaded_files->containsKey(UploadEditedVideoApiRequest::VIDEO_KEY)) {
+        $this->logger->info("Invalid parameter key for uploaded edited video: " . $uploaded_files->keys()[0]);
+        return new FailedUploadEditedVideoApiResult(
+          UploadEditedVideoApiFailureType::GENERAL_ERROR
+        );
+      }
 
       // Execute upload edited video method
       $edited_video_id = $this->uploadEditedVideoMethod->upload(
