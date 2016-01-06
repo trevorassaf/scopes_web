@@ -29,11 +29,13 @@ drop table CellLabels;
 drop table EditedVideoOrders;
 
 drop table CompletedOrders;
+drop table ConfirmedOrderScopeMappings;
 drop table ConfirmedOrders;
 
 drop table OrderConfiguration;
 
 -- Reserved orders
+drop table ReservedOrderScopeMappings;
 drop table RsvdOrders;
 drop table ReservedOrderPolicy;
 

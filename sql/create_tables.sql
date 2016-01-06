@@ -11,11 +11,13 @@ source create_tables/short_codes/short_code_validation_checks.sql
 -- Reserved orders
 source create_tables/orders/rsvd_order_policy.sql
 source create_tables/orders/rsvd_orders.sql
+source create_tables/orders/reserved_order_scope_mappings.sql
 
 -- Confirmed orders
 source create_tables/orders/order_configuration.sql
 
 source create_tables/orders/confirmed_orders.sql
+source create_tables/orders/confirmed_order_scope_mappings.sql
 source create_tables/orders/completed_orders.sql
 
 source create_tables/orders/edited_video_orders.sql
