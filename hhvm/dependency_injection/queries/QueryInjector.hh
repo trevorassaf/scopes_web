@@ -114,12 +114,17 @@ class QueryInjector {
   private ?FetchCompositeVideoByOrderQuery $fetchCompositeVideoByOrderQuery;
   private ?InsertQuery<CompositeVideo> $insertCompositeVideoQuery;
   private ?InsertCompositeVideoQuery $concreteInsertCompositeVideoQuery;
+  private ?FetchCompletedCompositeVideoByEditedVideoOrderQuery $fetchCompletedCompositeVideoByEditedVideoOrderQuery;
 
   private ?FetchQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetQuery;
   private ?FetchByUniqueKeyQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetByUniqueKeyQuery;
   private ?FetchByIdQuery<CompletedBasicVideoSet> $fetchCompletedBasicVideoSetByIdQuery;
   private ?FetchCompletedBasicVideoSetByCompletedOrderQuery $fetchCompletedBasicVideoSetByCompletedOrderQuery;
   private ?InsertQuery<CompletedBasicVideoSet> $insertCompletedBasicVideoSetQuery;
+
+  private ?FetchQuery<CompletedCompositeVideo> $fetchCompletedCompositeVideoQuery;
+  private ?FetchByUniqueKeyQuery<CompletedCompositeVideo> $fetchCompletedCompositeVideoByUniqueKeyQuery;
+  private ?FetchByIdQuery<CompletedCompositeVideo> $fetchCompletedCompositeVideoByIdQuery;
 
   private ?FetchQuery<VideoUploadPolicy> $fetchVideoUploadPolicyQuery;
   private ?FetchVideoUploadPolicyQuery $concreteFetchVideoUploadPolicyQuery;
@@ -1543,6 +1548,48 @@ class QueryInjector {
       ); 
     }
     return $this->concreteInsertBasicVideoDownloadReceiptQuery;
+  }
+
+  public function getFetchCompletedCompositeVideoQuery(): FetchQuery<CompletedCompositeVideo> {
+    if ($this->fetchCompletedCompositeVideoQuery === null) {
+      $this->fetchCompletedCompositeVideoQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->completedCompositeVideoModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedCompositeVideoQuery;
+  }
+
+  public function getFetchCompletedCompositeVideoByUniqueKeyQuery(): FetchByUniqueKeyQuery<CompletedCompositeVideo> {
+    if ($this->fetchCompletedCompositeVideoByUniqueKeyQuery === null) {
+      $this->fetchCompletedCompositeVideoByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchCompletedCompositeVideoQuery(),
+        $this->completedCompositeVideoTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedCompositeVideoByUniqueKeyQuery;
+  }
+
+  public function getFetchCompletedCompositeVideoByEditedVideoOrderQuery(): FetchCompletedCompositeVideoByEditedVideoOrderQuery {
+    if ($this->fetchCompletedCompositeVideoByEditedVideoOrderQuery === null) {
+      $this->fetchCompletedCompositeVideoByEditedVideoOrderQuery = new FetchCompletedCompositeVideoByEditedVideoOrderQuery(
+        $this->getFetchCompletedCompositeVideoByUniqueKeyQuery(),
+        $this->completedCompositeVideoTableLazyLoader->load() 
+      );
+    }
+    return $this->fetchCompletedCompositeVideoByEditedVideoOrderQuery;
+  }
+
+  public function getFetchCompletedCompositeVideoByIdQuery(): FetchByIdQuery<CompletedCompositeVideo> {
+    if ($this->fetchCompletedCompositeVideoByIdQuery === null) {
+      $this->fetchCompletedCompositeVideoByIdQuery = new FetchByIdQuery(
+        $this->getFetchCompletedCompositeVideoByUniqueKeyQuery(),
+        $this->completedCompositeVideoTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchCompletedCompositeVideoByIdQuery;
   }
 
   public function getCompositeVideosTable(): CompositeVideoTable {

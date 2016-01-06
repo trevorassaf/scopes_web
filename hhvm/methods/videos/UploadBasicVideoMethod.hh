@@ -2,9 +2,6 @@
 
 class UploadBasicVideoMethod {
 
-  const string FILE_EXTENSION_DELIMITER = ".";
-  const string BASIC_VIDEO_UPLOAD_KEY = "basic_video_file";
-
   public function __construct(
     private FetchCompletedBasicVideoSetByCompletedOrderQuery $fetchCompletedBasicVideoSetByCompletedOrderQuery,
     private FetchByIdQuery<CompletedOrder> $fetchCompletedOrderByIdQuery,
@@ -85,7 +82,7 @@ class UploadBasicVideoMethod {
       );
     }
 
-    // Make sure that the user linked with this session owns this order
+    // Fetch VideoUploadPolicy for this order
     $fetch_confirmed_order_handle = $this->fetchConfirmedOrderByIdQuery->fetch(
       $completed_order->getConfirmedOrderId()
     );
@@ -102,7 +99,6 @@ class UploadBasicVideoMethod {
       );
     }
 
-    // Validate file size
     $video_upload_policy_handle = $this->fetchVideoUploadPolicyQuery->fetch(
       $confirmed_order->getTimeOrdered()
     );
@@ -111,6 +107,7 @@ class UploadBasicVideoMethod {
       ->getWaitHandle()
       ->join();
 
+    // Validate file size
     $max_video_size = $video_upload_policy->getMaxBytes();
 
     if ($max_video_size->lessThan($uploaded_file->getSize())) {
@@ -183,14 +180,5 @@ class UploadBasicVideoMethod {
     }
     
     return $basic_video;
-  }
-
-  private function makeUploadedFileKey(UnsignedInt $video_index): string {
-    return self::BASIC_VIDEO_UPLOAD_KEY . (string)$video_index->getNumber();
-  }
-
-  private function getFiles(): ?ImmMap<string, ImmMap<string, ImmVector<mixed>>> {
-    // UNSAFE
-    return $_FILES;
   }
 }

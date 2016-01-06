@@ -20,7 +20,7 @@ class UploadEditedVideoApi extends Api<UploadEditedVideoApiRequest> {
   ): ApiResult {
     try {
       // Log upload edited videos api request
-      $this->logger->info("Upload edited video api claled...");
+      $this->logger->info("Upload edited video api called...");
 
       // Fetch uploaded files
       $uploaded_files = $this->uploadedFilesFetcher->fetch();
@@ -42,16 +42,16 @@ class UploadEditedVideoApi extends Api<UploadEditedVideoApiRequest> {
       }
 
       // Execute upload edited video method
-      $edited_video_id = $this->uploadEditedVideoMethod->upload(
+      $composite_video = $this->uploadEditedVideoMethod->upload(
         $request->getUserId()->get(),
         $request->getEditedVideoOrderId()->get(),
         $request->getVideoDuration()->get(),
         $request->getTitle()->get(),
         $request->getDescription()->get(),
-        $request->getExpirationTime()->get()
+        $uploaded_files[UploadEditedVideoApiRequest::VIDEO_KEY]
       );
 
-      return new UploadEditedVideoApiResult($edited_video_id);
+      return new UploadEditedVideoApiResult($composite_video->getId());
 
     } catch (InvalidFileUploadException $ex) {
       $this->logger->info($ex->getMessage()); 

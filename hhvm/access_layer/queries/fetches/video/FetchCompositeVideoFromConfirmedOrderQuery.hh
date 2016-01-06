@@ -4,7 +4,7 @@ class FetchCompositeVideoFromConfirmedOrderQuery {
 
   public function __construct(
     private FetchCompositeVideoByCompletedCompositeVideoOrderQuery $fetchCompositeVideoByCompletedCompositeVideoOrderQuery,
-    private FetchCompletedCompositeVideoOrderByEditedVideoOrderQuery $fetchCompletedCompositeVideoOrderByEditedVideoOrderQuery,
+    private FetchCompletedCompositeVideoByEditedVideoOrderQuery $fetchCompletedCompositeVideoOrderByEditedVideoOrderQuery,
     private FetchEditedVideoOrderByConfirmedOrderQuery $fetchEditedVideoOrderByConfirmedOrderQuery
   ) {}
 

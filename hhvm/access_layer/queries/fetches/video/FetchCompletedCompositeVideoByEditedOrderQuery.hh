@@ -1,6 +1,6 @@
 <?hh // strict
 
-class FetchCompletedCompositeVideoOrderByEditedVideoOrderQuery {
+class FetchCompletedCompositeVideoByEditedVideoOrderQuery {
 
   public function __construct(
     private FetchByUniqueKeyQuery<CompletedCompositeVideo> $fetchCompletedCompositeOrderByUniqueKeyQuery,

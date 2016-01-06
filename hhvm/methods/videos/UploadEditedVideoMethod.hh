@@ -20,7 +20,8 @@ class UploadEditedVideoMethod {
     private TimestampBuilder $timestampBuilder,
     private HRTimestampSerializer $timestampSerializer,
     private HRTimeSerializer $timeSerializer,
-    private HttpUploadedFilesFetcher $uploadedFilesFetcher
+    private FetchCompletedCompositeVideoByEditedVideoOrderQuery $fetchCompletedCompositeVideoOrderByEditedVideoOrderQuery,
+    private CompositeVideoPathFormatMethod $compositeVideoPathFormatMethod
   ) {}
 
   public function upload(
@@ -29,16 +30,44 @@ class UploadEditedVideoMethod {
     Time $video_duration,
     private string $title,
     private string $description,
-    Timestamp $expiration_time
-  ): UnsignedInt {
+    HttpUploadedFile $uploaded_file
+  ): CompositeVideo {
     // Log file upload
     $this->logger->info(
       "Uploading edited video set for EditedVideoOrder (id="
       . $edited_order_id->getNumber() . ")"
     );
+    
+    // Check for errors caught by hhvm rutime 
+    if ($uploaded_file->getErrorCode()->getNumber() !== 0) {
+      throw new InvalidFileUploadException(
+        "PHP file upload error with code " . $uploaded_file->getErrorCode()->getNumber()
+      );
+    }
+    
+    // Validate mime type
+    $mime_types_handle = $this->fetchVideoMimeTypesQuery->fetch();
 
-    //// Make sure that this order has been fulfilled
-    // Fetch edited video
+    $mime_type_list = $mime_types_handle
+      ->getWaitHandle()
+      ->join();
+
+    $mime_type = null;
+
+    foreach ($mime_type_list as $mime) {
+      if ($mime->getHttpApplicationMimeType() == $uploaded_file->getType()) {
+        $mime_type = $mime;
+        break;
+      }
+    }
+
+    if ($mime_type === null) {
+      throw new InvalidFileUploadException(
+        "Invalid mime type: " . $uploaded_file->getType()
+      );
+    }
+
+    // Verify that this EditedOrder exists!
     $fetch_edited_order_handle_query = $this->fetchEditedVideoOrderByIdQuery->fetch(
       $edited_order_id
     );
@@ -54,15 +83,31 @@ class UploadEditedVideoMethod {
       );
     }
 
-    // Fetch confirmed order
-    $fetch_confirmed_order_handle_query = $this->fetchConfirmedOrderByIdQuery->fetch(
+    // Make sure order has been completed
+    $fetch_completed_order_handle = $this->fetchCompletedOrderByConfirmedOrderQuery->fetch(
       $edited_order->getConfirmedOrderId()
     );
 
-    $confirmed_order = $fetch_confirmed_order_handle_query
+    $completed_order = $fetch_completed_order_handle
       ->getWaitHandle()
       ->join();
-    
+
+    if ($completed_order === null) {
+      throw new NonextantObjectException(
+        "CompletedOrder not found for ConfirmedOrder (id=" . $edited_order->getConfirmedOrderId()->getNumber() . ")!",
+        ObjectType::COMPLETED_ORDER
+      ); 
+    }
+
+    // Fetch video upload policy
+    $fetch_confirmed_order_handle = $this->fetchConfirmedOrderByIdQuery->fetch(
+      $edited_order->getConfirmedOrderId()
+    );
+
+    $confirmed_order = $fetch_confirmed_order_handle
+      ->getWaitHandle()
+      ->join();
+
     if ($confirmed_order === null) {
       throw new NonextantObjectException(
         "ConfirmedOrder (id=" . $edited_order->getConfirmedOrderId()->getNumber() . ") not found!",
@@ -70,112 +115,53 @@ class UploadEditedVideoMethod {
       );
     }
 
-    // Make sure that the user linked with this session owns this order
-    if (!$user_id->equals($confirmed_order->getUserId())) {
-      throw new InvalidFileUploadException(
-        "User associated with this session (id=" . $user_id->getNumber() 
-        . ") does not own specified ConfirmedOrder (id=" . $confirmed_order->getId()->getNumber(). ")!"
-      );  
-    }
-
-    // Fetch completed order
-    $fetch_completed_order_handle = $this->fetchCompletedOrderByConfirmedOrderQuery->fetch(
-      $confirmed_order->getId()
+    $fetch_video_upload_handle = $this->fetchVideoUploadPolicyQuery->fetch(
+      $confirmed_order->getTimeOrdered()
     );
 
-    $completed_order = $fetch_completed_order_handle
+    $video_upload_policy = $fetch_video_upload_handle
       ->getWaitHandle()
       ->join();
-    
-    if ($completed_order === null) {
-      throw new NonextantObjectException(
-        "CompletedOrder does not exist for ConfirmedOrder (id=" . $confirmed_order->getId()->getNumber() . ") not found!",
-        ObjectType::COMPLETED_ORDER
-      );
-    }
-    
-    //// Validate edited video upload 
-    // Load upload policy
-    $upload_time = $this->timestampBuilder->now();
-    $video_upload_policy_handle = $this->fetchVideoUploadPolicyQuery->fetch(
-      $upload_time
-    );
-
-    $video_upload_policy = $video_upload_policy_handle
-      ->getWaitHandle()
-      ->join();
-    
-    // Validate transfered files, insert metadata to db, move file to storage directory
-    $files = $this->uploadedFilesFetcher->fetch();
-
-    // Fail if files not uploaded
-    if ($files->isEmpty()) {
-      throw new InvalidFileUploadException("No video files found!");   
-    }
-
-    // Fail if we receive unexpected number of files 
-    if ($files->count() !== 1) {
-      throw new InvalidFileUploadException(
-        "Expected 1 file, but received " . $files->count()
-      );
-    }
-
-    // Fail if the top-level file label is incorrectly named
-    $edited_videos_param_key = $video_upload_policy->getWebFilesParamKey();
-
-    if (!$files->containsKey($edited_videos_param_key)) {
-      throw new InvalidFileUploadException(
-        "Expected 1 file with name '" . $edited_videos_param_key . "', " .
-        "but instead received file with name '" . $files->keys()[0] . "'"
-      );
-    }
-
-    // Validate php file upload 
-    $file = $files->at($edited_videos_param_key);
-
-    if ($file->getErrorCode()->getNumber() !== 0) {
-      throw new InvalidFileUploadException(
-        "PHP file upload error with code " . $file->getErrorCode()->getNumber()
-      );
-    }
 
     // Validate file size
     $max_video_size = $video_upload_policy->getMaxBytes();
 
-    if ($file->getSize()->greaterThan($max_video_size)) {
+    if ($max_video_size->lessThan($uploaded_file->getSize())) {
       throw new InvalidFileUploadException(
-        "File size (" . $file->getSize()->getNumber() . "bytes) exceeds maximum "
-        . "allowed file size (" . $max_video_size->getNumber() . "bytes)"
+        "Video file size (" . $uploaded_file->getSize()->getNumber() . ") exceeds max video size ("
+        . $max_video_size->getNumber() 
       );
     }
 
-    // Validate mime type
-    $mime_types_handle = $this->fetchVideoMimeTypesQuery->fetch();
+    // Check that another EditedVideo hasn't already been uploaded. We can
+    // simplify this check by fetching only the CompletedEditedVideo record,
+    // and not the EditedVideo record. 
+    $fetch_completed_composite_video_handle = $this->fetchCompletedCompositeVideoOrderByEditedVideoOrderQuery->fetch(
+      $edited_order_id
+    ); 
 
-    $mime_types = $mime_types_handle
+    $completed_composite_video = $fetch_completed_composite_video_handle
       ->getWaitHandle()
       ->join();
 
-    $finfo = finfo_open(FILEINFO_MIME_TYPE); 
-    $mime = strtolower(finfo_file($finfo, $file->getTmpName()));
-    finfo_close($finfo);
-
-    if (!$mime_types->containsKey($mime)) {
-      $this->logger->info("Invalid file mime type: " . $mime); 
-      throw new InvalidFileUploadException("Invalid file mime type: " . $mime);
+    if ($completed_composite_video !== null) {
+      throw new DuplicateObjectMethodException(
+        "EditedVideo already uploaded for EditedVideoOrder (id=" . $edited_order_id->getNumber() . ")!",
+        ObjectType::EDITED_VIDEO
+      );
     }
 
-    //// Insert records into db and transfer files to permanent storage 
-    // Mark composite video as completed in db
+    //// The file is valid! Transfer video to permanent storage. ////
+
+    // Insert CompletedCompositeVideo record
+    $upload_time = $this->timestampBuilder->now();
+
     $insert_completed_composite_video_query_handle = $this->insertCompletedCompositeVideoQuery->insert(
       ImmMap{
         $this->completedCompositeVideoTable->getEditedVideoOrderIdKey() => $edited_order_id,
         $this->completedCompositeVideoTable->getTimeCompletedKey() => $this->timestampSerializer->serialize(
           $upload_time  
         ),
-        $this->completedCompositeVideoTable->getExpirationTimeKey() => $this->timestampSerializer->serialize(
-          $expiration_time  
-        )
       }
     );
 
@@ -183,52 +169,38 @@ class UploadEditedVideoMethod {
       ->getWaitHandle()
       ->join();
 
-    try {
-      // Register this edited video with the db.
-      $insert_query_handle = $this->insertCompositeVideoQuery->insert(
-        ImmMap{
-          $this->compositeVideoTable->getTitleKey() => $title,
-          $this->compositeVideoTable->getDescriptionKey() => $description, 
-          $this->compositeVideoTable->getDurationKey() => $this->timeSerializer->serialize($video_duration)
-        }
-      );
-
-      $composite_video = $insert_query_handle
-        ->getWaitHandle()
-        ->join();
-
-      //// Move video file to permanent storage
-      // Create target path
-      $target_path = $video_upload_policy->getCompositeVideoStoragePath() . DIRECTORY_SEPARATOR
-        . (string)$composite_video->getId()->getNumber() . self::FILE_EXTENSION_DELIMITER . $mime;
-
-      $upload_succeeded = move_uploaded_file(
-        $file->getTmpName(),
-        $target_path
-      );
-
-      if (!$upload_succeeded) {
-        $delete_handle = $this->deleteByIdQuery->delete(
-          $this->compositeVideoTable,
-          $composite_video->getId()
-        ); 
-
-        $delete_handle
-          ->getWaitHandle()
-          ->join();
-
-        $this->deleteCompletedCompositeVideo($completed_composite_video->getId());
-
-        throw new InvalidFileUploadException(
-          "Failed to transfer uploaded composite video file to permanent storage"
-        );
+    // Insert CompositeVideo record
+    $insert_query_handle = $this->insertCompositeVideoQuery->insert(
+      ImmMap{
+        $this->compositeVideoTable->getTitleKey() => $title,
+        $this->compositeVideoTable->getDescriptionKey() => $description, 
+        $this->compositeVideoTable->getDurationKey() => $this->timeSerializer->serialize($video_duration)
       }
+    );
 
-      return $composite_video->getId();
-    } catch (QueryException $ex) {
-      $this->deleteCompletedCompositeVideo($completed_composite_video->getId());
-      throw $ex;
+    $composite_video = $insert_query_handle
+      ->getWaitHandle()
+      ->join();
+
+    // Move file to permanent storage
+    $destination_path = $this->compositeVideoPathFormatMethod->make(
+      $video_upload_policy->getCompositeVideoStoragePath(),
+      $composite_video->getId(),
+      $mime_type->getFileExtension()
+    );   
+
+    $upload_succeeded = move_uploaded_file(
+      $uploaded_file->getTmpName(),
+      $destination_path
+    );
+
+    if (!$upload_succeeded) {
+      throw new InvalidFileUploadException(
+        "Failed to move uploaded composite video file!"
+      );
     }
+
+    return $composite_video;
   }
 
   private function deleteCompletedCompositeVideo(UnsignedInt $id): void {

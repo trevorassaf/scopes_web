@@ -65,6 +65,7 @@ class MethodInjector {
   private ?UploadBasicVideoMethod $uploadBasicVideoMethod;
   private ?BasicVideoPathFormatMethod $basicVideoPathFormatMethod;
   private ?UploadEditedVideoMethod $uploadEditedVideoMethod;
+  private ?CompositeVideoPathFormatMethod $compositeVideoPathFormatMethod;
   private ?CreateVideoMimeTypeMethod $createVideoMimeTypeMethod;
   private ?MarkBasicVideoDownloadedMethod $markBasicVideoDownloadedMethod;
   private ?IsBasicVideoDownloadedMethod $isBasicVideoDownloadedMethod;
@@ -447,6 +448,13 @@ class MethodInjector {
     return $this->basicVideoPathFormatMethod;
   }
 
+  public function getCompositeVideoPathFormatMethod(): CompositeVideoPathFormatMethod {
+    if ($this->compositeVideoPathFormatMethod === null) {
+      $this->compositeVideoPathFormatMethod = new CompositeVideoPathFormatMethod(); 
+    }
+    return $this->compositeVideoPathFormatMethod;
+  }
+
   public function getUploadEditedVideoMethod(): UploadEditedVideoMethod {
     if ($this->uploadEditedVideoMethod === null) {
       $this->uploadEditedVideoMethod = new UploadEditedVideoMethod(
@@ -465,7 +473,8 @@ class MethodInjector {
         $this->timestampBuilderLoader->load(),
         $this->timestampSerializerLoader->load(),
         $this->timeSerializerLoader->load(),
-        $this->httpUploadedFilesFetcher
+        $this->queryInjector->getFetchCompletedCompositeVideoByEditedVideoOrderQuery(),
+        $this->getCompositeVideoPathFormatMethod()
       ); 
     }
     return $this->uploadEditedVideoMethod;
