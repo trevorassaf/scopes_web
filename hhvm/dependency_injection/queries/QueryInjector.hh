@@ -62,6 +62,8 @@ class QueryInjector {
   private ?InsertQuery<RsvdOrder> $insertRsvdOrderQuery;
   private ?InsertReservedOrderQuery $concreteInsertRsvdOrderQuery;
   private ?FetchUsersReservedOrdersQuery $fetchUsersReservedOrdersQuery;
+  private ?FetchQuery<ReservedOrderScopeMapping> $fetchReservedOrderScopeMappingsQuery;
+  private ?InsertQuery<ReservedOrderScopeMapping> $insertReservedOrderScopeMappingQuery;
   
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
@@ -74,6 +76,8 @@ class QueryInjector {
   private ?FetchConfirmedOrderCellLabelsQuery $fetchConfirmedOrderCellLabelsQuery;
   private ?FetchIsUserOwnedShortCodeQuery $fetchIsUserOwnedShortCodeQuery;
   private ?FetchUserShortCodesQuery $fetchUserShortCodesQuery;
+  private ?FetchQuery<ConfirmedOrderScopeMapping> $fetchConfirmedOrderScopeMappingsQuery;
+  private ?InsertQuery<ConfirmedOrderScopeMapping> $insertConfirmedOrderScopeMappingQuery;
 
   // Edited video order queries
   private ?InsertQuery<EditedVideoOrder> $insertEditedVideoOrderQuery;
@@ -217,7 +221,11 @@ class QueryInjector {
     private LazyLoader<UserPrivilegesTable> $userPrivilegesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<UserPrivilege>> $userPrivilegeModelFactoryLazyLoader,
     private LazyLoader<BasicVideoDownloadReceiptsTable> $basicVideoDownloadReceiptsTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<BasicVideoDownloadReceipt>> $basicVideoDownloadReceiptModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<BasicVideoDownloadReceipt>> $basicVideoDownloadReceiptModelFactoryLazyLoader,
+    private LazyLoader<ReservedOrderScopeMappingsTable> $reservedOrderScopeMappingsTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<ReservedOrderScopeMapping>> $reservedOrderScopeMappingModelFactoryLazyLoader,
+    private LazyLoader<ConfirmedOrderScopeMappingsTable> $confirmedOrderScopeMappingsTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<ConfirmedOrderScopeMapping>> $confirmedOrderScopeMappingModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -1590,6 +1598,54 @@ class QueryInjector {
       ); 
     }
     return $this->fetchCompletedCompositeVideoByIdQuery;
+  }
+  
+  public function getFetchReservedOrderScopeMappingQuery(): FetchQuery<ReservedOrderScopeMapping> {
+    if ($this->fetchReservedOrderScopeMappingsQuery === null) {
+      $this->fetchReservedOrderScopeMappingsQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->reservedOrderScopeMappingModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchReservedOrderScopeMappingsQuery;
+  }
+
+  public function getInsertReservedOrderScopeMappingQuery(): InsertQuery<ReservedOrderScopeMapping> {
+    if ($this->insertReservedOrderScopeMappingQuery === null) {
+      $this->insertReservedOrderScopeMappingQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->reservedOrderScopeMappingsTableLazyLoader->load(),
+        $this->reservedOrderScopeMappingModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertReservedOrderScopeMappingQuery;
+  }
+
+  public function getFetchConfirmedOrderScopeMappingQuery(): FetchQuery<ConfirmedOrderScopeMapping> {
+    if ($this->fetchConfirmedOrderScopeMappingsQuery === null) {
+      $this->fetchConfirmedOrderScopeMappingsQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->confirmedOrderScopeMappingModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchConfirmedOrderScopeMappingsQuery;
+  }
+  
+  public function getInsertConfirmedOrderScopeMappingQuery(): InsertQuery<ConfirmedOrderScopeMapping> {
+    if ($this->insertConfirmedOrderScopeMappingQuery === null) {
+      $this->insertConfirmedOrderScopeMappingQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->confirmedOrderScopeMappingsTableLazyLoader->load(),
+        $this->confirmedOrderScopeMappingModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertConfirmedOrderScopeMappingQuery;
   }
 
   public function getCompositeVideosTable(): CompositeVideoTable {
