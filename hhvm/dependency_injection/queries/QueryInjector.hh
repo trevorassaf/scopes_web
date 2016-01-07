@@ -64,6 +64,7 @@ class QueryInjector {
   private ?FetchUsersReservedOrdersQuery $fetchUsersReservedOrdersQuery;
   private ?FetchQuery<ReservedOrderScopeMapping> $fetchReservedOrderScopeMappingsQuery;
   private ?InsertQuery<ReservedOrderScopeMapping> $insertReservedOrderScopeMappingQuery;
+  private ?FetchScopeMappingsByReservedOrderQuery $fetchScopeMappingsByReservedOrderQuery;
   
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
@@ -78,6 +79,7 @@ class QueryInjector {
   private ?FetchUserShortCodesQuery $fetchUserShortCodesQuery;
   private ?FetchQuery<ConfirmedOrderScopeMapping> $fetchConfirmedOrderScopeMappingsQuery;
   private ?InsertQuery<ConfirmedOrderScopeMapping> $insertConfirmedOrderScopeMappingQuery;
+  private ?FetchScopeMappingsByConfirmedOrderQuery $fetchScopeMappingsByConfirmedOrderQuery;
 
   // Edited video order queries
   private ?InsertQuery<EditedVideoOrder> $insertEditedVideoOrderQuery;
@@ -1646,6 +1648,26 @@ class QueryInjector {
       ); 
     }
     return $this->insertConfirmedOrderScopeMappingQuery;
+  }
+  
+  public function getFetchScopeMappingsByReservedOrderQuery(): FetchScopeMappingsByReservedOrderQuery {
+    if ($this->fetchScopeMappingsByReservedOrderQuery === null) {
+      $this->fetchScopeMappingsByReservedOrderQuery = new FetchScopeMappingsByReservedOrderQuery(
+        $this->getFetchReservedOrderScopeMappingQuery(),
+        $this->reservedOrderScopeMappingsTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchScopeMappingsByReservedOrderQuery;
+  }
+
+  public function getFetchScopeMappingsByConfirmedOrderQuery(): FetchScopeMappingsByConfirmedOrderQuery {
+    if ($this->fetchScopeMappingsByConfirmedOrderQuery === null) {
+      $this->fetchScopeMappingsByConfirmedOrderQuery = new FetchScopeMappingsByConfirmedOrderQuery(
+        $this->getFetchConfirmedOrderScopeMappingQuery(),
+        $this->confirmedOrderScopeMappingsTableLazyLoader->load()
+      ); 
+    }
+    return $this->fetchScopeMappingsByConfirmedOrderQuery;
   }
 
   public function getCompositeVideosTable(): CompositeVideoTable {

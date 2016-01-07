@@ -1,10 +1,11 @@
 <?hh // strict
 
 enum ObjectType : int {
-
   CONFIRMED_ORDER = 0x0;
   COMPLETED_ORDER = 0x1;
   EDITED_VIDEO_ORDER = 0x3;
   USER = 0x4;
   EDITED_VIDEO = 0x5;
+  RESERVED_ORDER_SCOPE_MAPPING = 0x6;
+  CONFIRMED_ORDER_SCOPE_MAPPING = 0x6;
 }
