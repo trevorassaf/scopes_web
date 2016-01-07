@@ -10,7 +10,10 @@ class ConfirmOrderMethod {
     private BatchInsertQuery<CellLabel> $cellLabelBatchInsertQuery,
     private DeleteByIdQuery $deleteByIdQuery,
     private CellLabelsTable $cellLabelsTable,
-    private RsvdOrdersTable $rsvdOrdersTable
+    private RsvdOrdersTable $rsvdOrdersTable,
+    private InsertConfirmedOrderScopeMappingQuery $insertConfirmedOrderScopeMappingQuery,
+    private FetchScopeMappingsByReservedOrderQuery $fetchScopeMappingsByReservedOrderQuery,
+    private ReservedOrderScopeMappingsTable $reservedOrderScopeMappingsTable
   ) {}
 
   public function confirm(
@@ -22,12 +25,10 @@ class ConfirmOrderMethod {
         $create_confirm_order_request->getReserveOrderId()
       );
 
-      // Block until we fetch the reserved order 
       $rsvd_order = $fetch_result
         ->getWaitHandle()
         ->join();
 
-      // Fail if we can't find reserved order
       if ($rsvd_order === null) {
         throw new NonextantObjectException();
       }
@@ -68,6 +69,25 @@ class ConfirmOrderMethod {
       $confirmed_order = $confirmed_order_insert_result
         ->getWaitHandle()
         ->join();
+
+      // Transfer physical scope mappings for reserved order to confirmed order
+      $fetch_mappings_handle = $this->fetchScopeMappingsByReservedOrderQuery->fetch(
+        $rsvd_order
+      );
+
+      $mapping_list = $fetch_mappings_handle
+        ->getWaitHandle()
+        ->join();
+
+      foreach ($mapping_list as $mapping) {
+        $this->insertConfirmedOrderScopeMappingQuery->insert(
+          $confirmed_order->getId(),
+          $mapping->getVirtualScopeIndex(),
+          $mapping->getPhysicalScopeIndex()
+        )
+        ->getWaitHandle()
+        ->join();
+      }
 
       // Handle edited-video-order request, if provided
       $edited_video_order_request = $create_confirm_order_request->getCreateEditedVideoOrderRequest();

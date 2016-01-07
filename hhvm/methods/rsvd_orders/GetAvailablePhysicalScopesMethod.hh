@@ -7,7 +7,9 @@ class GetAvailablePhysicalScopesMethod {
     private FetchConfirmedOrdersByTimeQuery $fetchConfirmedOrdersByTimeQuery,
     private FetchSingletonQuery<ReservedOrderPolicy> $fetchReservedOrderPolicyQuery,
     private Logger $logger,
-    private TimestampSegmentFactory $timestampSegmentFactory
+    private TimestampSegmentFactory $timestampSegmentFactory,
+    private FetchScopeMappingsByReservedOrderQuery $fetchScopeMappingsByReservedOrderQuery,
+    private FetchScopeMappingsByConfirmedOrderQuery $fetchScopeMappingsByConfirmedOrderQuery
   ) {}
 
   public function get(
@@ -26,16 +28,17 @@ class GetAvailablePhysicalScopesMethod {
 
       // Fail immediately if the number of requested scopes exceeds
       // the maximum number of scopes that could be available
-      if ($order_policy->getScopesCount()->getNumber() < $scopes_count->getNumber()) {
+      $max_scopes = $order_policy->getScopesCount();
+
+      if ($max_scopes->getNumber() < $scopes_count->getNumber()) {
         return ImmVector{};
       }
 
-      // Commence queries simultaneously. Start with order fetches
-      // because they take the longest...
+      // Fetch orders that overlap with requested time range so we
+      // can determine if the new request can be serviced
       $rsvd_order_fetch_handle = $this->fetchReservedOrdersByTimeQuery 
         ->fetch($timestamp_segment);
 
-      // TODO make better use of async mysql      
       $rsvd_orders = $rsvd_order_fetch_handle
         ->getWaitHandle()
         ->join();
@@ -43,14 +46,12 @@ class GetAvailablePhysicalScopesMethod {
       $confirmed_order_fetch_handle = $this->fetchConfirmedOrdersByTimeQuery 
         ->fetch($timestamp_segment);
 
-      // TODO make better use of async mysql      
       $confirmed_orders = $confirmed_order_fetch_handle
         ->getWaitHandle()
         ->join();
 
       // Now check to see if our scopes would be overbooked if we run this
       // order alongside previously scheduled orders
-      // Data structure for keeping track of available physical scopes
       $available_scopes_count = $max_scopes->getNumber();
       
       $available_physical_scopes = Map{};
@@ -59,169 +60,69 @@ class GetAvailablePhysicalScopesMethod {
         $available_physical_scopes[$i] = true;    
       }
 
-      // Convert rsvd/confirmed order types to time intervals and sort them in
-      // ascending order by start-time
-      $time_intervals = $this->condenseOrdersToSortedTimeSegments(
-        $rsvd_orders,
-        $confirmed_orders
-      );
+      // Check reserved orders
+      foreach ($rsvd_orders as $order) {
+        // Fetch scope mappings for this order
+        $fetch_scope_mappings_handle = $this->fetchScopeMappingsByReservedOrderQuery->fetch(
+          $order
+        );
 
-      // Determine if request would overbook our available scopes 
-      return $this->getAvailableScopesFromTimeIntervals(
-        $time_intervals,
-        $order_policy->getScopesCount(),
-        $scopes_count
-      );
+        $scope_mappings = $fetch_scope_mappings_handle
+          ->getWaitHandle()
+          ->join();
+
+        // Register unavailable scopes
+        foreach ($scope_mappings as $mapping) {
+          $physical_scope_number = $mapping->getPhysicalScopeIndex()->getNumber();
+
+          if ($available_physical_scopes[$physical_scope_number]) {
+            $available_physical_scopes[$physical_scope_number] = false;
+            --$available_scopes_count;
+            if ($available_scopes_count < $available_scopes_count) {
+              return ImmVector{}; // short circuit with failure
+            }
+          }
+        }
+      }
+
+      // Check confirmed orders
+      foreach ($confirmed_orders as $order) {
+        // Fetch scope mappings for this order
+        $fetch_scope_mappings_handle = $this->fetchScopeMappingsByConfirmedOrderQuery->fetch(
+          $order
+        );
+
+        $scope_mappings = $fetch_scope_mappings_handle
+          ->getWaitHandle()
+          ->join();
+
+        // Register unavailable scopes
+        foreach ($scope_mappings as $mapping) {
+          $physical_scope_number = $mapping->getPhysicalScopeIndex()->getNumber();
+
+          if ($available_physical_scopes[$physical_scope_number]) {
+            $available_physical_scopes[$physical_scope_number] = false;
+            --$available_scopes_count;
+            if ($available_scopes_count < $available_scopes_count) {
+              return ImmVector{}; // short circuit with failure
+            }
+          }
+        }
+      }
+
+      // The timeslot is not overbooked! This request may proceed!
+      $available_scope_indexes = Vector{};
+
+      foreach ($available_physical_scopes as $scope_idx => $is_available) {
+        if ($is_available) {
+          $available_scope_indexes[] = new UnsignedInt($scope_idx);
+        }
+      }
+
+      return $available_scope_indexes->toImmVector();
+
     } catch (QueryException $ex) {
       throw new MethodException();
     }
-  }
-
-  private function getAvailableScopesFromTimeIntervals(
-    ImmVector<OrderTimestampSegment> $time_intervals,
-    UnsignedInt $max_scopes,
-    UnsignedInt $scopes_count
-  ): ImmVector<UnsignedInt> {
-
-    // Data structure for keeping track of available physical scopes
-    $available_scopes_count = $max_scopes->getNumber();
-    
-    $available_physical_scopes = Map{};
-
-    for ($i = 0; $i < $available_scopes_count; ++$i) {
-      $available_physical_scopes[$i] = true;    
-    }
-
-    // Iterate through overlapping time intervals and register the 
-    // used scopes
-    $timestamp_serializer = new HRTimestampSerializer(
-      new HRDateSerializer(),
-      new HRTimeSerializer()
-    );
-
-    foreach ($time_intervals as $order_interval) {
-      $this->logger->debug("Time interval-order", $order_interval->getScopesCount()->getNumber());
-      $this->logger->debug(
-        "Time interval-start",
-        $timestamp_serializer->serialize(
-          $order_interval->getTimestampSegment()->getStart())
-        );
-      $this->logger->debug(
-        "Time interval-end",
-        $timestamp_serializer->serialize(
-          $order_interval->getTimestampSegment()->getEnd())
-        );
-      $this->logger->debug("");
-    }
-    
-    $this->logger->debug("Max scopes", $max_scopes->getNumber());
-    $this->logger->debug("Scopes count", $scopes_count->getNumber());
-
-    $available_scopes_count = $max_scopes->getNumber() - $scopes_count->getNumber();
-
-    // Create priority queue that orders by end-time in ascending order.
-    // Top-most element is always time interval that will finish earliest
-    $queue = new PriorityQueue(
-      new MinEndTimeOrderTimestampSegmentComparator(),
-      $max_scopes
-    ); 
-
-    foreach ($time_intervals as $interval) {
-      // Pop all time intervals that finish before 'interval' starts. Their scopes
-      // are now available, so restore them to 'available_scopes_count'
-        while (!$queue->isEmpty() && !$interval->getTimestampSegment()
-          ->getStart()
-          ->isBefore(
-            $queue
-              ->peek()
-              ->getTimestampSegment()
-              ->getEnd()
-          )
-        ) {
-          $available_scopes_count += $queue
-            ->pop()
-            ->getScopesCount()
-            ->getNumber();
-        }
-
-      // Check to see if 'interval' would overbook us. We know 'interval' to be a valid
-      // order, one that doesn't overbook our scopes, thus, the new order is to blame
-      // for the overbooking. Reject this delinquent order!
-      if ($available_scopes_count < $interval->getScopesCount()->getNumber()) {
-        return false;
-      }
-
-      // Still not overbooked, so add interval to queue and deduct number of scopes
-      // reserved by that interval from the number of available scopes.
-      $queue->push($interval);
-      $available_scopes_count -= $interval->getScopesCount()->getNumber();
-    }
-
-    return true;
-  }
-
-  private function condenseOrdersToSortedTimeSegments(
-    ImmVector<RsvdOrder> $rsvd_orders,
-    ImmVector<ConfirmedOrder> $confirmed_orders
-  ): ImmVector<OrderTimestampSegment> {
-    $time_intervals = Vector{};
-    $rsvd_order_idx = 0;
-    $confirmed_order_idx = 0;
-
-    // Interleave reserved/confirmed using the 'merge' algorithm of Merge Sort
-    while ($rsvd_order_idx < $rsvd_orders->count() && $confirmed_order_idx < $confirmed_orders->count()) {
-      $rsvd_order = $rsvd_orders[$rsvd_order_idx];
-      $confirmed_order = $confirmed_orders[$confirmed_order_idx];
-      
-      if ($rsvd_order->getTimestampSegment()->getStart()->isBefore($confirmed_order->getTimestampSegment()->getStart())) {
-        $time_intervals[] = new OrderTimestampSegment(
-          $this->timestampSegmentFactory->make(
-            $rsvd_order->getTimestampSegment()->getStart(),
-            $rsvd_order->getTimestampSegment()->getEnd()
-          ),
-          $rsvd_order->getScopesCount()
-        );
-        ++$rsvd_order_idx;
-      } else {
-        $time_intervals[] = new OrderTimestampSegment(
-          $this->timestampSegmentFactory->make(
-            $confirmed_order->getTimestampSegment()->getStart(),
-            $confirmed_order->getTimestampSegment()->getEnd()
-          ),
-          $confirmed_order->getScopesCount()
-        );
-        ++$confirmed_order_idx;
-      }
-    }
-
-    // Either rsvd order or confirmed orders are remaining, but not both.
-    // Append remaining orders to end of list.
-    // Rsvd orders
-    while ($rsvd_order_idx < $rsvd_orders->count()) {
-      $rsvd_order = $rsvd_orders[$rsvd_order_idx];
-      $time_intervals[] = new OrderTimestampSegment(
-        $this->timestampSegmentFactory->make(
-          $rsvd_order->getTimestampSegment()->getStart(),
-          $rsvd_order->getTimestampSegment()->getEnd()
-        ),
-        $rsvd_order->getScopesCount()
-      );
-      ++$rsvd_order_idx;
-    }
-
-    // Confirmed orders
-    while ($confirmed_order_idx < $confirmed_orders->count()) {
-      $confirmed_order = $confirmed_orders[$confirmed_order_idx];
-      $time_intervals[] = new OrderTimestampSegment(
-        $this->timestampSegmentFactory->make(
-          $confirmed_order->getTimestampSegment()->getStart(),
-          $confirmed_order->getTimestampSegment()->getEnd()
-        ),
-        $confirmed_order->getScopesCount()
-      );
-      ++$confirmed_order_idx;
-    }
-
-    return $time_intervals->toImmVector();
   }
 }

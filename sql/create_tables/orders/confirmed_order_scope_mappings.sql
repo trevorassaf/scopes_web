@@ -5,7 +5,7 @@ CREATE TABLE ConfirmedOrderScopeMappings (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   PRIMARY KEY(id),
   confirmedOrderId INT UNSIGNED NOT NULL,
-  FOREIGN KEY(confirmedOrderId) REFERENCES ConfirmedOrders(id),
+  FOREIGN KEY(confirmedOrderId) REFERENCES ConfirmedOrders(id) ON DELETE CASCADE,
   virtualScopeIndex INT UNSIGNED NOT NULL,
   physicalScopeIndex INT UNSIGNED NOT NULL,
   UNIQUE KEY(confirmedOrderId, virtualScopeIndex), 

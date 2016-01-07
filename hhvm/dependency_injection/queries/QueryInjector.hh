@@ -63,8 +63,9 @@ class QueryInjector {
   private ?InsertReservedOrderQuery $concreteInsertRsvdOrderQuery;
   private ?FetchUsersReservedOrdersQuery $fetchUsersReservedOrdersQuery;
   private ?FetchQuery<ReservedOrderScopeMapping> $fetchReservedOrderScopeMappingsQuery;
-  private ?InsertQuery<ReservedOrderScopeMapping> $insertReservedOrderScopeMappingQuery;
   private ?FetchScopeMappingsByReservedOrderQuery $fetchScopeMappingsByReservedOrderQuery;
+  private ?InsertQuery<ReservedOrderScopeMapping> $insertReservedOrderScopeMappingQuery;
+  private ?InsertReservedOrderScopeMappingQuery $concreteInsertReservedOrderScopeMappingsQuery;
   
   // Confirmed orders queries
   private ?FetchQuery<ConfirmedOrder> $fetchConfirmedOrderQuery;
@@ -78,8 +79,9 @@ class QueryInjector {
   private ?FetchIsUserOwnedShortCodeQuery $fetchIsUserOwnedShortCodeQuery;
   private ?FetchUserShortCodesQuery $fetchUserShortCodesQuery;
   private ?FetchQuery<ConfirmedOrderScopeMapping> $fetchConfirmedOrderScopeMappingsQuery;
-  private ?InsertQuery<ConfirmedOrderScopeMapping> $insertConfirmedOrderScopeMappingQuery;
   private ?FetchScopeMappingsByConfirmedOrderQuery $fetchScopeMappingsByConfirmedOrderQuery;
+  private ?InsertQuery<ConfirmedOrderScopeMapping> $insertConfirmedOrderScopeMappingQuery;
+  private ?InsertConfirmedOrderScopeMappingQuery $concreteInsertConfirmedOrderScopeMappingsQuery;
 
   // Edited video order queries
   private ?InsertQuery<EditedVideoOrder> $insertEditedVideoOrderQuery;
@@ -1669,6 +1671,26 @@ class QueryInjector {
     }
     return $this->fetchScopeMappingsByConfirmedOrderQuery;
   }
+  
+  public function getConcreteInsertReservedOrderScopeMappingsQuery(): InsertReservedOrderScopeMappingQuery {
+    if ($this->concreteInsertReservedOrderScopeMappingsQuery === null) {
+      $this->concreteInsertReservedOrderScopeMappingsQuery = new InsertReservedOrderScopeMappingQuery(
+        $this->getInsertReservedOrderScopeMappingQuery(),
+        $this->reservedOrderScopeMappingsTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertReservedOrderScopeMappingsQuery; 
+  }
+
+  public function getConcreteInsertConfirmedOrderScopeMappingsQuery(): InsertConfirmedOrderScopeMappingQuery {
+    if ($this->concreteInsertConfirmedOrderScopeMappingsQuery === null) {
+      $this->concreteInsertConfirmedOrderScopeMappingsQuery = new InsertConfirmedOrderScopeMappingQuery(
+        $this->getInsertConfirmedOrderScopeMappingQuery(),
+        $this->confirmedOrderScopeMappingsTableLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertConfirmedOrderScopeMappingsQuery; 
+  }
 
   public function getCompositeVideosTable(): CompositeVideoTable {
     return $this->compositeVideoTableLazyLoader->load();
@@ -1688,5 +1710,9 @@ class QueryInjector {
 
   public function getBasicVideoDownloadReceiptsTable(): BasicVideoDownloadReceiptsTable {
     return $this->basicVideoDownloadReceiptsTableLazyLoader->load();
+  }
+
+  public function getReservedOrderScopeMappingsTable(): ReservedOrderScopeMappingsTable {
+    return $this->reservedOrderScopeMappingsTableLazyLoader->load();
   }
 }

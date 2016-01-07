@@ -216,7 +216,9 @@ class MethodInjector {
         $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
         $this->queryInjector->getFetchReservedOrderPolicyQuery(),
         $this->logger,
-        $this->timestampSegmentFactoryLoader->load()
+        $this->timestampSegmentFactoryLoader->load(),
+        $this->queryInjector->getFetchScopeMappingsByReservedOrderQuery(),
+        $this->queryInjector->getFetchScopeMappingsByConfirmedOrderQuery()
       ); 
     } 
     return $this->getAvailablePhysicalScopesMethod;
@@ -251,7 +253,8 @@ class MethodInjector {
       $this->reserveOrderMethod = new ReserveOrderMethod(
         $this->queryInjector->getConcreteInsertRsvdOrderQuery(),
         $this->getIsValidReservedOrderMethod(),
-        $this->getGetAvailablePhysicalScopesMethod()
+        $this->getGetAvailablePhysicalScopesMethod(),
+        $this->queryInjector->getConcreteInsertReservedOrderScopeMappingsQuery()
       ); 
     }
     return $this->reserveOrderMethod;
@@ -290,7 +293,10 @@ class MethodInjector {
         $this->queryInjector->getBatchInsertCellLabelsQuery(),
         $this->queryInjector->getDeleteByIdQuery(),
         $this->cellsLabelTableLoader->load(),
-        $this->rsvdOrdersTableLoader->load()
+        $this->rsvdOrdersTableLoader->load(),
+        $this->queryInjector->getConcreteInsertConfirmedOrderScopeMappingsQuery(),
+        $this->queryInjector->getFetchScopeMappingsByReservedOrderQuery(),
+        $this->queryInjector->getReservedOrderScopeMappingsTable()
       ); 
     }
     return $this->confirmOrderMethod;

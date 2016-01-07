@@ -8,7 +8,7 @@ class FetchScopeMappingsByConfirmedOrderQuery {
   ) {}
 
   public async function fetch(
-    RsvdOrder $order
+    ConfirmedOrder $order
   ): Awaitable<ImmVector<ConfirmedOrderScopeMapping>> {
     // Fetch scope mappings
     $fetch_params_builder = new FetchParamsBuilder();
