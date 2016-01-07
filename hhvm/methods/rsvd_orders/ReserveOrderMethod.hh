@@ -5,7 +5,7 @@ class ReserveOrderMethod {
   public function __construct(
     private InsertReservedOrderQuery $rsvdOrderInsertQuery,
     private IsValidReservedOrderMethod $isValidReservedOrderMethod,
-    private IsConflictingReservedOrderMethod $isConflictingReservedOrderMethod
+    private GetAvailablePhysicalScopesMethod $getAvailablePhysicalScopesMethod
   ) {}
 
   public function reserve(
@@ -23,10 +23,12 @@ class ReserveOrderMethod {
     }
 
     // Second, ensure that the requested order does not overbook our scopes
-    if (!$this->isConflictingReservedOrderMethod->check(
+    $available_physical_scopes = $this->getAvailablePhysicalScopesMethod->check(
       $scopes_count,
-      $timestamp_segment)
-    ) {
+      $timestamp_segment
+    );
+
+    if (!$available_physical_scopes->count() < $scopes_count->getNumber()) {
       throw new ConflictingReservedOrderRequestException();
     }
 

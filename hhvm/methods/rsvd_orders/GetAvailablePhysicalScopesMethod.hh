@@ -1,6 +1,6 @@
 <?hh // strict
 
-class IsConflictingReservedOrderMethod {
+class GetAvailablePhysicalScopesMethod {
 
   public function __construct(
     private FetchReservedOrdersByTimeQuery $fetchReservedOrdersByTimeQuery,
@@ -10,10 +10,10 @@ class IsConflictingReservedOrderMethod {
     private TimestampSegmentFactory $timestampSegmentFactory
   ) {}
 
-  public function check(
+  public function get(
     UnsignedInt $scopes_count,
     TimestampSegment $timestamp_segment
-  ): bool {
+  ): ImmVector<UnsignedInt> {
     try {
       // Check reserved order policy 
       $order_policy_fetch_handle = $this->fetchReservedOrderPolicyQuery
@@ -27,7 +27,7 @@ class IsConflictingReservedOrderMethod {
       // Fail immediately if the number of requested scopes exceeds
       // the maximum number of scopes that could be available
       if ($order_policy->getScopesCount()->getNumber() < $scopes_count->getNumber()) {
-        return false;
+        return ImmVector{};
       }
 
       // Commence queries simultaneously. Start with order fetches
@@ -50,6 +50,14 @@ class IsConflictingReservedOrderMethod {
 
       // Now check to see if our scopes would be overbooked if we run this
       // order alongside previously scheduled orders
+      // Data structure for keeping track of available physical scopes
+      $available_scopes_count = $max_scopes->getNumber();
+      
+      $available_physical_scopes = Map{};
+
+      for ($i = 0; $i < $available_scopes_count; ++$i) {
+        $available_physical_scopes[$i] = true;    
+      }
 
       // Convert rsvd/confirmed order types to time intervals and sort them in
       // ascending order by start-time
@@ -59,7 +67,7 @@ class IsConflictingReservedOrderMethod {
       );
 
       // Determine if request would overbook our available scopes 
-      return $this->isConflictingRequest(
+      return $this->getAvailableScopesFromTimeIntervals(
         $time_intervals,
         $order_policy->getScopesCount(),
         $scopes_count
@@ -69,12 +77,23 @@ class IsConflictingReservedOrderMethod {
     }
   }
 
-  private function isConflictingRequest(
+  private function getAvailableScopesFromTimeIntervals(
     ImmVector<OrderTimestampSegment> $time_intervals,
     UnsignedInt $max_scopes,
     UnsignedInt $scopes_count
-  ): bool {
+  ): ImmVector<UnsignedInt> {
 
+    // Data structure for keeping track of available physical scopes
+    $available_scopes_count = $max_scopes->getNumber();
+    
+    $available_physical_scopes = Map{};
+
+    for ($i = 0; $i < $available_scopes_count; ++$i) {
+      $available_physical_scopes[$i] = true;    
+    }
+
+    // Iterate through overlapping time intervals and register the 
+    // used scopes
     $timestamp_serializer = new HRTimestampSerializer(
       new HRDateSerializer(),
       new HRTimeSerializer()

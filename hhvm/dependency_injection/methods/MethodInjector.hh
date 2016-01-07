@@ -32,7 +32,7 @@ class MethodInjector {
   private ?CreateIrregularTimeMethod $createIrregularTimeMethod;
 
   // Is conflicting reserved order method
-  private ?IsConflictingReservedOrderMethod $isConflictingReservedOrderMethod;
+  private ?GetAvailablePhysicalScopesMethod $getAvailablePhysicalScopesMethod;
 
   // Is valid reserved order method
   private ?IsValidReservedOrderMethod $isValidReservedOrderMethod;
@@ -209,9 +209,9 @@ class MethodInjector {
   /**
    * Is conflicting reserved order method
    */
-  public function getIsConflictingReservedOrderMethod(): IsConflictingReservedOrderMethod {
-    if ($this->isConflictingReservedOrderMethod === null) {
-      $this->isConflictingReservedOrderMethod = new IsConflictingReservedOrderMethod(
+  public function getGetAvailablePhysicalScopesMethod(): GetAvailablePhysicalScopesMethod {
+    if ($this->getAvailablePhysicalScopesMethod === null) {
+      $this->getAvailablePhysicalScopesMethod = new GetAvailablePhysicalScopesMethod(
         $this->queryInjector->getFetchRsvdOrdersByTimeQuery(),
         $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
         $this->queryInjector->getFetchReservedOrderPolicyQuery(),
@@ -219,7 +219,7 @@ class MethodInjector {
         $this->timestampSegmentFactoryLoader->load()
       ); 
     } 
-    return $this->isConflictingReservedOrderMethod;
+    return $this->getAvailablePhysicalScopesMethod;
   }
 
   /**
@@ -251,7 +251,7 @@ class MethodInjector {
       $this->reserveOrderMethod = new ReserveOrderMethod(
         $this->queryInjector->getConcreteInsertRsvdOrderQuery(),
         $this->getIsValidReservedOrderMethod(),
-        $this->getIsConflictingReservedOrderMethod()
+        $this->getGetAvailablePhysicalScopesMethod()
       ); 
     }
     return $this->reserveOrderMethod;
