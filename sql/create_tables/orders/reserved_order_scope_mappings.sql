@@ -8,6 +8,6 @@ CREATE TABLE ReservedOrderScopeMappings (
   FOREIGN KEY(rsvdOrderId) REFERENCES RsvdOrders(id) ON DELETE CASCADE,
   virtualScopeIndex INT UNSIGNED NOT NULL,
   physicalScopeIndex INT UNSIGNED NOT NULL,
-  UNIQUE KEY(confirmedOrderId, virtualScopeIndex), 
-  UNIQUE KEY(confirmedOrderId, physicalScopeIndex)
+  UNIQUE KEY(rsvdOrderId, virtualScopeIndex), 
+  UNIQUE KEY(rsvdOrderId, physicalScopeIndex)
 );
