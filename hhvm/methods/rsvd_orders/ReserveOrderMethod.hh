@@ -55,12 +55,16 @@ class ReserveOrderMethod {
           new UnsignedInt($virtual_scope_idx),
           $physical_scope
         ); 
+
+        $insert_mapping_handle
+          ->getWaitHandle()
+          ->join();
       }
 
       return $order;
 
     } catch (QueryException $ex) {
-      throw new MethodException();
+      throw new FailedQueryMethodException($ex);
     }
   }
 }

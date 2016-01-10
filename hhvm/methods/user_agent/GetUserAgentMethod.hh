@@ -7,7 +7,7 @@ class GetUserAgentMethod {
     private FetchUsersPrivilegesQuery $fetchUsersPrivilegeQuery
   ) {}
 
-  public function fetch(UnsignedInt $user_id): UserAgent {
+  public function get(UnsignedInt $user_id): UserAgent {
     // Verify user exists
     $fetch_user_handle = $this->fetchUserByIdQuery->fetch(
       $user_id

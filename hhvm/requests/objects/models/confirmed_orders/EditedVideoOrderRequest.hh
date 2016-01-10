@@ -3,8 +3,8 @@
 class EditedVideoOrderApiRequest {
 
   const string REQUEST_OBJECT_NAME = "EditedVideoOrderApiRequest"; 
-  const string RECORDING_DURATION_KEY = "recordingDurationMinutes";
-  const string CELL_LABEL_KEY = "labels";
+  const string RECORDING_DURATION_KEY = "duration";
+  const string CELL_LABEL_KEY = "cells";
 
   public function __construct(
     private RequestField<UnsignedInt> $recordingDurationMinutes,

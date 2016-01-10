@@ -43,7 +43,6 @@ class UploadEditedVideoApi extends Api<UploadEditedVideoApiRequest> {
 
       // Execute upload edited video method
       $composite_video = $this->uploadEditedVideoMethod->upload(
-        $request->getUserId()->get(),
         $request->getEditedVideoOrderId()->get(),
         $request->getVideoDuration()->get(),
         $request->getTitle()->get(),

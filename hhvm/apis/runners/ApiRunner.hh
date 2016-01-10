@@ -1,4 +1,4 @@
-<?hh // decl 
+<?hh // strict
 
 class ApiRunner {
 
@@ -20,13 +20,14 @@ class ApiRunner {
       // Fetch and validate session 
       if (!$this->sessionDataFetcher->hasSession()) {
         $this->logger->info("Session does not exist!"); 
-        return new FailedApiResult(GeneralApiFailureType::INVALID_SESSION);
+        $failed_result = new GeneralFailedApiResult(GeneralApiFailureType::INVALID_SESSION);
+        return $this->apiResultSerializer->serialize($failed_result);
       }
 
       // Fetch user data
       $session_data = $this->sessionDataFetcher->getSession();
       $user_agent = $this->getUserAgentMethod->get(
-        $session_data->getUser()->getiId()
+        $session_data->getUserAgentId()
       );
 
       // Digest request params into request wrapper

@@ -2,7 +2,7 @@
 
 class ConfirmedOrderScopeMappingsTable extends Table {
   
-  const string TABLE_NAME = "ReservedOrderScopeMappings";
+  const string TABLE_NAME = "ConfirmedOrderScopeMappings";
   const string CONFIRMED_ORDER_ID_KEY = "confirmedOrderId";
   const string VIRTUAL_SCOPE_INDEX_KEY = "virtualScopeIndex";
   const string PHYSICAL_SCOPE_INDEX_KEY = "physicalScopeIndex";

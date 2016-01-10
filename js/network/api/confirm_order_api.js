@@ -10,8 +10,8 @@ function ConfirmOrderApi(network_module) {
   this.titleKey = "title";
   this.descriptionKey = "desc";
   this.shortCodeIdKey = "code-id";
+  this.editedVideoOrderKey = "edited-video-order";
 }
-
 
 ConfirmOrderApi.prototype.setReservedOrderId = function(reserved_order_id) {
   this.data[this.reservedOrderIdKey] = reserved_order_id;
@@ -30,5 +30,10 @@ ConfirmOrderApi.prototype.setDescription = function(description) {
 
 ConfirmOrderApi.prototype.setShortCodeId = function(short_code_id) {
   this.data[this.shortCodeIdKey] = short_code_id;
+  return this;
+}
+
+ConfirmedOrdereApi.prototype.setEditedVideoOrderRequestObject = function(edited_video_order_request_object) {
+  this.data[this.editedVideoOrderKey] = edited_video_order_request_object.getData();
   return this;
 }

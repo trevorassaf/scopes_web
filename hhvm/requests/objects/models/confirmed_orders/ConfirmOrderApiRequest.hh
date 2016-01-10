@@ -8,7 +8,7 @@ class ConfirmOrderApiRequest {
   const string TITLE_KEY = 'title';
   const string DESCRIPTION_KEY = 'desc';
   const string SHORT_CODE_KEY = 'code-id';
-  const string EDITED_VIDEO_ORDER_REQUEST = 'edited-video';
+  const string EDITED_VIDEO_ORDER_REQUEST = 'edited-video-order';
 
   public function __construct(
     private RequestField<UnsignedInt> $rsvdOrderId,

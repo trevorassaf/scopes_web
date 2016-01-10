@@ -1,6 +1,6 @@
 var ScopesNetwork = (function() {
   
-  var ENDPOINT_PATH = "../../hhvm/endpoints/endpoint.hh";
+  var ENDPOINT_PATH = "../../../html/scopes_web/hhvm/endpoints/endpoint.hh";
 
   var API_TYPE_KEY = "api_type";
 
@@ -17,19 +17,6 @@ var ScopesNetwork = (function() {
   var PARAMETER_ASSIGNMENT_TOKEN = "=";
 
   var PARAMETER_SEPARATOR_TOKEN = "&";
-
-  /**
-   * urlEncodeRequestObject()
-   * @param Object<string, mixed> request_object: key/value pairs of request params
-   */
-  var urlEncodeRequestObject = function(request_object) {
-    var param_str = "";
-    for (var key in request_object) {
-      param_str += key + PARAMETER_ASSIGNMENT_TOKEN + request_object[key] + PARAMETER_SEPARATOR_TOKEN;
-    }
-
-    return param_str.substring(0, param_str.length - 1);
-  };
 
   return {
     /**

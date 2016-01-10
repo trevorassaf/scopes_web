@@ -25,11 +25,10 @@ class UploadEditedVideoMethod {
   ) {}
 
   public function upload(
-    UnsignedInt $user_id,
     UnsignedInt $edited_order_id,
     Time $video_duration,
-    private string $title,
-    private string $description,
+    string $title,
+    string $description,
     HttpUploadedFile $uploaded_file
   ): CompositeVideo {
     // Log file upload

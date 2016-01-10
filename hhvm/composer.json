@@ -13,7 +13,8 @@
         "requests/",
         "dependency_injection/",
         "logger/",
-        "objects/"
+        "objects/",
+        "session"
     ]
   },
   "extra": {
