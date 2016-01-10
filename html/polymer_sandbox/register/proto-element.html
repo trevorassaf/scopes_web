@@ -1,0 +1,16 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html" /> 
+
+<script type="text/javascript">
+  // register new element called the 'proto-element' 
+  Polymer(
+    {
+      is: 'proto-element',
+      
+      // Callback for object load
+      ready: function() {
+        this.textContext = 'I\'m a proto-element. Check out my prototype!'; 
+        console.log(this.textContext);
+      }
+    }    
+  );
+</script>
