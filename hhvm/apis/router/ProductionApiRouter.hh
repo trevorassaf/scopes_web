@@ -74,6 +74,9 @@ class ProductionApiRouter implements ApiRouter {
       case ApiType::DELETE_BASIC_VIDEO:
         $api = $this->apiInjector->getDeleteBasicVideoApi();
         break;
+      case ApiType::GET_SESSION_INFO:
+        $api = $this->apiInjector->getGetSessionInfoApi();
+        break;
       default:
         throw new Exception("Unhandled api type!");
         break;

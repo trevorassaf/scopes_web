@@ -30,9 +30,12 @@ class ApiInjector {
   private ?UploadBasicVideoApi $uploadBasicVideoApi;
   private ?UploadEditedVideoApi $uploadEditedVideoApi;
 
-  // Video downlaod receipts
+  // Video downlaod receipts apis
   private ?MarkBasicVideoDownloadedApi $markBasicVideoDownloadedApi;
   private ?DeleteBasicVideoApi $deleteBasicVideoApi;
+
+  // Session apis
+  private ?GetSessionInfoApi $getSessionInfoApi;
 
   public function __construct(
     private MethodInjector $methodInjector,
@@ -58,7 +61,8 @@ class ApiInjector {
     private LazyLoader<RequestFactory<GetUsersCompletedOrdersApiRequest>> $getUsersCompletedOrdersApiRequestFactoryLoader,
     private LazyLoader<RequestFactory<UploadBasicVideoApiRequest>> $uploadBasicVideoApiRequestFactoryLoader,
     private LazyLoader<RequestFactory<MarkBasicVideoDownloadedApiRequest>> $markBasicVideoDownloadedApiRequestLoader,
-    private LazyLoader<RequestFactory<DeleteBasicVideoApiRequest>> $deleteBasicVideoApiRequestLoader
+    private LazyLoader<RequestFactory<DeleteBasicVideoApiRequest>> $deleteBasicVideoApiRequestLoader,
+    private LazyLoader<RequestFactory<GetSessionInfoApiRequest>> $getSessionInfoApiRequestFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -266,6 +270,16 @@ class ApiInjector {
       ); 
     }
     return $this->deleteBasicVideoApi;
+  }
+
+  public function getGetSessionInfoApi(): GetSessionInfoApi {
+    if ($this->getSessionInfoApi === null) {
+      $this->getSessionInfoApi = new GetSessionInfoApi(
+        $this->getSessionInfoApiRequestFactoryLoader->load(),
+        $this->logger
+      );
+    } 
+    return $this->getSessionInfoApi;
   }
 
   public function getMethodInjector(): MethodInjector {
