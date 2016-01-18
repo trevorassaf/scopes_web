@@ -122,4 +122,4 @@ var NewExperimentUiController = (function() {
   return {
     init: init
   };
-}());
+})();

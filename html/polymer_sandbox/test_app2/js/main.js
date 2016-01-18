@@ -5,7 +5,7 @@ window.onload = function() {
    */
   CenterPanelController.init();
   SidePanelUiController.init();
-  //NewExperimentUiController.init();
+  NewExperimentUiController.init();
 
   /**
    * Fetch session information

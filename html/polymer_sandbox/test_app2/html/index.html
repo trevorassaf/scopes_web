@@ -3,7 +3,7 @@
   <head>
     <link rel='import' href='../lib/libraries.html?fd=p'>
     <link rel='import' href='../styles/styles.html?fd=p' />
-    <link rel='import' href='../js/js.html?hi=p' />
+    <link rel='import' href='../js/js.html?i=p' />
   </head>
 
   <body unresolved>
@@ -56,15 +56,51 @@
     <!-- Center panel -->
     <div id='center-panel'>
       <div id='center-panel-inner-frame-container'>
+            <!-- Admin icon buttons -->
+            <div id='admin-btn-container'>
+              <div id='user-profile-admin-btn-container'>
+                <iron-icon id='user-circle-icon' icon='account-circle'></iron-icon>
+              </div>
+              <div id='settings-admin-btn-container'>
+                <iron-icon id='settings-icon' icon='settings'></iron-icon>
+              </div>
+            </div>
         <div id='center-panel-inner-container'>
           <!-- Title for the center page -->
           <div id='center-page-title-container'>
             <span id='center-page-title-label'></span> 
+
           </div> 
 
           <div id='center-panel-page-container'>
-            <!-- New Experiment center panel page -->
-            <div id='add-exp-center-page' class='center-page' hidden-page></div>
+            <!-- New Experiment center page -->
+            <div id='add-exp-center-page' class='center-page' hidden-page>
+              
+              <div id='add-exp-input-card-1-container' class='new-exp-container'>
+                <!-- Microscope count input form -->
+                <div id='scopes-count-form-container' class='form-container'>
+                  <div id='scopes-count-form-label-container' class='form-label-container'>
+                    <span id='scopes-count-form-label' class='form-label'>How many microscopes do you need?</span>
+                  </div>
+                  <div id='scopes-count-input-container' class='input-container'>
+                    <span id='scopes-count-display'></span>
+                    <span id='scopes-count-display-unit'></span>
+                    <paper-slider id='scopes-count-input' min='1' max='15' step='1' value='5' pin='true'></paper-slider>
+                  </div>
+                </div>
+
+                <!-- Duration input form -->
+                <div id='duration-form-container' class='form-container'>
+                  <div id='duration-form-label-container' class='form-label-container'>
+                    <span id='duration-form-label' class='form-label'>How long is your experiment?</span>
+                  </div>
+                  <div id='duration-input-container' class='input-container'>
+                    <span id='duration-display'></span>
+                    <span id='duration-display-unit'></span>
+                    <paper-slider id='duration-input' min='1' max='12' step='1' value='5' pin='true'></paper-slider>
+                  </div>
+                </div>
+              </div>
             
             <!-- My Experiments center panel page -->
             <div id='my-exp-center-page' class='center-page' hidden-page></div>
