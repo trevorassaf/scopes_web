@@ -4,7 +4,7 @@ window.onload = function() {
    * Configure UI elements
    */
   console.log(NewExperimentUiController);
-  NewExperimentUiController.init();
+  //NewExperimentUiController.init();
 
   /**
    * Fetch session information
@@ -24,7 +24,7 @@ window.onload = function() {
       }    
     )
     .send();
-
+  
   var NAV_PANEL_ID = "dash-nav-panel";
   var ADD_EXP_BTN_ID = 'add-exp-btn';
   var SELECTED_ATTR = "selected";
