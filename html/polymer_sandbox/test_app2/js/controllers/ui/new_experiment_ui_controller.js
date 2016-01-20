@@ -1,5 +1,10 @@
 var NewExperimentUiController = (function() {
- 
+
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_VALIDATION_ICON_ATTRIBUTE = 'hidden-validation-icon';
+
   /**
    * Ui node id's
    */
@@ -8,19 +13,25 @@ var NewExperimentUiController = (function() {
     id_set: {
       display: 'scopes-count-display',
       display_unit: 'scopes-count-display-unit',
-      input: 'scopes-count-input'
+      input: 'scopes-count-input',
+      valid_icon: 'scopes-count-valid-icon',
+      invalid_icon: 'scopes-count-invalid-icon'
     },
     
     ui_nodes: {
       input_field: null,
       display_unit: null,
-      display: null
+      display: null,
+      valid_icon: null,
+      invalid_icon: null
     },
 
     display_labels: {
-      singular: 'microscope',
-      plural: 'microscopes'
-    }
+      singular: 'scope',
+      plural: 'scopes'
+    },
+
+    value_change_count: 0
   };
   
   // Experiment duration
@@ -28,19 +39,25 @@ var NewExperimentUiController = (function() {
     id_set: {
       display: 'duration-display',
       display_unit: 'duration-display-unit',
-      input: 'duration-input'
+      input: 'duration-input',
+      valid_icon: 'duration-valid-icon',
+      invalid_icon: 'duration-invalid-icon'
     },
   
     ui_nodes: {
       input_field: null,
       display_unit: null,
-      display: null
+      display: null,
+      valid_icon: null,
+      invalid_icon: null
     },
 
     display_labels: {
       singular: 'hour',
       plural: 'hours'
-    }
+    },
+
+    value_change_count: 0
   };
 
   /**
@@ -53,10 +70,7 @@ var NewExperimentUiController = (function() {
    * @param: Obj ui_form_info: data for form ui element (see 
    *    'this.scopesCountUiFormInfo')
    */
-  var updateDisplay = function(
-    count,
-    ui_form_info
-  ) {
+  this.updateDisplay = function(count, ui_form_info) {
     ui_form_info.ui_nodes.display.innerHTML = count;
     ui_form_info.ui_nodes.display_unit.innerHTML = (count == 1)
       ? ui_form_info.display_labels.singular
@@ -70,7 +84,7 @@ var NewExperimentUiController = (function() {
    *    'this.scopesCountUiFormInfo')
    * @param: int count: number of microscopes
    */
-  var setInputValue = function(ui_form_info, count) {
+  this.setInputValue = function(ui_form_info, count) {
     // Skip if same value
     if (ui_form_info.ui_nodes.input_field.value == count) {
       return;
@@ -81,17 +95,53 @@ var NewExperimentUiController = (function() {
     updateDisplay(count, ui_form_info);
   };
 
-  var bindFormDomNodes = function(ui_form_info) {
+  this.bindFormDomNodes = function(ui_form_info) {
     ui_form_info.ui_nodes.input_field = document.getElementById(ui_form_info.id_set.input); 
     ui_form_info.ui_nodes.display_unit = document.getElementById(ui_form_info.id_set.display_unit); 
     ui_form_info.ui_nodes.display = document.getElementById(ui_form_info.id_set.display); 
+    ui_form_info.ui_nodes.valid_icon = document.getElementById(ui_form_info.id_set.valid_icon);
+    ui_form_info.ui_nodes.invalid_icon = document.getElementById(ui_form_info.id_set.invalid_icon);
+  };
+
+  /**
+   * hideInputValidationIcon()
+   * - hide the validation icon
+   */
+  this.hideInputValidationIcon = function(validation_input_icon_dom) {
+    validation_input_icon_dom.setAttribute(HIDDEN_VALIDATION_ICON_ATTRIBUTE, '');  
+  };
+
+  /**
+   * showInputValidationIcon()
+   * - show the validation icon
+   */
+  this.showInputValidationIcon = function(validation_input_icon_dom) {
+    validation_input_icon_dom.removeAttribute(HIDDEN_VALIDATION_ICON_ATTRIBUTE); 
+  };
+
+  /**
+   * updateUiInputCardWithValidInput()
+   * - update the ui of the specified input card to reflect valid input
+   */
+  this.updateUiInputCardWithValidInput = function(ui_form_info) {
+    hideInputValidationIcon(ui_form_info.ui_nodes.invalid_icon);   
+    showInputValidationIcon(ui_form_info.ui_nodes.valid_icon);   
+  };
+ 
+  /**
+   * updateUiInputCardWithInvalidInput()
+   * - update the ui of the specified input card to reflect invalid input
+   */
+  this.updateUiInputCardWithInvalidInput = function(ui_form_info) {
+    hideInputValidationIcon(ui_form_info.ui_nodes.valid_icon);   
+    showInputValidationIcon(ui_form_info.ui_nodes.invalid_icon);   
   };
 
   /**
    * Initialize all input forms in the 'New Experiment' page.
    * Bind DOM nodes and attach event listeners.
    */
-  var init = function() {
+  this.init = function() {
     /**
      * Configure 'Scopes Count' input field
      */
@@ -103,6 +153,8 @@ var NewExperimentUiController = (function() {
       updateDisplay(this.immediateValue, scopesCountUiFormInfo);
     };
 
+    // Initialize scopes count input card ui
+    updateUiInputCardWithValidInput(scopesCountUiFormInfo); 
     setInputValue(scopesCountUiFormInfo, 9);
 
     /**
@@ -116,6 +168,8 @@ var NewExperimentUiController = (function() {
       updateDisplay(this.immediateValue, durationUiFormInfo);
     };
 
+    // Initialize duration input card ui
+    updateUiInputCardWithInvalidInput(durationUiFormInfo); 
     setInputValue(durationUiFormInfo, 9);
   };
 
