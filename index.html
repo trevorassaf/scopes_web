@@ -1,174 +1,145 @@
-<html>
+<!DOCTYPE html>
+<html lang='en'>
   <head>
-    <!-- Import html -->
-    <link rel="import" href="html/elements.html">
-
-    <!-- Import js -->
-    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="js/main.js"></script>
-
-    <!-- Import styles -->
-    <link rel="stylesheet" href="css/main.css">
+    <link rel='import' href='../lib/libraries.html?fd=p'>
+    <link rel='import' href='../styles/styles.html?f=pp' />
+    <link rel='import' href='../js/js.html?i=pp' />
   </head>
 
   <body unresolved>
-    <paper-card id="side-panel" class="panel" elevation="4">
-      <div id="side-panel-inner" class="inner">
-        
-        <!-- UM Med school banner -->
-        <div id="um-med-banner">
-          <a id="um-med-banner-link" href="http://medicine.umich.edu/medschool/">
-            <img id="um-med-banner-img" src="assets/images/med_school_banner_blue.png">
-          </a>
-        </div>
-
-        <!-- MVS back button -->
-        <div id="mvs-back-btn-container" class="side-panel-element">
-          <paper-button noink id="mvs-back-btn" class="side-panel-button"> 
-            <div class="side-panel-button-component-wrapper">
-              <span id="mvs-back-arrow">
-                <iron-icon class="side-panel-icon" icon="arrow-back"></iron-icon>
-              </span>
-              <span id="mvs-decal">
-                <span id="mvs-logo">
-                  <iron-icon icon="image:camera"></iron-icon>
-                </span>
-                <span id="mvs-title" class="side-panel-text">
-                  MVS
-                </span>
-              </span>
-              </div>
-          </paper-button>
-        </div>
-
-        <!-- Experiment panel label-->
-        <div class="side-panel-element" id="experiment-panel-label-container">
-          <iron-icon class="side-panel-icon" icon="image:navigate-before"></iron-icon>
-          <span id="experiment-panel-label">MVS Experiment Panel</span>
-          <iron-icon class="side-panel-icon" icon="image:navigate-next"></iron-icon>
-        </div>
-
-        <!-- Experiment panel buttons -->
-        <div id="mvs-panel-btns">
-          
-          <!-- New Experiment Button -->
-          <div class="side-panel-element">
-            <paper-button noink toggles id="new-exp-btn" class="side-panel-button">
-              <div class="side-panel-button-component-wrapper">
-                <span class="icon-component">
-                  <iron-icon icon="add-circle-outline"></iron-icon>
-                </span>
-                <span class="side-panel-text">
-                 New Experiment
-               </span>
-             </div>
-            </paper-button>
-          </div>
-
-          <!-- My Experiments Button -->
-          <div class="side-panel-element">
-            <paper-button noink toggles id="my-exp-btn" class="side-panel-button">
-              <div class="side-panel-button-component-wrapper">
-                <span class="icon-component">
-                  <iron-icon icon="group-work"></iron-icon>
-                </span>
-                <span class="side-panel-text">
-                  My Experiments
-                </span>
-              </div>
-            </paper-button>
-          </div>
-          
-          <!-- Recordings Button -->
-          <div class="side-panel-element">
-            <paper-button noink toggles id="recordings-btn" class="side-panel-button">
-              <div class="side-panel-button-component-wrapper">
-                <span class="icon-component">
-                  <iron-icon icon="cloud-queue"></iron-icon>
-                </span>
-                <span class="side-panel-text">
-                  Recorded Experiments 
-                </span>
-              </div>
-            </paper-button>
-          </div>
-
-          <!-- Settings Button -->
-          <div class="side-panel-element">
-            <paper-button noink toggles id="settings-btn" class="side-panel-button">
-              <div class="side-panel-button-component-wrapper">
-                <span class="icon-component">
-                  <iron-icon icon="settings"></iron-icon>
-                </span>
-                <span class="side-panel-text">
-                  Settings
-                </span>
-              </div>
-            </paper-button>
-          </div>
-
-          <!-- Contact us button -->
-          <div class="side-panel-element">
-            <paper-button noink toggles id="contact-us-btn" class="side-panel-button">
-              <div class="side-panel-button-component-wrapper">
-                <span class="icon-component">
-                  <iron-icon icon="info-outline"></iron-icon>
-                </span>
-                <span class="side-panel-text">
-                  Contact Us 
-                </span>
-              </div>
-            </paper-button>
-          </div>
-        </div>
-      </div>
-    </paper-card>
-
-    <div id="main-panel-container">
-      <div id="main-panel-super-container">
-        <div id="main-panel-super-header"></div>
-        
-        <div id="aux-btn-panel">
-          <paper-icon-button toggles icon="account-circle"></paper-icon-button>
-          <paper-icon-button icon="home"></paper-icon-button>
-        </div>
+    <div id='side-panel'>
+      <!-- User name -->
+      <div id='side-panel-user-container'>
+        <img id='side-panel-user-profile-pic' src='../../../../assets/default_profile_images/blue-ring.png' />
+        <span id='side-panel-user-label'>Kalyna Petrusha</span>
       </div>
 
-      <div>
-        <span>Schedule Experiment</span>
-      </div>
-      <paper-card id="new-exp-logistics-card" class="main-card" elevation="1">
-        <div>
-          <div>
-            <div>
-              <span>How many scopes do you need?</span> 
-              <paper-slider pin max="16" step="1" value="4"></paper-slider>
-            </div>
-            <div>
-              <span>How long is your experiment?</span> 
-              <paper-slider pin min="1" max="24" step="1" value="1"></paper-slider>
-            </div>
-          </div>
+      <!-- Mvs home button -->
+      <div id='home-nav-container'>
+        <div id='home-nav-label'>
+          <span><iron-icon id='home-nav-label-back-icon' icon='chevron-left'></iron-icon></span>  
+          <div id='home-nav-label-home-icon-container'><iron-icon id='home-nav-label-home-icon' icon='home'></iron-icon></div>
+          <span id='home-nav-label-name'>MVS Home</span>
         </div>
-      </paper-card>
+      </div>
       
-      <paper-card id="new-exp-video-card" class="main-card" elevation="1">
-        <div>
-          <div>
-            <div>
-              <span>When would you like to perform your experiment?</span> 
-              <paper-input label="3 pm"></paper-input>
-              <paper-input label="05/01/15"></paper-input>
-            </div>
-            <div>
-              <span>Please select a time:How long is your experiment?</span> 
-              <paper-slider pin min="1" max="24" step="1" value="1"></paper-slider>
-            </div>
-          </div>
+      <!-- Mvs dashboard title -->
+      <div id='dash-title-container'>
+        <div id='dash-title-label'>
+          <span><iron-icon icon='dashboard' id='dash-title-label-icon'></iron-icon></span>
+          <span id='dash-title-label-name'>MVS Dashboard</span>
+          <span id='dash-title-label-version'>1.0.0</span>
         </div>
-      </paper-card>
+      </div>
+
+      <!-- Page navigation buttons -->
+      <div id='nav-btns-container'>
+        <div id='add-exp-btn' class='dash-nav-panel-btn'>
+          <iron-icon icon='add-circle-outline'></iron-icon>
+          <span class='nav-btn-label'>Add Experiment</span>
+        </div>
+        <div id='my-exp-btn' class='dash-nav-panel-btn'>
+          <iron-icon icon='group-work'></iron-icon>
+          <span class='nav-btn-label'>My Experiments</span>
+        </div>
+        <div id='recorded-exp-btn' class='dash-nav-panel-btn'>
+          <iron-icon icon='cloud-queue'></iron-icon>
+          <span class='nav-btn-label'>Recorded Experiments</span>
+        </div>
+        <div id='monitor-exp-btn' class='dash-nav-panel-btn'>
+          <iron-icon icon='settings-input-svideo'></iron-icon>
+          <span class='nav-btn-label'>Monitor Experiment</span>
+        </div>
+      </div>
     </div>
 
+    <!-- Center panel -->
+    <div id='center-panel'>
+      <div id='center-panel-inner-frame-container'>
+        
+        <!-- Admin icon buttons -->
+        <div id='admin-btn-container'>
+          <div id='user-profile-admin-btn-container'>
+            <iron-icon id='user-circle-icon' icon='account-circle'></iron-icon>
+          </div>
+          <div id='settings-admin-btn-container'>
+            <iron-icon id='settings-icon' icon='settings'></iron-icon>
+          </div>
+        </div>
+
+        <!-- Center panel inner container: contains title and associated content -->
+        <div id='center-panel-inner-container'>
+          <!-- Title for the center page -->
+          <div id='center-page-title-container'>
+            <span id='center-page-title-label'></span> 
+          </div> 
+          
+          <!-- Center panel container: contains all main forms -->
+          <div id='center-panel-page-container'>
+            <!-- New Experiment center page -->
+            <div id='add-exp-center-page' class='center-page' hidden-page>
+              <!-- Card 1: scopes count -->
+              <div id='add-exp-input-card-1-container' class='add-exp-input-card'>
+                <!-- Microscope count input form -->
+                <div id='scopes-count-form-container' class='form-container'>
+                  
+                  <!-- Form title -->
+                  <div id='scopes-count-form-label-container' class='form-label-container'>
+                    <span id='scopes-count-form-label' class='form-label'>How many microscopes do you need?</span>
+                  </div>
+                  
+                  <!-- Form input field -->
+                  <div id='scopes-count-input-container' class='input-container'>
+                    <span id='scopes-count-display'></span>
+                    <span id='scopes-count-display-unit'></span>
+                    <paper-slider id='scopes-count-input' min='0' max='15' step='1' value='5' pin='true'></paper-slider>
+                  </div>
+
+                  <!-- Validation icon -->
+                  <div id='scopes-count-validation-icon-container' class='add-exp-validation-icon-container'>
+                    <iron-icon id='scopes-count-valid-icon' class='valid-input-icon validation-input-icon' icon='check-circle'></iron-icon>
+                    <iron-icon id='scopes-count-invalid-icon' class='invalid-input-icon validation-input-icon' icon='cancel'></iron-icon>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: experiment duration -->
+              <div id='add-exp-input-card-2-container' class='add-exp-input-card'>
+                <!-- Duration input form -->
+                <div id='duration-form-container' class='form-container'>
+                  
+                  <!-- Form title -->
+                  <div id='duration-form-label-container' class='form-label-container'>
+                    <span id='duration-form-label' class='form-label'>How long is your experiment?</span>
+                  </div>
+                  
+                  <!-- Form input field -->
+                  <div id='duration-input-container' class='input-container'>
+                    <span id='duration-display'></span>
+                    <span id='duration-display-unit'></span>
+                    <paper-slider id='duration-input' min='0' max='12' step='1' value='5' pin='true'></paper-slider>
+                  </div>
+
+                  <!-- Validation icon -->
+                  <div id='duration-validation-icon-container' class='add-exp-validation-icon-container'>
+                    <iron-icon id='duration-valid-icon' class='valid-input-icon validation-input-icon' icon='check-circle'></iron-icon>
+                    <iron-icon id='duration-invalid-icon' class='invalid-input-icon validation-input-icon' icon='cancel'></iron-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- My Experiments center panel page -->
+            <div id='my-exp-center-page' class='center-page' hidden-page></div>
+            
+            <!-- Recorded Experiments center panel page -->
+            <div id='recorded-exp-center-page' class='center-page' hidden-page></div>
+            
+            <!-- Monitor Experiment center panel page -->
+            <div id='monitor-exp-center-page' class='center-page' hidden-page></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

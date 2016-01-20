@@ -1,6 +1,6 @@
 var ScopesNetwork = (function() {
   
-  var ENDPOINT_PATH = "../../../html/scopes_web/hhvm/endpoints/endpoint.hh";
+  var ENDPOINT_PATH = "../../../../../../../../html/scopes_web/hhvm/endpoints/endpoint.hh";
 
   var API_TYPE_KEY = "api_type";
 
