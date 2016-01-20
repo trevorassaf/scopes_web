@@ -1,3 +1,0 @@
-#define _PROXY_DB		"@proxydb@"
-#define _FILTER_DB		"@filterdb@"
-#define _COSIGN_TICKET_CACHE	"@ticketcache@"
