@@ -1,2 +1,2 @@
 RewriteEngine on
-RewriteRule ^valid$ valid.html
+RewriteRule ^/foo\.html$ /bar.html

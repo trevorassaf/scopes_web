@@ -2,4 +2,4 @@
 sandbox
 files
 ssl
-logs
+logs/*
