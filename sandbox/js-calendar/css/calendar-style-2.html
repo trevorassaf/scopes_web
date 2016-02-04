@@ -1,0 +1,136 @@
+<style type='text/css' is='custom-style'>
+
+  html, body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+  }
+
+  .calendar-wrapper .selected-date-display-container {
+    background-color: rgb(38, 108, 177);
+    height: 76px;
+    color: #FFFFFF;
+    position: relative;
+  }
+
+  .calendar-wrapper .selected-year-container {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-weight: bold;
+  }
+
+  .calendar-wrapper .selected-date-container {
+    position: absolute;
+    top: 36px;
+    left: 16px;
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .calendar-wrapper .selected-year-label {
+    font-size: 12px;
+  }
+
+  .calendar-wrapper {
+    background-color: #FFFFFF; 
+    height: 200px;
+    width: 320px;
+    font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .calendar-wrapper .month-banner-container {
+    color: #000000;
+    font-size: 14px;
+    text-align: center;
+    padding-top: 14px;
+  }
+
+  .calendar-wrapper .dow-container {
+    color: #777777;
+    padding-top: 14px;
+  }
+
+  .calendar-wrapper .date-cell {
+    display: inline-block;
+    width: 40px;
+    width: 40px;
+    height: 40px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .calendar-wrapper .dow-container .date-cell {
+    height: 30px;
+  }
+
+  .calendar-wrapper .sun-date-cell {
+    margin-left: 6px;
+  }
+
+  .calendar-wrapper .calendar-main-container .selectable-dates-container {
+    padding-left: 5px;
+  }
+
+  .calendar-wrapper .decrement-month-container {
+    float: left; 
+  }
+  
+  .calendar-wrapper .increment-month-container {
+    float: right; 
+  }
+
+  .calendar-wrapper .month-nav-container iron-icon {
+    --iron-icon-height: 20px;
+    --iron-icon-width: 20px;
+    cursor: pointer;
+  }
+
+  .calendar-wrapper .month-nav-container iron-icon:hover {
+    background-color: #EEEEEE;
+    border-radius: 50%;
+  }
+
+  .calendar-wrapper .selectable-dates-container .date {
+    display: inline-block;
+    width: 44px;
+  }
+
+  .calendar-wrapper .selectable-dates-container .selectable-date {
+    height: 44px;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 50%;
+    position: relative;
+  }
+
+  .calendar-wrapper .selectable-dates-container .unselectable-date {
+    height: 44px;
+    text-align: center;
+    font-size: 14px;
+    position: relative;
+  };
+  
+  .calendar-wrapper .selectable-dates-container .unselectable-date .date-label {
+    position: relative;
+    top: 12px;
+    color: #777777;
+  }
+
+  .calendar-wrapper .selectable-dates-container .selectable-date .date-label {
+    position: relative;
+    top: 12px;
+  }
+
+  .calendar-wrapper .selectable-dates-container div.selectable-date:hover:not([selected]) {
+    background-color: #EEEEEE;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+
+  .calendar-wrapper .selectable-dates-container div.date[selected] {
+    background-color: #EEEEEE;
+  }
+
+</style>

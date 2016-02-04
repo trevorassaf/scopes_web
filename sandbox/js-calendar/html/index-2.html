@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <link rel='import' href='../css/calendar-style.html?d=p' />  
+    <script src="../../../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel='import' href="../../../bower_components/iron-icons/iron-icons.html" />
+    
+    <script type='text/javascript' src='../js/utils.js?43=p'></script>
+    <script type='text/javascript' src='../js/calendar.js?43=p'></script>
+    <script type='text/javascript' src='../js/main.js?43=fd'></script>
+  </head>
+  <body>
+    <div id='calendar-id' class='calendar-wrapper'>
+      <div class='selected-date-display-container'>
+        <div class='selected-year-container'>
+          <span class='selected-year-label'>2015</span>
+        </div>
+        <div class='selected-date-container'>
+          <span class='selected-date-label'></span>
+          <span class='selected-month-label'></span>
+        </div>
+      </div>
+
+      <!-- Main calendar content (select date here)  -->
+      <div class='calendar-main-container'>
+        
+        <!-- Month banner -->
+        <div class='month-banner-container'>
+          <div class='month-nav-container decrement-month-container'>
+            <iron-icon icon='chevron-left'></iron-icon>  
+          </div>
+          <span class='month-label'>April</span>
+          <div class='month-nav-container increment-month-container'>
+            <iron-icon icon='chevron-right'></iron-icon>  
+          </div>
+        </div>
+
+        <!-- Day of the week labels -->
+        <div class='dow-container'>
+          <div class='dow date-cell sun-date-cell'>S</div>
+          <div class='dow date-cell m-date-cell'>M</div>
+          <div class='dow date-cell tu-date-cell'>T</div>
+          <div class='dow date-cell wed-date-cell'>W</div>
+          <div class='dow date-cell thu-date-cell'>T</div>
+          <div class='dow date-cell fri-date-cell'>F</div>
+          <div class='dow date-cell sat-date-cell'>S</div>
+        </div>
+
+        <!-- Selectable dates -->
+        <div class='selectable-dates-container'>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

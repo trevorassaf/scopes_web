@@ -1,0 +1,16 @@
+<script type='text/javascript'>
+  var Calendar = (function(calendar_id) {
+   
+    var decrementMonthNavNode = document.getElementById(calendar_id + '.decrement-month-container');
+    var monthNode = document.getElementById(calendar_id + '.month-label');
+    var incrementMonthNavNode = document.getElementById(calendar_id + '.increment-month-container');
+
+    this.init = function() {
+      monthNode.innerHTML = 'changed!';
+      console.log(monthNode);
+    }; 
+    return {
+      init: init
+    };
+  })();
+</script>
