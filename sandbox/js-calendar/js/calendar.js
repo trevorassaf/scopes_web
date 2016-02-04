@@ -19,6 +19,8 @@ function Calendar(
    */
   var SELECTED_DATE_ATTR = 'selected-date';
   var DISABLED_MONTH_NAV_ATTR = 'disabled';
+  var HIDDEN_ATTR = 'hidden';
+  var CLOSED_ATTR = 'closed';
 
   /**
    * Class constants
@@ -76,6 +78,7 @@ function Calendar(
   var disallowedWeekDays = disallowed_week_days;
   var irregularDisallowedDays = irregular_disallowed_days;
   var isEnabled = true;
+  var isVisible = false;
   
   var monthDisplacement = 0;
   var maxMonthDisplacement = forward_month_limit;
@@ -160,6 +163,16 @@ function Calendar(
     node: null
   };
 
+  var selectedDateDisplayContainer = {
+    className: 'selected-date-display-container',
+    node: null
+  };
+
+  var calendarMainContainerNodeInfo = {
+    className: 'calendar-main-container',
+    node: null
+  };
+
   /**
    * Private functions
    */
@@ -190,6 +203,17 @@ function Calendar(
     fetchClassBoundDomNode(selectedDomLabelNodeInfo);
     fetchClassBoundDomNode(selectedMonthLabelNodeInfo);
 
+    fetchClassBoundDomNode(calendarMainContainerNodeInfo);
+    fetchClassBoundDomNode(selectedDateDisplayContainer);
+
+    selectedDateDisplayContainer.node.onclick = function(event) {
+      if (isVisible) {
+        hideCalendar();
+      } else {
+        showCalendar();
+      }
+    };
+
     // Month nav nodes
     fetchClassBoundDomNode(monthNavDisplayNodeInfo);
     fetchClassBoundDomNode(decrementMonthNavNodeInfo);
@@ -197,10 +221,18 @@ function Calendar(
     
     // Month navigation button event listeners
     decrementMonthNavNodeInfo.node.onclick = function() {
+      // Kill event if client asks for it
+      if (!isEnabled) {
+        return;
+      }
       shiftMonth(false); 
     };
     
     incrementMonthNavNodeInfo.node.onclick = function() {
+      // Kill event if client asks for it
+      if (!isEnabled) {
+        return;
+      }
       shiftMonth(true); 
     };
 
@@ -209,6 +241,11 @@ function Calendar(
 
     // Selectable dates event listener
     selectableDaysContainerNodeInfo.node.onclick = function(event) {
+      // Kill event if client asks for it
+      if (!isEnabled) {
+        return;
+      }
+
       // Search event propagation list to find selectable-date node
       var date = null;
       for (var i = 0; i < event.path.length; ++i) {
@@ -248,7 +285,22 @@ function Calendar(
       // Update selected date top-banner display
       updateSelectedDowDisplay(date_idx);
       updateSelectedMonthDisplay(calendarMonthObj.month);
+
+      // Hide calendar body
+      hideCalendar();
     };
+  };
+
+  function hideCalendar() {
+    isVisible = false;  
+    calendarMainContainerNodeInfo.node.setAttribute(HIDDEN_ATTR, ''); 
+    selectedDateDisplayContainer.node.setAttribute(CLOSED_ATTR, '');
+  };
+
+  function showCalendar() {
+    isVisible = true; 
+    calendarMainContainerNodeInfo.node.removeAttribute(HIDDEN_ATTR); 
+    selectedDateDisplayContainer.node.removeAttribute(CLOSED_ATTR);
   };
 
   /**
@@ -494,6 +546,13 @@ function Calendar(
 
     // Render calendar month label for grid
     updateCurrentMonthDisplay(selectedDateObj.month);
+
+    // Render or hide main calendar content on startup
+    if (isVisible) {
+      showCalendar();
+    } else {
+      hideCalendar();
+    }
   };
 
   /**

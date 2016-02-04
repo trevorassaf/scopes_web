@@ -1,9 +1,19 @@
 <style type='text/css' is='custom-style'>
 
+ #calendar-id {
+   margin-top: 20px;
+   margin-left: 20px;
+ } 
+
   html, body {
     margin: 0px;
     padding: 0px;
     height: 100%;
+    background-color: #EEEEEE;
+  }
+
+  .calendar-wrapper[hidden] {
+    display: none;
   }
 
   .calendar-wrapper .selected-date-display-container {
@@ -13,6 +23,30 @@
     position: relative;
   }
 
+  .calendar-wrapper .selected-date-display-container {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    transition: box-shadow 0.3s ease-in-out:
+  }
+
+  /* Transition to a bigger shadow on hover */
+  .calendar-wrapper .selected-date-display-container[closed]:hover {
+    box-shadow: 0px 0px 5px 5px rgba(38, 108, 177, 0.5);
+  }
+
+  /* .calendar-wrapper .selected-date-display-container { */
+  /*   box-shadow: 0 1px 2px rgba(0,0,0,0.15); */
+  /* } */
+  /*  */
+  /* .calendar-wrapper .selected-date-display-container::after { */
+  /*   box-shadow: 0 5px 15px rgba(0,0,0,0.3); */
+  /*   opacity: 0; */
+  /*   transition: opacity 0.3s ease-in-out; */
+  /* } */
+  /*  */
+  /* .calendar-wrapper .selected-date-display-container:hover::after { */
+  /*   opacity: 1; */
+  /* } */
+  
   .calendar-wrapper .selected-year-container {
     position: absolute;
     top: 10px;
@@ -34,7 +68,6 @@
 
   .calendar-wrapper {
     background-color: #FFFFFF; 
-    height: 160px;
     width: 224px;
     font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -72,10 +105,12 @@
 
   .calendar-wrapper .decrement-month-container {
     float: left; 
+    margin-left: 10px;
   }
   
   .calendar-wrapper .increment-month-container {
     float: right; 
+    margin-right: 6px;
   }
 
   .calendar-wrapper .month-nav-container iron-icon {
