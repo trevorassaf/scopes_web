@@ -289,6 +289,22 @@ function Calendar(
       // Hide calendar body
       hideCalendar();
     };
+
+    // Hide calendar if user clicks off the screen
+    document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
+      console.log(event.path);
+      for (var node_id in event.path) {
+        var node = event.path[node_id];
+        console.log(node.id);
+        // User clicked on the screen, so don't hide!
+        if (node.id == calendarRootNodeInfo.node.id) {
+          return;
+        }
+      }
+
+      // User clicked off the calendar, so hide it!
+      hideCalendar();
+    });
   };
 
   function hideCalendar() {
@@ -633,5 +649,13 @@ function Calendar(
    */
   this.enable = function() {
     isEnabled = true;
+  };
+
+  this.getSelectedDate = function() {
+    return {
+      year: selectedDateObj.year,
+      month: selectedDateObj.month,
+      date: selectedDateObj.date
+    };
   };
 };
