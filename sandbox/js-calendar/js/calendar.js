@@ -6,6 +6,12 @@ function Calendar(
     min_num_days_in_advance) {
 
   /**
+   * Import logic
+   */
+  var IMPORT_SCRIPT_SELECTOR = '#calendar-import';
+  var CALENDAR_TEMPLATE_SELECTOR = '#calendar-template .calendar-wrapper';
+
+  /**
    * Html class names
    */
   var DATE_CLASS = 'date';
@@ -188,15 +194,12 @@ function Calendar(
   };
 
   /**
-   * initNodes()
+   * initInternalCalendarNodes()
    * - initialize dom node pointers
    * - binds event listeners
    */
-  function initNodes() {
+  function initInternalCalendarNodes() {
     // Bind all nodes and init their event listeners
-    // Root calendar node
-    calendarRootNodeInfo.node = document.getElementById(calendarRootNodeInfo.id);
-    
     // Selected display date nodes
     fetchClassBoundDomNode(selectedYearLabelNodeInfo);
     fetchClassBoundDomNode(selectedDowLabelNodeInfo);
@@ -292,10 +295,8 @@ function Calendar(
 
     // Hide calendar if user clicks off the screen
     document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
-      console.log(event.path);
       for (var node_id in event.path) {
         var node = event.path[node_id];
-        console.log(node.id);
         // User clicked on the screen, so don't hide!
         if (node.id == calendarRootNodeInfo.node.id) {
           return;
@@ -622,6 +623,23 @@ function Calendar(
   };
 
   /**
+   * synthesizeCalendarTemplate()
+   * - copy calendar template and insert into main dom tree
+   * @pre-condition: 'calendarRootNodeInfo' must be initialized
+   */
+  function synthesizeCalendarTemplate() {
+    // Bind calendar dom template 
+    var link = document.querySelector(IMPORT_SCRIPT_SELECTOR);
+    var calendar_template = link.import.querySelector(CALENDAR_TEMPLATE_SELECTOR);
+
+    // Synthesize template
+    var new_calendar = document.importNode(calendar_template, true);
+
+    // Insert template into main dom
+    calendarRootNodeInfo.node.appendChild(new_calendar);
+  };
+
+  /**
    * Privileged functions
    */
   /**
@@ -630,8 +648,19 @@ function Calendar(
    * - bind event listeners
    */
   this.init = function() {
-    initNodes();
+    // Initialize top-level calendar node (we're going to copy the template into this!)
+    calendarRootNodeInfo.node = document.getElementById(calendarRootNodeInfo.id);
+
+    // Copy the template and insert into root node
+    synthesizeCalendarTemplate();
+
+    // Initialize dom nodes internal to the calendar object
+    initInternalCalendarNodes();
+
+    // Cache today's date
     initDate();
+
+    // Load ui
     initDisplay();
   };
 
