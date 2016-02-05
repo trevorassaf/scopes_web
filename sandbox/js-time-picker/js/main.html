@@ -1,0 +1,23 @@
+<script type='text/javascript'>
+  window.onload = function() {
+    var start_time = {
+      hours: 9,
+      minutes: 30
+    };
+
+    var end_time = {
+      hours: 17,
+      minutes: 30 
+    };
+
+    var time_picker = new TimePicker(
+      'time-picker',
+      start_time,
+      end_time,
+      30
+    ); 
+
+    time_picker.init();
+
+  };
+</script>
