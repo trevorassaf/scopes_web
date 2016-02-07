@@ -1,0 +1,133 @@
+#side-panel {
+  float: left;
+  border-right: 1px solid rgb(228, 228, 228);
+  border-bottom: 1px solid rgb(228, 228, 228);
+  background-color: #FFFFFF;
+  width: 280px;
+  height: 100%;
+}
+
+#side-panel-user-container {
+  margin-top: 20px;
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+#side-panel-user-profile-pic {
+  height: 50px; 
+  width: 50px; 
+  margin-right: 20px;
+}
+
+#side-panel-user-label {
+  /* color: #505050; */
+  color: #424242;
+  font-size: 20px;
+  font-weight: bold;
+  display: inline-block;
+  position: relative;
+  top: -20px;
+}
+
+#home-nav-label {
+  border-top: 1px solid rgb(228, 228, 228);
+  border-bottom: 1px solid rgb(228, 228, 228);
+  background-color: #ECEFF1;
+  font-size: 16px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+}
+
+#home-nav-label-back-icon {
+  margin-left: 10px;  
+  color: #777777;
+}
+
+#home-nav-label-home-icon-container {
+  margin-left: 6px;
+  padding-top: 5px;
+  padding-left: 5px;
+  display: inline-block;
+  height: 35px;
+  width: 35px;
+  background-color: #FFFFFF;
+}
+
+#home-nav-label-home-icon {
+  color: rgb(38, 108, 177);
+  --iron-icon-height: 30px;
+  --iron-icon-width: 30px;
+}
+
+#home-nav-label-name {
+  /* margin-left: 10px; */
+  margin-left: 15px;
+  position: relative;
+  top: 2px;
+  color: #505050;
+  font-weight: bold;
+}
+
+#dash-title-label {
+  color: #424242;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+#dash-title-label-icon {
+  margin-left: 15px;
+  color: rgb(38, 108, 177);
+  --iron-icon-height: 35px;
+  --iron-icon-width: 35px;
+}
+
+#dash-title-label-name {
+  margin-left: 20px;
+  position: relative;
+  top: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#dash-title-label-version {
+  margin-left: 20px;
+  position: relative;
+  top: 8px;
+  font-size: 14px;
+  color: #9e9e9e;
+}
+
+#nav-btns-container {
+  color: rgb(98, 98, 98);
+  font-size: 16px;
+  cursor: pointer;
+  /* margin-top: 15px; */
+  margin-bottom: 15px;
+}
+
+.dash-nav-panel-btn {
+  background: #FFFFFF;  
+  padding: 10px;
+  /* padding-left: 17px; */
+  padding-left: 20px;
+}
+
+.dash-nav-panel-btn[selected] {
+  background-color: #ECEFF1;
+}
+
+.dash-nav-panel-btn[selected] iron-icon {
+  color: rgb(41, 98, 255);
+}
+
+#nav-btns-container iron-icon {
+  margin-right: 20px;
+  --iron-icon-height: 24px;
+  --iron-icon-width: 24px;
+}
+
+.nav-btn-label {
+  position: relative;
+  top: 2px;
+}

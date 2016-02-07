@@ -3,7 +3,6 @@ var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var cssmin = require('gulp-minify-css');
 var rename = require("gulp-rename");
-var sass = require('gulp-sass');
 var uglify = require('gulp-uglify');
 
 gulp.task('default', function() {
@@ -15,7 +14,7 @@ gulp.task('default', function() {
  * - concatenates and minifies js
  */
 gulp.task('scripts', function() {
-  return gulp.src('./src/js/**/*.js')
+  return gulp.src('./src/**/*.js')
     .pipe(concat('app.js'))
     .pipe(gulp.dest('./dist/js/'))
     .pipe(uglify())
@@ -30,7 +29,7 @@ gulp.task('scripts', function() {
  * - concatenates and minifies css
  */
 gulp.task('styles', function() {
-  return gulp.src('./src/css/**/*.css')
+  return gulp.src('./src/**/*.css')
     .pipe(gulp.dest('./dist/css/'))
     .pipe(cssmin())
     .pipe(rename({
@@ -44,6 +43,6 @@ gulp.task('styles', function() {
  * - tracks changes to src files and automatically runs deployment tasks
  */
 gulp.task('watch', function() {
-  gulp.watch('./src/js/**/*.js', ['scripts']);
-  gulp.watch('./src/css/**/*.css', ['styles']);
+  gulp.watch('./src/**/*.js', ['scripts']);
+  gulp.watch('./src/**/*.css', ['styles']);
 });
