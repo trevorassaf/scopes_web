@@ -15,3 +15,4 @@
 [Fri Jan 22 15:39:22.862182 2016] [core:error] [pid 22319:tid 140448324617984] [client 69.162.69.205:52369] AH00126: Invalid URI in request GET <title>phpMyAdmin HTTP/1.1
 [Fri Jan 22 15:40:38.043721 2016] [core:error] [pid 22319:tid 140448240690944] [client 69.162.69.205:51244] AH00126: Invalid URI in request GET <title>phpMyAdmin HTTP/1.1
 [Thu Feb 04 16:07:13.469136 2016] [core:error] [pid 24050:tid 140448333010688] [client 178.79.141.9:40250] AH00135: Invalid method in request SFXO / HTTP/1.1
+[Sun Feb 07 08:57:40.944516 2016] [core:error] [pid 5466:tid 140448461657856] [client 169.229.3.91:46395] AH00135: Invalid method in request K
