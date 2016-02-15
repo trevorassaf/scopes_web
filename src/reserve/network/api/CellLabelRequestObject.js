@@ -7,7 +7,7 @@ function CellLabelRequestObject() {
   this.labelKey = 'label';
 }
 
-function CellLabelRequestObject.prototype.setLabel = function(label) {
-  this.data[this.labelKey] = label;
-  return this;
-}
+// function CellLabelRequestObject.prototype.setLabel = function(label) {
+//   this.data[this.labelKey] = label;
+//   return this;
+// }

@@ -3,39 +3,57 @@
 }
 
 .calendar-wrapper .selected-date-display-container {
-  background-color: rgb(38, 108, 177);
-  height: 66px;
-  color: #FFFFFF;
+  /* background-color: rgb(38, 108, 177); */
+  /* height: 66px; */
+  /* color: #FFFFFF; */
   position: relative;
+  cursor: pointer;
 }
 
 .calendar-wrapper .selected-date-display-container {
-  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-  transition: box-shadow 0.3s ease-in-out:
+  display: inline-block;
+  /* box-shadow: 0 1px 2px rgba(0,0,0,0.15); */
+  /* transition: box-shadow 0.3s ease-in-out: */
+}
+
+.calendar-wrapper .selected-date-container {
+  /* border: 1px solid rgb(228, 228, 228); */
+  /* border-radius: 5px; */
+  /* padding: 8px; */
+  padding-left: 8px;
 }
 
 /* Transition to a bigger shadow on hover */
 .calendar-wrapper .selected-date-display-container[closed]:hover {
-  box-shadow: 0px 0px 5px 5px rgba(38, 108, 177, 0.5);
+  box-shadow: 0px 0px 2px 2px rgba(38, 108, 177, 0.5);
 }
 
-.calendar-wrapper .selected-year-container {
-  position: absolute;
-  top: 10px;
-  left: 16px;
-  font-weight: bold;
+.calendar-wrapper .selected-date-display-container div {
+  display: inline-block;
+}
+
+.calendar-wrapper .icon-wrapper {
+  margin-left: 6px;
+  background-color: rgb(38, 108, 177);
+  padding: 5px;
+  border-radius: 25%;
+}
+
+.calendar-wrapper .icon-wrapper iron-icon {
+  color: #FFFFFF;
 }
 
 .calendar-wrapper .selected-date-container {
-  position: absolute;
-  top: 28px;
-  left: 16px;
-  font-size: 22px;
-  font-weight: bold;
+  position: relative;
+  top: 2px;
 }
 
-.calendar-wrapper .selected-year-label {
-  font-size: 12px;
+.calendar-wrapper .selected-dow-label {
+  margin-right: 2px;
+}
+
+.calendar-wrapper .selected-dom-label {
+  margin-right: 2px;
 }
 
 .calendar-wrapper {
@@ -53,7 +71,7 @@
 }
 
 .calendar-wrapper .dow-container {
-  color: rgb(38, 108, 177);
+  /* color: rgb(38, 108, 177); */
   font-weight: bold;
   margin-top: 10px;
 }
@@ -70,9 +88,11 @@
 }
 
 .calendar-wrapper .calendar-main-container {
-  border-left: 1px solid rgb(228, 228, 228);
-  border-right: 1px solid rgb(228, 228, 228);
-  border-bottom: 1px solid rgb(228, 228, 228);
+  margin-top: 6px;
+  border: 1px solid rgb(228, 228, 228);
+  /* border-left: 1px solid rgb(228, 228, 228); */
+  /* border-right: 1px solid rgb(228, 228, 228); */
+  /* border-bottom: 1px solid rgb(228, 228, 228); */
 }
 
 .calendar-wrapper .calendar-main-container .selectable-dates-container {
@@ -108,7 +128,6 @@
 }
 
 .calendar-wrapper .selectable-dates-container .selectable-date {
-  /* height: 44px; */
   text-align: center;
   font-size: 14px;
   border-radius: 50%;
@@ -117,15 +136,14 @@
 }
 
 .calendar-wrapper .selectable-dates-container .unselectable-date {
-  /* height: 44px; */
   text-align: center;
   font-size: 14px;
   position: relative;
+  height: 30px;
+  top: 6px;
 };
 
 .calendar-wrapper .selectable-dates-container .unselectable-date .date-label {
-  /* position: relative; */
-  /* top: 12px; */
   color: #777777;
   position: relative;
   top: 6px;

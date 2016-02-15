@@ -1,10 +1,17 @@
 function Calendar(
+  template_store,
   calendar_id,
   disallowed_week_days,
   irregular_disallowed_days,
   forward_month_limit,
   min_num_days_in_advance
 ) {
+
+  /**
+   * Date style tokens
+   */
+  var SHORT_DOW_ABBREVIATION_TOKEN = '.';
+  var DOM_DELIMITER = ',';
 
   /**
    * Template name constants
@@ -43,6 +50,16 @@ function Calendar(
     'Fri',
     'Sat'
   ];
+
+  var LONG_DAY_OF_THE_WEEK_NAMES = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+  ];
   
   var LONG_MONTH_NAMES = [
     'January',
@@ -79,7 +96,7 @@ function Calendar(
   var jsDate = null;
 
   // Calendar State
-
+  var templateStore = template_store;
   var minNumDaysInAdvance = min_num_days_in_advance;
   var disallowedWeekDays = disallowed_week_days;
   var irregularDisallowedDays = irregular_disallowed_days;
@@ -411,7 +428,7 @@ function Calendar(
   function updateSelectedDowDisplay(date) {
     var date_label = computeSelectedDowLabel(date);
     selectedDowLabelNodeInfo.node.innerHTML = date_label;
-    selectedDomLabelNodeInfo.node.innerHTML = date;
+    selectedDomLabelNodeInfo.node.innerHTML = date + DOM_DELIMITER;
   };
 
   function updateSelectedMonthDisplay(month) {
@@ -588,7 +605,7 @@ function Calendar(
    */
   function computeSelectedDowLabel(date) {
     var day_of_week_idx = (date + calendarMonthObj.startingDayOfTheWeek - 1) % 7;
-    return SHORT_DAY_OF_THE_WEEK_NAMES[day_of_week_idx];
+    return SHORT_DAY_OF_THE_WEEK_NAMES[day_of_week_idx] + SHORT_DOW_ABBREVIATION_TOKEN;
   };
 
   /**
@@ -629,15 +646,7 @@ function Calendar(
    */
   function synthesizeCalendarTemplate() {
     // Bind calendar dom template 
-    <!-- var calendar_template = document.querySelector('#calendar&#45;template'); -->
-    <!-- var calendar_clone = document.importNode(calendar_template.content, true); -->
-    <!-- calendarRootNodeInfo.node.appendChild(calendar_clone); -->
-
-    var js_import = document.querySelector('#js-import');
-    var ui_element_import = js_import.import.querySelector('#ui-elements-import');
-    var calendar_import = ui_element_import.import.querySelector('#calendar-import');
-    
-    var calendar_template = calendar_import.import.querySelector('#calendar-template');
+    var calendar_template = templateStore.import.querySelector(TEMPLATE_ID);
     var calendar_clone = document.importNode(calendar_template.content, true);
     calendarRootNodeInfo.node.appendChild(calendar_clone);
   };

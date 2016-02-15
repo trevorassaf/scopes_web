@@ -3,7 +3,9 @@ var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var cssmin = require('gulp-minify-css');
 var rename = require("gulp-rename");
+var sass = require('gulp-sass');
 var uglify = require('gulp-uglify');
+var ignore = require('gulp-ignore');
 
 gulp.task('default', function() {
     // place code for your default task here
@@ -14,14 +16,26 @@ gulp.task('default', function() {
  * - concatenates and minifies js
  */
 gulp.task('scripts', function() {
-  return gulp.src('./src/**/*.js')
+  return gulp.src([
+      './src/js/**/*.js',
+      './src/templates/**/*.js',
+    ])
     .pipe(concat('app.js'))
     .pipe(gulp.dest('./dist/js/'))
-    .pipe(uglify())
-    .pipe(rename({
-      suffix: '.min'
-    }))
+    // .pipe(ignore.exclude([ "*|)}>#*.map" ]))
+    // .pipe(uglify())
+    // .pipe(rename({
+    //   suffix: '.min'
+    // }))
     .pipe(gulp.dest('./dist/js/'));
+});
+
+gulp.task('templates', function() {
+  return gulp.src([
+    './src/templates/**/*.html'
+  ])
+  .pipe(concat('templates.html'))
+  .pipe(gulp.dest('./dist/templates/'));
 });
 
 /**
@@ -30,6 +44,7 @@ gulp.task('scripts', function() {
  */
 gulp.task('styles', function() {
   return gulp.src('./src/**/*.css')
+    .pipe(concat('app.css'))
     .pipe(gulp.dest('./dist/css/'))
     .pipe(cssmin())
     .pipe(rename({

@@ -16,3 +16,6 @@
 [Fri Jan 22 15:40:38.043721 2016] [core:error] [pid 22319:tid 140448240690944] [client 69.162.69.205:51244] AH00126: Invalid URI in request GET <title>phpMyAdmin HTTP/1.1
 [Thu Feb 04 16:07:13.469136 2016] [core:error] [pid 24050:tid 140448333010688] [client 178.79.141.9:40250] AH00135: Invalid method in request SFXO / HTTP/1.1
 [Sun Feb 07 08:57:40.944516 2016] [core:error] [pid 5466:tid 140448461657856] [client 169.229.3.91:46395] AH00135: Invalid method in request K
+[Wed Feb 10 09:52:42.035870 2016] [authz_core:error] [pid 5466:tid 140448249083648] [client 155.94.254.143:57792] AH01630: client denied by server configuration: /var/www/mvscorefacility.com/server-status
+[Sun Feb 14 06:53:03.928116 2016] [core:error] [pid 31572:tid 140448512014080] [client 169.229.3.91:44609] AH00126: Invalid URI in request \x1d\xc1\xa1\xd7\xe2>^(\x82C\xaf;\x8b\x81F\xfe\x07wY\x07\xde\vL\xea\xa2\x17It;\x83l\xd4\xea\xd6\xd6\xfa($\x80&\xb04\x88\xfd\x05\xf9w`\xef\xd38\xa4T\x01\xee\x91
+[Sun Feb 14 21:24:19.215900 2016] [core:error] [pid 31572:tid 140448503621376] [client 193.189.117.177:57592] AH00126: Invalid URI in request GET HTTP/1.1 HTTP/1.1
