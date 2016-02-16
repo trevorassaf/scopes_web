@@ -47,25 +47,6 @@ window.onload = function() {
   //   .send();
 };
 
-var Utils = (function() {
- 
-  this.hasClass = function(expected_class, node_class) {
-    var class_idx = node_class.indexOf(expected_class);
-    
-    if (class_idx == -1) {
-      return;
-    }
-
-    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-      && (expected_class.length + class_idx == node_class.length
-        || node_class.charAt(expected_class.length + class_idx) == ' ');
-  };
-
-  return {
-    hasClass: hasClass
-  };
-})();
-
 var CenterPanelController = (function() {
 
   /**
@@ -529,6 +510,25 @@ var SidePanelUiController = (function() {
   };
 })();
 
+var Utils = (function() {
+ 
+  this.hasClass = function(expected_class, node_class) {
+    var class_idx = node_class.indexOf(expected_class);
+    
+    if (class_idx == -1) {
+      return;
+    }
+
+    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
+      && (expected_class.length + class_idx == node_class.length
+        || node_class.charAt(expected_class.length + class_idx) == ' ');
+  };
+
+  return {
+    hasClass: hasClass
+  };
+})();
+
 function Calendar(
   template_store,
   calendar_id,
@@ -675,10 +675,10 @@ function Calendar(
   };
 
   // Selected display date
-  var selectedDowLabelNodeInfo = {
-    className: 'selected-dow-label',
-    node: null
-  };
+  // var selectedDowLabelNodeInfo = {
+  //   className: 'selected-dow-label',
+  //   node: null
+  // };
 
   var selectedMonthLabelNodeInfo = {
     className: 'selected-month-label',
@@ -750,7 +750,7 @@ function Calendar(
     // Bind all nodes and init their event listeners
     // Selected display date nodes
     fetchClassBoundDomNode(selectedYearLabelNodeInfo);
-    fetchClassBoundDomNode(selectedDowLabelNodeInfo);
+    // fetchClassBoundDomNode(selectedDowLabelNodeInfo);
     fetchClassBoundDomNode(selectedDomLabelNodeInfo);
     fetchClassBoundDomNode(selectedMonthLabelNodeInfo);
 
@@ -957,8 +957,8 @@ function Calendar(
    * @param Obj selected_date: {int date, int month, int year}
    */
   function updateSelectedDowDisplay(date) {
-    var date_label = computeSelectedDowLabel(date);
-    selectedDowLabelNodeInfo.node.innerHTML = date_label;
+    // var date_label = computeSelectedDowLabel(date);
+    // selectedDowLabelNodeInfo.node.innerHTML = date_label;
     selectedDomLabelNodeInfo.node.innerHTML = date + DOM_DELIMITER;
   };
 

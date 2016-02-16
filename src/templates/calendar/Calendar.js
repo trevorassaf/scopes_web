@@ -144,10 +144,10 @@ function Calendar(
   };
 
   // Selected display date
-  var selectedDowLabelNodeInfo = {
-    className: 'selected-dow-label',
-    node: null
-  };
+  // var selectedDowLabelNodeInfo = {
+  //   className: 'selected-dow-label',
+  //   node: null
+  // };
 
   var selectedMonthLabelNodeInfo = {
     className: 'selected-month-label',
@@ -219,7 +219,7 @@ function Calendar(
     // Bind all nodes and init their event listeners
     // Selected display date nodes
     fetchClassBoundDomNode(selectedYearLabelNodeInfo);
-    fetchClassBoundDomNode(selectedDowLabelNodeInfo);
+    // fetchClassBoundDomNode(selectedDowLabelNodeInfo);
     fetchClassBoundDomNode(selectedDomLabelNodeInfo);
     fetchClassBoundDomNode(selectedMonthLabelNodeInfo);
 
@@ -426,8 +426,8 @@ function Calendar(
    * @param Obj selected_date: {int date, int month, int year}
    */
   function updateSelectedDowDisplay(date) {
-    var date_label = computeSelectedDowLabel(date);
-    selectedDowLabelNodeInfo.node.innerHTML = date_label;
+    // var date_label = computeSelectedDowLabel(date);
+    // selectedDowLabelNodeInfo.node.innerHTML = date_label;
     selectedDomLabelNodeInfo.node.innerHTML = date + DOM_DELIMITER;
   };
 
