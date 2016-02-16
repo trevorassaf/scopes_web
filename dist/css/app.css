@@ -139,7 +139,6 @@ paper-slider {
 }
 
 #exp-date-calendar {
-  width: 224px;
   position: absolute;
 }
 
@@ -281,6 +280,12 @@ paper-slider {
   display: none;
 }
 
+.calendar-wrapper {
+  background-color: #FFFFFF; 
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
 .calendar-wrapper .selected-date-display-container:not([closed]) {
   background-color: rgb(38, 108, 177);
   color: #FFFFFF;
@@ -341,13 +346,6 @@ paper-slider {
   margin-right: 2px;
 }
 
-.calendar-wrapper {
-  background-color: #FFFFFF; 
-  width: 224px;
-  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
 .calendar-wrapper .month-banner-container {
   color: #000000;
   font-size: 14px;
@@ -373,7 +371,7 @@ paper-slider {
 }
 
 .calendar-wrapper .calendar-main-container {
-  /* border: 1px solid rgb(228, 228, 228); */
+  width: 224px;
   border-left: 1px solid rgb(228, 228, 228);
   border-right: 1px solid rgb(228, 228, 228);
   border-bottom: 1px solid rgb(228, 228, 228);
