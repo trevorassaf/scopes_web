@@ -2,6 +2,12 @@
   display: none;
 }
 
+.calendar-wrapper {
+  background-color: #FFFFFF; 
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
 .calendar-wrapper .selected-date-display-container:not([closed]) {
   background-color: rgb(38, 108, 177);
   color: #FFFFFF;
@@ -60,13 +66,6 @@
 
 .calendar-wrapper .selected-dom-label {
   margin-right: 2px;
-}
-
-.calendar-wrapper {
-  background-color: #FFFFFF; 
-  width: 224px;
-  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
 }
 
 .calendar-wrapper .month-banner-container {
