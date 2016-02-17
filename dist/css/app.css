@@ -130,10 +130,6 @@ paper-slider {
   display: none;
 }
 
-#add-exp-input-card-3-container {
-  height: 120px;
-}
-
 #exp-date-input-field-container {
   padding-left: 40px;
   position: relative;
@@ -142,8 +138,6 @@ paper-slider {
 #exp-time-input-container .input-container {
   display: inline-block; 
 }
-
-
 
 #side-panel {
   float: left;
@@ -292,8 +286,8 @@ paper-slider {
 .calendar-wrapper .selected-date-display-container:not([closed]) {
   background-color: rgb(38, 108, 177);
   color: #FFFFFF;
-  height: 40px;
-  padding-top: 10px;
+  height: 34px;
+  padding-top: 2px;
   font-size: 22px;
   font-weight: bold;
   text-align: center;
@@ -339,6 +333,10 @@ paper-slider {
 
 .calendar-wrapper .selected-date-container {
   position: relative;
+  top: 4px;
+}
+
+.calendar-wrapper .selected-date-display-container[closed] .selected-date-container {
   top: 2px;
 }
 
@@ -460,26 +458,38 @@ paper-slider {
 }
 
 #time-picker {
-  width: 130px;
 }
 
 .time-picker-wrapper {
-  width: 130px;
   cursor: pointer;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-.time-picker-wrapper .input-field {
-  /* border: 1px solid rgb(228, 228, 228); */
-  font-size: 18px;
-  text-align: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+.time-picker-wrapper .input-field-wrapper > div {
+  display: inline-block; 
 }
 
-.time-picker-wrapper .input-field:hover {
+.time-picker-wrapper .input-field {
+  font-size: 18px;
+  text-align: center;
+}
+
+.time-picker-wrapper .input-field-wrapper:hover {
   box-shadow: 0px 0px 2px 2px rgba(38, 108, 177, 0.5);
+}
+
+.time-picker-wrapper .icon-wrapper {
+  background-color: rgb(38, 108, 177);
+  border-radius: 25%;
+  padding: 3px;
+  margin-left: 6px;
+}
+
+.time-picker-wrapper .icon-wrapper iron-icon {
+  color: #FFFFFF;
+  height: 26px;
+  width: 26px;
 }
 
 /* .time-picker-wrapper .input-field[shadow-border] { */
@@ -499,7 +509,7 @@ paper-slider {
   margin-top: 2px;
   position: absolute;
   background-color: #FFFFFF;
-  width: 130px;
+  width: 116px;
 }
 
 .time-picker-wrapper[hidden-dropdown] .time-dropdown {

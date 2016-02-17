@@ -11,8 +11,8 @@
 .calendar-wrapper .selected-date-display-container:not([closed]) {
   background-color: rgb(38, 108, 177);
   color: #FFFFFF;
-  height: 40px;
-  padding-top: 10px;
+  height: 34px;
+  padding-top: 2px;
   font-size: 22px;
   font-weight: bold;
   text-align: center;
@@ -58,6 +58,10 @@
 
 .calendar-wrapper .selected-date-container {
   position: relative;
+  top: 4px;
+}
+
+.calendar-wrapper .selected-date-display-container[closed] .selected-date-container {
   top: 2px;
 }
 

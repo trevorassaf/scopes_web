@@ -66,10 +66,6 @@ paper-slider {
   display: none;
 }
 
-#add-exp-input-card-3-container {
-  height: 120px;
-}
-
 #exp-date-input-field-container {
   padding-left: 40px;
   position: relative;
@@ -78,5 +74,3 @@ paper-slider {
 #exp-time-input-container .input-container {
   display: inline-block; 
 }
-
-

@@ -48,7 +48,6 @@ function TimePicker(
   /**
    * Internal dom nodes
    */
-
   var timePickerWrapperNode = {
     class: 'time-picker-wrapper',
     node: null
@@ -56,6 +55,11 @@ function TimePicker(
 
   var inputFieldNode = {
     class: 'input-field',
+    node: null
+  };
+
+  var inputFieldWrapperNode = {
+    class: 'input-field-wrapper',
     node: null
   };
 
@@ -187,8 +191,9 @@ function TimePicker(
 
     // Bind input field and configure event listener
     bindInternalNode(inputFieldNode);
+    bindInternalNode(inputFieldWrapperNode);
 
-    inputFieldNode.node.onclick = function(event) {
+    inputFieldWrapperNode.node.onclick = function(event) {
       if (isDropDownOpen) {
         closeDropDown(); 
       } else {
