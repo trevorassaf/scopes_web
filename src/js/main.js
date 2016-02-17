@@ -7,6 +7,28 @@ window.onload = function() {
   console.assert(template_store != null);
 
   /**
+   * Configure time-picker element
+   */
+  var start_time = {
+    hours: 9,
+    minutes: 30
+  };
+
+  var end_time = {
+    hours: 17,
+    minutes: 30 
+  };
+
+  var time_picker = new TimePicker(
+    template_store,
+    'exp-time-picker',
+    start_time,
+    end_time,
+    30
+  ); 
+  time_picker.init();
+
+  /**
    * Configure calendar element
    */
   var disallowed_week_days = new Set([0, 6]);

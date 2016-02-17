@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <link rel='import' href='../css/time-picker.html?p=00' />
+    <script type='text/javascript' src='../js/utils.js'></script>
+    <link id='time-picker-import' rel='import' href='../js/time-picker.html?pp=0' />
+    <link rel='import' href='../js/main.html?p=01' />
+  </head>
+  <body>
+    <div id='time-picker'></div>
+  </body>
+</html>
+
+window.onload = function() {
+  var start_time = {
+    hours: 9,
+    minutes: 30
+  };
+
+  var end_time = {
+    hours: 17,
+    minutes: 30 
+  };
+
+  var time_picker = new TimePicker(
+    'time-picker',
+    start_time,
+    end_time,
+    30
+  ); 
+
+  time_picker.init();
+
+};

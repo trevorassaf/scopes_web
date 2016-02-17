@@ -71,9 +71,12 @@ paper-slider {
 }
 
 #exp-date-input-field-container {
+  padding-left: 40px;
   position: relative;
 }
 
-#exp-date-calendar {
-  position: absolute;
+#exp-time-input-container .input-container {
+  display: inline-block; 
 }
+
+

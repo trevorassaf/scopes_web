@@ -7,9 +7,7 @@ var sass = require('gulp-sass');
 var uglify = require('gulp-uglify');
 var ignore = require('gulp-ignore');
 
-gulp.task('default', function() {
-    // place code for your default task here
-});
+gulp.task('default', ['scripts', 'templates', 'styles']);
 
 /**
  * Scripts task

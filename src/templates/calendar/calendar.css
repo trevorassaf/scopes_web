@@ -16,6 +16,7 @@
   font-size: 22px;
   font-weight: bold;
   text-align: center;
+  width: 226px;
 }
 
 .calendar-wrapper .selected-date-display-container:not([closed]) .icon-wrapper {
@@ -93,10 +94,16 @@
 }
 
 .calendar-wrapper .calendar-main-container {
+  position: absolute;
   width: 224px;
   border-left: 1px solid rgb(228, 228, 228);
   border-right: 1px solid rgb(228, 228, 228);
   border-bottom: 1px solid rgb(228, 228, 228);
+  background-color: #FFFFFF;
+}
+
+.calendar-wrapper .calendar-main-container-wrapper {
+  position: relative;
 }
 
 .calendar-wrapper .calendar-main-container .selectable-dates-container {
@@ -170,4 +177,3 @@
 .calendar-wrapper .selectable-dates-container div.date[selected] {
   background-color: #EEEEEE;
 }
-
