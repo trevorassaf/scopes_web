@@ -6,6 +6,9 @@
   background-color: #FFFFFF; 
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  z-index: 100;
+  height: 34px;
 }
 
 .calendar-wrapper .selected-date-display-container:not([closed]) {

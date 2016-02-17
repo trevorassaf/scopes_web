@@ -281,6 +281,9 @@ paper-slider {
   background-color: #FFFFFF; 
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  z-index: 100;
+  height: 34px;
 }
 
 .calendar-wrapper .selected-date-display-container:not([closed]) {
@@ -457,6 +460,7 @@ paper-slider {
   background-color: #EEEEEE;
 }
 
+
 #time-picker {
 }
 
@@ -464,6 +468,8 @@ paper-slider {
   cursor: pointer;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  z-index: 1000;
 }
 
 .time-picker-wrapper .input-field-wrapper > div {

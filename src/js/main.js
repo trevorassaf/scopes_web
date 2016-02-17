@@ -43,6 +43,26 @@ window.onload = function() {
   calendar.init();
 
   /**
+   * Configure short-code picker element
+   */
+  var short_codes = [
+    {
+      code: '0xDEADBEEF',
+      name: 'Dead Beef'
+    },
+    {
+      code: '0xBEEEED',
+      name: 'Penis'
+    }
+  ];
+  var short_code_picker = new ShortCodePicker(
+    template_store,
+    'existing-short-code-picker',
+    short_codes
+  );
+  short_code_picker.init();
+
+  /**
    * Configure UI elements
    */
   CenterPanelController.init();

@@ -5,6 +5,8 @@
   cursor: pointer;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  z-index: 1000;
 }
 
 .time-picker-wrapper .input-field-wrapper > div {
