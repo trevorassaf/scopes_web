@@ -36,12 +36,9 @@ paper-slider {
   width: 400px;
 }
 
-#duration-display {
-  /* margin-left: 35px; */
-}
-
 .add-exp-validation-icon-container iron-icon {
-  display: block;
+  /* display: block; */
+  display: none;
 }
 
 .add-exp-validation-icon-container {
@@ -66,10 +63,20 @@ paper-slider {
   display: none;
 }
 
-#exp-time-input-field-container > div {
-  display: inline-block; 
+.validation-input-icon {
+  display: none;
+}
+
+#exp-time-input-field-container {
+  width: 400px;
+  height: 30px;
+}
+
+#exp-time-picker {
+  float: left;
 }
 
 #exp-date-calendar {
-  margin-left: 30px;
+  float: right;
 }
+

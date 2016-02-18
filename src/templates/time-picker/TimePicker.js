@@ -132,7 +132,7 @@ function TimePicker(
 
   var stringifyTimeForInputField = function(time) {
     var string_time = stringifyTime(time);
-    return string_time.replace(/&nbsp;/g, '');
+    return string_time.replace(/&nbsp/gi, '');
   };
 
   /**

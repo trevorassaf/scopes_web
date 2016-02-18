@@ -154,7 +154,7 @@ var NewExperimentUiController = (function() {
     };
 
     // Initialize scopes count input card ui
-    updateUiInputCardWithValidInput(scopesCountUiFormInfo); 
+    // updateUiInputCardWithValidInput(scopesCountUiFormInfo); 
     setInputValue(scopesCountUiFormInfo, 9);
 
     /**
@@ -169,7 +169,7 @@ var NewExperimentUiController = (function() {
     };
 
     // Initialize duration input card ui
-    updateUiInputCardWithInvalidInput(durationUiFormInfo); 
+    // updateUiInputCardWithInvalidInput(durationUiFormInfo); 
     setInputValue(durationUiFormInfo, 9);
   };
 

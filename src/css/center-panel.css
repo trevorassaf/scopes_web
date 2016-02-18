@@ -10,6 +10,8 @@
   height: 100%;
   width: calc(100% - 280px);
   left: 280px;
+  max-height: 100%;
+  overflow-y: scroll;
 }
 
 #center-panel-inner-container {

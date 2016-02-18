@@ -4,7 +4,7 @@
   -webkit-font-smoothing: antialiased;
   position: relative;
   display: inline-block;
-  width: 152px;
+  width: 146px;
 }
 
 .short-code-picker-wrapper:not([hidden-dropdown]) {
@@ -27,7 +27,7 @@
   font-size: 18px;
   text-align: center;
   position: relative;
-  top: 8px;
+  top: 6px;
   left: 10px;
 }
 
@@ -44,12 +44,13 @@
 
 .short-code-picker-wrapper .icon-wrapper iron-icon {
   color: #FFFFFF;
-  height: 32px;
-  width: 32px;
+  height: 26px;
+  width: 26px;
 }
 
 .short-code-picker-wrapper .short-code-dropdown-wrapper {
   position: absolute;
+  left: -1px;
 }
 
 .short-code-picker-wrapper .short-code-dropdown {
@@ -60,7 +61,7 @@
   overflow-y: auto;
   margin-top: 2px;
   background-color: #FFFFFF;
-  width: 152px;
+  width: 146px;
 }
 
 .short-code-picker-wrapper[hidden-dropdown] .short-code-dropdown {

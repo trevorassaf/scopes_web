@@ -10,8 +10,8 @@ window.onload = function() {
    * Configure time-picker element
    */
   var start_time = {
-    hours: 9,
-    minutes: 30
+    hours: 10,
+    minutes: 00 
   };
 
   var end_time = {

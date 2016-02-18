@@ -3,7 +3,7 @@
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
-  width: 135px;
+  width: 124px;
 }
 
 .time-picker-wrapper:not([hidden-dropdown]) {
@@ -23,8 +23,8 @@
   font-size: 18px;
   text-align: center;
   position: relative;
-  top: 9px;
-  left: 10px;
+  top: 5px;
+  left: 7px;
 }
 
 .time-picker-wrapper .input-field-wrapper:hover {
@@ -40,8 +40,8 @@
 
 .time-picker-wrapper .icon-wrapper iron-icon {
   color: #FFFFFF;
-  height: 32px;
-  width: 32px;
+  height: 26px;
+  width: 26px;
 }
 
 .time-picker-wrapper .time-dropdown-wrapper {
@@ -55,9 +55,10 @@
   max-height: 250px;
   overflow-y: auto;
   margin-top: 2px;
-  position: absolute;
   background-color: #FFFFFF;
-  width: 135px;
+  position: absolute;
+  left: -1px;
+  width: 125px;
 }
 
 .time-picker-wrapper[hidden-dropdown] .time-dropdown {
@@ -69,8 +70,8 @@
   color: black;
   font-height: 14px;
   text-align: center;
-  height: 30px;
-  padding-top: 10px;
+  height: 26px;
+  padding-top: 6px;
 }
 
 .time-picker-wrapper .time-picker-option:hover {
