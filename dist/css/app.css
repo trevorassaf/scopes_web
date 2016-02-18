@@ -33,7 +33,7 @@
   color: #424242;
 }
 
-#center-inner-panel .center-page[hidden-page] {
+#center-panel-page-container .center-page[hidden-page] {
   display: none;
 } 
 

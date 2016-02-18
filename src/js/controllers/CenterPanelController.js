@@ -62,7 +62,7 @@ var CenterPanelController = (function() {
         'Illegal state: current page (id=' + currentPage.id + ') should not have the HIDDEN_LABEL_ATTRIBUTE'
       );
 
-      currentPage.removeAttribute(HIDDEN_PAGE_ATTRIBUTE);
+      currentPage.setAttribute(HIDDEN_PAGE_ATTRIBUTE, '');
     }
 
     // Display page indicated by 'next_page_info'
