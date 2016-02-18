@@ -143,11 +143,10 @@ function Calendar(
     node: null
   };
 
-  // Selected display date
-  // var selectedDowLabelNodeInfo = {
-  //   className: 'selected-dow-label',
-  //   node: null
-  // };
+  var calendarWrapperNodeInfo = {
+    className: 'calendar-wrapper',
+    node: null
+  };
 
   var selectedMonthLabelNodeInfo = {
     className: 'selected-month-label',
@@ -217,9 +216,10 @@ function Calendar(
    */
   function initInternalCalendarNodes() {
     // Bind all nodes and init their event listeners
+    fetchClassBoundDomNode(calendarWrapperNodeInfo);
+
     // Selected display date nodes
     fetchClassBoundDomNode(selectedYearLabelNodeInfo);
-    // fetchClassBoundDomNode(selectedDowLabelNodeInfo);
     fetchClassBoundDomNode(selectedDomLabelNodeInfo);
     fetchClassBoundDomNode(selectedMonthLabelNodeInfo);
 
@@ -328,13 +328,13 @@ function Calendar(
   function hideCalendar() {
     isVisible = false;  
     calendarMainContainerNodeInfo.node.setAttribute(HIDDEN_ATTR, ''); 
-    selectedDateDisplayContainer.node.setAttribute(CLOSED_ATTR, '');
+    calendarWrapperNodeInfo.node.setAttribute(CLOSED_ATTR, '');
   };
 
   function showCalendar() {
     isVisible = true; 
     calendarMainContainerNodeInfo.node.removeAttribute(HIDDEN_ATTR); 
-    selectedDateDisplayContainer.node.removeAttribute(CLOSED_ATTR);
+    calendarWrapperNodeInfo.node.removeAttribute(CLOSED_ATTR);
   };
 
   /**

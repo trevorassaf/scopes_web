@@ -1,0 +1,81 @@
+.short-code-picker-wrapper {
+  cursor: pointer;
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  display: inline-block;
+  width: 152px;
+}
+
+.short-code-picker-wrapper:not([hidden-dropdown]) {
+  z-index: 1000;
+}
+
+.short-code-picker-wrapper:not([hidden-dropdown]) .input-field-wrapper {
+  box-shadow: 0px 0px 2px 2px rgba(38, 108, 177, 0.5);
+}
+
+.short-code-picker-wrapper .input-field-wrapper {
+  overflow: auto;
+}
+
+.short-code-picker-wrapper .input-field-wrapper > div {
+  display: inline-block; 
+}
+
+.short-code-picker-wrapper .input-field {
+  font-size: 18px;
+  text-align: center;
+  position: relative;
+  top: 8px;
+  left: 10px;
+}
+
+.short-code-picker-wrapper .input-field-wrapper:hover {
+  box-shadow: 0px 0px 2px 2px rgba(38, 108, 177, 0.5);
+}
+
+.short-code-picker-wrapper .icon-wrapper {
+  background-color: rgb(38, 108, 177);
+  border-radius: 25%;
+  padding: 3px;
+  float: right;
+}
+
+.short-code-picker-wrapper .icon-wrapper iron-icon {
+  color: #FFFFFF;
+  height: 32px;
+  width: 32px;
+}
+
+.short-code-picker-wrapper .short-code-dropdown-wrapper {
+  position: absolute;
+}
+
+.short-code-picker-wrapper .short-code-dropdown {
+  border-bottom: 1px solid rgb(228, 228, 228);
+  border-right: 1px solid rgb(228, 228, 228);
+  border-left: 1px solid rgb(228, 228, 228);
+  max-height: 250px;
+  overflow-y: auto;
+  margin-top: 2px;
+  background-color: #FFFFFF;
+  width: 152px;
+}
+
+.short-code-picker-wrapper[hidden-dropdown] .short-code-dropdown {
+  display: none; 
+}
+
+.short-code-picker-wrapper .short-code-picker-option {
+  height: 30px;
+  color: black;
+  font-height: 14px;
+  text-align: center;
+  height: 30px;
+  padding-top: 10px;
+}
+
+.short-code-picker-wrapper .short-code-picker-option:hover {
+  background-color: #EEEEEE;
+}

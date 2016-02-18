@@ -9,14 +9,17 @@ function ShortCodePicker(
    */
   var HIDDEN_ATTR = 'hidden-dropdown';
   var SHADOW_BORDER_ATTR = 'shadow-border';
+  var INPUT_FIELD_WRAPPER_TOOLTIP_ATTR = 'tooltip';
   var OPTION_LOCAL_IDX_ATTR = 'local-idx';
-  var TOOLTIP_ATTR = 'tooltip';
+  var OPTION_TOOLTIP_ATTR = 'tooltip';
+  var OPTION_SELECTED_ATTR = 'selected-option';
 
   /**
    * Html class names
    */
   var SHORT_CODE_LABEL_CLASS = 'short-code-label';
   var SHORT_CODE_PICKER_OPTION_CLASS = 'short-code-option';
+  var SHORT_CODE_PICKER_OPTION_CLASS = 'short-code-picker-option';
 
   /**
    * Html template id names
@@ -30,7 +33,7 @@ function ShortCodePicker(
   var templateStore = template_store;
   var shortCodes = short_codes;
   var isDropDownOpen = false;
-  var selectedOption = null;
+  var selectedOptionIndex = null;
 
   /**
    * Dom nodes
@@ -42,6 +45,11 @@ function ShortCodePicker(
 
   var shortCodePickerWrapperNode = {
     class: 'short-code-picker-wrapper',
+    node: null
+  };
+  
+  var inputFieldLabelNode = {
+    class: 'input-field-label',
     node: null
   };
 
@@ -94,11 +102,35 @@ function ShortCodePicker(
 
   /**
    * initOptionNode()
-   * - initialize option node, e.g. add event listeners, bind data
+   * - clone new option node
+   * - bind data and event listeners
+   * - insert into drop-down
    * @param Object option: option struct provided in constructor
    */
   var initOptionNode = function(option) {
-  
+    // Clone new option node from template
+    var short_code_picker_option_template = templateStore.import.querySelector(OPTION_TEMPLATE_ID);  
+    var short_code_picker_option_clone = document.importNode(short_code_picker_option_template.content, true);
+
+    // Add to drop-down (activates node so that we can now bind data/event listeners)
+    dropDownNode.node.appendChild(short_code_picker_option_clone); 
+
+    // Bind data
+    var short_code_picker_option_list = dropDownNode.node.getElementsByClassName(SHORT_CODE_PICKER_OPTION_CLASS);
+    console.assert(short_code_picker_option_list.length > 0);
+    var option_local_idx = short_code_picker_option_list.length - 1; 
+    var short_code_picker_option = short_code_picker_option_list[option_local_idx];
+
+    // Local index (index of short-code in local array of short-code objects)
+    short_code_picker_option.setAttribute(OPTION_LOCAL_IDX_ATTR, option_local_idx);
+   
+    // Tooltip (actual short code number, not just name)
+    short_code_picker_option.setAttribute(OPTION_TOOLTIP_ATTR, option.code);
+   
+    // Short code name (name given by user, not just number)
+    var short_code_label_node_list = short_code_picker_option.getElementsByClassName(SHORT_CODE_LABEL_CLASS);
+    console.assert(short_code_label_node_list.length == 1);
+    short_code_label_node_list[0].innerHTML = option.name;
   };
 
   /**
@@ -129,6 +161,7 @@ function ShortCodePicker(
     bindInternalNode(shortCodePickerWrapperNode);
     
     // Bind input field and configure event listener
+    bindInternalNode(inputFieldLabelNode);
     bindInternalNode(inputFieldNode);
     bindInternalNode(inputFieldWrapperNode);
 
@@ -148,7 +181,7 @@ function ShortCodePicker(
         closeDropDown();
       } 
 
-      // Capture selected time
+      // Capture selected short-code 
       for (var i in event.path) {
         var node = event.path[i];
         if (hasClass(SHORT_CODE_PICKER_OPTION_CLASS, node.className)) {
@@ -158,14 +191,12 @@ function ShortCodePicker(
 
           var local_idx = parseInt(local_idx_str);
           console.assert(local_idx != null);
-          console.assert(shortCodes.length > local_idx);
 
           // Deselect previously selected option
-          unselectOption(selectedOption);
+          unselectOptionByIndex(selectedOptionIndex);
 
           // Select clicked option
-          selectedOption = shortCodes[local_idx];
-          selectOption(selectedOption);
+          selectOptionByIndex(local_idx);
 
           return;
         }
@@ -185,6 +216,11 @@ function ShortCodePicker(
       // User clicked off the time-picker, so hide it!
       closeDropDown();
     });
+    
+    // Generate option nodes and insert into parent
+    for (var i = 0; i < shortCodes.length; ++i) {
+      initOptionNode(shortCodes[i]);
+    }
   }
   
   /**
@@ -199,15 +235,8 @@ function ShortCodePicker(
       closeDropDown();
     }
 
-    // Generate option nodes and insert into parent
-    for (var i = 0; i < shortCodes; ++i) {
-      var option_node = initOptionNode(shortCodes[i]);
-      dropDownNode.node.appendChild(option_node);  
-    }
-
     // Initialize starting short code 
-    var first_option = shortCodes[0];
-    selectOption(first_option);
+    selectOptionByIndex(0);
   };
 
   /**
@@ -216,7 +245,24 @@ function ShortCodePicker(
    * @param uint option_index: index of the option that is selected
    */
   var selectOptionByIndex = function(option_index) {
-    console.assert(option != null);    
+    console.assert(selectedOptionIndex == null);
+    console.assert(option_index < shortCodes.length);
+
+    // Bind attributes
+    var option = shortCodes[option_index];
+
+    var option_dom_node_list = dropDownNode.node.getElementsByClassName(SHORT_CODE_PICKER_OPTION_CLASS);
+    console.assert(option_dom_node_list.length == shortCodes.length);
+
+    var option_node = option_dom_node_list[option_index];
+    option_node.setAttribute(OPTION_SELECTED_ATTR, '');
+    
+    inputFieldWrapperNode.node.setAttribute(INPUT_FIELD_WRAPPER_TOOLTIP_ATTR, option.code);
+
+    // Update main display
+    inputFieldLabelNode.node.innerHTML = option.name; 
+
+    selectedOptionIndex = option_index;
   };
 
   /**
@@ -224,10 +270,25 @@ function ShortCodePicker(
    * - unselect the specified short-code option
    * @param uint option_index: index of the option that is to be unselected
    */
-  var unselectOption = function(option_index) {
-    console.assert(option != null);    
-   
+  var unselectOptionByIndex = function(option_index) {
+    console.assert(selectedOptionIndex != null);
+    console.assert(option_index < shortCodes.length);
 
+    // Unbind attributes
+    var option = shortCodes[option_index];
+
+    var option_dom_node_list = dropDownNode.node.getElementsByClassName(SHORT_CODE_PICKER_OPTION_CLASS);
+    console.assert(option_dom_node_list.length == shortCodes.length);
+
+    var option_node = option_dom_node_list[option_index];
+    option_node.removeAttribute(OPTION_SELECTED_ATTR);
+
+    inputFieldWrapperNode.node.removeAttribute(INPUT_FIELD_WRAPPER_TOOLTIP_ATTR);
+
+    // Update main display
+    inputFieldLabelNode.node.innerHTML = '';
+
+    selectedOptionIndex = null;
   };
 
   // Privileged functions

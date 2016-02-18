@@ -11,7 +11,12 @@
   height: 34px;
 }
 
-.calendar-wrapper .selected-date-display-container:not([closed]) {
+.calendar-wrapper:not([closed]) {
+  position: relative;
+  top: -16px;
+}
+
+.calendar-wrapper:not([closed]) .selected-date-display-container {
   background-color: rgb(38, 108, 177);
   color: #FFFFFF;
   height: 34px;
@@ -22,50 +27,49 @@
   width: 226px;
 }
 
-.calendar-wrapper .selected-date-display-container:not([closed]) .icon-wrapper {
+.calendar-wrapper:not([closed]) .selected-date-display-container .icon-wrapper {
   display: none;
 }
 
-.calendar-wrapper .selected-date-display-container[closed]{
+.calendar-wrapper[closed] .selected-date-display-container {
   position: relative;
   cursor: pointer;
-}
-
-.calendar-wrapper .selected-date-display-container[closed]{
+  overflow: auto;
+  width: 166px;
   display: inline-block;
 }
 
-.calendar-wrapper .selected-date-display-container[closed] .selected-date-container {
+.calendar-wrapper[closed] .selected-date-display-container .selected-date-container {
   padding-left: 8px;
+  position: relative;
+  top: 8px;
 }
 
 /* Transition to a bigger shadow on hover */
-.calendar-wrapper .selected-date-display-container[closed]:hover {
+.calendar-wrapper[closed] .selected-date-display-container:hover {
   box-shadow: 0px 0px 2px 2px rgba(38, 108, 177, 0.5);
 }
 
-.calendar-wrapper .selected-date-display-container[closed] div {
+.calendar-wrapper[closed] .selected-date-display-container div {
   display: inline-block;
 }
 
 .calendar-wrapper .icon-wrapper {
-  margin-left: 6px;
   background-color: rgb(38, 108, 177);
-  padding: 5px;
+  padding: 3px;
   border-radius: 25%;
+  float: right;
 }
 
 .calendar-wrapper .icon-wrapper iron-icon {
   color: #FFFFFF;
+  height: 32px;
+  width: 32px;
 }
 
 .calendar-wrapper .selected-date-container {
   position: relative;
   top: 4px;
-}
-
-.calendar-wrapper .selected-date-display-container[closed] .selected-date-container {
-  top: 2px;
 }
 
 .calendar-wrapper .selected-dow-label {

@@ -66,11 +66,10 @@ paper-slider {
   display: none;
 }
 
-#exp-date-input-field-container {
-  padding-left: 40px;
-  position: relative;
+#exp-time-input-field-container > div {
+  display: inline-block; 
 }
 
-#exp-time-input-container .input-container {
-  display: inline-block; 
+#exp-date-calendar {
+  margin-left: 30px;
 }

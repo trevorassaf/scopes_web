@@ -47,12 +47,12 @@ window.onload = function() {
    */
   var short_codes = [
     {
-      code: '0xDEADBEEF',
-      name: 'Dead Beef'
+      code: '0xabcd',
+      name: 'ShortCode1'
     },
     {
-      code: '0xBEEEED',
-      name: 'Penis'
+      code: '0xefgh',
+      name: 'ShortCode2'
     }
   ];
   var short_code_picker = new ShortCodePicker(
