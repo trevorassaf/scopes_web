@@ -20,3 +20,6 @@
 [Sun Feb 14 06:53:03.928116 2016] [core:error] [pid 31572:tid 140448512014080] [client 169.229.3.91:44609] AH00126: Invalid URI in request \x1d\xc1\xa1\xd7\xe2>^(\x82C\xaf;\x8b\x81F\xfe\x07wY\x07\xde\vL\xea\xa2\x17It;\x83l\xd4\xea\xd6\xd6\xfa($\x80&\xb04\x88\xfd\x05\xf9w`\xef\xd38\xa4T\x01\xee\x91
 [Sun Feb 14 21:24:19.215900 2016] [core:error] [pid 31572:tid 140448503621376] [client 193.189.117.177:57592] AH00126: Invalid URI in request GET HTTP/1.1 HTTP/1.1
 [Tue Feb 16 04:39:52.122490 2016] [core:error] [pid 31571:tid 140448374974208] [client 46.183.221.142:51104] AH00126: Invalid URI in request GET HTTP/1.1 HTTP/1.1
+[Sat Feb 20 09:54:49.050547 2016] [core:error] [pid 31572:tid 140448358188800] [client 169.229.3.91:51691] AH00135: Invalid method in request \xa0\xbf\xfd\x8d_@\x02r\x7f\xfb\x1bAok;\xf4\xff\xb2-\x06'\xbd\xebv\x85)\xcdHk\x94\xbd\xb8%/\x19\x12F\xae\xdc
+[Thu Feb 25 09:29:38.494656 2016] [core:error] [pid 12011:tid 140448358188800] [client 169.229.3.91:53039] AH00135: Invalid method in request \xfc\xb8E\xe5\xe7\xbenE\xe2\x9e\x9e\xfd\x03G\xba\x1a\x8d\xb1\x1b\x07
+[Mon Feb 29 06:51:29.141953 2016] [core:error] [pid 9920:tid 140448374974208] [client 169.229.3.91:60003] AH00135: Invalid method in request I\x8f
