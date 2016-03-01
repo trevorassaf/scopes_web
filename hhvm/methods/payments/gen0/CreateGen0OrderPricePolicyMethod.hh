@@ -7,7 +7,12 @@ class CreateGen0OrderPricePolicyMethod {
     private TimestampBuilder $timestampBuilder
   ) {}
 
-  public function createOrderPricePolicy(
+  public function createOrderPricePolicy(UnsignedFloat $price): Gen0OrderPricePolicy {
+    $current_time = $this->timestampBuilder->now();
+    return $this->createOrderPricePolicyWithTime($current_time, $price);
+  }
+
+  public function createOrderPricePolicyWithTime(
     Timestamp $time_enacted,
     UnsignedFloat $price
   ): Gen0OrderPricePolicy {
