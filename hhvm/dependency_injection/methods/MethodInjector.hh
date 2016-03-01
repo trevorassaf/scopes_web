@@ -79,6 +79,10 @@ class MethodInjector {
   private ?CompleteOrderMethod $completeOrderMethod;
   private ?GetUsersCompletedOrdersMethod $getUsersCompletedOrdersMethod;
 
+  // Gen0 Order Price Policy
+  private ?CreateGen0OrderPricePolicyMethod $createGen0OrderPricePolicyMethod; 
+  private ?GetGen0OrderPricePolicyByTimeMethod $getGen0OrderPricePolicyByTimeMethod;
+
   public function __construct(
     private QueryInjector $queryInjector,
     private LazyLoader<UsersTable> $usersTableLoader,
@@ -621,5 +625,24 @@ class MethodInjector {
       $this->deleteFileMethod = new DeleteFileMethod(); 
     }
     return $this->deleteFileMethod;
+  }
+
+  public function getCreateGen0OrderPricePolicyMethod(): CreateGen0OrderPricePolicyMethod {
+    if ($this->createGen0OrderPricePolicyMethod === null) {
+      $this->createGen0OrderPricePolicyMethod = new CreateGen0OrderPricePolicyMethod(
+        $this->queryInjector->getConcreteInsertGen0OrderPricePolicyQuery(),
+        $this->timestampBuilderLoader->load()
+      ); 
+    }
+    return $this->createGen0OrderPricePolicyMethod;
+  }
+
+  public function getGetGen0OrderPricePolicyMethod(): GetGen0OrderPricePolicyByTimeMethod {
+    if ($this->getGen0OrderPricePolicyByTimeMethod === null) {
+      $this->getGen0OrderPricePolicyByTimeMethod = new GetGen0OrderPricePolicyByTimeMethod(
+        $this->queryInjector->getFetchGen0OrderPricePolicyByTimeQuery()
+      );
+    }
+    return $this->getGen0OrderPricePolicyByTimeMethod;
   }
 }

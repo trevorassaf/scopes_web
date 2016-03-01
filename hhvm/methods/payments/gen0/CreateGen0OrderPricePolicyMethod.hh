@@ -4,7 +4,6 @@ class CreateGen0OrderPricePolicyMethod {
 
   public function __construct(
     private InsertGen0OrderPricePolicyQuery $insertQuery,
-    private Gen0OrderPricePoliciesTable $table,
     private TimestampBuilder $timestampBuilder
   ) {}
 
