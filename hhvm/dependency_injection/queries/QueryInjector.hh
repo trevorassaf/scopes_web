@@ -168,6 +168,12 @@ class QueryInjector {
   private ?InsertQuery<CompletedOrder> $insertCompletedOrderQuery;
   private ?InsertCompletedOrderQuery $concreteInsertCompletedOrderQuery;
 
+  // Price policies (gen0)
+  private ?FetchQuery<Gen0OrderPricePolicy> $fetchGen0OrderPricePolicy;
+  private ?FetchGen0OrderPricePolicyByTimeQuery $fetchGen0OrderPricePolicyByTimeQuery;
+  private ?InsertQuery<Gen0OrderPricePolicy> $insertGen0OrderPricePolicyQuery;
+  private ?InsertGen0OrderPricePolicyQuery $concreteInsertGen0OrderPricePolicyQuery;
+
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
@@ -229,7 +235,9 @@ class QueryInjector {
     private LazyLoader<ReservedOrderScopeMappingsTable> $reservedOrderScopeMappingsTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<ReservedOrderScopeMapping>> $reservedOrderScopeMappingModelFactoryLazyLoader,
     private LazyLoader<ConfirmedOrderScopeMappingsTable> $confirmedOrderScopeMappingsTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<ConfirmedOrderScopeMapping>> $confirmedOrderScopeMappingModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<ConfirmedOrderScopeMapping>> $confirmedOrderScopeMappingModelFactoryLazyLoader,
+    private LazyLoader<Gen0OrderPricePoliciesTable> $gen0OrderPricePoliciesTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<Gen0OrderPricePolicy>> $gen0OrderPricePolicyModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -1690,6 +1698,52 @@ class QueryInjector {
       ); 
     }
     return $this->concreteInsertConfirmedOrderScopeMappingsQuery; 
+  }
+
+  public function getFetchGen0OrderPricePolicyQuery(): FetchQuery<Gen0OrderPricePolicy> {
+    if ($this->fetchGen0OrderPricePolicy === null) {
+      $this->fetchGen0OrderPricePolicy = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->gen0OrderPricePolicyModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->fetchGen0OrderPricePolicy;
+  }
+
+  public function getFetchGen0OrderPricePolicyByTimeQuery(): FetchGen0OrderPricePolicyByTimeQuery {
+    if ($this->fetchGen0OrderPricePolicyByTimeQuery === null) {
+      $this->fetchGen0OrderPricePolicyByTimeQuery = new FetchGen0OrderPricePolicyByTimeQuery(
+        $this->getFetchGen0OrderPricePolicyQuery(),
+        $this->gen0OrderPricePoliciesTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
+      ); 
+    }
+    return $this->fetchGen0OrderPricePolicyByTimeQuery;
+  }
+
+  public function getInsertGen0OrderPricePolicyQuery(): InsertQuery<Gen0OrderPricePolicy> {
+    if ($this->insertGen0OrderPricePolicyQuery === null) {
+      $this->insertGen0OrderPricePolicyQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->gen0OrderPricePoliciesTableLazyLoader->load(),
+        $this->gen0OrderPricePolicyModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertGen0OrderPricePolicyQuery;
+  }
+
+  public function getConcreteInsertGen0OrderPricePolicyQuery(): InsertGen0OrderPricePolicyQuery {
+    if ($this->concreteInsertGen0OrderPricePolicyQuery === null) {
+      $this->concreteInsertGen0OrderPricePolicyQuery = new InsertGen0OrderPricePolicyQuery(
+        $this->getInsertGen0OrderPricePolicyQuery(),
+        $this->gen0OrderPricePoliciesTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load()
+      ); 
+    }
+    return $this->concreteInsertGen0OrderPricePolicyQuery;
   }
 
   public function getCompositeVideosTable(): CompositeVideoTable {
