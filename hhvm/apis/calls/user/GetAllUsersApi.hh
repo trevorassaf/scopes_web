@@ -18,7 +18,7 @@ class GetAllUsersApi extends Api<GetAllUsersApiRequest> {
     GetAllUsersApiRequest $request_object
   ): ApiResult {
 
-    // Log get all users method call
+    // Log get all users api call
     $this->logger->info("Get all users api called...");
 
     // Execute get all users method
