@@ -8,6 +8,9 @@ source create_tables/users/user_user_privilege_edges.sql
 source create_tables/short_codes/short_codes.sql
 source create_tables/short_codes/short_code_validation_checks.sql
 
+-- Order Payment Policies
+source create_tables/payments/gen0/gen0_order_price_policies.sql
+
 -- Reserved orders
 source create_tables/orders/rsvd_order_policy.sql
 source create_tables/orders/rsvd_orders.sql

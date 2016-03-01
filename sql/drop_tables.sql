@@ -39,6 +39,9 @@ drop table ReservedOrderScopeMappings;
 drop table RsvdOrders;
 drop table ReservedOrderPolicy;
 
+-- Order Payment Policies
+drop table Gen0OrderPricePolicies;
+
 -- Short Codes
 drop table ShortCodeValidationChecks;
 drop table ShortCodes;

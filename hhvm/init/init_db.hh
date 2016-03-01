@@ -38,6 +38,7 @@ function initDbMain($argv, $argc): void {
   $method_injector = $production_method_injector_factory->get();
 
   // Init policies
+  initGen0OrderPricePolicy($method_injector);
   initRsvdOrderPolicy($method_injector);
   initVideoUploadPolicy($method_injector, $project_root_dir);
   initVideoMimeTypes($method_injector);
@@ -156,6 +157,12 @@ function initUsers(MethodInjector $method_injector): void {
       UserPrivilegeType::TECHNICIAN
     }
   );
+}
+
+function initGen0OrderPricePolicy(MethodInjector $method_injector): void {
+  $create_order_price_policy_method = $method_injector->getCreateGen0OrderPricePolicyMethod(); 
+  $price = new UnsignedFloat(27.50); 
+  $create_order_price_policy_method->createOrderPricePolicy($price);
 }
 
 initDbMain($argv, $argc);
