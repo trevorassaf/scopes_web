@@ -1,6 +1,32 @@
 window.onload = function() {
 
   /**
+   * Test GetAllUsersApi
+   */
+  var get_all_users_api = new GetAllUsersApi(ScopesNetwork);
+  console.log(get_all_users_api);
+  get_all_users_api.setSuccessfulCallback(function(response) {
+    console.log(response);
+  });
+  get_all_users_api.setFailedCallback(function(response) {
+    console.log(response);
+  });
+  get_all_users_api.send();
+
+  /**
+   * Test GetOrderPricePolicyApi
+   */
+  var get_order_price_policy_api = new GetOrderPricePolicyApi(ScopesNetwork);
+  console.log(get_order_price_policy_api);
+  get_order_price_policy_api.setSuccessfulCallback(function(response) {
+    console.log(response);
+  });
+  get_order_price_policy_api.setFailedCallback(function(response) {
+    console.log(response);
+  });
+  get_order_price_policy_api.send();
+
+  /**
    * Capture import node for html templates
    */
   var template_store = document.querySelector('#template-import');
@@ -570,6 +596,162 @@ var Utils = (function() {
     hasClass: hasClass
   };
 })();
+
+/**
+ * ScopesApi
+ * - base class for all api calls.
+ * @req: all child classes assign 'this.apiType' to corresponding api-type value
+ *       in constructor.
+ * @req: all child classes assign 'network_module' to 'this.networkModule'
+ *       in constructor
+ */
+
+function ScopesApi(network_module) {
+  this.networkModule = network_module;
+  this.data = {};
+  this.isAsync = true;
+  this.successfulCallback = function() {};
+  this.failedCallback = function() {};
+  this.uploadedFile = null;
+}
+
+ScopesApi.prototype.setIsAsync = function(is_async) {
+  this.isAsync = is_async;
+  return this;
+}
+
+ScopesApi.prototype.setSuccessfulCallback = function(callback) {
+  this.successfulCallback = callback;
+  return this;
+}
+
+ScopesApi.prototype.setFailedCallback = function(callback) {
+  this.failedCallback = callback;
+  return this;
+}
+
+ScopesApi.prototype.setFile = function(file) {
+  this.uploadedFile = file;
+  return this;
+}
+
+ScopesApi.prototype.send = function() {
+  return this.networkModule.request(
+    this.apiType,
+    this.data,
+    this.isAsync,
+    this.successfulCallback,
+    this.failedCallback,
+    this.uploadedFile
+  );    
+}
+
+var ScopesNetwork = (function() {
+  
+  var ENDPOINT_PATH = "hhvm/endpoints/endpoint.hh";
+
+  var API_TYPE_KEY = "api_type";
+
+  var PAYLOAD_KEY = "payload";
+
+  var VIDEO_UPLOAD_KEY = "video";
+
+  var HTTP_REQUEST_TYPE = "POST";
+
+  var CONTENT_TYPE_KEY = "Content-Type";
+
+  var WWW_FORM_URLENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
+
+  var PARAMETER_ASSIGNMENT_TOKEN = "=";
+
+  var PARAMETER_SEPARATOR_TOKEN = "&";
+
+  return {
+    /**
+     * request()
+     * @param int api_type: index of specified api 
+     * @param array<string, mixed> payload_fields: payload parameters
+     * @param bool is_async: is request synchronous
+     * @param function(XMLHttpRequest xhttp) successful_callback: callback function for when request finishes successfully
+     * @param function(XMLHttpRequest xhttp) failed_callback: callback function for when request finishes with failure
+     * @param File upload_file: optional file upload parameter
+     */
+    request: function(
+     api_type,
+     payload_fields,
+     is_async,
+     successful_callback,
+     failed_callback,
+     upload_file
+   ) {
+      var xhttp = new XMLHttpRequest(); 
+      
+      // Bind callbacks
+      if (is_async) {
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4) {
+            if (xhttp.status == 200) {
+              successful_callback(xhttp); 
+            } else {
+              failed_callback(xhttp);
+            }
+          }
+        };
+      }
+
+      // Bind http destination and request type
+      xhttp.open(
+        HTTP_REQUEST_TYPE,
+        ENDPOINT_PATH,
+        is_async
+      );
+
+      console.log(ENDPOINT_PATH);
+
+      // Assemble payload
+      var serialized_payload = JSON.stringify(payload_fields);
+
+      var form_data = new FormData();
+      
+      if (upload_file != null) {
+        form_data.append(VIDEO_UPLOAD_KEY, upload_file);
+        console.log(VIDEO_UPLOAD_KEY);
+        console.log(upload_file);
+      }
+
+      form_data.append(API_TYPE_KEY, api_type);
+      form_data.append(PAYLOAD_KEY, serialized_payload);
+
+console.log(API_TYPE_KEY);
+console.log(api_type);
+console.log(PAYLOAD_KEY);
+console.log(serialized_payload);
+
+      // Execute request 
+      xhttp.send(form_data);
+
+      if (!is_async) {
+        return xhttp.responseText;
+      }
+    }  
+  }
+}());
+
+GetAllUsersApi.prototype = new ScopesApi();
+GetAllUsersApi.prototype.constructor = GetAllUsersApi;
+
+function GetAllUsersApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0xD;
+}
+
+GetOrderPricePolicyApi.prototype = new ScopesApi();
+GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
+
+function GetOrderPricePolicyApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x14;
+}
 
 function Calendar(
   template_store,
