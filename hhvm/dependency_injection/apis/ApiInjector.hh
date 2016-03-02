@@ -37,6 +37,9 @@ class ApiInjector {
   // Session apis
   private ?GetSessionInfoApi $getSessionInfoApi;
 
+  // Order price policy
+  private ?GetOrderPricePolicyApi $getOrderPricePolicyApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private Logger $logger,
@@ -62,7 +65,8 @@ class ApiInjector {
     private LazyLoader<RequestFactory<UploadBasicVideoApiRequest>> $uploadBasicVideoApiRequestFactoryLoader,
     private LazyLoader<RequestFactory<MarkBasicVideoDownloadedApiRequest>> $markBasicVideoDownloadedApiRequestLoader,
     private LazyLoader<RequestFactory<DeleteBasicVideoApiRequest>> $deleteBasicVideoApiRequestLoader,
-    private LazyLoader<RequestFactory<GetSessionInfoApiRequest>> $getSessionInfoApiRequestFactoryLoader
+    private LazyLoader<RequestFactory<GetSessionInfoApiRequest>> $getSessionInfoApiRequestFactoryLoader,
+    private LazyLoader<RequestFactory<GetOrderPricePolicyApiRequest>> $getOrderPricePolicyApiRequestFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -280,6 +284,18 @@ class ApiInjector {
       );
     } 
     return $this->getSessionInfoApi;
+  }
+
+  public function getGetOrderPricePolicyApi(): GetOrderPricePolicyApi {
+    if ($this->getOrderPricePolicyApi === null) {
+      $this->getOrderPricePolicyApi = new GetOrderPricePolicyApi(
+        $this->getOrderPricePolicyApiRequestFactoryLoader->load(),
+        $this->methodInjector->getGetGen0OrderPricePolicyMethod(),
+        $this->logger,
+        $this->timestampBuilderLoader->load()
+      ); 
+    }
+    return $this->getOrderPricePolicyApi;
   }
 
   public function getMethodInjector(): MethodInjector {
