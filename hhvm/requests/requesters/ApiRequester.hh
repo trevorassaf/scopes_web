@@ -2,7 +2,7 @@
 
 class ApiRequester {
 
-  const string URL = "www.organicdump.com/scopes_web/hhvm/endpoints/endpoint.hh";
+  const string URL = "www.mvscorefacility.com/hhvm/endpoints/endpoint.hh";
   
   public function executeRequest(
     ApiType $type,
