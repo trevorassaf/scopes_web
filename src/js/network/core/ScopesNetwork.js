@@ -33,7 +33,9 @@ var ScopesNetwork = (function() {
      payload_fields,
      is_async,
      successful_callback,
+     deserialize_successful_response,
      failed_callback,
+     deserialize_failed_response,
      upload_file
    ) {
       var xhttp = new XMLHttpRequest(); 
@@ -73,11 +75,6 @@ var ScopesNetwork = (function() {
 
       form_data.append(API_TYPE_KEY, api_type);
       form_data.append(PAYLOAD_KEY, serialized_payload);
-
-console.log(API_TYPE_KEY);
-console.log(api_type);
-console.log(PAYLOAD_KEY);
-console.log(serialized_payload);
 
       // Execute request 
       xhttp.send(form_data);

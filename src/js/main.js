@@ -1,6 +1,18 @@
 window.onload = function() {
 
   /**
+   * Test get startup data network module
+   */
+  var get_startup_data_api = new GetStartupDataApi(ScopesNetwork);
+  get_startup_data_api.setSuccessfulCallback(function(response) {
+    console.log(response); 
+  });
+  get_startup_data_api.setFailedCallback(function(response) {
+    console.log(response); 
+  });
+  get_startup_data_api.send();
+
+  /**
    * Capture import node for html templates
    */
   var template_store = document.querySelector('#template-import');

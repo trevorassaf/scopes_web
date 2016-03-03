@@ -1,30 +1,16 @@
 window.onload = function() {
 
   /**
-   * Test GetAllUsersApi
+   * Test get startup data network module
    */
-  var get_all_users_api = new GetAllUsersApi(ScopesNetwork);
-  console.log(get_all_users_api);
-  get_all_users_api.setSuccessfulCallback(function(response) {
-    console.log(response);
+  var get_startup_data_api = new GetStartupDataApi(ScopesNetwork);
+  get_startup_data_api.setSuccessfulCallback(function(response) {
+    console.log(response); 
   });
-  get_all_users_api.setFailedCallback(function(response) {
-    console.log(response);
+  get_startup_data_api.setFailedCallback(function(response) {
+    console.log(response); 
   });
-  get_all_users_api.send();
-
-  /**
-   * Test GetOrderPricePolicyApi
-   */
-  var get_order_price_policy_api = new GetOrderPricePolicyApi(ScopesNetwork);
-  console.log(get_order_price_policy_api);
-  get_order_price_policy_api.setSuccessfulCallback(function(response) {
-    console.log(response);
-  });
-  get_order_price_policy_api.setFailedCallback(function(response) {
-    console.log(response);
-  });
-  get_order_price_policy_api.send();
+  get_startup_data_api.send();
 
   /**
    * Capture import node for html templates
@@ -597,6 +583,30 @@ var Utils = (function() {
   };
 })();
 
+GetAllUsersApi.prototype = new ScopesApi();
+GetAllUsersApi.prototype.constructor = GetAllUsersApi;
+
+function GetAllUsersApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0xD;
+}
+
+GetOrderPricePolicyApi.prototype = new ScopesApi();
+GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
+
+function GetOrderPricePolicyApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x14;
+}
+
+GetStartupDataApi.prototype = new ScopesApi();
+GetStartupDataApi.prototype.constructor = GetStartupDataApi;
+
+function GetStartupDataApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x15;
+}
+
 /**
  * ScopesApi
  * - base class for all api calls.
@@ -736,22 +746,6 @@ console.log(serialized_payload);
     }  
   }
 }());
-
-GetAllUsersApi.prototype = new ScopesApi();
-GetAllUsersApi.prototype.constructor = GetAllUsersApi;
-
-function GetAllUsersApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0xD;
-}
-
-GetOrderPricePolicyApi.prototype = new ScopesApi();
-GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
-
-function GetOrderPricePolicyApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0x14;
-}
 
 function Calendar(
   template_store,

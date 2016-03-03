@@ -12,7 +12,13 @@ function ScopesApi(network_module) {
   this.data = {};
   this.isAsync = true;
   this.successfulCallback = function() {};
+  this.deserializeSuccessfulResponse = function(xhttp_response) {
+    return xhttp_response;
+  };
   this.failedCallback = function() {};
+  this.deserializeFailedResponse = function(xhttp_response) {
+    return xhttp_response;
+  };
   this.uploadedFile = null;
 }
 
@@ -42,7 +48,9 @@ ScopesApi.prototype.send = function() {
     this.data,
     this.isAsync,
     this.successfulCallback,
+    this.deserializeSuccessfulResponse,
     this.failedCallback,
+    this.deserializeFailedResponse,
     this.uploadedFile
   );    
 }
