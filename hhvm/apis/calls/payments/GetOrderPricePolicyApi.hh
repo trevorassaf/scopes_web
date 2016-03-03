@@ -5,8 +5,7 @@ class GetOrderPricePolicyApi extends Api<GetOrderPricePolicyApiRequest> {
   public function __construct(
     RequestFactory<GetOrderPricePolicyApiRequest> $request_factory,
     private GetGen0OrderPricePolicyByTimeMethod $getOrderPricePolicyMethod,
-    private Logger $logger,
-    private TimestampBuilder $timestampBuilder
+    private Logger $logger
   ) {
     parent::__construct(
       $request_factory,
@@ -23,8 +22,7 @@ class GetOrderPricePolicyApi extends Api<GetOrderPricePolicyApiRequest> {
     $this->logger->info("Get gen0 order payment policy api called..."); 
 
     // Fetch generation 0 order pricing policy
-    $current_time = $this->timestampBuilder->now();
-    $gen0_order_price_policy = $this->getOrderPricePolicyMethod->getOrderPricePolicy($current_time);
+    $gen0_order_price_policy = $this->getOrderPricePolicyMethod->getCurrentOrderPricePolicy();
 
     return new GetOrderPricePolicyApiResult($gen0_order_price_policy->getPrice()); 
   }

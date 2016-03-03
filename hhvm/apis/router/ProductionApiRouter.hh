@@ -80,6 +80,9 @@ class ProductionApiRouter implements ApiRouter {
       case ApiType::GET_ORDER_PRICE_POLICY:
         $api = $this->apiInjector->getGetOrderPricePolicyApi();
         break;
+      case ApiType::GET_STARTUP_DATA:
+        $api = $this->apiInjector->getGetStartupDataApi();
+        break;
       default:
         throw new Exception("Unhandled api type!");
         break;

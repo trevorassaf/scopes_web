@@ -3,10 +3,16 @@
 class GetGen0OrderPricePolicyByTimeMethod {
 
   public function __construct(
-    private FetchGen0OrderPricePolicyByTimeQuery $fetchByTimeQuery
+    private FetchGen0OrderPricePolicyByTimeQuery $fetchByTimeQuery,
+    private TimestampBuilder $timestampBuilder
   ) {}
 
-  public function getOrderPricePolicy(
+  public function getCurrentOrderPricePolicy(): Gen0OrderPricePolicy {
+    $current_time = $this->timestampBuilder->now();
+    return $this->getOrderPricePolicyByTimestamp($current_time);
+  }
+
+  public function getOrderPricePolicyByTimestamp(
     Timestamp $current_time
   ): Gen0OrderPricePolicy {
     try {

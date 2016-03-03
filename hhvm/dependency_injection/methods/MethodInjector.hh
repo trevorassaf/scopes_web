@@ -640,7 +640,8 @@ class MethodInjector {
   public function getGetGen0OrderPricePolicyMethod(): GetGen0OrderPricePolicyByTimeMethod {
     if ($this->getGen0OrderPricePolicyByTimeMethod === null) {
       $this->getGen0OrderPricePolicyByTimeMethod = new GetGen0OrderPricePolicyByTimeMethod(
-        $this->queryInjector->getFetchGen0OrderPricePolicyByTimeQuery()
+        $this->queryInjector->getFetchGen0OrderPricePolicyByTimeQuery(),
+        $this->timestampBuilderLoader->load()
       );
     }
     return $this->getGen0OrderPricePolicyByTimeMethod;

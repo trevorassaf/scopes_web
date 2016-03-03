@@ -79,7 +79,8 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
         new MarkBasicVideoDownloadedApiRequestLazyLoader(),
         new DeleteBasicVideoApiRequestFactoryLazyLoader(),
         new GetSessionInfoApiRequestFactoryLazyLoader(),
-        new GetOrderPricePolicyApiRequestFactoryLazyLoader()
+        new GetOrderPricePolicyApiRequestFactoryLazyLoader(),
+        new GetStartupDataApiRequestFactoryLazyLoader()
       ); 
     }
     return $this->productionApiInjector;  

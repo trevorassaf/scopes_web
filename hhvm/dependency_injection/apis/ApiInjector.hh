@@ -40,6 +40,9 @@ class ApiInjector {
   // Order price policy
   private ?GetOrderPricePolicyApi $getOrderPricePolicyApi;
 
+  // Startup data
+  private ?GetStartupDataApi $getStartupDataApi;
+
   public function __construct(
     private MethodInjector $methodInjector,
     private Logger $logger,
@@ -66,7 +69,8 @@ class ApiInjector {
     private LazyLoader<RequestFactory<MarkBasicVideoDownloadedApiRequest>> $markBasicVideoDownloadedApiRequestLoader,
     private LazyLoader<RequestFactory<DeleteBasicVideoApiRequest>> $deleteBasicVideoApiRequestLoader,
     private LazyLoader<RequestFactory<GetSessionInfoApiRequest>> $getSessionInfoApiRequestFactoryLoader,
-    private LazyLoader<RequestFactory<GetOrderPricePolicyApiRequest>> $getOrderPricePolicyApiRequestFactoryLoader
+    private LazyLoader<RequestFactory<GetOrderPricePolicyApiRequest>> $getOrderPricePolicyApiRequestFactoryLoader,
+    private LazyLoader<RequestFactory<GetStartupDataApiRequest>> $getStartupDataApiRequestFactoryLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -291,11 +295,21 @@ class ApiInjector {
       $this->getOrderPricePolicyApi = new GetOrderPricePolicyApi(
         $this->getOrderPricePolicyApiRequestFactoryLoader->load(),
         $this->methodInjector->getGetGen0OrderPricePolicyMethod(),
-        $this->logger,
-        $this->timestampBuilderLoader->load()
+        $this->logger
       ); 
     }
     return $this->getOrderPricePolicyApi;
+  }
+
+  public function getGetStartupDataApi(): GetStartupDataApi {
+    if ($this->getStartupDataApi === null) {
+      $this->getStartupDataApi = new GetStartupDataApi(
+        $this->getStartupDataApiRequestFactoryLoader->load(),
+        $this->methodInjector->getGetGen0OrderPricePolicyMethod(),
+        $this->logger 
+      );
+    }
+    return $this->getStartupDataApi;
   }
 
   public function getMethodInjector(): MethodInjector {
