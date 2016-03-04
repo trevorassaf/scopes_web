@@ -35,7 +35,8 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
     foreach ($short_code_list as $short_code) {
       $short_code_api_object_list[] = new ShortCodeApiObject(
         $short_code->getId()->getNumber(),
-        $short_code->getCode()
+        $short_code->getCode(),
+        $short_code->getAlias()
       );
     }
 

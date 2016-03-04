@@ -1,22 +1,6 @@
 window.onload = function() {
 
   /**
-   * Test get startup data network module
-   */
-  var get_startup_data_api = new GetStartupDataApi(ScopesNetwork);
-
-  get_startup_data_api.setSuccessfulApiCallback(function(response) {
-    console.log(response);
-  });
-  get_startup_data_api.setLogicalApiFailureCallback(function(response) {
-    console.log(response);
-  });
-  get_startup_data_api.setNonLogicalApiFailureCallback(function(response) {
-    console.log(response);
-  });
-  get_startup_data_api.send();
-
-  /**
    * Capture import node for html templates
    */
   var template_store = document.querySelector('#template-import');
@@ -57,26 +41,21 @@ window.onload = function() {
       0 
   );
   calendar.init();
-
+  
   /**
    * Configure short-code picker element
    */
-  var short_codes = [
-    {
-      code: '0xabcd',
-      name: 'ShortCode1'
-    },
-    {
-      code: '0xefgh',
-      name: 'ShortCode2'
-    }
-  ];
   var short_code_picker = new ShortCodePicker(
     template_store,
-    'existing-short-code-picker',
-    short_codes
+    'existing-short-code-picker'
   );
   short_code_picker.init();
+
+  /**
+   * Fetch startup data and route to proper views 
+   */
+  GetStartupDataApiController.setShortCodePicker(short_code_picker);
+  GetStartupDataApiController.fetch();
 
   /**
    * Configure UI elements

@@ -9,12 +9,14 @@ class InsertShortCodeQuery {
 
   public async function insert(
     UnsignedInt $user_id,
-    string $code 
+    string $code,
+    string $alias
   ): Awaitable<ShortCode> {
     return await $this->insertQuery->insert(
       ImmMap{
         $this->shortCodesTable->getUserIdKey() => $user_id->getNumber(),
         $this->shortCodesTable->getCodeKey() => $code,
+        $this->shortCodesTable->getAliasKey() => $alias,
       }
     );
   }

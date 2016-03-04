@@ -1,25 +1,45 @@
 var GetStartupDataApiController = (function() {
 
-  /**
-   * Cached startup data
-   */
-  var startupData = null;
+  var shortCodePicker = null;
+  var getStartupDataApi = null;
 
   /**
-   * get()
-   * - fetches and caches startup data
+   * fetch()
+   * - fetches startup data
    */
-  this.get = function() {
+  var fetch = function() {
+    // Initialize api and bind event listeners
+    if (getStartupDataApi === null) {
+      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
+
+      // Bind api listeners
+      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
+      getStartupDataApi.setLogicalApiFailureCallback(failedApiCallback);
+      getStartupDataApi.setNonLogicalApiFailureCallback(failedApiCallback);
+    }
+
+    // Fetch startup data from server
+    getStartupDataApi.send();
   };
 
-  /**
-   * populate()
-   * - supplies startup-data to proper ui controller
-   */
-  this.populate = function() {};
+  var setShortCodePicker = function(short_code_picker) {
+    shortCodePicker = short_code_picker;
+    return this;
+  };
+  
+  var successfulApiCallback = function(api_response) {
+    console.assert(shortCodePicker !== null, "Must set short-code-picker");
+    shortCodePicker.setShortCodes(api_response[getStartupDataApi.getShortCodesKey()]);
+  };
+
+  var failedApiCallback = function(api_response) {
+    console.log(api_response); 
+  };
 
   return {
-    get: get,
-    populate: populate
+    fetch: fetch,
+    setShortCodePicker: setShortCodePicker,
+    successfulApiCallback: successfulApiCallback,
+    failedApiCallback: failedApiCallback
   };
 })();

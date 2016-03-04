@@ -1,7 +1,7 @@
 function ShortCodePicker(
   template_store,
   id,
-  short_codes // { code: xxx, name: xxx}
+  short_codes // {id, code, alias}, optional
 ) {
 
   /**
@@ -31,7 +31,7 @@ function ShortCodePicker(
    * Private state
    */
   var templateStore = template_store;
-  var shortCodes = short_codes;
+  var shortCodes = typeof short_codes == 'undefined' ? [] : short_codes;
   var isDropDownOpen = false;
   var selectedOptionIndex = null;
 
@@ -130,7 +130,7 @@ function ShortCodePicker(
     // Short code name (name given by user, not just number)
     var short_code_label_node_list = short_code_picker_option.getElementsByClassName(SHORT_CODE_LABEL_CLASS);
     console.assert(short_code_label_node_list.length == 1);
-    short_code_label_node_list[0].innerHTML = option.name;
+    short_code_label_node_list[0].innerHTML = option.alias;
   };
 
   /**
@@ -153,10 +153,10 @@ function ShortCodePicker(
   };
 
   /**
-   * initNodes()
+   * initMainNodes()
    * - bind all internal nodes and configure event listeners
    */
-  var initNodes = function() {
+  var initMainNodes = function() {
     // Bind top-level node in short-code-picker template
     bindInternalNode(shortCodePickerWrapperNode);
     
@@ -216,12 +216,18 @@ function ShortCodePicker(
       // User clicked off the time-picker, so hide it!
       closeDropDown();
     });
-    
+  }
+ 
+  /**
+   * initOptionNodes()
+   * - initialize nodes for short code options
+   */
+  var initOptionNodes = function() {
     // Generate option nodes and insert into parent
     for (var i = 0; i < shortCodes.length; ++i) {
       initOptionNode(shortCodes[i]);
     }
-  }
+  };
   
   /**
    * initDisplay()
@@ -236,7 +242,9 @@ function ShortCodePicker(
     }
 
     // Initialize starting short code 
-    selectOptionByIndex(0);
+    if (shortCodes.length !== 0) {
+      selectOptionByIndex(0);
+    }
   };
 
   /**
@@ -260,7 +268,7 @@ function ShortCodePicker(
     inputFieldWrapperNode.node.setAttribute(INPUT_FIELD_WRAPPER_TOOLTIP_ATTR, option.code);
 
     // Update main display
-    inputFieldLabelNode.node.innerHTML = option.name; 
+    inputFieldLabelNode.node.innerHTML = option.alias; 
 
     selectedOptionIndex = option_index;
   };
@@ -293,6 +301,19 @@ function ShortCodePicker(
 
   // Privileged functions
   /**
+   * setShortCodes()
+   * - set list of selectable short-codes
+   * @param: array<ShortCode> short_codes: {id, code, alias}
+   */
+  this.setShortCodes = function(short_codes) {
+    shortCodes = short_codes; 
+
+    // Update ui with new short-codes
+    initOptionNodes();
+    initDisplay();
+  };
+
+  /**
    * init()
    * - initialize short-code picker
    */
@@ -307,7 +328,10 @@ function ShortCodePicker(
     synthesizeShortCodePickerTemplate();
 
     // Initialize nodes: dom elements and event listeners
-    initNodes();
+    initMainNodes();
+
+    // Initialize option nodes
+    initOptionNodes(); 
 
     // Initialize the ui
     initDisplay();

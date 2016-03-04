@@ -2,11 +2,11 @@
 
 class GetStartupDataApiResult extends SuccessfulApiResult {
 
-  const string FIRST_NAME_KEY = "first-name";
-  const string LAST_NAME_KEY = "last-name";
+  const string FIRST_NAME_KEY = "first_name";
+  const string LAST_NAME_KEY = "last_name";
   const string EMAIL_KEY = "email";
-  const string HOURLY_PRICE_KEY = "hourly-price";
-  const string USER_SHORT_CODES_KEY = "short-codes";
+  const string HOURLY_PRICE_KEY = "hourly_price";
+  const string USER_SHORT_CODES_KEY = "short_codes";
 
   public function __construct(
     private string $firstName,

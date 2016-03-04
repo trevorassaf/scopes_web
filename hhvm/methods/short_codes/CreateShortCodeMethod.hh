@@ -8,13 +8,15 @@ class CreateShortCodeMethod {
 
   public function createShortCode(
     UnsignedInt $user_id,
-    string $code
+    string $code,
+    string $alias
   ): ShortCode {
     try {
       // Attempt insert
       $insert_query_wait_handle = $this->insertShortCodeQuery->insert(
         $user_id,
-        $code
+        $code,
+        $alias
       ); 
 
       // Block until insert query finishes

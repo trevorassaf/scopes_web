@@ -61,7 +61,7 @@ function ScopesApi(network_module) {
    */
   this.handleMalformedApiResponseWrapper = function(xhttp_response) {
     console.log("API ERROR: Malformed api response", xhttp_response);
-    this.nonLogicalApiFailureCallback(xhttp_response);
+    this.prototype.nonLogicalApiFailureCallback(xhttp_response);
   };
 
   /**
@@ -70,7 +70,7 @@ function ScopesApi(network_module) {
    */
   this.handleJsonParseError = function(xhttp_response) {
     console.log("API ERROR: Json parse error");
-    this.nonLogicalApiFailureCallback(xhttp_response);
+    this.prototype.nonLogicalApiFailureCallback(xhttp_response);
   };
 
   /**

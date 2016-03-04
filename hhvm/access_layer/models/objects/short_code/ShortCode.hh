@@ -5,7 +5,8 @@ class ShortCode implements Model {
   public function __construct(
     private UnsignedInt $id,
     private UnsignedInt $userId,
-    private string $code
+    private string $code,
+    private string $alias
   ) {}
 
   public function getId(): UnsignedInt {
@@ -18,5 +19,9 @@ class ShortCode implements Model {
 
   public function getCode(): string {
     return $this->code;
+  }
+
+  public function getAlias(): string {
+    return $this->alias;
   }
 }

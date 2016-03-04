@@ -1,28 +1,6 @@
 window.onload = function() {
 
   /**
-   * Test get startup data network module
-   */
-  var get_startup_data_api = new GetStartupDataApi(ScopesNetwork);
-  // get_startup_data_api.setSuccessfulCallback(function(response) {
-  //   console.log(response); 
-  // });
-  // get_startup_data_api.setFailedCallback(function(response) {
-  //   console.log(response); 
-  // });
-
-  get_startup_data_api.setSuccessfulApiCallback(function(response) {
-    console.log(response);
-  });
-  get_startup_data_api.setLogicalApiFailureCallback(function(response) {
-    console.log(response);
-  });
-  get_startup_data_api.setNonLogicalApiFailureCallback(function(response) {
-    console.log(response);
-  });
-  get_startup_data_api.send();
-
-  /**
    * Capture import node for html templates
    */
   var template_store = document.querySelector('#template-import');
@@ -63,26 +41,32 @@ window.onload = function() {
       0 
   );
   calendar.init();
-
+  
   /**
    * Configure short-code picker element
    */
-  var short_codes = [
-    {
-      code: '0xabcd',
-      name: 'ShortCode1'
-    },
-    {
-      code: '0xefgh',
-      name: 'ShortCode2'
-    }
-  ];
+  // var short_codes = [
+  //   {
+  //     code: '0xabcd',
+  //     name: 'ShortCode1'
+  //   },
+  //   {
+  //     code: '0xefgh',
+  //     name: 'ShortCode2'
+  //   }
+  // ];
   var short_code_picker = new ShortCodePicker(
     template_store,
-    'existing-short-code-picker',
-    short_codes
+    'existing-short-code-picker'
   );
   short_code_picker.init();
+  // short_code_picker.setShortCodes(short_codes);
+
+  /**
+   * Test get startup data network module
+   */
+  GetStartupDataApiController.setShortCodePicker(short_code_picker);
+  GetStartupDataApiController.fetch();
 
   /**
    * Configure UI elements
@@ -111,18 +95,6 @@ window.onload = function() {
   //   .send();
 };
 
-function Test() {
-  
-  this.a = function() {
-    console.log("A");
-    this.b();
-  };
-
-  this.b = function() {
-    console.log("B");
-  };
-};
-
 var Utils = (function() {
  
   this.hasClass = function(expected_class, node_class) {
@@ -144,29 +116,81 @@ var Utils = (function() {
 
 var GetStartupDataApiController = (function() {
 
-  /**
-   * Cached startup data
-   */
-  var startupData = null;
+  var shortCodePicker = null;
+  var getStartupDataApi = null;
 
   /**
-   * get()
-   * - fetches and caches startup data
+   * fetch()
+   * - fetches startup data
    */
-  this.get = function() {
+  var fetch = function() {
+    // Initialize api and bind event listeners
+    if (getStartupDataApi === null) {
+      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
+
+      // Bind api listeners
+      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
+      getStartupDataApi.setLogicalApiFailureCallback(failedApiCallback);
+      getStartupDataApi.setNonLogicalApiFailureCallback(failedApiCallback);
+    }
+
+    // Fetch startup data from server
+    getStartupDataApi.send();
   };
 
-  /**
-   * populate()
-   * - supplies startup-data to proper ui controller
-   */
-  this.populate = function() {};
+  var setShortCodePicker = function(short_code_picker) {
+    shortCodePicker = short_code_picker;
+    return this;
+  };
+  
+  var successfulApiCallback = function(api_response) {
+    console.assert(shortCodePicker !== null, "Must set short-code-picker");
+    shortCodePicker.setShortCodes(api_response[getStartupDataApi.getShortCodesKey()]);
+  };
+
+  var failedApiCallback = function(api_response) {
+    console.log(api_response); 
+  };
 
   return {
-    get: get,
-    populate: populate
+    fetch: fetch,
+    setShortCodePicker: setShortCodePicker,
+    successfulApiCallback: successfulApiCallback,
+    failedApiCallback: failedApiCallback
   };
 })();
+
+GetAllUsersApi.prototype = new ScopesApi();
+GetAllUsersApi.prototype.constructor = GetAllUsersApi;
+
+function GetAllUsersApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0xD;
+}
+
+GetOrderPricePolicyApi.prototype = new ScopesApi();
+GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
+
+function GetOrderPricePolicyApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x14;
+}
+
+GetStartupDataApi.prototype = new ScopesApi();
+GetStartupDataApi.prototype.constructor = GetStartupDataApi;
+
+function GetStartupDataApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x15;
+}
+
+GetStartupDataApi.prototype.getFirstNameKey = function() {
+  return "first_name";
+};
+
+GetStartupDataApi.prototype.getShortCodesKey = function() {
+  return "short_codes";
+};
 
 var CenterPanelController = (function() {
 
@@ -631,30 +655,6 @@ var SidePanelUiController = (function() {
   };
 })();
 
-GetAllUsersApi.prototype = new ScopesApi();
-GetAllUsersApi.prototype.constructor = GetAllUsersApi;
-
-function GetAllUsersApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0xD;
-}
-
-GetOrderPricePolicyApi.prototype = new ScopesApi();
-GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
-
-function GetOrderPricePolicyApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0x14;
-}
-
-GetStartupDataApi.prototype = new ScopesApi();
-GetStartupDataApi.prototype.constructor = GetStartupDataApi;
-
-function GetStartupDataApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0x15;
-}
-
 /**
  * ScopesApi
  * - base class for all api calls.
@@ -718,7 +718,7 @@ function ScopesApi(network_module) {
    */
   this.handleMalformedApiResponseWrapper = function(xhttp_response) {
     console.log("API ERROR: Malformed api response", xhttp_response);
-    this.nonLogicalApiFailureCallback(xhttp_response);
+    this.prototype.nonLogicalApiFailureCallback(xhttp_response);
   };
 
   /**
@@ -727,18 +727,9 @@ function ScopesApi(network_module) {
    */
   this.handleJsonParseError = function(xhttp_response) {
     console.log("API ERROR: Json parse error");
-    this.nonLogicalApiFailureCallback(xhttp_response);
+    this.prototype.nonLogicalApiFailureCallback(xhttp_response);
   };
 
-  this.testA = function() {
-    console.log("A");
-    this.testB();
-  };
-
-  this.testB = function() {
-    console.log("B");
-  };
-  
   /**
    * networkSuccessCallbackWrapper()
    * - callback for ScopesNetwork when network call succeeds
@@ -1609,7 +1600,7 @@ function Calendar(
 function ShortCodePicker(
   template_store,
   id,
-  short_codes // { code: xxx, name: xxx}
+  short_codes // {id, code, alias}, optional
 ) {
 
   /**
@@ -1639,7 +1630,7 @@ function ShortCodePicker(
    * Private state
    */
   var templateStore = template_store;
-  var shortCodes = short_codes;
+  var shortCodes = typeof short_codes == 'undefined' ? [] : short_codes;
   var isDropDownOpen = false;
   var selectedOptionIndex = null;
 
@@ -1738,7 +1729,7 @@ function ShortCodePicker(
     // Short code name (name given by user, not just number)
     var short_code_label_node_list = short_code_picker_option.getElementsByClassName(SHORT_CODE_LABEL_CLASS);
     console.assert(short_code_label_node_list.length == 1);
-    short_code_label_node_list[0].innerHTML = option.name;
+    short_code_label_node_list[0].innerHTML = option.alias;
   };
 
   /**
@@ -1761,10 +1752,10 @@ function ShortCodePicker(
   };
 
   /**
-   * initNodes()
+   * initMainNodes()
    * - bind all internal nodes and configure event listeners
    */
-  var initNodes = function() {
+  var initMainNodes = function() {
     // Bind top-level node in short-code-picker template
     bindInternalNode(shortCodePickerWrapperNode);
     
@@ -1824,12 +1815,18 @@ function ShortCodePicker(
       // User clicked off the time-picker, so hide it!
       closeDropDown();
     });
-    
+  }
+ 
+  /**
+   * initOptionNodes()
+   * - initialize nodes for short code options
+   */
+  var initOptionNodes = function() {
     // Generate option nodes and insert into parent
     for (var i = 0; i < shortCodes.length; ++i) {
       initOptionNode(shortCodes[i]);
     }
-  }
+  };
   
   /**
    * initDisplay()
@@ -1844,7 +1841,9 @@ function ShortCodePicker(
     }
 
     // Initialize starting short code 
-    selectOptionByIndex(0);
+    if (shortCodes.length !== 0) {
+      selectOptionByIndex(0);
+    }
   };
 
   /**
@@ -1868,7 +1867,7 @@ function ShortCodePicker(
     inputFieldWrapperNode.node.setAttribute(INPUT_FIELD_WRAPPER_TOOLTIP_ATTR, option.code);
 
     // Update main display
-    inputFieldLabelNode.node.innerHTML = option.name; 
+    inputFieldLabelNode.node.innerHTML = option.alias; 
 
     selectedOptionIndex = option_index;
   };
@@ -1901,6 +1900,19 @@ function ShortCodePicker(
 
   // Privileged functions
   /**
+   * setShortCodes()
+   * - set list of selectable short-codes
+   * @param: array<ShortCode> short_codes: {id, code, alias}
+   */
+  this.setShortCodes = function(short_codes) {
+    shortCodes = short_codes; 
+
+    // Update ui with new short-codes
+    initOptionNodes();
+    initDisplay();
+  };
+
+  /**
    * init()
    * - initialize short-code picker
    */
@@ -1915,7 +1927,10 @@ function ShortCodePicker(
     synthesizeShortCodePickerTemplate();
 
     // Initialize nodes: dom elements and event listeners
-    initNodes();
+    initMainNodes();
+
+    // Initialize option nodes
+    initOptionNodes(); 
 
     // Initialize the ui
     initDisplay();

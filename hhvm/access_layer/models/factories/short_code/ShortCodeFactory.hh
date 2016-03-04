@@ -13,7 +13,8 @@ class ShortCodeFactory extends ConcreteModelFactory<ShortCode> {
     return new ShortCode(
       $id,
       new UnsignedInt((int)$params[$this->shortCodesTable->getUserIdKey()]),
-      (string)$params[$this->shortCodesTable->getCodeKey()]
+      (string)$params[$this->shortCodesTable->getCodeKey()],
+      (string)$params[$this->shortCodesTable->getAliasKey()]
     );
   } 
 }

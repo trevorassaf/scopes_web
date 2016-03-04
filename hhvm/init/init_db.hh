@@ -139,17 +139,21 @@ function initUsers(MethodInjector $method_injector): void {
   );
 
   // Insert Short Codes
-  $trevors_short_code1 = "0xSHORT";
-  $trevors_short_code2 = "0xCODE";
+  $trevors_short_code1 = "0xDEAD";
+  $trevors_short_code1_alias = "SHORT";
+  $trevors_short_code2 = "0xBEEF";
+  $trevors_short_code2_alias = "CODE";
   $create_short_code_method = $method_injector->getCreateShortCodeMethod();
 
   $create_short_code_method->createShortCode(
     $trevor->getId(),
-    $trevors_short_code1
+    $trevors_short_code1,
+    $trevors_short_code1_alias
   );
   $create_short_code_method->createShortCode(
     $trevor->getId(),
-    $trevors_short_code2
+    $trevors_short_code2,
+    $trevors_short_code2_alias
   );
 
   // Assign default privileges for 'trevor'
