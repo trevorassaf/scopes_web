@@ -64,6 +64,11 @@ window.onload = function() {
   SidePanelUiController.init();
   NewExperimentUiController.init();
 
+  ConfirmOrderUiController.init();
+  ConfirmOrderUiController.setHourlyCost(27.50);
+  ConfirmOrderUiController.setNumberOfScopes(5);
+  ConfirmOrderUiController.setExperimentDuration(6);
+
   /**
    * Fetch session information
    */

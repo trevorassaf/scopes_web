@@ -45,25 +45,14 @@ window.onload = function() {
   /**
    * Configure short-code picker element
    */
-  // var short_codes = [
-  //   {
-  //     code: '0xabcd',
-  //     name: 'ShortCode1'
-  //   },
-  //   {
-  //     code: '0xefgh',
-  //     name: 'ShortCode2'
-  //   }
-  // ];
   var short_code_picker = new ShortCodePicker(
     template_store,
     'existing-short-code-picker'
   );
   short_code_picker.init();
-  // short_code_picker.setShortCodes(short_codes);
 
   /**
-   * Test get startup data network module
+   * Fetch startup data and route to proper views 
    */
   GetStartupDataApiController.setShortCodePicker(short_code_picker);
   GetStartupDataApiController.fetch();
@@ -74,6 +63,11 @@ window.onload = function() {
   CenterPanelController.init();
   SidePanelUiController.init();
   NewExperimentUiController.init();
+
+  ConfirmOrderUiController.init();
+  ConfirmOrderUiController.setHourlyCost(27.50);
+  ConfirmOrderUiController.setNumberOfScopes(5);
+  ConfirmOrderUiController.setExperimentDuration(6);
 
   /**
    * Fetch session information
@@ -113,84 +107,6 @@ var Utils = (function() {
     hasClass: hasClass
   };
 })();
-
-var GetStartupDataApiController = (function() {
-
-  var shortCodePicker = null;
-  var getStartupDataApi = null;
-
-  /**
-   * fetch()
-   * - fetches startup data
-   */
-  var fetch = function() {
-    // Initialize api and bind event listeners
-    if (getStartupDataApi === null) {
-      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
-
-      // Bind api listeners
-      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
-      getStartupDataApi.setLogicalApiFailureCallback(failedApiCallback);
-      getStartupDataApi.setNonLogicalApiFailureCallback(failedApiCallback);
-    }
-
-    // Fetch startup data from server
-    getStartupDataApi.send();
-  };
-
-  var setShortCodePicker = function(short_code_picker) {
-    shortCodePicker = short_code_picker;
-    return this;
-  };
-  
-  var successfulApiCallback = function(api_response) {
-    console.assert(shortCodePicker !== null, "Must set short-code-picker");
-    shortCodePicker.setShortCodes(api_response[getStartupDataApi.getShortCodesKey()]);
-  };
-
-  var failedApiCallback = function(api_response) {
-    console.log(api_response); 
-  };
-
-  return {
-    fetch: fetch,
-    setShortCodePicker: setShortCodePicker,
-    successfulApiCallback: successfulApiCallback,
-    failedApiCallback: failedApiCallback
-  };
-})();
-
-GetAllUsersApi.prototype = new ScopesApi();
-GetAllUsersApi.prototype.constructor = GetAllUsersApi;
-
-function GetAllUsersApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0xD;
-}
-
-GetOrderPricePolicyApi.prototype = new ScopesApi();
-GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
-
-function GetOrderPricePolicyApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0x14;
-}
-
-GetStartupDataApi.prototype = new ScopesApi();
-GetStartupDataApi.prototype.constructor = GetStartupDataApi;
-
-function GetStartupDataApi(network_module) {
-  this.networkModule = network_module;
-  this.apiType = 0x15;
-}
-
-GetStartupDataApi.prototype.getFirstNameKey = function() {
-  return "first_name";
-};
-
-GetStartupDataApi.prototype.getShortCodesKey = function() {
-  return "short_codes";
-};
 
 var CenterPanelController = (function() {
 
@@ -325,6 +241,192 @@ var CenterPanelController = (function() {
     displayMonitorExperimentPage: displayMonitorExperimentPage
   };
 
+})();
+
+var ConfirmOrderUiController = (function() {
+  
+  /**
+   * Class-bound ui symbols
+   */
+  var MULTIPLIER_LABEL_SYMBOL_INFO = {
+    className: 'payment-multiplier-label',
+    symbol: 'x'
+  };
+
+  var ASSIGNMENT_LABEL_SYMBOL_INFO = {
+    className: 'payment-assignment-label',
+    symbol: '='
+  };
+
+  var CURRENCY_UNIT_SYMBOL_INFO = {
+    className: 'payment-currency-unit-label',
+    symbol: '$'
+  };
+
+  /**
+   * Private state
+   */
+  var isInitialized = false;
+  var hourlyCost = 0;
+  var scopesCount = 0;
+  var experimentDuration = 0;
+  var totalPrice = 0;
+
+  /**
+   * Dom Nodes
+   */
+  var rootNode = {
+    id: 'pricing-confirmation-form-container',
+    node: null
+  };
+
+  var scopesCountNode = {
+    number: {
+      id: 'payment-scopes-count-amount-label',
+      node: null
+    },
+    unit: {
+      id: 'payment-scopes-count-unit-label',
+      node: null,
+      singular: 'scope',
+      plural: 'scopes'
+    }
+  };
+
+  var experimentDurationNode = {
+    number: {
+      id: 'payment-experiment-duration-amount-label',
+      node: null
+    },
+    unit: {
+      id: 'payment-experiment-duration-unit-label',
+      node: null,
+      singular: 'hour',
+      plural: 'hours'
+    }
+  };
+
+  var hourlyPriceNode = {
+    number: {
+      id: 'payment-hourly-price-amount-label',
+      node: null
+    },
+    unit: {
+      id: 'payment-hourly-price-unit-label',
+      node: null,
+      singular: '/ (scope x hour)',
+      plural: '/ (scope x hour)'
+    }
+  };
+
+  var paymentAmountNode = {
+    id: 'payment-total-price-label',
+    node: null
+  };
+
+  /**
+   * Private methods
+   */
+  var bindInternalNode = function(internal_node) {
+    internal_node.node = document.getElementById(internal_node.id);
+    console.assert(internal_node !== null, "ERROR: failed to bind internal node with id: " + internal_node.id);
+  };
+
+  var bindPriceComponentNode = function(price_component_node) {
+    bindInternalNode(price_component_node.number); 
+    bindInternalNode(price_component_node.unit); 
+  };
+
+  var bindNodes = function() {
+    bindInternalNode(rootNode); 
+    bindInternalNode(paymentAmountNode);
+
+    bindPriceComponentNode(scopesCountNode);
+    bindPriceComponentNode(experimentDurationNode);
+    bindPriceComponentNode(hourlyPriceNode);
+  };
+
+  var populateClassBoundUiSymbol = function(class_bound_ui_symbol) {
+    var dom_nodes = rootNode.node.getElementsByClassName(class_bound_ui_symbol.className);
+    for (var i = 0; i < dom_nodes.length; ++i) {
+      dom_nodes[i].innerHTML = class_bound_ui_symbol.symbol;
+    }
+  };
+  
+  var initDisplay = function() {
+    // Populate dom nodes with ui symbols 
+    populateClassBoundUiSymbol(MULTIPLIER_LABEL_SYMBOL_INFO);
+    populateClassBoundUiSymbol(ASSIGNMENT_LABEL_SYMBOL_INFO);
+    populateClassBoundUiSymbol(CURRENCY_UNIT_SYMBOL_INFO);
+
+    // Initialize price label
+    setHourlyCost(0);
+    setNumberOfScopes(0);
+    setExperimentDuration(0);
+    updatePrice();
+  };
+  
+  var updatePrice = function() {
+    // Recompute price
+    totalPrice = scopesCount * experimentDuration * hourlyCost;
+
+    // Update price display
+    paymentAmountNode.node.innerHTML = totalPrice; 
+  };
+
+  var updatePriceContributingNodeIfInitialized = function(price_contributing_node, value) {
+    if (isInitialized) {
+      // Update value
+      price_contributing_node.number.node.innerHTML = value;
+
+      // Update unit
+      price_contributing_node.unit.node.innerHTML = (value === 1)
+        ? price_contributing_node.unit.singular
+        : price_contributing_node.unit.plural;
+
+      // Recompute price and update ui
+      updatePrice();
+    } 
+  };
+
+  /**
+   * Public methods
+   */
+  var setHourlyCost = function(hourly_cost) {
+    hourlyCost = hourly_cost;
+    updatePriceContributingNodeIfInitialized(hourlyPriceNode, hourly_cost);
+    return this;
+  };
+
+  var setNumberOfScopes = function(scopes_count) {
+    scopesCount = scopes_count;
+    updatePriceContributingNodeIfInitialized(scopesCountNode, scopes_count);
+    return this;
+  };
+
+  var setExperimentDuration = function(experiment_duration) {
+    experimentDuration = experiment_duration; 
+    updatePriceContributingNodeIfInitialized(experimentDurationNode, experiment_duration);
+    return this;
+  };
+
+  var init = function() {
+    console.assert(isInitialized === false, "ERROR: don't initialize ConfirmOrderUiController more than once!");
+    isInitialized = true;
+
+    // Bind all nodes and attach event listeners
+    bindNodes(); 
+    
+    // Render dynamic ui elements
+    initDisplay();
+  };
+
+  return {
+    init: init,
+    setHourlyCost: setHourlyCost,
+    setNumberOfScopes: setNumberOfScopes,
+    setExperimentDuration: setExperimentDuration
+  };
 })();
 
 var NewExperimentUiController = (function() {
@@ -654,6 +756,84 @@ var SidePanelUiController = (function() {
     init: init
   };
 })();
+
+var GetStartupDataApiController = (function() {
+
+  var shortCodePicker = null;
+  var getStartupDataApi = null;
+
+  /**
+   * fetch()
+   * - fetches startup data
+   */
+  var fetch = function() {
+    // Initialize api and bind event listeners
+    if (getStartupDataApi === null) {
+      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
+
+      // Bind api listeners
+      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
+      getStartupDataApi.setLogicalApiFailureCallback(failedApiCallback);
+      getStartupDataApi.setNonLogicalApiFailureCallback(failedApiCallback);
+    }
+
+    // Fetch startup data from server
+    getStartupDataApi.send();
+  };
+
+  var setShortCodePicker = function(short_code_picker) {
+    shortCodePicker = short_code_picker;
+    return this;
+  };
+  
+  var successfulApiCallback = function(api_response) {
+    console.assert(shortCodePicker !== null, "Must set short-code-picker");
+    shortCodePicker.setShortCodes(api_response[getStartupDataApi.getShortCodesKey()]);
+  };
+
+  var failedApiCallback = function(api_response) {
+    console.log(api_response); 
+  };
+
+  return {
+    fetch: fetch,
+    setShortCodePicker: setShortCodePicker,
+    successfulApiCallback: successfulApiCallback,
+    failedApiCallback: failedApiCallback
+  };
+})();
+
+GetAllUsersApi.prototype = new ScopesApi();
+GetAllUsersApi.prototype.constructor = GetAllUsersApi;
+
+function GetAllUsersApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0xD;
+}
+
+GetOrderPricePolicyApi.prototype = new ScopesApi();
+GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
+
+function GetOrderPricePolicyApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x14;
+}
+
+GetStartupDataApi.prototype = new ScopesApi();
+GetStartupDataApi.prototype.constructor = GetStartupDataApi;
+
+function GetStartupDataApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x15;
+}
+
+GetStartupDataApi.prototype.getFirstNameKey = function() {
+  return "first_name";
+};
+
+GetStartupDataApi.prototype.getShortCodesKey = function() {
+  return "short_codes";
+};
 
 /**
  * ScopesApi
