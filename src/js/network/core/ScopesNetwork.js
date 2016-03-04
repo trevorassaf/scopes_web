@@ -24,19 +24,18 @@ var ScopesNetwork = (function() {
      * @param int api_type: index of specified api 
      * @param array<string, mixed> payload_fields: payload parameters
      * @param bool is_async: is request synchronous
-     * @param function(XMLHttpRequest xhttp) successful_callback: callback function for when request finishes successfully
-     * @param function(XMLHttpRequest xhttp) failed_callback: callback function for when request finishes with failure
+     * @param function(XMLHttpRequest xhttp) network_success_callback: callback function for when request finishes successfully
+     * @param function(XMLHttpRequest xhttp) network_failure_callback: callback function for when request finishes with failure
      * @param File upload_file: optional file upload parameter
      */
     request: function(
      api_type,
      payload_fields,
      is_async,
-     successful_callback,
-     deserialize_successful_response,
-     failed_callback,
-     deserialize_failed_response,
-     upload_file
+     network_success_callback,
+     network_failure_callback,
+     upload_file,
+     scopes_api_context
    ) {
       var xhttp = new XMLHttpRequest(); 
       
@@ -45,9 +44,9 @@ var ScopesNetwork = (function() {
         xhttp.onreadystatechange = function() {
           if (xhttp.readyState == 4) {
             if (xhttp.status == 200) {
-              successful_callback(xhttp); 
+              scopes_api_context.networkSuccessCallbackWrapper(xhttp); 
             } else {
-              failed_callback(xhttp);
+              scopes_api_context.networkFailureCallbackWrapper(xhttp);
             }
           }
         };

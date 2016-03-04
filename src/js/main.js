@@ -4,11 +4,15 @@ window.onload = function() {
    * Test get startup data network module
    */
   var get_startup_data_api = new GetStartupDataApi(ScopesNetwork);
-  get_startup_data_api.setSuccessfulCallback(function(response) {
-    console.log(response); 
+
+  get_startup_data_api.setSuccessfulApiCallback(function(response) {
+    console.log(response);
   });
-  get_startup_data_api.setFailedCallback(function(response) {
-    console.log(response); 
+  get_startup_data_api.setLogicalApiFailureCallback(function(response) {
+    console.log(response);
+  });
+  get_startup_data_api.setNonLogicalApiFailureCallback(function(response) {
+    console.log(response);
   });
   get_startup_data_api.send();
 

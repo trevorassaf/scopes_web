@@ -4,11 +4,21 @@ window.onload = function() {
    * Test get startup data network module
    */
   var get_startup_data_api = new GetStartupDataApi(ScopesNetwork);
-  get_startup_data_api.setSuccessfulCallback(function(response) {
-    console.log(response); 
+  // get_startup_data_api.setSuccessfulCallback(function(response) {
+  //   console.log(response); 
+  // });
+  // get_startup_data_api.setFailedCallback(function(response) {
+  //   console.log(response); 
+  // });
+
+  get_startup_data_api.setSuccessfulApiCallback(function(response) {
+    console.log(response);
   });
-  get_startup_data_api.setFailedCallback(function(response) {
-    console.log(response); 
+  get_startup_data_api.setLogicalApiFailureCallback(function(response) {
+    console.log(response);
+  });
+  get_startup_data_api.setNonLogicalApiFailureCallback(function(response) {
+    console.log(response);
   });
   get_startup_data_api.send();
 
@@ -100,6 +110,63 @@ window.onload = function() {
   //   )
   //   .send();
 };
+
+function Test() {
+  
+  this.a = function() {
+    console.log("A");
+    this.b();
+  };
+
+  this.b = function() {
+    console.log("B");
+  };
+};
+
+var Utils = (function() {
+ 
+  this.hasClass = function(expected_class, node_class) {
+    var class_idx = node_class.indexOf(expected_class);
+    
+    if (class_idx == -1) {
+      return;
+    }
+
+    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
+      && (expected_class.length + class_idx == node_class.length
+        || node_class.charAt(expected_class.length + class_idx) == ' ');
+  };
+
+  return {
+    hasClass: hasClass
+  };
+})();
+
+var GetStartupDataApiController = (function() {
+
+  /**
+   * Cached startup data
+   */
+  var startupData = null;
+
+  /**
+   * get()
+   * - fetches and caches startup data
+   */
+  this.get = function() {
+  };
+
+  /**
+   * populate()
+   * - supplies startup-data to proper ui controller
+   */
+  this.populate = function() {};
+
+  return {
+    get: get,
+    populate: populate
+  };
+})();
 
 var CenterPanelController = (function() {
 
@@ -564,25 +631,6 @@ var SidePanelUiController = (function() {
   };
 })();
 
-var Utils = (function() {
- 
-  this.hasClass = function(expected_class, node_class) {
-    var class_idx = node_class.indexOf(expected_class);
-    
-    if (class_idx == -1) {
-      return;
-    }
-
-    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-      && (expected_class.length + class_idx == node_class.length
-        || node_class.charAt(expected_class.length + class_idx) == ' ');
-  };
-
-  return {
-    hasClass: hasClass
-  };
-})();
-
 GetAllUsersApi.prototype = new ScopesApi();
 GetAllUsersApi.prototype.constructor = GetAllUsersApi;
 
@@ -614,15 +662,121 @@ function GetStartupDataApi(network_module) {
  *       in constructor.
  * @req: all child classes assign 'network_module' to 'this.networkModule'
  *       in constructor
+ * @override: 
+ *        - nonLogicalApiFailureCallback()
+ *        - logicalApiFailureCallback()
+ *        - successfulApiCallback()
  */
-
 function ScopesApi(network_module) {
+
+  /**
+   * Api parameters 
+   */
+  this.IS_SUCCESSFUL_KEY = "is_successful";
+  this.API_TYPE_KEY = "api_type";
+
   this.networkModule = network_module;
   this.data = {};
   this.isAsync = true;
-  this.successfulCallback = function() {};
-  this.failedCallback = function() {};
   this.uploadedFile = null;
+
+  /**
+   * isWellFormedApiResponseWrapper()
+   * - checks that 'json_response' contains the fields characteristic of all
+   *   responses (both successful and failed)
+   * @param JSON json_response: response payload
+   */
+  this.isWellFormedApiResponseWrapper = function(json_response) {
+    return this.IS_SUCCESSFUL_KEY in json_response &&
+      this.API_TYPE_KEY in json_response;
+  };
+
+  /**
+   * nonLogicalApiFailureCallback()
+   * - callback register for handling non-logical api failures (e.g. bad request)
+   * - user overrides this function to register callback
+   */
+  this.nonLogicalApiFailureCallback = function(xhttp_response) {}
+
+  /**
+   * logicalApiFailureCallback()
+   * - callback for handling logical api failures (e.g. user not found)
+   * - user overrides this function to register callback
+   */
+  this.logicalApiFailureCallback = function(json_response) {}
+
+  /**
+   * successfulApiCallback()
+   * - callback for handling successful api call
+   * - user overrides this function to register callback
+   */
+  this.successfulApiCallback = function(json_response) {};
+
+  /**
+   * handleMalformedApiResponseWrapper()
+   * - callback for malformed api response
+   */
+  this.handleMalformedApiResponseWrapper = function(xhttp_response) {
+    console.log("API ERROR: Malformed api response", xhttp_response);
+    this.nonLogicalApiFailureCallback(xhttp_response);
+  };
+
+  /**
+   * handleJsonParseError()
+   * - callback for json parse error in api call 
+   */
+  this.handleJsonParseError = function(xhttp_response) {
+    console.log("API ERROR: Json parse error");
+    this.nonLogicalApiFailureCallback(xhttp_response);
+  };
+
+  this.testA = function() {
+    console.log("A");
+    this.testB();
+  };
+
+  this.testB = function() {
+    console.log("B");
+  };
+  
+  /**
+   * networkSuccessCallbackWrapper()
+   * - callback for ScopesNetwork when network call succeeds
+   */
+  this.networkSuccessCallbackWrapper = function(xhttp_response) {
+    try {
+      // Deserialize json payload
+      var json_response = JSON.parse(xhttp_response.responseText);
+     
+      // Check that wrapper api keys are present (should be here whether api
+      // call succeeded or not...)
+      if (!this.isWellFormedApiResponseWrapper(json_response)) {
+        this.handleMalformedApiResponseWrapper(xhttp_response);
+      }
+
+      // Check if api call succeeded
+      if (!json_response[this.IS_SUCCESSFUL_KEY]) {
+        // Api logical failure. Should have meaningful api failure code...
+        this.logicalApiFailureCallback(json_response);
+      }
+
+      // Api call succeeded. Pass off to next handler
+      this.successfulApiCallback(json_response);
+    } catch (parse_exception) {
+      // Failed to parse json api response
+      this.handleJsonParseError(xhttp_response);
+    }
+  };
+
+  /**
+   * networkFailureCallbackWrapper()
+   * - callback for network failure when making api call
+   */
+  this.networkFailureCallbackWrapper = function(xhttp_response) {
+    console.log("API ERROR: Network failure durng api call");
+    this.nonLogicalApiFailureCallback(xhttp_response);
+  };
+
 }
 
 ScopesApi.prototype.setIsAsync = function(is_async) {
@@ -630,13 +784,18 @@ ScopesApi.prototype.setIsAsync = function(is_async) {
   return this;
 }
 
-ScopesApi.prototype.setSuccessfulCallback = function(callback) {
-  this.successfulCallback = callback;
+ScopesApi.prototype.setSuccessfulApiCallback = function(callback) {
+  this.successfulApiCallback = callback;
   return this;
 }
 
-ScopesApi.prototype.setFailedCallback = function(callback) {
-  this.failedCallback = callback;
+ScopesApi.prototype.setLogicalApiFailureCallback = function(callback) {
+  this.logicalApiFailureCallback = callback;
+  return this;
+}
+
+ScopesApi.prototype.setNonLogicalApiFailureCallback = function(callback) {
+  this.nonLogicalApiFailureCallback = callback;
   return this;
 }
 
@@ -650,9 +809,10 @@ ScopesApi.prototype.send = function() {
     this.apiType,
     this.data,
     this.isAsync,
-    this.successfulCallback,
-    this.failedCallback,
-    this.uploadedFile
+    this.networkSuccessCallbackWrapper,
+    this.networkFailureCallbackWrapper,
+    this.uploadedFile,
+    this
   );    
 }
 
@@ -682,17 +842,18 @@ var ScopesNetwork = (function() {
      * @param int api_type: index of specified api 
      * @param array<string, mixed> payload_fields: payload parameters
      * @param bool is_async: is request synchronous
-     * @param function(XMLHttpRequest xhttp) successful_callback: callback function for when request finishes successfully
-     * @param function(XMLHttpRequest xhttp) failed_callback: callback function for when request finishes with failure
+     * @param function(XMLHttpRequest xhttp) network_success_callback: callback function for when request finishes successfully
+     * @param function(XMLHttpRequest xhttp) network_failure_callback: callback function for when request finishes with failure
      * @param File upload_file: optional file upload parameter
      */
     request: function(
      api_type,
      payload_fields,
      is_async,
-     successful_callback,
-     failed_callback,
-     upload_file
+     network_success_callback,
+     network_failure_callback,
+     upload_file,
+     scopes_api_context
    ) {
       var xhttp = new XMLHttpRequest(); 
       
@@ -701,9 +862,9 @@ var ScopesNetwork = (function() {
         xhttp.onreadystatechange = function() {
           if (xhttp.readyState == 4) {
             if (xhttp.status == 200) {
-              successful_callback(xhttp); 
+              scopes_api_context.networkSuccessCallbackWrapper(xhttp); 
             } else {
-              failed_callback(xhttp);
+              scopes_api_context.networkFailureCallbackWrapper(xhttp);
             }
           }
         };
@@ -731,11 +892,6 @@ var ScopesNetwork = (function() {
 
       form_data.append(API_TYPE_KEY, api_type);
       form_data.append(PAYLOAD_KEY, serialized_payload);
-
-console.log(API_TYPE_KEY);
-console.log(api_type);
-console.log(PAYLOAD_KEY);
-console.log(serialized_payload);
 
       // Execute request 
       xhttp.send(form_data);
