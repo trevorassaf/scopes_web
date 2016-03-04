@@ -116,7 +116,7 @@ var ConfirmOrderUiController = (function() {
 
     // Initialize price label
     setHourlyCost(0);
-    setNumberOfScopes(0);
+    setScopesCount(0);
     setExperimentDuration(0);
     updatePrice();
   };
@@ -153,7 +153,7 @@ var ConfirmOrderUiController = (function() {
     return this;
   };
 
-  var setNumberOfScopes = function(scopes_count) {
+  var setScopesCount = function(scopes_count) {
     scopesCount = scopes_count;
     updatePriceContributingNodeIfInitialized(scopesCountNode, scopes_count);
     return this;
@@ -179,7 +179,7 @@ var ConfirmOrderUiController = (function() {
   return {
     init: init,
     setHourlyCost: setHourlyCost,
-    setNumberOfScopes: setNumberOfScopes,
+    setScopesCount: setScopesCount,
     setExperimentDuration: setExperimentDuration
   };
 })();

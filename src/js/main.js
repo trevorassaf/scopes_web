@@ -41,50 +41,16 @@ window.onload = function() {
       0 
   );
   calendar.init();
-  
-  /**
-   * Configure short-code picker element
-   */
-  var short_code_picker = new ShortCodePicker(
-    template_store,
-    'existing-short-code-picker'
-  );
-  short_code_picker.init();
-
-  /**
-   * Fetch startup data and route to proper views 
-   */
-  GetStartupDataApiController.setShortCodePicker(short_code_picker);
-  GetStartupDataApiController.fetch();
 
   /**
    * Configure UI elements
    */
   CenterPanelController.init();
   SidePanelUiController.init();
-  NewExperimentUiController.init();
-
-  ConfirmOrderUiController.init();
-  ConfirmOrderUiController.setHourlyCost(27.50);
-  ConfirmOrderUiController.setNumberOfScopes(5);
-  ConfirmOrderUiController.setExperimentDuration(6);
-
+  NewExperimentUiController.init(template_store);
+  
   /**
-   * Fetch session information
+   * Fetch startup data and route to proper views 
    */
-  // var get_session_info_api = new GetSessionInfoApi(ScopesNetwork); 
-  // get_session_info_api
-  //   .setSuccessfulCallback(
-  //     function (response) {
-  //       console.log("Success for GetSessionInfoApi!"); 
-  //       console.log(response.responseText);
-  //     }    
-  //   )
-  //   .setFailedCallback(
-  //     function (response) {
-  //       console.log("Failure for GetSessionInfoApi!"); 
-  //       console.log(response.responseText);
-  //     }    
-  //   )
-  //   .send();
+  GetStartupDataApiController.fetch();
 };

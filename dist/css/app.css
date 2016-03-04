@@ -467,7 +467,7 @@ paper-slider {
   -webkit-font-smoothing: antialiased;
   position: relative;
   display: inline-block;
-  width: 146px;
+  min-width: 86px;
 }
 
 .short-code-picker-wrapper:not([hidden-dropdown]) {
@@ -492,6 +492,7 @@ paper-slider {
   position: relative;
   top: 6px;
   left: 10px;
+  margin-right: 20px;
 }
 
 .short-code-picker-wrapper .input-field-wrapper:hover {

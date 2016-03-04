@@ -4,7 +4,7 @@
   -webkit-font-smoothing: antialiased;
   position: relative;
   display: inline-block;
-  width: 146px;
+  min-width: 86px;
 }
 
 .short-code-picker-wrapper:not([hidden-dropdown]) {
@@ -29,6 +29,7 @@
   position: relative;
   top: 6px;
   left: 10px;
+  margin-right: 20px;
 }
 
 .short-code-picker-wrapper .input-field-wrapper:hover {

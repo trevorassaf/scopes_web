@@ -1,7 +1,12 @@
 var GetStartupDataApiController = (function() {
 
-  var shortCodePicker = null;
+  /**
+   * Private state
+   */
   var getStartupDataApi = null;
+  var successfulApiCallbackListeners = [];
+  var failedLogicalApiCallbackListeners = [];
+  var failedNonLogicalApiCallbackListeners = [];
 
   /**
    * fetch()
@@ -14,32 +19,72 @@ var GetStartupDataApiController = (function() {
 
       // Bind api listeners
       getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
-      getStartupDataApi.setLogicalApiFailureCallback(failedApiCallback);
-      getStartupDataApi.setNonLogicalApiFailureCallback(failedApiCallback);
+      getStartupDataApi.setLogicalApiFailureCallback(logicallyFailedApiCallback);
+      getStartupDataApi.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
     }
 
     // Fetch startup data from server
     getStartupDataApi.send();
   };
 
-  var setShortCodePicker = function(short_code_picker) {
-    shortCodePicker = short_code_picker;
-    return this;
+  var successfulApiCallback = function(api_response) {
+    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
+      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
   };
   
-  var successfulApiCallback = function(api_response) {
-    console.assert(shortCodePicker !== null, "Must set short-code-picker");
-    shortCodePicker.setShortCodes(api_response[getStartupDataApi.getShortCodesKey()]);
+  var logicallyFailedApiCallback = function(api_response) {
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
+    
+    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
+      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
   };
 
-  var failedApiCallback = function(api_response) {
-    console.log(api_response); 
+  var nonLogicallyFailedApiCallback = function(api_response) {
+    console.nonLog("WARNING: Logically failed api response!");
+    console.nonLog(api_response); 
+    
+    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
+      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  /**
+   * registerSuccessfulApiCallback()
+   * - add callback for successful api call
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerSuccessfulApiCallback = function(callback) {
+    successfulApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerLogicalFailedApiCallback()
+   * - add callback for logical failed api call (i.e. api error error rather than network error)
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerNonLogicalFailedApiCallback()
+   * - add callback for non-logical failed api call (i.e. network error rather than api error)
+   * @param FuncPtr callback: function(xhttp_response) {...}
+   */
+  var registerNonLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
   };
 
   return {
     fetch: fetch,
-    setShortCodePicker: setShortCodePicker,
-    successfulApiCallback: successfulApiCallback,
-    failedApiCallback: failedApiCallback
+    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
+    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
+    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
   };
 })();

@@ -41,52 +41,18 @@ window.onload = function() {
       0 
   );
   calendar.init();
-  
-  /**
-   * Configure short-code picker element
-   */
-  var short_code_picker = new ShortCodePicker(
-    template_store,
-    'existing-short-code-picker'
-  );
-  short_code_picker.init();
-
-  /**
-   * Fetch startup data and route to proper views 
-   */
-  GetStartupDataApiController.setShortCodePicker(short_code_picker);
-  GetStartupDataApiController.fetch();
 
   /**
    * Configure UI elements
    */
   CenterPanelController.init();
   SidePanelUiController.init();
-  NewExperimentUiController.init();
-
-  ConfirmOrderUiController.init();
-  ConfirmOrderUiController.setHourlyCost(27.50);
-  ConfirmOrderUiController.setNumberOfScopes(5);
-  ConfirmOrderUiController.setExperimentDuration(6);
-
+  NewExperimentUiController.init(template_store);
+  
   /**
-   * Fetch session information
+   * Fetch startup data and route to proper views 
    */
-  // var get_session_info_api = new GetSessionInfoApi(ScopesNetwork); 
-  // get_session_info_api
-  //   .setSuccessfulCallback(
-  //     function (response) {
-  //       console.log("Success for GetSessionInfoApi!"); 
-  //       console.log(response.responseText);
-  //     }    
-  //   )
-  //   .setFailedCallback(
-  //     function (response) {
-  //       console.log("Failure for GetSessionInfoApi!"); 
-  //       console.log(response.responseText);
-  //     }    
-  //   )
-  //   .send();
+  GetStartupDataApiController.fetch();
 };
 
 var Utils = (function() {
@@ -105,6 +71,97 @@ var Utils = (function() {
 
   return {
     hasClass: hasClass
+  };
+})();
+
+var GetStartupDataApiController = (function() {
+
+  /**
+   * Private state
+   */
+  var getStartupDataApi = null;
+  var successfulApiCallbackListeners = [];
+  var failedLogicalApiCallbackListeners = [];
+  var failedNonLogicalApiCallbackListeners = [];
+
+  /**
+   * fetch()
+   * - fetches startup data
+   */
+  var fetch = function() {
+    // Initialize api and bind event listeners
+    if (getStartupDataApi === null) {
+      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
+
+      // Bind api listeners
+      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
+      getStartupDataApi.setLogicalApiFailureCallback(logicallyFailedApiCallback);
+      getStartupDataApi.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
+    }
+
+    // Fetch startup data from server
+    getStartupDataApi.send();
+  };
+
+  var successfulApiCallback = function(api_response) {
+    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
+      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+  
+  var logicallyFailedApiCallback = function(api_response) {
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
+    
+    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
+      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  var nonLogicallyFailedApiCallback = function(api_response) {
+    console.nonLog("WARNING: Logically failed api response!");
+    console.nonLog(api_response); 
+    
+    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
+      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  /**
+   * registerSuccessfulApiCallback()
+   * - add callback for successful api call
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerSuccessfulApiCallback = function(callback) {
+    successfulApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerLogicalFailedApiCallback()
+   * - add callback for logical failed api call (i.e. api error error rather than network error)
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerNonLogicalFailedApiCallback()
+   * - add callback for non-logical failed api call (i.e. network error rather than api error)
+   * @param FuncPtr callback: function(xhttp_response) {...}
+   */
+  var registerNonLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  return {
+    fetch: fetch,
+    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
+    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
+    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
   };
 })();
 
@@ -361,7 +418,7 @@ var ConfirmOrderUiController = (function() {
 
     // Initialize price label
     setHourlyCost(0);
-    setNumberOfScopes(0);
+    setScopesCount(0);
     setExperimentDuration(0);
     updatePrice();
   };
@@ -398,7 +455,7 @@ var ConfirmOrderUiController = (function() {
     return this;
   };
 
-  var setNumberOfScopes = function(scopes_count) {
+  var setScopesCount = function(scopes_count) {
     scopesCount = scopes_count;
     updatePriceContributingNodeIfInitialized(scopesCountNode, scopes_count);
     return this;
@@ -424,189 +481,275 @@ var ConfirmOrderUiController = (function() {
   return {
     init: init,
     setHourlyCost: setHourlyCost,
-    setNumberOfScopes: setNumberOfScopes,
+    setScopesCount: setScopesCount,
     setExperimentDuration: setExperimentDuration
   };
+})();
+
+var ExperimentDurationUiController = (function() {
+
+  /**
+   * Unit plural/singular
+   */
+  var EXPERIMENT_DURATION_UNIT_SINGULAR = "hour";
+  var EXPERIMENT_DURATION_UNIT_PLURAL = "hours";
+
+  /**
+   * Private state
+   */
+  var experimentDuration = 0;
+  var onChangeCallback = function(duration) {};
+
+  /**
+   * Dom nodes
+   */
+  var rootNode = {
+    id: 'duration-form-container',
+    node: null
+  };
+  
+  var experimentDurationValueNode = {
+    id: 'duration-display',
+    node: null
+  };
+
+  var experimentDurationUnitNode = {
+    id: 'duration-display-unit',
+    node: null
+  };
+
+  var experimentDurationSliderNode = {
+    id: 'duration-input',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindInternalNode = function(internal_node) {
+    internal_node.node = document.getElementById(internal_node.id);
+    console.assert(internal_node !== null, "ERROR: failed to bind internal node with id: " + internal_node.id);
+  };
+
+  var bindNodes = function() {
+    // Bind internal nodes
+    bindInternalNode(rootNode);
+    bindInternalNode(experimentDurationValueNode);
+    bindInternalNode(experimentDurationUnitNode);
+    bindInternalNode(experimentDurationSliderNode);
+
+    // Attach event listeners
+    experimentDurationSliderNode.node.onchange = function() {
+      experimentDuration = this.immediateValue;
+      updateDurationDisplay();
+    };
+  };
+
+  var updateDurationDisplay = function() {
+    // Render scope count value
+    experimentDurationValueNode.node.innerHTML = experimentDuration;
+
+    // Update scope count unit
+    experimentDurationUnitNode.node.innerHTML = (experimentDuration === 1)
+      ? EXPERIMENT_DURATION_UNIT_SINGULAR
+      : EXPERIMENT_DURATION_UNIT_PLURAL;
+
+    // Notify listeners
+    onChangeCallback(experimentDuration);
+  };
+
+  /**
+   * Public functions
+   */
+  var setDuration = function(experiment_duration) {
+    experimentDuration = experiment_duration;
+
+    // Update ui
+    experimentDurationSliderNode.node.value = experiment_duration;
+    updateDurationDisplay();
+  };
+
+  var getDuration = function() {
+    return experimentDuration;
+  };
+
+  var init = function() {
+    // Bind dom nodes and attach event listeners
+    bindNodes();
+
+    // Initialize scopes count
+    setDuration(0);
+  };
+
+  var setOnChangeCallback = function(callback) {
+    onChangeCallback = callback;
+  };
+
+  return {
+    init: init,
+    setDuration: setDuration,
+    getDuration: getDuration,
+    setOnChangeCallback: setOnChangeCallback
+  };
+
 })();
 
 var NewExperimentUiController = (function() {
 
   /**
-   * Ui attributes
+   * Private state
    */
-  var HIDDEN_VALIDATION_ICON_ATTRIBUTE = 'hidden-validation-icon';
+  var shortCodePicker = null;
 
   /**
-   * Ui node id's
+   * Private functions
    */
-  // Scope count
-  var scopesCountUiFormInfo = {
-    id_set: {
-      display: 'scopes-count-display',
-      display_unit: 'scopes-count-display-unit',
-      input: 'scopes-count-input',
-      valid_icon: 'scopes-count-valid-icon',
-      invalid_icon: 'scopes-count-invalid-icon'
-    },
-    
-    ui_nodes: {
-      input_field: null,
-      display_unit: null,
-      display: null,
-      valid_icon: null,
-      invalid_icon: null
-    },
 
-    display_labels: {
-      singular: 'scope',
-      plural: 'scopes'
-    },
+  /**
+   * Public methods
+   */
+  var init = function(template_store) {
+    // Configure confirm-order controller
+    ConfirmOrderUiController.init();
 
-    value_change_count: 0
-  };
+    // Configure scopes count ui contrller
+    ScopesCountUiController.setOnChangeCallback(function(scopes_count) {
+      ConfirmOrderUiController.setScopesCount(scopes_count);
+    });
+    ScopesCountUiController.init();
+   
+    // Configure experiment duration ui contrller
+    ExperimentDurationUiController.setOnChangeCallback(function(experiment_duration) {
+      ConfirmOrderUiController.setExperimentDuration(experiment_duration);
+    });
+    ExperimentDurationUiController.init();
   
-  // Experiment duration
-  var durationUiFormInfo = {
-    id_set: {
-      display: 'duration-display',
-      display_unit: 'duration-display-unit',
-      input: 'duration-input',
-      valid_icon: 'duration-valid-icon',
-      invalid_icon: 'duration-invalid-icon'
-    },
-  
-    ui_nodes: {
-      input_field: null,
-      display_unit: null,
-      display: null,
-      valid_icon: null,
-      invalid_icon: null
-    },
+    // Configure short code picker
+    var shortCodePicker = new ShortCodePicker(
+      template_store,
+      'existing-short-code-picker'
+    );
+    shortCodePicker.init();
 
-    display_labels: {
-      singular: 'hour',
-      plural: 'hours'
-    },
+    // Register listeners on startup-data api call
+    GetStartupDataApiController.registerSuccessfulApiCallback(function(json_response, api_keys) {
+      shortCodePicker.setShortCodes(json_response[api_keys.short_codes]);
+      ConfirmOrderUiController.setHourlyCost(json_response[api_keys.hourly_price]);
+    }); 
 
-    value_change_count: 0
-  };
-
-  /**
-   * Ui util functions
-   */
-  /**
-   * Update the display for an input form.
-   *
-   * @param: int count: number of microscopes
-   * @param: Obj ui_form_info: data for form ui element (see 
-   *    'this.scopesCountUiFormInfo')
-   */
-  this.updateDisplay = function(count, ui_form_info) {
-    ui_form_info.ui_nodes.display.innerHTML = count;
-    ui_form_info.ui_nodes.display_unit.innerHTML = (count == 1)
-      ? ui_form_info.display_labels.singular
-      : ui_form_info.display_labels.plural;
-  };
-
-  /**
-   * Updates input node and display labels for the form.
-   *
-   * @param: Obj ui_form_info: data for form ui element (see 
-   *    'this.scopesCountUiFormInfo')
-   * @param: int count: number of microscopes
-   */
-  this.setInputValue = function(ui_form_info, count) {
-    // Skip if same value
-    if (ui_form_info.ui_nodes.input_field.value == count) {
-      return;
-    }
-
-    // Update with new 'count' 
-    ui_form_info.ui_nodes.input_field.value = count;
-    updateDisplay(count, ui_form_info);
-  };
-
-  this.bindFormDomNodes = function(ui_form_info) {
-    ui_form_info.ui_nodes.input_field = document.getElementById(ui_form_info.id_set.input); 
-    ui_form_info.ui_nodes.display_unit = document.getElementById(ui_form_info.id_set.display_unit); 
-    ui_form_info.ui_nodes.display = document.getElementById(ui_form_info.id_set.display); 
-    ui_form_info.ui_nodes.valid_icon = document.getElementById(ui_form_info.id_set.valid_icon);
-    ui_form_info.ui_nodes.invalid_icon = document.getElementById(ui_form_info.id_set.invalid_icon);
-  };
-
-  /**
-   * hideInputValidationIcon()
-   * - hide the validation icon
-   */
-  this.hideInputValidationIcon = function(validation_input_icon_dom) {
-    validation_input_icon_dom.setAttribute(HIDDEN_VALIDATION_ICON_ATTRIBUTE, '');  
-  };
-
-  /**
-   * showInputValidationIcon()
-   * - show the validation icon
-   */
-  this.showInputValidationIcon = function(validation_input_icon_dom) {
-    validation_input_icon_dom.removeAttribute(HIDDEN_VALIDATION_ICON_ATTRIBUTE); 
-  };
-
-  /**
-   * updateUiInputCardWithValidInput()
-   * - update the ui of the specified input card to reflect valid input
-   */
-  this.updateUiInputCardWithValidInput = function(ui_form_info) {
-    hideInputValidationIcon(ui_form_info.ui_nodes.invalid_icon);   
-    showInputValidationIcon(ui_form_info.ui_nodes.valid_icon);   
-  };
- 
-  /**
-   * updateUiInputCardWithInvalidInput()
-   * - update the ui of the specified input card to reflect invalid input
-   */
-  this.updateUiInputCardWithInvalidInput = function(ui_form_info) {
-    hideInputValidationIcon(ui_form_info.ui_nodes.valid_icon);   
-    showInputValidationIcon(ui_form_info.ui_nodes.invalid_icon);   
-  };
-
-  /**
-   * Initialize all input forms in the 'New Experiment' page.
-   * Bind DOM nodes and attach event listeners.
-   */
-  this.init = function() {
-    /**
-     * Configure 'Scopes Count' input field
-     */
-    // Bind DOM nodes
-    bindFormDomNodes(scopesCountUiFormInfo);
-
-    // Bind event listeners
-    scopesCountUiFormInfo.ui_nodes.input_field.onchange = function() {
-      updateDisplay(this.immediateValue, scopesCountUiFormInfo);
-    };
-
-    // Initialize scopes count input card ui
-    // updateUiInputCardWithValidInput(scopesCountUiFormInfo); 
-    setInputValue(scopesCountUiFormInfo, 9);
-
-    /**
-     * Configure 'Duration' input field
-     */
-    // Bind DOM nodes
-    bindFormDomNodes(durationUiFormInfo);
-
-    // Bind event listeners
-    durationUiFormInfo.ui_nodes.input_field.onchange = function() {
-      updateDisplay(this.immediateValue, durationUiFormInfo);
-    };
-
-    // Initialize duration input card ui
-    // updateUiInputCardWithInvalidInput(durationUiFormInfo); 
-    setInputValue(durationUiFormInfo, 9);
   };
 
   return {
     init: init
   };
+})();
+
+var ScopesCountUiController = (function() {
+
+  /**
+   * Unit plural/singular
+   */
+  var SCOPES_UNIT_SINGULAR = "scope";
+  var SCOPES_UNIT_PLURAL = "scopes";
+
+  /**
+   * Private state
+   */
+  var scopesCount = 0;
+  var onChangeCallback = function(num_scopes) {};
+
+  /**
+   * Dom nodes
+   */
+  var rootNode = {
+    id: 'scopes-count-input-container',
+    node: null
+  };
+
+  var scopesCountValueNode = {
+    id: 'scopes-count-display',
+    node: null
+  };
+
+  var scopesCountUnitNode = {
+    id: 'scopes-count-display-unit',
+    node: null
+  };
+
+  var scopesCountSliderNode = {
+    id: 'scopes-count-input',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindInternalNode = function(internal_node) {
+    internal_node.node = document.getElementById(internal_node.id);
+    console.assert(internal_node !== null, "ERROR: failed to bind internal node with id: " + internal_node.id);
+  };
+
+  var bindNodes = function() {
+    // Bind internal nodes
+    bindInternalNode(rootNode);
+    bindInternalNode(scopesCountValueNode);
+    bindInternalNode(scopesCountUnitNode);
+    bindInternalNode(scopesCountSliderNode);
+
+    // Attach event listeners
+    scopesCountSliderNode.node.onchange = function() {
+      scopesCount = this.immediateValue;
+      updateScopesCountDisplay();
+    };
+  };
+
+  var updateScopesCountDisplay = function() {
+    // Render scope count value
+    scopesCountValueNode.node.innerHTML = scopesCount;
+
+    // Update scope count unit
+    scopesCountUnitNode.node.innerHTML = (scopesCount === 1)
+      ? SCOPES_UNIT_SINGULAR
+      : SCOPES_UNIT_PLURAL;
+
+    // Notify listeners
+    onChangeCallback(scopesCount);
+  };
+
+  /**
+   * Public functions
+   */
+  var setScopesCount = function(scopes_count) {
+    scopesCount = scopes_count;
+
+    // Update ui
+    scopesCountSliderNode.node.value = scopes_count;
+    updateScopesCountDisplay();
+  };
+
+  var getScopesCount = function() {
+    return scopesCount;
+  };
+
+  var init = function() {
+    // Bind dom nodes and attach event listeners
+    bindNodes();
+
+    // Initialize scopes count
+    setScopesCount(0);
+  };
+
+  var setOnChangeCallback = function(callback) {
+    onChangeCallback = callback;
+  };
+
+  return {
+    init: init,
+    setScopesCount: setScopesCount,
+    getScopesCount: getScopesCount,
+    setOnChangeCallback: setOnChangeCallback
+  };
+
 })();
 
 var SidePanelUiController = (function() {
@@ -757,52 +900,6 @@ var SidePanelUiController = (function() {
   };
 })();
 
-var GetStartupDataApiController = (function() {
-
-  var shortCodePicker = null;
-  var getStartupDataApi = null;
-
-  /**
-   * fetch()
-   * - fetches startup data
-   */
-  var fetch = function() {
-    // Initialize api and bind event listeners
-    if (getStartupDataApi === null) {
-      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
-
-      // Bind api listeners
-      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
-      getStartupDataApi.setLogicalApiFailureCallback(failedApiCallback);
-      getStartupDataApi.setNonLogicalApiFailureCallback(failedApiCallback);
-    }
-
-    // Fetch startup data from server
-    getStartupDataApi.send();
-  };
-
-  var setShortCodePicker = function(short_code_picker) {
-    shortCodePicker = short_code_picker;
-    return this;
-  };
-  
-  var successfulApiCallback = function(api_response) {
-    console.assert(shortCodePicker !== null, "Must set short-code-picker");
-    shortCodePicker.setShortCodes(api_response[getStartupDataApi.getShortCodesKey()]);
-  };
-
-  var failedApiCallback = function(api_response) {
-    console.log(api_response); 
-  };
-
-  return {
-    fetch: fetch,
-    setShortCodePicker: setShortCodePicker,
-    successfulApiCallback: successfulApiCallback,
-    failedApiCallback: failedApiCallback
-  };
-})();
-
 GetAllUsersApi.prototype = new ScopesApi();
 GetAllUsersApi.prototype.constructor = GetAllUsersApi;
 
@@ -827,12 +924,14 @@ function GetStartupDataApi(network_module) {
   this.apiType = 0x15;
 }
 
-GetStartupDataApi.prototype.getFirstNameKey = function() {
-  return "first_name";
-};
-
-GetStartupDataApi.prototype.getShortCodesKey = function() {
-  return "short_codes";
+GetStartupDataApi.prototype.getApiKeys = function() {
+  return {
+    first_name: 'first_name',
+    last_name: 'last_name',
+    email: 'email',
+    hourly_price: 'hourly_price',
+    short_codes: 'short_codes'
+  };
 };
 
 /**
