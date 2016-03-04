@@ -306,6 +306,7 @@ class ApiInjector {
       $this->getStartupDataApi = new GetStartupDataApi(
         $this->getStartupDataApiRequestFactoryLoader->load(),
         $this->methodInjector->getGetGen0OrderPricePolicyMethod(),
+        $this->methodInjector->getGetUsersShortCodesMethod(),
         $this->logger 
       );
     }

@@ -74,6 +74,7 @@ class MethodInjector {
 
   // Short code methods
   private ?CreateShortCodeMethod $createShortCodeMethod;
+  private ?GetUsersShortCodesMethod $getUsersShortCodesMethod;
 
   // Complete order methods
   private ?CompleteOrderMethod $completeOrderMethod;
@@ -507,6 +508,16 @@ class MethodInjector {
       );
     }
     return $this->createShortCodeMethod;
+  }
+
+  public function getGetUsersShortCodesMethod(): GetUsersShortCodesMethod {
+    if ($this->getUsersShortCodesMethod === null) {
+      $this->getUsersShortCodesMethod = new GetUsersShortCodesMethod(
+        $this->queryInjector->getFetchUserByIdQuery(),
+        $this->queryInjector->getFetchUserShortCodesQuery()
+      ); 
+    }
+    return $this->getUsersShortCodesMethod;
   }
 
   /**

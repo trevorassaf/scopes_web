@@ -567,6 +567,7 @@ return array(
     'SessionKeys' => $baseDir . '/session/SessionKeys.hh',
     'SessionManager' => $baseDir . '/session/SessionManager.hh',
     'ShortCode' => $baseDir . '/access_layer/models/objects/short_code/ShortCode.hh',
+    'ShortCodeApiObject' => $baseDir . '/apis/results/short_codes/ShortCodeApiObject.hh',
     'ShortCodeFactory' => $baseDir . '/access_layer/models/factories/short_code/ShortCodeFactory.hh',
     'ShortCodeModelFactoryLazyLoader' => $baseDir . '/dependency_injection/queries/lazy_loaders/short_code/ShortCodeModelFactoryLazyLoader.hh',
     'ShortCodeTable' => $baseDir . '/access_layer/tables/short_code/ShortCodeTable.hh',
