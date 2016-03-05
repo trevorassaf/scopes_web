@@ -146,6 +146,40 @@ paper-slider {
   float: right;
 }
 
+#confirm-payment-container div {
+  display: inline-block;
+  padding: 10px;
+  color: #FFFFFF;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#confirm-payment-button {
+  background-color: #4D90FE;
+  /* background-color: #61DD61; */
+  margin-right: 20px;
+}
+
+#cancel-payment-button {
+  background-color: #FF3B45;
+}
+
+#confirm-payment-button:hover {
+  background-image: -webkit-linear-gradient(top, #4D90FE, #2478FD);
+}
+
+#cancel-payment-button:hover {
+  background-image: -webkit-linear-gradient(top, #FF3B45, #FF0E1A);
+}
+
+#confirm-payment-container {
+  margin-top: 25px;
+}
+
+#confirm-payment-input-container .payment-multiplier-label, #confirm-payment-input-container .payment-assignment-label {
+  margin-left: 5px;
+  margin-right: 5px;
+}
 
 #side-panel {
   float: left;
@@ -309,7 +343,7 @@ paper-slider {
   position: relative;
   cursor: pointer;
   overflow: auto;
-  width: 156px;
+  min-width: 120px;
   display: inline-block;
 }
 
@@ -317,6 +351,7 @@ paper-slider {
   padding-left: 8px;
   position: relative;
   top: 6px;
+  margin-right: 10px;
 }
 
 /* Transition to a bigger shadow on hover */
@@ -513,7 +548,7 @@ paper-slider {
 }
 
 .short-code-picker-wrapper .short-code-dropdown-wrapper {
-  position: absolute;
+  position: relative;
   left: -1px;
 }
 
@@ -525,7 +560,8 @@ paper-slider {
   overflow-y: auto;
   margin-top: 2px;
   background-color: #FFFFFF;
-  width: 146px;
+  position: absolute;
+  width: 100%;
 }
 
 .short-code-picker-wrapper[hidden-dropdown] .short-code-dropdown {

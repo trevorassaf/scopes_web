@@ -184,7 +184,7 @@ function ShortCodePicker(
       // Capture selected short-code 
       for (var i in event.path) {
         var node = event.path[i];
-        if (hasClass(SHORT_CODE_PICKER_OPTION_CLASS, node.className)) {
+        if (hasClass(SHORT_CODE_PICKER_OPTION_CLASS, node)) {
           // Capture selected option
           var local_idx_str = node.getAttribute(OPTION_LOCAL_IDX_ATTR);
           console.assert(local_idx_str != null);
@@ -205,10 +205,10 @@ function ShortCodePicker(
 
     // Hide short-code picker if user clicks off the screen
     document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
-      for (var node_id in event.path) {
-        var node = event.path[node_id];
+      for (var node_idx in event.path) {
+        var node = event.path[node_idx];
         // User clicked on the time-picker, so don't hide it!
-        if (node.id == rootNode.node.id) {
+        if (Utils.hasClass(shortCodePickerWrapperNode.class, node)) {
           return;
         }
       }    

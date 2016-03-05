@@ -29,7 +29,7 @@
   position: relative;
   cursor: pointer;
   overflow: auto;
-  width: 156px;
+  min-width: 120px;
   display: inline-block;
 }
 
@@ -37,6 +37,7 @@
   padding-left: 8px;
   position: relative;
   top: 6px;
+  margin-right: 10px;
 }
 
 /* Transition to a bigger shadow on hover */

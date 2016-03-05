@@ -56,22 +56,46 @@ window.onload = function() {
 };
 
 var Utils = (function() {
- 
-  this.hasClass = function(expected_class, node_class) {
+
+  var CLASS_NAME_PROPERTY = "className";
+
+  this.hasClass = function(expected_class, node) {
+    if (!(CLASS_NAME_PROPERTY in node)) {
+      return false;
+    }
+
+    var node_class = node[CLASS_NAME_PROPERTY];
     var class_idx = node_class.indexOf(expected_class);
     
     if (class_idx == -1) {
-      return;
+      return false;
     }
 
     return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
       && (expected_class.length + class_idx == node_class.length
         || node_class.charAt(expected_class.length + class_idx) == ' ');
   };
+  
+  this.makePriceString = function(price) {
+    var price_in_cents = Math.floor(price * 100);
+    price = price_in_cents / 100;
+    
+    if (price_in_cents % 100 === 0) {
+      return price.toString() + ".00"; 
+    } 
+    
+    if (price_in_cents % 10 === 0) {
+      return price.toString() + "0";
+    }
+
+    return price;
+  };
 
   return {
-    hasClass: hasClass
+    hasClass: hasClass,
+    makePriceString: makePriceString
   };
+
 })();
 
 var GetStartupDataApiController = (function() {
@@ -367,12 +391,6 @@ var ConfirmOrderUiController = (function() {
     number: {
       id: 'payment-hourly-price-amount-label',
       node: null
-    },
-    unit: {
-      id: 'payment-hourly-price-unit-label',
-      node: null,
-      singular: '/ (scope x hour)',
-      plural: '/ (scope x hour)'
     }
   };
 
@@ -391,7 +409,9 @@ var ConfirmOrderUiController = (function() {
 
   var bindPriceComponentNode = function(price_component_node) {
     bindInternalNode(price_component_node.number); 
-    bindInternalNode(price_component_node.unit); 
+    if (price_component_node.hasOwnProperty("unit")) {
+      bindInternalNode(price_component_node.unit); 
+    }
   };
 
   var bindNodes = function() {
@@ -437,9 +457,11 @@ var ConfirmOrderUiController = (function() {
       price_contributing_node.number.node.innerHTML = value;
 
       // Update unit
-      price_contributing_node.unit.node.innerHTML = (value === 1)
-        ? price_contributing_node.unit.singular
-        : price_contributing_node.unit.plural;
+      if (price_contributing_node.hasOwnProperty("unit")) {
+        price_contributing_node.unit.node.innerHTML = (value === 1)
+          ? price_contributing_node.unit.singular
+          : price_contributing_node.unit.plural;
+      }
 
       // Recompute price and update ui
       updatePrice();
@@ -451,7 +473,7 @@ var ConfirmOrderUiController = (function() {
    */
   var setHourlyCost = function(hourly_cost) {
     hourlyCost = hourly_cost;
-    updatePriceContributingNodeIfInitialized(hourlyPriceNode, hourly_cost);
+    updatePriceContributingNodeIfInitialized(hourlyPriceNode, Utils.makePriceString(hourly_cost));
     return this;
   };
 
@@ -1444,7 +1466,7 @@ function Calendar(
       // Search event propagation list to find selectable-date node
       var date = null;
       for (var i = 0; i < event.path.length; ++i) {
-        if (event.path[i].className != undefined && Utils.hasClass(SELECTABLE_DATE_CLASS, event.path[i].className)) {
+        if (Utils.hasClass(SELECTABLE_DATE_CLASS, event.path[i])) {
           date = event.path[i];
           break;
         } 
@@ -1463,7 +1485,7 @@ function Calendar(
       // Extract the numerical date
       console.assert(date.childNodes.length == 1);
       var label = date.childNodes[0];
-      console.assert(Utils.hasClass(DATE_LABEL_CLASS, label.className));
+      console.assert(Utils.hasClass(DATE_LABEL_CLASS, label));
 
       var date_idx = parseInt(label.innerHTML);
 
@@ -2062,7 +2084,7 @@ function ShortCodePicker(
       // Capture selected short-code 
       for (var i in event.path) {
         var node = event.path[i];
-        if (hasClass(SHORT_CODE_PICKER_OPTION_CLASS, node.className)) {
+        if (hasClass(SHORT_CODE_PICKER_OPTION_CLASS, node)) {
           // Capture selected option
           var local_idx_str = node.getAttribute(OPTION_LOCAL_IDX_ATTR);
           console.assert(local_idx_str != null);
@@ -2083,10 +2105,10 @@ function ShortCodePicker(
 
     // Hide short-code picker if user clicks off the screen
     document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
-      for (var node_id in event.path) {
-        var node = event.path[node_id];
+      for (var node_idx in event.path) {
+        var node = event.path[node_idx];
         // User clicked on the time-picker, so don't hide it!
-        if (node.id == rootNode.node.id) {
+        if (Utils.hasClass(shortCodePickerWrapperNode.class, node)) {
           return;
         }
       }    
@@ -2430,7 +2452,7 @@ function TimePicker(
       // Capture selected time
       for (var i in event.path) {
         var node = event.path[i];
-        if (hasClass(TIME_PICKER_OPTION_CLASS, node.className)) {
+        if (hasClass(TIME_PICKER_OPTION_CLASS, node)) {
           var numeric_time = node.getAttribute(TIME_ATTR); 
           inputFieldNode.node.innerHTML = stringifyTimeForInputField(numeric_time);
           return;

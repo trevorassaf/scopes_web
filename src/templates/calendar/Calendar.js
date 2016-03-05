@@ -269,7 +269,7 @@ function Calendar(
       // Search event propagation list to find selectable-date node
       var date = null;
       for (var i = 0; i < event.path.length; ++i) {
-        if (event.path[i].className != undefined && Utils.hasClass(SELECTABLE_DATE_CLASS, event.path[i].className)) {
+        if (Utils.hasClass(SELECTABLE_DATE_CLASS, event.path[i])) {
           date = event.path[i];
           break;
         } 
@@ -288,7 +288,7 @@ function Calendar(
       // Extract the numerical date
       console.assert(date.childNodes.length == 1);
       var label = date.childNodes[0];
-      console.assert(Utils.hasClass(DATE_LABEL_CLASS, label.className));
+      console.assert(Utils.hasClass(DATE_LABEL_CLASS, label));
 
       var date_idx = parseInt(label.innerHTML);
 

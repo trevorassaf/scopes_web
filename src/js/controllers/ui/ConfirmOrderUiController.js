@@ -65,12 +65,6 @@ var ConfirmOrderUiController = (function() {
     number: {
       id: 'payment-hourly-price-amount-label',
       node: null
-    },
-    unit: {
-      id: 'payment-hourly-price-unit-label',
-      node: null,
-      singular: '/ (scope x hour)',
-      plural: '/ (scope x hour)'
     }
   };
 
@@ -89,7 +83,9 @@ var ConfirmOrderUiController = (function() {
 
   var bindPriceComponentNode = function(price_component_node) {
     bindInternalNode(price_component_node.number); 
-    bindInternalNode(price_component_node.unit); 
+    if (price_component_node.hasOwnProperty("unit")) {
+      bindInternalNode(price_component_node.unit); 
+    }
   };
 
   var bindNodes = function() {
@@ -135,9 +131,11 @@ var ConfirmOrderUiController = (function() {
       price_contributing_node.number.node.innerHTML = value;
 
       // Update unit
-      price_contributing_node.unit.node.innerHTML = (value === 1)
-        ? price_contributing_node.unit.singular
-        : price_contributing_node.unit.plural;
+      if (price_contributing_node.hasOwnProperty("unit")) {
+        price_contributing_node.unit.node.innerHTML = (value === 1)
+          ? price_contributing_node.unit.singular
+          : price_contributing_node.unit.plural;
+      }
 
       // Recompute price and update ui
       updatePrice();
@@ -149,7 +147,7 @@ var ConfirmOrderUiController = (function() {
    */
   var setHourlyCost = function(hourly_cost) {
     hourlyCost = hourly_cost;
-    updatePriceContributingNodeIfInitialized(hourlyPriceNode, hourly_cost);
+    updatePriceContributingNodeIfInitialized(hourlyPriceNode, Utils.makePriceString(hourly_cost));
     return this;
   };
 

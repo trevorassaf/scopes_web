@@ -212,7 +212,7 @@ function TimePicker(
       // Capture selected time
       for (var i in event.path) {
         var node = event.path[i];
-        if (hasClass(TIME_PICKER_OPTION_CLASS, node.className)) {
+        if (hasClass(TIME_PICKER_OPTION_CLASS, node)) {
           var numeric_time = node.getAttribute(TIME_ATTR); 
           inputFieldNode.node.innerHTML = stringifyTimeForInputField(numeric_time);
           return;

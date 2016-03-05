@@ -50,7 +50,7 @@
 }
 
 .short-code-picker-wrapper .short-code-dropdown-wrapper {
-  position: absolute;
+  position: relative;
   left: -1px;
 }
 
@@ -62,7 +62,8 @@
   overflow-y: auto;
   margin-top: 2px;
   background-color: #FFFFFF;
-  width: 146px;
+  position: absolute;
+  width: 100%;
 }
 
 .short-code-picker-wrapper[hidden-dropdown] .short-code-dropdown {
