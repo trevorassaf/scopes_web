@@ -48,6 +48,7 @@ class MethodInjector {
   private ?DeleteConfirmedOrderMethod $deleteConfirmedOrderMethod;
   private ?GetUsersConfirmedOrdersAndCellLabelsMethod $getUsersConfirmedOrdersAndCellLabelsMethod;
   private ?GetUsersConfirmedOrdersMethod $getUsersConfirmedOrdersMethod;
+  private ?IsConflictingConfirmedOrderMethod $isConflictingConfirmedOrderMethod;
 
   // Cell label methods
   private ?UpdateCellLabelMethod $updateCellLabelMethod;
@@ -97,6 +98,7 @@ class MethodInjector {
     private LazyLoader<HRTimeSerializer> $timeSerializerLoader,
     private LazyLoader<DateSerializer> $dateSerializerLoader,
     private LazyLoader<TimestampBuilder> $timestampBuilderLoader,
+    private LazyLoader<TimestampOperator> $timestampOperatorLoader,
     private LazyLoader<DateToDayOfTheWeekConverter> $dateToDayOfTheWeekConverterLoader,
     private LazyLoader<TimestampSegmentExpander> $timestampSegmentExpanderLoader,
     private LazyLoader<ConfirmedOrdersTable> $confirmedOrdersTableLoader,
@@ -291,17 +293,13 @@ class MethodInjector {
   public function getConfirmOrderMethod(): ConfirmOrderMethod {
     if ($this->confirmOrderMethod === null) {
       $this->confirmOrderMethod = new ConfirmOrderMethod(
-        $this->queryInjector->getFetchRsvdOrderByIdQuery(),
         $this->queryInjector->getFetchIsUserOwnedShortCodeQuery(),
         $this->queryInjector->getConcreteInsertConfirmedOrderQuery(),
-        $this->queryInjector->getConcreteInsertEditedVideoOrderQuery(),
-        $this->queryInjector->getBatchInsertCellLabelsQuery(),
-        $this->queryInjector->getDeleteByIdQuery(),
-        $this->cellsLabelTableLoader->load(),
-        $this->rsvdOrdersTableLoader->load(),
-        $this->queryInjector->getConcreteInsertConfirmedOrderScopeMappingsQuery(),
-        $this->queryInjector->getFetchScopeMappingsByReservedOrderQuery(),
-        $this->queryInjector->getReservedOrderScopeMappingsTable()
+        $this->getIsValidReservedOrderMethod(),
+        $this->getIsConflictingConfirmedOrderMethod(),
+        $this->timestampSegmentFactoryLoader->load(),
+        $this->timestampBuilderLoader->load(),
+        $this->timestampOperatorLoader->load()
       ); 
     }
     return $this->confirmOrderMethod;
@@ -338,6 +336,16 @@ class MethodInjector {
       ); 
     }
     return $this->getUsersConfirmedOrdersAndCellLabelsMethod;
+  }
+
+  public function getIsConflictingConfirmedOrderMethod(): IsConflictingConfirmedOrderMethod {
+    if ($this->isConflictingConfirmedOrderMethod === null) {
+      $this->isConflictingConfirmedOrderMethod = new IsConflictingConfirmedOrderMethod(
+        $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
+        $this->queryInjector->getFetchReservedOrderPolicyQuery()
+      );
+    }
+    return $this->isConflictingConfirmedOrderMethod;
   }
 
   public function getGetUsersConfirmedOrdersMethod(): GetUsersConfirmedOrdersMethod {

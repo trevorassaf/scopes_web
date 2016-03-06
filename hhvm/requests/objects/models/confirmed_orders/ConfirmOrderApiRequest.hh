@@ -4,69 +4,61 @@ class ConfirmOrderApiRequest {
 
   const string REQUEST_OBJECT_NAME = "ConfirmOrderApiRequest";
 
-  const string RSVD_ORDER_ID_KEY = 'rid';
-  const string TITLE_KEY = 'title';
-  const string DESCRIPTION_KEY = 'desc';
-  const string SHORT_CODE_KEY = 'code-id';
-  const string EDITED_VIDEO_ORDER_REQUEST = 'edited-video-order';
+  const string SCOPES_COUNT_KEY = "scopes-count";
+  const string DURATION_KEY = "duration";
+  const string START_TIMESTAMP_KEY = "start-timestamp";
+  const string SHORT_CODE_KEY = 'short-code';
 
   public function __construct(
-    private RequestField<UnsignedInt> $rsvdOrderId,
-    private RequestField<string> $title,
-    private RequestField<string> $description,
-    private RequestField<UnsignedInt> $shortCodeId,
-    private ?EditedVideoOrderApiRequest $editedVideoOrder
+    private RequestField<UnsignedInt> $scopesCount,
+    private RequestField<Timestamp> $startTimestamp,
+    private RequestField<UnsignedInt> $experimentDuration,
+    private RequestField<UnsignedInt> $shortCodeId
   ) {}
 
-  public function getRsvdOrderId(): RequestField<UnsignedInt> {
-    return $this->rsvdOrderId;
+  public function getScopesCount(): RequestField<UnsignedInt> {
+    return $this->scopesCount;
   }
 
-  public function getTitle(): RequestField<string> {
-    return $this->title;
+  public function getStartTimestamp(): RequestField<Timestamp> {
+    return $this->startTimestamp;
   }
 
-  public function getDescription(): RequestField<string> {
-    return $this->description;
+  public function getExperimentDuration(): RequestField<UnsignedInt> {
+    return $this->experimentDuration;
   }
 
   public function getShortCodeId(): RequestField<UnsignedInt> {
     return $this->shortCodeId;
   }
-
-  public function getEditedVideoOrderApiRequest(): ?EditedVideoOrderApiRequest {
-    return $this->editedVideoOrder;
-  }
 }
 
 class ConfirmOrderApiRequestBuilder {
   
-  private ?RequestField<UnsignedInt> $rsvdOrderId;
-  private ?RequestField<string> $title;
-  private ?RequestField<string> $description;
+  private ?RequestField<UnsignedInt> $scopesCount;
+  private ?RequestField<Timestamp> $startTimestamp;
+  private ?RequestField<UnsignedInt> $experimentDuration;
   private ?RequestField<UnsignedInt> $shortCodeId;
-  private ?EditedVideoOrderApiRequest $editedVideoOrder;
 
-  public function setRsvdOrderId(RequestField<UnsignedInt> $rsvd_order_id): this {
-    $this->rsvdOrderId = $rsvd_order_id;
-    return $this; 
-  }
-
-  public function setTitle(RequestField<string> $title): this {
-    $this->title = $title;
+  public function setScopesCount(RequestField<UnsignedInt> $scopes_count): this {
+    $this->scopesCount = $scopes_count;
     return $this;
   }
 
-  public function setDescription(RequestField<string> $description): this {
-    $this->description = $description;
+  public function setStartTimestamp(RequestField<Timestamp> $start_timestamp): this {
+    $this->startTimestamp = $start_timestamp;
     return $this;
   }
-  
+
+  public function setExperimentDuration(RequestField<UnsignedInt> $duration): this {
+    $this->experimentDuration = $duration;
+    return $this;
+  }
+
   public function setShortCodeId(RequestField<UnsignedInt> $short_code_id): this {
     $this->shortCodeId = $short_code_id;
     return $this;
   }
-
   private function checkNotNull<T>(?T $field, string $key): T {
     if ($field === null) {
       throw new UnsetRequestFieldException(
@@ -80,11 +72,10 @@ class ConfirmOrderApiRequestBuilder {
   public function build(): ConfirmOrderApiRequest {
     // Extrude request object and ensure fields are not null
     return new ConfirmOrderApiRequest(
-      $this->checkNotNull($this->rsvdOrderId, ConfirmOrderApiRequest::RSVD_ORDER_ID_KEY),
-      $this->checkNotNull($this->title, ConfirmOrderApiRequest::TITLE_KEY),
-      $this->checkNotNull($this->description, ConfirmOrderApiRequest::DESCRIPTION_KEY),
-      $this->checkNotNull($this->shortCodeId, ConfirmOrderApiRequest::SHORT_CODE_KEY),
-      $this->editedVideoOrder
+      $this->checkNotNull($this->scopesCount, ConfirmOrderApiRequest::SCOPES_COUNT_KEY),
+      $this->checkNotNull($this->startTimestamp, ConfirmOrderApiRequest::START_TIMESTAMP_KEY),
+      $this->checkNotNull($this->experimentDuration, ConfirmOrderApiRequest::DURATION_KEY),
+      $this->checkNotNull($this->shortCodeId, ConfirmOrderApiRequest::SHORT_CODE_KEY)
     );
   }
 }

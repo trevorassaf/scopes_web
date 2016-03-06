@@ -594,6 +594,8 @@ return array(
     'TimestampBuilder' => $baseDir . '/utils/data_types/chronos/timestamp/objects/TimestampBuilder.hh',
     'TimestampBuilderLazyLoader' => $baseDir . '/dependency_injection/queries/lazy_loaders/chronos/TimestampBuilderLazyLoader.hh',
     'TimestampFieldConverter' => $baseDir . '/requests/fields/converters/TimestampFieldConverter.hh',
+    'TimestampOperator' => $baseDir . '/utils/data_types/chronos/timestamp/objects/TimestampOperator.hh',
+    'TimestampOperatorLazyLoader' => $baseDir . '/dependency_injection/methods/lazy_loaders/TimestampOperatorLazyLoader.hh',
     'TimestampRequestFieldFactoryBuilder' => $baseDir . '/requests/fields/factories/TimestampRequestFieldFactoryBuilder.hh',
     'TimestampRequestFieldFactoryBuilderLazyLoader' => $baseDir . '/dependency_injection/apis/lazy_loaders/TimestampRequestFieldFactoryBuilderLazyLoader.hh',
     'TimestampSegment' => $baseDir . '/utils/data_types/chronos/timestamp/objects/TimestampSegment.hh',

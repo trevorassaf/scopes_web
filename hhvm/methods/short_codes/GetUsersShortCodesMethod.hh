@@ -8,6 +8,7 @@ class GetUsersShortCodesMethod {
   ) {}
 
   public function getShortCodes(UnsignedInt $user_id): ImmVector<ShortCode> {
+
     try {
       // Check that user exists
       $fetch_user_handle = $this->fetchUserByIdQuery->fetch($user_id);
