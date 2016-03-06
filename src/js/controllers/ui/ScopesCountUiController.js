@@ -1,4 +1,9 @@
 var ScopesCountUiController = (function() {
+  
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_VALIDATION_ICON_ATTR = "hidden";
 
   /**
    * Unit plural/singular
@@ -17,6 +22,16 @@ var ScopesCountUiController = (function() {
    */
   var rootNode = {
     id: 'scopes-count-input-container',
+    node: null
+  };
+  
+  var validIconNode = {
+    id: 'scopes-count-valid-icon',
+    node: null
+  };
+  
+  var invalidIconNode = {
+    id: 'scopes-count-invalid-icon',
     node: null
   };
 
@@ -38,6 +53,37 @@ var ScopesCountUiController = (function() {
   /**
    * Private functions
    */
+  var showProperValidationIcon = function() {
+    if (isValidInput()) {
+      showValidIcon();
+    } else {
+      showInvalidIcon();
+    }
+  };
+
+  var showValidIcon = function() {
+    hideValidationIcon(invalidIconNode);
+    showValidationIcon(validIconNode);
+  };
+
+  var showInvalidIcon = function() {
+    hideValidationIcon(validIconNode);
+    showValidationIcon(invalidIconNode);
+  };
+
+  var hideBothValidationIcons = function() {
+    hideValidationIcon(invalidIconNode);
+    hideValidationIcon(validIconNode);
+  };
+
+  var hideValidationIcon = function(validation_icon_node) {
+    validation_icon_node.node.setAttribute(HIDDEN_VALIDATION_ICON_ATTR, '');
+  };
+
+  var showValidationIcon = function(validation_icon_node) {
+    validation_icon_node.node.removeAttribute(HIDDEN_VALIDATION_ICON_ATTR);
+  }
+
   var bindInternalNode = function(internal_node) {
     internal_node.node = document.getElementById(internal_node.id);
     console.assert(internal_node !== null, "ERROR: failed to bind internal node with id: " + internal_node.id);
@@ -49,11 +95,16 @@ var ScopesCountUiController = (function() {
     bindInternalNode(scopesCountValueNode);
     bindInternalNode(scopesCountUnitNode);
     bindInternalNode(scopesCountSliderNode);
+    bindInternalNode(validIconNode);
+    bindInternalNode(invalidIconNode);
 
     // Attach event listeners
     scopesCountSliderNode.node.onchange = function() {
       scopesCount = this.immediateValue;
       updateScopesCountDisplay();
+      
+      // Show appropriate validation icon
+      showProperValidationIcon();
     };
   };
 
@@ -65,7 +116,7 @@ var ScopesCountUiController = (function() {
     scopesCountUnitNode.node.innerHTML = (scopesCount === 1)
       ? SCOPES_UNIT_SINGULAR
       : SCOPES_UNIT_PLURAL;
-
+      
     // Notify listeners
     onChangeCallback(scopesCount);
   };
@@ -79,6 +130,9 @@ var ScopesCountUiController = (function() {
     // Update ui
     scopesCountSliderNode.node.value = scopes_count;
     updateScopesCountDisplay();
+    
+    // Show appropriate validation icon
+    showProperValidationIcon();
   };
 
   var getScopesCount = function() {
@@ -91,17 +145,32 @@ var ScopesCountUiController = (function() {
 
     // Initialize scopes count
     setScopesCount(0);
+    hideBothValidationIcons();
   };
 
   var setOnChangeCallback = function(callback) {
     onChangeCallback = callback;
   };
 
+  var isValidInput = function() {
+    return scopesCount !== 0; 
+  };
+
+  var signalInvalidInput = function() {
+    // Short circuit if valid input...
+    if (isValidInput()) {
+      return;
+    }
+
+    showInvalidIcon();
+  };
+
   return {
     init: init,
     setScopesCount: setScopesCount,
     getScopesCount: getScopesCount,
-    setOnChangeCallback: setOnChangeCallback
+    setOnChangeCallback: setOnChangeCallback,
+    isValidInput: isValidInput,
+    signalInvalidInput: signalInvalidInput
   };
-
 })();

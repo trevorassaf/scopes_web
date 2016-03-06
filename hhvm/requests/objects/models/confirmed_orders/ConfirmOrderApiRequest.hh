@@ -7,7 +7,7 @@ class ConfirmOrderApiRequest {
   const string SCOPES_COUNT_KEY = "scopes-count";
   const string DURATION_KEY = "duration";
   const string START_TIMESTAMP_KEY = "start-timestamp";
-  const string SHORT_CODE_KEY = 'short-code';
+  const string SHORT_CODE_KEY = 'short-code-id';
 
   public function __construct(
     private RequestField<UnsignedInt> $scopesCount,

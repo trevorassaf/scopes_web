@@ -13,6 +13,18 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
     ImmMap<string, mixed> $params
   ): ConfirmedOrder {
 
+    // Capture title arg, if it exists 
+    $title = null;
+    if ($params->containsKey($this->confirmedOrdersTable->getTitleKey())) {
+      $title = (string)$params[$this->confirmedOrdersTable->getTitleKey()];
+    }
+
+    // Capture dscription arg, if it exists
+    $description = null;
+    if ($params->containsKey($this->confirmedOrdersTable->getDescriptionKey())) {
+      $description = (string)$params[$this->confirmedOrdersTable->getDescriptionKey()];
+    }
+
     return new ConfirmedOrder(
       $id,
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getUserIdKey()]), 
@@ -21,8 +33,8 @@ class ConfirmedOrderFactory extends ConcreteModelFactory<ConfirmedOrder> {
         $this->timestampSerializer->deserialize((string)$params[$this->confirmedOrdersTable->getStartTimeKey()]),
         $this->timestampSerializer->deserialize((string)$params[$this->confirmedOrdersTable->getEndTimeKey()])
       ),
-      (string)$params[$this->confirmedOrdersTable->getTitleKey()],
-      (string)$params[$this->confirmedOrdersTable->getDescriptionKey()],
+      $title,
+      $description,
       new UnsignedInt((int)$params[$this->confirmedOrdersTable->getShortCodeIdKey()]),
       new UnsignedFloat((float)$params[$this->confirmedOrdersTable->getPriceKey()]),
       $this->timestampSerializer->deserialize((string)$params[$this->confirmedOrdersTable->getTimeOrderedKey()])

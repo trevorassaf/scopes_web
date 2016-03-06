@@ -7,42 +7,6 @@ window.onload = function() {
   console.assert(template_store != null);
 
   /**
-   * Configure time-picker element
-   */
-  var start_time = {
-    hours: 10,
-    minutes: 00 
-  };
-
-  var end_time = {
-    hours: 17,
-    minutes: 30 
-  };
-
-  var time_picker = new TimePicker(
-    template_store,
-    'exp-time-picker',
-    start_time,
-    end_time,
-    30
-  ); 
-  time_picker.init();
-
-  /**
-   * Configure calendar element
-   */
-  var disallowed_week_days = new Set([0, 6]);
-  var calendar = new Calendar(
-      template_store,
-      'exp-date-calendar',
-      disallowed_week_days,
-      {},
-      3,
-      0 
-  );
-  calendar.init();
-
-  /**
    * Configure UI elements
    */
   CenterPanelController.init();
@@ -58,6 +22,11 @@ window.onload = function() {
 var Utils = (function() {
 
   var CLASS_NAME_PROPERTY = "className";
+
+  // Timestamp delimiters
+  var DATE_DELIMITER = "-";
+  var TIME_DELIMITER = ":";
+  var DATE_TIME_SEPERATOR = " ";
 
   this.hasClass = function(expected_class, node) {
     if (!(CLASS_NAME_PROPERTY in node)) {
@@ -77,116 +46,69 @@ var Utils = (function() {
   };
   
   this.makePriceString = function(price) {
-    var price_in_cents = Math.floor(price * 100);
-    price = price_in_cents / 100;
+
+    // Group thousands with commas 
+    var price_str = "";
+    var price_in_dollars = Math.floor(price);
     
-    if (price_in_cents % 100 === 0) {
-      return price.toString() + ".00"; 
-    } 
-    
-    if (price_in_cents % 10 === 0) {
-      return price.toString() + "0";
+    var i = 1;
+    var j = 1000;
+
+    while (j < price_in_dollars) {
+      var codon = Math.floor((price_in_dollars % j) / i);
+      price_str = "," + codon.toString().concat(price_str);
+      i = j;
+      j *= 1000;
     }
 
-    return price;
+    var leading_digits = Math.floor(price_in_dollars / i);
+    price_str = leading_digits.toString().concat(price_str);
+
+    // Stringify decimal digits
+    var cents = Math.floor(price * 100) % 100;
+    var cents_str = cents.toString();
+    if (cents_str.length === 1) {
+      cents_str = "0".concat(cents_str);
+    }
+    console.assert(cents_str.length === 2);
+
+    cents_str = ".".concat(cents_str);
+    return price_str.concat(cents_str);
+  };
+
+  this.stringifyNumberWithEnforcedDigitCount = function(number, digit_count) {
+    var number_string = number.toString();
+    console.assert(number_string.length <= digit_count);
+
+    if (number_string.length < digit_count) {
+      var zero_prefix = "0".repeat(digit_count - number_string.length);
+      number_string = zero_prefix.concat(number_string);
+    }
+
+    return number_string;
+  };
+
+  /**
+   * makeTimestampString()
+   * @param DateObj date: {year, month, date}
+   * @param TimeObj time: {hours, minutes, seconds}
+   *   - 'hours' is in military time
+   */
+  this.makeTimestampString = function(date, time) {
+    return date.year.toString() + DATE_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(date.month, 2) + DATE_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(date.date, 2) + DATE_TIME_SEPERATOR +
+      stringifyNumberWithEnforcedDigitCount(time.hours, 2) + TIME_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(time.minutes, 2) + TIME_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
   };
 
   return {
     hasClass: hasClass,
-    makePriceString: makePriceString
+    makePriceString: makePriceString,
+    makeTimestampString: makeTimestampString
   };
 
-})();
-
-var GetStartupDataApiController = (function() {
-
-  /**
-   * Private state
-   */
-  var getStartupDataApi = null;
-  var successfulApiCallbackListeners = [];
-  var failedLogicalApiCallbackListeners = [];
-  var failedNonLogicalApiCallbackListeners = [];
-
-  /**
-   * fetch()
-   * - fetches startup data
-   */
-  var fetch = function() {
-    // Initialize api and bind event listeners
-    if (getStartupDataApi === null) {
-      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
-
-      // Bind api listeners
-      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
-      getStartupDataApi.setLogicalApiFailureCallback(logicallyFailedApiCallback);
-      getStartupDataApi.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
-    }
-
-    // Fetch startup data from server
-    getStartupDataApi.send();
-  };
-
-  var successfulApiCallback = function(api_response) {
-    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
-      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
-    }
-  };
-  
-  var logicallyFailedApiCallback = function(api_response) {
-    console.log("WARNING: Logically failed api response!");
-    console.log(api_response); 
-    
-    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
-      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
-    }
-  };
-
-  var nonLogicallyFailedApiCallback = function(api_response) {
-    console.nonLog("WARNING: Logically failed api response!");
-    console.nonLog(api_response); 
-    
-    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
-      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
-    }
-  };
-
-  /**
-   * registerSuccessfulApiCallback()
-   * - add callback for successful api call
-   * @param FuncPtr callback: function(json_response, api_keys) {...}
-   */
-  var registerSuccessfulApiCallback = function(callback) {
-    successfulApiCallbackListeners.push(callback);
-    return this;
-  };
-
-  /**
-   * registerLogicalFailedApiCallback()
-   * - add callback for logical failed api call (i.e. api error error rather than network error)
-   * @param FuncPtr callback: function(json_response, api_keys) {...}
-   */
-  var registerLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
-    return this;
-  };
-
-  /**
-   * registerNonLogicalFailedApiCallback()
-   * - add callback for non-logical failed api call (i.e. network error rather than api error)
-   * @param FuncPtr callback: function(xhttp_response) {...}
-   */
-  var registerNonLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
-    return this;
-  };
-
-  return {
-    fetch: fetch,
-    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
-    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
-    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
-  };
 })();
 
 var CenterPanelController = (function() {
@@ -352,12 +274,24 @@ var ConfirmOrderUiController = (function() {
   var scopesCount = 0;
   var experimentDuration = 0;
   var totalPrice = 0;
+  var confirmOrderButtonOnClickListeners = [];
+  var cancelOrderButtonOnClickListeners = [];
 
   /**
    * Dom Nodes
    */
   var rootNode = {
     id: 'pricing-confirmation-form-container',
+    node: null
+  };
+
+  var confirmOrderButtonNode = {
+    id: 'confirm-payment-button',
+    node: null
+  };
+  
+  var cancelOrderButtonNode = {
+    id: 'cancel-payment-button',
     node: null
   };
 
@@ -418,6 +352,20 @@ var ConfirmOrderUiController = (function() {
     bindInternalNode(rootNode); 
     bindInternalNode(paymentAmountNode);
 
+    bindInternalNode(confirmOrderButtonNode);
+    confirmOrderButtonNode.node.onclick = function() {
+      for (var i = 0; i < confirmOrderButtonOnClickListeners.length; ++i) {
+        confirmOrderButtonOnClickListeners[i](); 
+      }
+    };
+
+    bindInternalNode(cancelOrderButtonNode);
+    cancelOrderButtonNode.node.onclick = function() {
+      for (var i = 0; i < cancelOrderButtonOnClickListeners.length; ++i) {
+        cancelOrderButtonOnClickListeners[i](); 
+      }
+    };
+
     bindPriceComponentNode(scopesCountNode);
     bindPriceComponentNode(experimentDurationNode);
     bindPriceComponentNode(hourlyPriceNode);
@@ -448,7 +396,7 @@ var ConfirmOrderUiController = (function() {
     totalPrice = scopesCount * experimentDuration * hourlyCost;
 
     // Update price display
-    paymentAmountNode.node.innerHTML = totalPrice; 
+    paymentAmountNode.node.innerHTML = Utils.makePriceString(totalPrice); 
   };
 
   var updatePriceContributingNodeIfInitialized = function(price_contributing_node, value) {
@@ -489,6 +437,14 @@ var ConfirmOrderUiController = (function() {
     return this;
   };
 
+  var registerConfirmOrderOnClickListener = function(callback) {
+    confirmOrderButtonOnClickListeners.push(callback);
+  };
+
+  var registerCancelOrderOnClickListener = function(callback) {
+    cancelOrderButtonOnClickListeners.push(callback);
+  };
+
   var init = function() {
     console.assert(isInitialized === false, "ERROR: don't initialize ConfirmOrderUiController more than once!");
     isInitialized = true;
@@ -504,11 +460,18 @@ var ConfirmOrderUiController = (function() {
     init: init,
     setHourlyCost: setHourlyCost,
     setScopesCount: setScopesCount,
-    setExperimentDuration: setExperimentDuration
+    setExperimentDuration: setExperimentDuration,
+    registerConfirmOrderOnClickListener: registerConfirmOrderOnClickListener,
+    registerCancelOrderOnClickListener: registerCancelOrderOnClickListener
   };
 })();
 
 var ExperimentDurationUiController = (function() {
+
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_VALIDATION_ICON_ATTR = "hidden";
 
   /**
    * Unit plural/singular
@@ -527,6 +490,16 @@ var ExperimentDurationUiController = (function() {
    */
   var rootNode = {
     id: 'duration-form-container',
+    node: null
+  };
+
+  var validIconNode = {
+    id: 'duration-valid-icon',
+    node: null
+  };
+  
+  var invalidIconNode = {
+    id: 'duration-invalid-icon',
     node: null
   };
   
@@ -548,6 +521,37 @@ var ExperimentDurationUiController = (function() {
   /**
    * Private functions
    */
+  var showProperValidationIcon = function() {
+    if (isValidInput()) {
+      showValidIcon();
+    } else {
+      showInvalidIcon();
+    }
+  };
+
+  var showValidIcon = function() {
+    hideValidationIcon(invalidIconNode);
+    showValidationIcon(validIconNode);
+  };
+
+  var showInvalidIcon = function() {
+    hideValidationIcon(validIconNode);
+    showValidationIcon(invalidIconNode);
+  };
+
+  var hideBothValidationIcons = function() {
+    hideValidationIcon(invalidIconNode);
+    hideValidationIcon(validIconNode);
+  };
+
+  var hideValidationIcon = function(validation_icon_node) {
+    validation_icon_node.node.setAttribute(HIDDEN_VALIDATION_ICON_ATTR, '');
+  };
+
+  var showValidationIcon = function(validation_icon_node) {
+    validation_icon_node.node.removeAttribute(HIDDEN_VALIDATION_ICON_ATTR);
+  }
+
   var bindInternalNode = function(internal_node) {
     internal_node.node = document.getElementById(internal_node.id);
     console.assert(internal_node !== null, "ERROR: failed to bind internal node with id: " + internal_node.id);
@@ -559,11 +563,16 @@ var ExperimentDurationUiController = (function() {
     bindInternalNode(experimentDurationValueNode);
     bindInternalNode(experimentDurationUnitNode);
     bindInternalNode(experimentDurationSliderNode);
+    bindInternalNode(validIconNode);
+    bindInternalNode(invalidIconNode);
 
     // Attach event listeners
     experimentDurationSliderNode.node.onchange = function() {
       experimentDuration = this.immediateValue;
       updateDurationDisplay();
+      
+      // Show appropriate validation icon
+      showProperValidationIcon();
     };
   };
 
@@ -589,6 +598,9 @@ var ExperimentDurationUiController = (function() {
     // Update ui
     experimentDurationSliderNode.node.value = experiment_duration;
     updateDurationDisplay();
+
+    // Show appropriate validation icon
+    showProperValidationIcon();
   };
 
   var getDuration = function() {
@@ -601,19 +613,34 @@ var ExperimentDurationUiController = (function() {
 
     // Initialize scopes count
     setDuration(0);
+    hideBothValidationIcons();
   };
 
   var setOnChangeCallback = function(callback) {
     onChangeCallback = callback;
   };
 
+  var isValidInput = function() {
+    return experimentDuration !== 0; 
+  };
+
+  var signalInvalidInput = function() {
+    // Short circuit if valid input...
+    if (isValidInput()) {
+      return;
+    }
+
+    showInvalidIcon();
+  };
+
   return {
     init: init,
     setDuration: setDuration,
     getDuration: getDuration,
-    setOnChangeCallback: setOnChangeCallback
+    setOnChangeCallback: setOnChangeCallback,
+    isValidInput: isValidInput,
+    signalInvalidInput: signalInvalidInput
   };
-
 })();
 
 var NewExperimentUiController = (function() {
@@ -622,14 +649,90 @@ var NewExperimentUiController = (function() {
    * Private state
    */
   var shortCodePicker = null;
+  var calendarPicker = null;
+  var timePicker = null;
 
   /**
    * Private functions
    */
+  var isValidInput = function() {
+    return ScopesCountUiController.getScopesCount() !== 0 &&
+      ExperimentCountUiController.getDuration() !== 0;
+  };
+
+  var registerOnClickListeners = function() {
+    ConfirmOrderUiController.registerConfirmOrderOnClickListener(confirmOrder);
+
+    ConfirmOrderUiController.registerCancelOrderOnClickListener(cancelOrder);  
+  };
+
+  var registerEventListeners = function() {
+    registerOnClickListeners();
+  };
 
   /**
    * Public methods
    */
+  /**
+   * confirmOrder()
+   * - Ensure valid input states.
+   *   - invalid input: prompt user to to fix invalid input
+   *   - valid input: hit server confirm-order api 
+   */
+  var confirmOrder = function() {
+    // Check for invalid input -- notify user of all invalid input
+    var is_valid_input = true;
+
+    if (!ScopesCountUiController.isValidInput()) {
+      ScopesCountUiController.signalInvalidInput(); 
+      is_valid_input = false; 
+    } 
+
+    if (!ExperimentDurationUiController.isValidInput()) {
+      ExperimentDurationUiController.signalInvalidInput(); 
+      is_valid_input = false; 
+    }
+
+    // Short-circuit due to invalid input
+    if (!is_valid_input) {
+      return;
+    }
+
+    // Send confirm-order request to server
+    var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);   
+    confirm_order_api.setScopesCount(ScopesCountUiController.getScopesCount());
+    confirm_order_api.setExperimentDuration(ExperimentDurationUiController.getDuration());
+
+    var timestamp = Utils.makeTimestampString(
+      calendarPicker.getSelectedDate(),
+      timePicker.getSelectedTime()
+    );
+    confirm_order_api.setStartTimestamp(timestamp);
+    
+    confirm_order_api.setShortCodeId(shortCodePicker.getSelectedShortCode().id);
+    console.log(confirm_order_api.getData());
+
+    confirm_order_api.setSuccessfulApiCallback(function(api_response) {
+      console.log(api_response);
+    });
+
+    confirm_order_api.setLogicalApiFailureCallback(function(api_response) {
+      console.log(api_response);
+    });
+
+    confirm_order_api.setNonLogicalApiFailureCallback(function(api_response) {
+      console.log(api_response);
+    });
+
+    confirm_order_api.send();
+  };
+
+  /**
+   * cancelOrder()
+   * - revert all ui elements to original state
+   */
+  var cancelOrder = function() {};
+
   var init = function(template_store) {
     // Configure confirm-order controller
     ConfirmOrderUiController.init();
@@ -647,11 +750,47 @@ var NewExperimentUiController = (function() {
     ExperimentDurationUiController.init();
   
     // Configure short code picker
-    var shortCodePicker = new ShortCodePicker(
+    shortCodePicker = new ShortCodePicker(
       template_store,
       'existing-short-code-picker'
     );
     shortCodePicker.init();
+    
+    /**
+     * Configure time-picker element
+     */
+    var start_time = {
+      hours: 10,
+      minutes: 00 
+    };
+
+    var end_time = {
+      hours: 17,
+      minutes: 30 
+    };
+
+    timePicker = new TimePicker(
+      template_store,
+      'exp-time-picker',
+      start_time,
+      end_time,
+      30
+    ); 
+    timePicker.init();
+
+    /**
+     * Configure calendar element
+     */
+    var disallowed_week_days = new Set([0, 6]);
+    calendarPicker = new Calendar(
+        template_store,
+        'exp-date-calendar',
+        disallowed_week_days,
+        {},
+        3,
+        0 
+    );
+    calendarPicker.init();
 
     // Register listeners on startup-data api call
     GetStartupDataApiController.registerSuccessfulApiCallback(function(json_response, api_keys) {
@@ -659,14 +798,24 @@ var NewExperimentUiController = (function() {
       ConfirmOrderUiController.setHourlyCost(json_response[api_keys.hourly_price]);
     }); 
 
+    // Register event listeners
+    registerEventListeners();
+
   };
 
   return {
-    init: init
+    init: init,
+    confirmOrder: confirmOrder,
+    cancelOrder: cancelOrder
   };
 })();
 
 var ScopesCountUiController = (function() {
+  
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_VALIDATION_ICON_ATTR = "hidden";
 
   /**
    * Unit plural/singular
@@ -685,6 +834,16 @@ var ScopesCountUiController = (function() {
    */
   var rootNode = {
     id: 'scopes-count-input-container',
+    node: null
+  };
+  
+  var validIconNode = {
+    id: 'scopes-count-valid-icon',
+    node: null
+  };
+  
+  var invalidIconNode = {
+    id: 'scopes-count-invalid-icon',
     node: null
   };
 
@@ -706,6 +865,37 @@ var ScopesCountUiController = (function() {
   /**
    * Private functions
    */
+  var showProperValidationIcon = function() {
+    if (isValidInput()) {
+      showValidIcon();
+    } else {
+      showInvalidIcon();
+    }
+  };
+
+  var showValidIcon = function() {
+    hideValidationIcon(invalidIconNode);
+    showValidationIcon(validIconNode);
+  };
+
+  var showInvalidIcon = function() {
+    hideValidationIcon(validIconNode);
+    showValidationIcon(invalidIconNode);
+  };
+
+  var hideBothValidationIcons = function() {
+    hideValidationIcon(invalidIconNode);
+    hideValidationIcon(validIconNode);
+  };
+
+  var hideValidationIcon = function(validation_icon_node) {
+    validation_icon_node.node.setAttribute(HIDDEN_VALIDATION_ICON_ATTR, '');
+  };
+
+  var showValidationIcon = function(validation_icon_node) {
+    validation_icon_node.node.removeAttribute(HIDDEN_VALIDATION_ICON_ATTR);
+  }
+
   var bindInternalNode = function(internal_node) {
     internal_node.node = document.getElementById(internal_node.id);
     console.assert(internal_node !== null, "ERROR: failed to bind internal node with id: " + internal_node.id);
@@ -717,11 +907,16 @@ var ScopesCountUiController = (function() {
     bindInternalNode(scopesCountValueNode);
     bindInternalNode(scopesCountUnitNode);
     bindInternalNode(scopesCountSliderNode);
+    bindInternalNode(validIconNode);
+    bindInternalNode(invalidIconNode);
 
     // Attach event listeners
     scopesCountSliderNode.node.onchange = function() {
       scopesCount = this.immediateValue;
       updateScopesCountDisplay();
+      
+      // Show appropriate validation icon
+      showProperValidationIcon();
     };
   };
 
@@ -733,7 +928,7 @@ var ScopesCountUiController = (function() {
     scopesCountUnitNode.node.innerHTML = (scopesCount === 1)
       ? SCOPES_UNIT_SINGULAR
       : SCOPES_UNIT_PLURAL;
-
+      
     // Notify listeners
     onChangeCallback(scopesCount);
   };
@@ -747,6 +942,9 @@ var ScopesCountUiController = (function() {
     // Update ui
     scopesCountSliderNode.node.value = scopes_count;
     updateScopesCountDisplay();
+    
+    // Show appropriate validation icon
+    showProperValidationIcon();
   };
 
   var getScopesCount = function() {
@@ -759,19 +957,34 @@ var ScopesCountUiController = (function() {
 
     // Initialize scopes count
     setScopesCount(0);
+    hideBothValidationIcons();
   };
 
   var setOnChangeCallback = function(callback) {
     onChangeCallback = callback;
   };
 
+  var isValidInput = function() {
+    return scopesCount !== 0; 
+  };
+
+  var signalInvalidInput = function() {
+    // Short circuit if valid input...
+    if (isValidInput()) {
+      return;
+    }
+
+    showInvalidIcon();
+  };
+
   return {
     init: init,
     setScopesCount: setScopesCount,
     getScopesCount: getScopesCount,
-    setOnChangeCallback: setOnChangeCallback
+    setOnChangeCallback: setOnChangeCallback,
+    isValidInput: isValidInput,
+    signalInvalidInput: signalInvalidInput
   };
-
 })();
 
 var SidePanelUiController = (function() {
@@ -921,6 +1134,141 @@ var SidePanelUiController = (function() {
     init: init
   };
 })();
+
+var GetStartupDataApiController = (function() {
+
+  /**
+   * Private state
+   */
+  var getStartupDataApi = null;
+  var successfulApiCallbackListeners = [];
+  var failedLogicalApiCallbackListeners = [];
+  var failedNonLogicalApiCallbackListeners = [];
+
+  /**
+   * fetch()
+   * - fetches startup data
+   */
+  var fetch = function() {
+    // Initialize api and bind event listeners
+    if (getStartupDataApi === null) {
+      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
+
+      // Bind api listeners
+      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
+      getStartupDataApi.setLogicalApiFailureCallback(logicallyFailedApiCallback);
+      getStartupDataApi.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
+    }
+
+    // Fetch startup data from server
+    getStartupDataApi.send();
+  };
+
+  var successfulApiCallback = function(api_response) {
+    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
+      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+  
+  var logicallyFailedApiCallback = function(api_response) {
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
+    
+    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
+      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  var nonLogicallyFailedApiCallback = function(api_response) {
+    console.nonLog("WARNING: Logically failed api response!");
+    console.nonLog(api_response); 
+    
+    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
+      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  /**
+   * registerSuccessfulApiCallback()
+   * - add callback for successful api call
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerSuccessfulApiCallback = function(callback) {
+    successfulApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerLogicalFailedApiCallback()
+   * - add callback for logical failed api call (i.e. api error error rather than network error)
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerNonLogicalFailedApiCallback()
+   * - add callback for non-logical failed api call (i.e. network error rather than api error)
+   * @param FuncPtr callback: function(xhttp_response) {...}
+   */
+  var registerNonLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  return {
+    fetch: fetch,
+    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
+    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
+    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
+  };
+})();
+
+ConfirmOrderApi.prototype = new ScopesApi();
+ConfirmOrderApi.prototype.constructor = ConfirmOrderApi;
+
+function ConfirmOrderApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x3;
+
+  // Api request field keys
+  this.apiKeys = {
+    scopes_count: "scopes-count",
+    experiment_duration: "duration",
+    start_timestamp: "start-timestamp",
+    short_code_id: "short-code-id"
+  };
+}
+
+ConfirmOrderApi.prototype.getApiKeys = function() {
+  return this.apiKeys; 
+};
+
+ConfirmOrderApi.prototype.setScopesCount = function(scopes_count) {
+  this.data[this.apiKeys.scopes_count] = scopes_count;
+  return this;
+};
+
+ConfirmOrderApi.prototype.setExperimentDuration = function(duration) {
+  this.data[this.apiKeys.experiment_duration] = duration;
+  return this;
+};
+
+ConfirmOrderApi.prototype.setStartTimestamp = function(start_timestamp) {
+  this.data[this.apiKeys.start_timestamp] = start_timestamp;
+  return this;
+};
+
+ConfirmOrderApi.prototype.setShortCodeId = function(short_code_id) {
+  this.data[this.apiKeys.short_code_id] = short_code_id;
+  return this;
+};
+
+ConfirmOrderApi.prototype.getData = function() {
+  return this.data;
+};
 
 GetAllUsersApi.prototype = new ScopesApi();
 GetAllUsersApi.prototype.constructor = GetAllUsersApi;
@@ -1892,7 +2240,7 @@ function Calendar(
   this.getSelectedDate = function() {
     return {
       year: selectedDateObj.year,
-      month: selectedDateObj.month,
+      month: selectedDateObj.month + 1, // b/c month is 0 indexed internally
       date: selectedDateObj.date
     };
   };
@@ -2236,6 +2584,12 @@ function ShortCodePicker(
     // Initialize the ui
     initDisplay();
   };
+
+  this.getSelectedShortCode = function() {
+    console.assert(selectedOptionIndex !== null);
+    console.assert(selectedOptionIndex < shortCodes.length);
+    return shortCodes[selectedOptionIndex];
+  };
 };
 
 function TimePicker(
@@ -2455,6 +2809,7 @@ function TimePicker(
         if (hasClass(TIME_PICKER_OPTION_CLASS, node)) {
           var numeric_time = node.getAttribute(TIME_ATTR); 
           inputFieldNode.node.innerHTML = stringifyTimeForInputField(numeric_time);
+          currentTime = numeric_time;
           return;
         }
       }
@@ -2487,6 +2842,7 @@ function TimePicker(
     var time_picker_options = rootNode.node.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
     var starting_time_option = time_picker_options[0].getAttribute(TIME_ATTR);
     inputFieldNode.node.innerHTML = stringifyTimeForInputField(starting_time_option);
+    currentTime = starting_time_option;
   };
 
   // Privileged functions
@@ -2508,5 +2864,15 @@ function TimePicker(
 
     // Initialize the ui
     initDisplay();
+  };
+
+  this.getSelectedTime = function() {
+    var num_minutes = currentTime % 60;
+    var num_hours = (currentTime - num_minutes) / 60;
+    return {
+      hours: num_hours,
+      minutes: num_minutes,
+      seconds: 0
+    };
   };
 };

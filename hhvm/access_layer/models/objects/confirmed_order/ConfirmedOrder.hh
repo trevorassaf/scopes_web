@@ -7,8 +7,8 @@ class ConfirmedOrder implements Model {
     private UnsignedInt $userId,
     private UnsignedInt $scopesCount,
     private TimestampSegment $timestampSegment,
-    private string $title,
-    private string $description,
+    private ?string $title,
+    private ?string $description,
     private UnsignedInt $shortCodeId,
     private UnsignedFloat $price,
     private Timestamp $timeOrdered
@@ -30,11 +30,11 @@ class ConfirmedOrder implements Model {
     return $this->timestampSegment;
   }
 
-  public function getTitle(): string {
+  public function getTitle(): ?string {
     return $this->title;
   }
 
-  public function getDescription(): string {
+  public function getDescription(): ?string {
     return $this->description;
   }
 

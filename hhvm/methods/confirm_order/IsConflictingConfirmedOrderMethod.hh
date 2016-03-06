@@ -8,7 +8,6 @@ class IsConflictingConfirmedOrderMethod {
   ) {}
 
   public function check(
-    UnsignedInt $scopes_count,
     TimestampSegment $experiment_timestamp_segment
   ): bool {
     try {

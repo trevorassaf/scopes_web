@@ -21,15 +21,28 @@ class ConfirmOrderApi extends Api<ConfirmOrderApiRequest> {
     // Log confirm order call
     $this->logger->info("Confirm order api call...");
 
-    $confirmed_order = $this->confirmOrderMethod->confirm(
-      $user_agent->getUser()->getId(),
-      $request->getScopesCount()->get(),
-      $request->getStartTimestamp()->get(),
-      $request->getExperimentDuration()->get(),
-      $request->getShortCodeId()->get()
-    );
+    try {
+      $confirmed_order = $this->confirmOrderMethod->confirm(
+        $user_agent->getUser()->getId(),
+        $request->getScopesCount()->get(),
+        $request->getStartTimestamp()->get(),
+        $request->getExperimentDuration()->get(),
+        $request->getShortCodeId()->get()
+      );
 
-    return new ConfirmOrderApiResult($confirmed_order->getId());
+      return new ConfirmOrderApiResult($confirmed_order->getId());
+    } catch (UnownedShortCodeException $ex) {
+      $this->logger->info("Confirmed order request rejected due to invalid short-code");
+      return new FailedConfirmOrderApiResult(
+        FailedConfirmOrderApiResultType::INVALID_SHORT_CODE
+      );
+
+    } catch (ConflictingConfirmedOrderRequestException $ex) {
+      $this->logger->info("Confirmed order request rejected due to conflicting order");
+      return new FailedConfirmOrderApiResult(
+        FailedConfirmOrderApiResultType::CONFLICTING_ORDER
+      );
+    }
   }
 
   public function getApiType(): ApiType {

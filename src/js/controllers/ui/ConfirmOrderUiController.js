@@ -26,12 +26,24 @@ var ConfirmOrderUiController = (function() {
   var scopesCount = 0;
   var experimentDuration = 0;
   var totalPrice = 0;
+  var confirmOrderButtonOnClickListeners = [];
+  var cancelOrderButtonOnClickListeners = [];
 
   /**
    * Dom Nodes
    */
   var rootNode = {
     id: 'pricing-confirmation-form-container',
+    node: null
+  };
+
+  var confirmOrderButtonNode = {
+    id: 'confirm-payment-button',
+    node: null
+  };
+  
+  var cancelOrderButtonNode = {
+    id: 'cancel-payment-button',
     node: null
   };
 
@@ -92,6 +104,20 @@ var ConfirmOrderUiController = (function() {
     bindInternalNode(rootNode); 
     bindInternalNode(paymentAmountNode);
 
+    bindInternalNode(confirmOrderButtonNode);
+    confirmOrderButtonNode.node.onclick = function() {
+      for (var i = 0; i < confirmOrderButtonOnClickListeners.length; ++i) {
+        confirmOrderButtonOnClickListeners[i](); 
+      }
+    };
+
+    bindInternalNode(cancelOrderButtonNode);
+    cancelOrderButtonNode.node.onclick = function() {
+      for (var i = 0; i < cancelOrderButtonOnClickListeners.length; ++i) {
+        cancelOrderButtonOnClickListeners[i](); 
+      }
+    };
+
     bindPriceComponentNode(scopesCountNode);
     bindPriceComponentNode(experimentDurationNode);
     bindPriceComponentNode(hourlyPriceNode);
@@ -122,7 +148,7 @@ var ConfirmOrderUiController = (function() {
     totalPrice = scopesCount * experimentDuration * hourlyCost;
 
     // Update price display
-    paymentAmountNode.node.innerHTML = totalPrice; 
+    paymentAmountNode.node.innerHTML = Utils.makePriceString(totalPrice); 
   };
 
   var updatePriceContributingNodeIfInitialized = function(price_contributing_node, value) {
@@ -163,6 +189,14 @@ var ConfirmOrderUiController = (function() {
     return this;
   };
 
+  var registerConfirmOrderOnClickListener = function(callback) {
+    confirmOrderButtonOnClickListeners.push(callback);
+  };
+
+  var registerCancelOrderOnClickListener = function(callback) {
+    cancelOrderButtonOnClickListeners.push(callback);
+  };
+
   var init = function() {
     console.assert(isInitialized === false, "ERROR: don't initialize ConfirmOrderUiController more than once!");
     isInitialized = true;
@@ -178,6 +212,8 @@ var ConfirmOrderUiController = (function() {
     init: init,
     setHourlyCost: setHourlyCost,
     setScopesCount: setScopesCount,
-    setExperimentDuration: setExperimentDuration
+    setExperimentDuration: setExperimentDuration,
+    registerConfirmOrderOnClickListener: registerConfirmOrderOnClickListener,
+    registerCancelOrderOnClickListener: registerCancelOrderOnClickListener
   };
 })();

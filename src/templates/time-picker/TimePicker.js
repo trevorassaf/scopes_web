@@ -215,6 +215,7 @@ function TimePicker(
         if (hasClass(TIME_PICKER_OPTION_CLASS, node)) {
           var numeric_time = node.getAttribute(TIME_ATTR); 
           inputFieldNode.node.innerHTML = stringifyTimeForInputField(numeric_time);
+          currentTime = numeric_time;
           return;
         }
       }
@@ -247,6 +248,7 @@ function TimePicker(
     var time_picker_options = rootNode.node.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
     var starting_time_option = time_picker_options[0].getAttribute(TIME_ATTR);
     inputFieldNode.node.innerHTML = stringifyTimeForInputField(starting_time_option);
+    currentTime = starting_time_option;
   };
 
   // Privileged functions
@@ -268,5 +270,15 @@ function TimePicker(
 
     // Initialize the ui
     initDisplay();
+  };
+
+  this.getSelectedTime = function() {
+    var num_minutes = currentTime % 60;
+    var num_hours = (currentTime - num_minutes) / 60;
+    return {
+      hours: num_hours,
+      minutes: num_minutes,
+      seconds: 0
+    };
   };
 };

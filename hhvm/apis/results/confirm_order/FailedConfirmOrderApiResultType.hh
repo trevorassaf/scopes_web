@@ -2,6 +2,7 @@
 
 enum FailedConfirmOrderApiResultType : int {
 
-  NONEXTANT_RESERVED_ORDER = 0x0;
-  INVALID_CELL_LABEL_COUNT = 0x1;
+  CONFLICTING_ORDER = 0x0;
+  INVALID_SHORT_CODE = 0x1;
+
 }

@@ -336,4 +336,10 @@ function ShortCodePicker(
     // Initialize the ui
     initDisplay();
   };
+
+  this.getSelectedShortCode = function() {
+    console.assert(selectedOptionIndex !== null);
+    console.assert(selectedOptionIndex < shortCodes.length);
+    return shortCodes[selectedOptionIndex];
+  };
 };

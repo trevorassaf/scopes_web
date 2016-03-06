@@ -24,3 +24,4 @@
 [Thu Feb 25 09:29:38.494656 2016] [core:error] [pid 12011:tid 140448358188800] [client 169.229.3.91:53039] AH00135: Invalid method in request \xfc\xb8E\xe5\xe7\xbenE\xe2\x9e\x9e\xfd\x03G\xba\x1a\x8d\xb1\x1b\x07
 [Mon Feb 29 06:51:29.141953 2016] [core:error] [pid 9920:tid 140448374974208] [client 169.229.3.91:60003] AH00135: Invalid method in request I\x8f
 [Tue Mar 01 08:43:30.766269 2016] [core:error] [pid 9920:tid 140448503621376] [client 169.229.3.91:56753] AH00135: Invalid method in request *\xbc
+[Sun Mar 06 06:38:41.720442 2016] [core:error] [pid 19113:tid 139923029968640] [client 169.229.3.91:59063] AH00135: Invalid method in request \x9a\xaa\xf1JeU\x0e\xb5U\xe3\x954J\x1f1\xcd"\x11\x07<\xf2\x87F\x85\xcd,\xaa\xe3kt

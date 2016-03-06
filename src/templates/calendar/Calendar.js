@@ -695,7 +695,7 @@ function Calendar(
   this.getSelectedDate = function() {
     return {
       year: selectedDateObj.year,
-      month: selectedDateObj.month,
+      month: selectedDateObj.month + 1, // b/c month is 0 indexed internally
       date: selectedDateObj.date
     };
   };

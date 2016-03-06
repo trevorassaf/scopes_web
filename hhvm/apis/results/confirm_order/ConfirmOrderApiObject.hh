@@ -15,8 +15,8 @@ class ConfirmOrderApiObject {
     private int $scopesCount,
     private string $startTime,
     private string $endTime,
-    private string $title,
-    private string $description,
+    private ?string $title,
+    private ?string $description,
     private string $timeOrdered
   ) {}
 

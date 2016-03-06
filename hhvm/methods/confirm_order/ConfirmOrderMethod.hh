@@ -49,17 +49,10 @@ class ConfirmOrderMethod {
       $end_timestamp
     );
 
-    if (!$this->isValidReservedOrderMethod->check(
-      $scopes_count,
-      $experiment_timestamp_segment)
-    ) {
-      throw new InvalidReservedOrderRequestException();
+    if (!$this->isConflictingConfirmedOrderMethod->check($experiment_timestamp_segment)) {
+      throw new ConflictingConfirmedOrderRequestException();
     }
-
-    // Fail if this experiment overbooks our scopes
-     
     
-
     // Insert confirmed order into db
     $insert_confirmed_order_query_handle = $this->confirmedOrderInsertQuery->insert(
       $user_id,
