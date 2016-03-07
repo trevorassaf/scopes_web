@@ -9,22 +9,12 @@ window.onload = function() {
   /**
    * Configure UI elements
    */
-  CenterPanelController.init();
-  SidePanelUiController.init();
-  NewExperimentUiController.init(template_store);
+  SidePanelUiController.init(template_store);
   
   /**
    * Fetch startup data and route to proper views 
    */
   GetStartupDataApiController.fetch();
-
-  var my_experiments_page = new MyExperimentsPage(
-    template_store,
-    'my-exp-center-page',
-    false
-  );
-
-  my_experiments_page.init();
 };
 
 var Utils = (function() {
@@ -220,141 +210,6 @@ var GetStartupDataApiController = (function() {
     registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
     registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
   };
-})();
-
-var CenterPanelController = (function() {
-
-  /**
-   * Dom ui id's
-   */
-  var TITLE_LABEL_ID = 'center-page-title-label';
-
-  /**
-   * Attribute names
-   */
-  var HIDDEN_PAGE_ATTRIBUTE = 'hidden-page';
-
-  /**
-   * Dom nodes
-   */
-  var currentPage = null;
-  var titleLabel = null;
-
-  /**
-   * Center panel data structures
-   */
-  var addExperimentPageInfo = {
-    title: 'Add Experiment',
-    container_id : 'add-exp-center-page',
-    container : null
-  };
-  
-  var myExperimentsPageInfo = {
-    title: 'My Experiments',
-    container_id : 'my-exp-center-page',
-    container : null
-  };
-  
-  var recordedExperimentsPageInfo = {
-    title: 'Recorded Experiments',
-    container_id : 'recorded-exp-center-page',
-    container : null
-  };
-
-  var monitorExperimentPageInfo = {
-    title: 'Monitor Experiment',
-    container_id : 'monitor-exp-center-page',
-    container : null
-  };
-
-  /**
-   * changePage()
-   * - change page to page indicated in 'next_page_info'
-   */
-  this.changePage = function(next_page_info) {
-    // Check to see if 'currentPage' is set. If not, then this ui module is
-    // just being initialized.
-    if (currentPage != null) {
-      // Skip change b/c we're switching to the same page
-      if (next_page_info.container_id == currentPage.id) {
-        return;
-      }
-
-      // Hide 'currentPage'
-      console.assert(
-        !currentPage.hasAttribute(HIDDEN_PAGE_ATTRIBUTE),
-        'Illegal state: current page (id=' + currentPage.id + ') should not have the HIDDEN_LABEL_ATTRIBUTE'
-      );
-
-      currentPage.setAttribute(HIDDEN_PAGE_ATTRIBUTE, '');
-    }
-
-    // Display page indicated by 'next_page_info'
-    if (next_page_info.container == null) {
-      next_page_info.container = document.getElementById(next_page_info.container_id);
-      console.assert(
-        next_page_info.container != null,
-        'Illegal state: next page (id=' + next_page_info.container_id + ') has invalid id'
-      );
-    }
-
-    titleLabel.innerHTML = next_page_info.title;
-    currentPage = next_page_info.container;
-    currentPage.removeAttribute(HIDDEN_PAGE_ATTRIBUTE);
-  };
-
-  /**
-   * init()
-   * - bind dom ui nodes and event listeners, configure ui for startup
-   */
-  this.init = function() {
-    // Load dom ui nodes
-    titleLabel = document.getElementById(TITLE_LABEL_ID);
-
-    // Configure Ui
-    displayAddExperimentPage(); 
-  };
-  
-  /**
-   * dispalyAddExperimentPage()
-   * - hide previous page and display add experiment page 
-   */
-  this.displayAddExperimentPage = function() {
-    changePage(addExperimentPageInfo);
-  };
-
-  /**
-   * dispalyMyExperimentsPage()
-   * - hide previous page and display my experiments page 
-   */
-  this.displayMyExperimentsPage = function() {
-    changePage(myExperimentsPageInfo);
-  };
-
-  /**
-   * dispalyRecordedExperimentsPage()
-   * - hide previous page and display recorded experiments page 
-   */
-  this.displayRecordedExperimentsPage = function() {
-    changePage(recordedExperimentsPageInfo);
-  };
-  
-  /**
-   * dispalyMonitorExperimentPage()
-   * - hide previous page and display monitor experiment page 
-   */
-  this.displayMonitorExperimentPage = function() {
-    changePage(monitorExperimentPageInfo);
-  };
-
-  return {
-    init: init,
-    displayAddExperimentPage: displayAddExperimentPage,
-    displayMyExperimentsPage: displayMyExperimentsPage,
-    displayRecordedExperimentsPage: displayRecordedExperimentsPage,
-    displayMonitorExperimentPage: displayMonitorExperimentPage
-  };
-
 })();
 
 var ConfirmOrderUiController = (function() {
@@ -947,7 +802,6 @@ var NewExperimentUiController = (function() {
     
     // Initialize ui to 'show' state
     show();
-    hide();
   };
 
   var hide = function() {
@@ -1150,115 +1004,156 @@ var ScopesCountUiController = (function() {
 })();
 
 var SidePanelUiController = (function() {
+
+  /**
+   * Ui attributes
+   */
+  var START_HIDDEN_ATTR = "start-hidden";
   
   /**
    * Ui node id's 
    */
   var CENTER_PAGE_TITLE_LABEL_ID = 'center-page-title-label';
-
   var NAVIGATION_BUTTON_CONTAINER_ID = 'nav-btns-container';
+  var CENTER_PANEL_PAGE_CONTAINER = 'center-panel-page-container';
 
   /**
-   * Navigation button info
+   * Private state
    */
-  var addExperimentPageInfo = {
-    id: 'add-exp-btn',
-    node: null,
-    displayCenterPagePtr: CenterPanelController.displayAddExperimentPage
-  };
-
-  var myExperimentsPageInfo = {
-    id: 'my-exp-btn',
-    node: null,
-    displayCenterPagePtr: CenterPanelController.displayMyExperimentsPage
-  };
-  
-  var recordedExperimentsPageInfo = {
-    id: 'recorded-exp-btn',
-    node: null,
-    displayCenterPagePtr: CenterPanelController.displayRecordedExperimentsPage
-  };
-  
-  var monitorExperimentPageInfo = {
-    id: 'monitor-exp-btn',
-    node: null,
-    displayCenterPagePtr: CenterPanelController.displayMonitorExperimentPage
-  };
-
-  var ADD_EXP_BTN_ID = 'add-exp-btn';
-  var MY_EXP_BTN_ID = 'my-exp-btn';
-  var RECORDED_EXP_BTN_ID = 'recorded-exp-btn';
-  var MONITOR_EXP_BTN_ID = 'monitor-exp-btn';
-
-  /**
-   * Ui classes
-   */
-  var DASH_NAV_PANEL_BTN_CLASS = 'dash-nav-panel-btn';
-
-  /**
-   * Ui attributes
-   */
-  var SELECTED_ATTR = 'selected';
-  
-  /**
-   * Ui nodes
-   */
+  var currentlySelectedTabAndPageInfo = null;
   var centerPageTitleLabel = null;
+  var centerPanelPageContainer = null;
 
-  /**
-   * Id to node info map
-   */
-  var idToNodeInfoMap = {};
-
-  var currentSelectedPageNode = null;
-
-  /**
-   * changeCenterPage()
-   * - switch center page
-   */
-  var changeCenterPage = function(next_page_id) {
-    // Check that page id is valid
-    console.assert(
-        idToNodeInfoMap.hasOwnProperty(next_page_id),
-        'illegal key in idToNodeInfoMap: ' + next_page_id
-      );
-
-    // At startup, we don't have a 'current_page,' so we jump
-    // immediately to the 'next_page' rendering
-    if (currentSelectedPageNode != null) {
-      // Skip page change because same page would be rendered
-      if (currentSelectedPageNode.id == next_page_id) {
-        return;
-      }
-
-      // Deselect current page
-      console.assert(currentSelectedPageNode.hasAttribute(SELECTED_ATTR));
-      currentSelectedPageNode.removeAttribute(SELECTED_ATTR); 
+  var newExperimentInfo = {
+    tab_info: {
+      button_title: 'Add Experiment',
+      icon_type: 'add-circle-outline',
+      tab: null
+    },
+    page_info: {
+      page: null
     }
+  };
 
-    // Fetch 'next_page'
-    var next_page_info = idToNodeInfoMap[next_page_id];
-
-    // Lazy load ui dom node
-    if (next_page_info.node == null) {
-      next_page_info.node = document.getElementById(next_page_info.id);
-      console.assert(
-        next_page_info.node != null,
-        'Illegal state: failed to lazy load side panel nav button (id=' + next_page_id + ')'
-      );
+  var myExperimentsInfo = {
+    tab_info: {
+      button_title: 'My Experiments',
+      icon_type: 'group-work',
+      tab: null
+    },
+    page_info: {
+      id: 'my-exp-center-page',
+      page: null
     }
-    
-    console.assert(
-        !next_page_info.node.hasAttribute(SELECTED_ATTR),
-        'Illegal state: next-page (id=' + next_page_id + ') already has SELECTED_ATTR'
+  };
+
+  var monitorExperimentInfo = {
+    tab_info: {
+      button_title: 'Monitor Experiment',
+      icon_type: 'settings-input-svideo',
+      tab: null
+    },
+    page_info: {
+      id: 'monitor-exp-center-page',
+      page: null
+    }
+  };
+
+  var technicianInfo = {
+    tab_info: {
+      button_title: 'Technician',
+      icon_type: 'build',
+      tab: null
+    },
+    page_info: {
+      id: 'technician-center-page',
+      page: null
+    }
+  };
+
+  var initTabInfo = function(
+    template_store,
+    tab_parent_node,
+   tab_and_page_info 
+  ) {
+    var tab_info = tab_and_page_info.tab_info;
+
+    // Initialize tab info
+    tab_info.tab = new SidePanelTab(
+      template_store,
+      tab_parent_node,
+      tab_info.button_title,
+      tab_info.icon_type
     );
 
-    // Select new page and render center page
-    next_page_info.node.setAttribute(SELECTED_ATTR, "");
-    next_page_info.displayCenterPagePtr();
+    tab_info.tab.registerOnClickListener(function() {
+      selectNewTabAndShowNewPage(tab_and_page_info);
+    });
 
-    // Update 'currentSelectedPageNode'
-    currentSelectedPageNode = next_page_info.node;
+    tab_info.tab.init();
+  };
+
+  var deselectCurrentTabAndHideCurrentPage = function() {
+    console.assert(currentlySelectedTabAndPageInfo !== null);
+    currentlySelectedTabAndPageInfo.tab_info.tab.deselect();
+    currentlySelectedTabAndPageInfo.page_info.page.hide();
+  };
+
+  var selectCurrentTabAndShowCurrentPage = function() {
+    console.assert(currentlySelectedTabAndPageInfo !== null);
+    currentlySelectedTabAndPageInfo.tab_info.tab.select();
+    currentlySelectedTabAndPageInfo.page_info.page.show();
+    centerPageTitleLabel.innerHTML = currentlySelectedTabAndPageInfo.tab_info.button_title;
+  };
+
+  var selectNewTabAndShowNewPage = function(tab_and_page_info) {
+    deselectCurrentTabAndHideCurrentPage();
+    currentlySelectedTabAndPageInfo = tab_and_page_info;
+    selectCurrentTabAndShowCurrentPage();
+  };
+
+  var initTabAndPageInfos = function(template_store) {
+    // Init side-panel-container node
+    var tab_parent_node = document.getElementById(NAVIGATION_BUTTON_CONTAINER_ID);
+
+    // Init new experiment page/tab info
+    newExperimentInfo.page_info.page = NewExperimentUiController;
+    newExperimentInfo.page_info.page.init(template_store);
+   
+    // Init my experiments page
+    myExperimentsInfo.page_info.page = new MyExperimentsPage(
+      template_store,
+      myExperimentsInfo.page_info.id,
+      false
+    );
+    myExperimentsInfo.page_info.page.init();
+
+    // Init monitor experiment page
+    monitorExperimentInfo.page_info.page = new MonitorExperimentsPage(
+      template_store,
+      monitorExperimentInfo.page_info.id,
+      false
+    );
+    monitorExperimentInfo.page_info.page.init();
+
+    // Init technician page
+    technicianInfo.page_info.page = new TechnicianPage(
+      template_store,
+      technicianInfo.page_info.id,
+      false
+    );
+    technicianInfo.page_info.page.init();
+
+    // Configure tabs
+    initTabInfo(template_store, tab_parent_node, newExperimentInfo); 
+    initTabInfo(template_store, tab_parent_node, myExperimentsInfo); 
+    initTabInfo(template_store, tab_parent_node, monitorExperimentInfo); 
+    initTabInfo(template_store, tab_parent_node, technicianInfo); 
+  };
+
+  function initSelectedTabAndPage(tab_and_page_info) {
+    currentlySelectedTabAndPageInfo = tab_and_page_info;
+    selectCurrentTabAndShowCurrentPage();
   };
 
   /**
@@ -1266,30 +1161,17 @@ var SidePanelUiController = (function() {
    * - initialize ui node bindings, event listeners, and starting
    *   ui state
    */
-  var init = function() {
-    // Init DOM nodes
+  var init = function(template_store) {
+    // Init center-page title node
     centerPageTitleLabel = document.getElementById(CENTER_PAGE_TITLE_LABEL_ID);
+    centerPanelPageContainer = document.getElementById(CENTER_PANEL_PAGE_CONTAINER);
 
-    // Init id to ui node map
-    idToNodeInfoMap[ADD_EXP_BTN_ID] = addExperimentPageInfo;
-    idToNodeInfoMap[MY_EXP_BTN_ID] = myExperimentsPageInfo;
-    idToNodeInfoMap[RECORDED_EXP_BTN_ID] = recordedExperimentsPageInfo;
-    idToNodeInfoMap[MONITOR_EXP_BTN_ID] = monitorExperimentPageInfo;
+    // Initialize tab and center page controllers and ui elements
+    initTabAndPageInfos(template_store);
 
-    // Bind event listeners
-    document.getElementById(NAVIGATION_BUTTON_CONTAINER_ID).onclick = function(event) {
-      // Search event propagation path for selected navigation button
-      for (var i=0; i < event.path.length; ++i) {
-        var node = event.path[i];
-        if (node.classList.contains(DASH_NAV_PANEL_BTN_CLASS)) {
-          changeCenterPage(node.id);
-          break;
-        }
-      }
-    };
+    initSelectedTabAndPage(newExperimentInfo);
 
-    // Set initial page: new experiment
-    changeCenterPage(ADD_EXP_BTN_ID);
+    centerPanelPageContainer.removeAttribute(START_HIDDEN_ATTR);
   };
 
   return {
@@ -1615,6 +1497,132 @@ var ScopesNetwork = (function() {
     }  
   }
 }());
+
+function MonitorExperimentsPage(
+  template_store,
+  root_id,
+  is_displayed_initially
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = '#monitor-experiments-page-template';
+
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_ATTR = "hidden-monitor-experiments-page";
+
+  /**
+   * Private state
+   */
+  // Dom nodes
+  var templateStore = template_store;
+  var isDisplayedInitially = is_displayed_initially;
+  var _this = this;
+
+  // Root node
+  var monitorExperimentsPageRootNode = {
+    id: root_id,
+    node: null
+  };
+
+  // Class-bound nodes
+  var pageWrapperNode = {
+    className: 'monitor-experiments-page-wrapper',
+    node: null 
+  };
+
+  /**
+   * Private functions
+   */
+  function fetchClassBoundDomNode(node_info) {
+    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
+    console.assert(elements.length == 1);
+    node_info.node = elements[0];
+  };
+
+  /**
+   * synthesizeMonitorExperimentsPageTemplate()
+   * - copy monitor-experiments-page template and insert into main dom tree
+   * @pre-condition: 'monitorExperimentsPageRootNode' must be initialized
+   */
+  function synthesizeMonitorExperimentsPageTemplate() {
+    // Bind monitor-experiments-page dom template
+    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
+    var page_clone = document.importNode(page_template.content, true);
+    monitorExperimentsPageRootNode.node.appendChild(page_clone);
+  };
+
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  /**
+   * bindInternalNodes()
+   * - bind class-bound nodes internal to this template
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(pageWrapperNode);     
+  };
+
+  /**
+   * initDisplay()
+   * - render initially ui
+   */
+  function initDisplay() {
+    if (isDisplayedInitially) {
+      _this.show();
+    } else {
+      _this.hide(); 
+    }
+  };
+
+  /**
+   * Privileged functions
+   */
+  /**
+   * init()
+   * - initialize monitor experiments page and put it in starting state
+   */
+  this.init = function() {
+    // Bind top-level monitor-experiments-page node (we're going to copy the template into this!)
+    monitorExperimentsPageRootNode.node = document.getElementById(monitorExperimentsPageRootNode.id);
+
+    // Clone template and copy into wrapper
+    synthesizeMonitorExperimentsPageTemplate();
+
+    // Bind nodes internal to this template
+    bindInternalNodes();
+
+    // Initialize ui
+    initDisplay();
+  };
+
+  /**
+   * hide()
+   * - hide the monitor-experiments-page
+   */
+  this.hide = function() {
+    monitorExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+  };
+
+  /**
+   * show()
+   * - show the monitor-experiments-page
+   */
+  this.show = function() {
+    monitorExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  };
+
+};
 
 function Calendar(
   template_store,
@@ -2336,6 +2344,132 @@ function Calendar(
   };
 };
 
+function MyExperimentsPage(
+  template_store,
+  root_id,
+  is_displayed_initially
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = '#my-experiments-page-template';
+
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_ATTR = "hidden-my-experiments-page";
+
+  /**
+   * Private state
+   */
+  // Dom nodes
+  var templateStore = template_store;
+  var isDisplayedInitially = is_displayed_initially;
+  var _this = this;
+
+  // Root node
+  var myExperimentsPageRootNode = {
+    id: root_id,
+    node: null
+  };
+
+  // Class-bound nodes
+  var pageWrapperNode = {
+    className: 'my-experiments-page-wrapper',
+    node: null 
+  };
+
+  /**
+   * Private functions
+   */
+  function fetchClassBoundDomNode(node_info) {
+    elements = myExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
+    console.assert(elements.length == 1);
+    node_info.node = elements[0];
+  };
+
+  /**
+   * synthesizeMyExperimentsPageTemplate()
+   * - copy my-experiments-page template and insert into main dom tree
+   * @pre-condition: 'myExperimentsPageRootNode' must be initialized
+   */
+  function synthesizeMyExperimentsPageTemplate() {
+    // Bind my-experiments-page dom template
+    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
+    var page_clone = document.importNode(page_template.content, true);
+    myExperimentsPageRootNode.node.appendChild(page_clone);
+  };
+
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = myExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  /**
+   * bindInternalNodes()
+   * - bind class-bound nodes internal to this template
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(pageWrapperNode);     
+  };
+
+  /**
+   * initDisplay()
+   * - render initially ui
+   */
+  function initDisplay() {
+    if (isDisplayedInitially) {
+      _this.show();
+    } else {
+      _this.hide(); 
+    }
+  };
+
+  /**
+   * Privileged functions
+   */
+  /**
+   * init()
+   * - initialize my experiments page and put it in starting state
+   */
+  this.init = function() {
+    // Bind top-level my-experiments-page node (we're going to copy the template into this!)
+    myExperimentsPageRootNode.node = document.getElementById(myExperimentsPageRootNode.id);
+
+    // Clone template and copy into wrapper
+    synthesizeMyExperimentsPageTemplate();
+
+    // Bind nodes internal to this template
+    bindInternalNodes();
+
+    // Initialize ui
+    initDisplay();
+  };
+
+  /**
+   * hide()
+   * - hide the my-experiments-page
+   */
+  this.hide = function() {
+    myExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+  };
+
+  /**
+   * show()
+   * - show the my-experiments-page
+   */
+  this.show = function() {
+    myExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  };
+
+};
+
 function ShortCodePicker(
   template_store,
   id,
@@ -2690,7 +2824,129 @@ function ShortCodePicker(
   };
 };
 
-function MyExperimentsPage(
+function SidePanelTab(
+  template_store,
+  parent_node,
+  button_title,
+  iron_icon_type
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+
+  /**
+   * Ui attributes
+   */
+  var SELECTED_ATTR = "selected-side-panel-tab";
+  var IRON_ICON_TYPE_ATTR = "icon";
+
+  /**
+   * Private state
+   */
+  var _this = this;
+  var templateStore = template_store;
+  var buttonTitle = button_title;
+  var ironIconType = iron_icon_type;
+  var onClickListeners = [];
+
+  // Root dom node
+  var rootNode = {
+    className: 'dash-nav-panel-btn',
+    node: null
+  };
+
+  var ironIconNode = {
+    className: 'nav-btn-icon',
+    node: null
+  };
+
+  var buttonTitleNode = {
+    className: 'nav-btn-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  function synthesizeSidePanelTemplate() {
+    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var tab_clone = document.importNode(tab_template.content, true);
+    parent_node.appendChild(tab_clone);
+
+    // Initialize root node and configure event listener
+    var tabs = parent_node.getElementsByClassName(rootNode.className);
+    rootNode.node = tabs[tabs.length - 1];
+
+    rootNode.node.onclick = function() {
+      for (var i = 0; i < onClickListeners.length; ++i) {
+        onClickListeners[i]();
+      }
+    };
+  };
+
+  /**
+   * bindInternalNodes()
+   * @pre-condition: 'rootNode' must already be bound
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(ironIconNode); 
+    bindClassBoundNode(buttonTitleNode);
+  };
+
+  /**
+   * initDisplay()
+   * - initializes text/graphics for this tab
+   * @pre-condition: all internal nodes bound
+   */
+  function initDisplay() {
+    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
+    buttonTitleNode.node.innerHTML = buttonTitle; 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize template and append to parent dom node
+    synthesizeSidePanelTemplate();
+
+    // Initialize pointers to internal nodes
+    bindInternalNodes();
+
+    // Initialize the ui
+    initDisplay();
+  }; 
+
+  this.select = function() {
+    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
+  };
+
+  this.deselect = function() {
+    rootNode.node.removeAttribute(SELECTED_ATTR);
+  };
+
+  /**
+   * registerOnClickListener()
+   * @param FuncPtr callback: function(_this) {...}
+   */
+  this.registerOnClickListener = function(callback) {
+    onClickListeners.push(callback); 
+  };
+};
+
+function TechnicianPage(
   template_store,
   root_id,
   is_displayed_initially
@@ -2699,12 +2955,12 @@ function MyExperimentsPage(
   /**
    * Template id
    */
-  var TEMPLATE_ID_SELECTOR = '#my-experiments-page-template';
+  var TEMPLATE_ID_SELECTOR = '#technician-page-template';
 
   /**
    * Ui attributes
    */
-  var HIDDEN_ATTR = "hidden-my-experiments-page";
+  var HIDDEN_ATTR = "hidden-technician-page";
 
   /**
    * Private state
@@ -2715,14 +2971,14 @@ function MyExperimentsPage(
   var _this = this;
 
   // Root node
-  var myExperimentsPageRootNode = {
+  var TechnicianPageRootNode = {
     id: root_id,
     node: null
   };
 
   // Class-bound nodes
   var pageWrapperNode = {
-    className: 'my-experiments-page-wrapper',
+    className: 'technician-page-wrapper',
     node: null 
   };
 
@@ -2730,21 +2986,21 @@ function MyExperimentsPage(
    * Private functions
    */
   function fetchClassBoundDomNode(node_info) {
-    elements = myExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
+    elements = TechnicianPageRootNode.node.getElementsByClassName(node_info.className);
     console.assert(elements.length == 1);
     node_info.node = elements[0];
   };
 
   /**
-   * synthesizeMyExperimentsPageTemplate()
-   * - copy my-experiments-page template and insert into main dom tree
-   * @pre-condition: 'myExperimentsPageRootNode' must be initialized
+   * synthesizeTechnicianPageTemplate()
+   * - copy technician-page template and insert into main dom tree
+   * @pre-condition: 'TechnicianPageRootNode' must be initialized
    */
-  function synthesizeMyExperimentsPageTemplate() {
-    // Bind my-experiments-page dom template
+  function synthesizeTechnicianPageTemplate() {
+    // Bind technician-page dom template
     var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
     var page_clone = document.importNode(page_template.content, true);
-    myExperimentsPageRootNode.node.appendChild(page_clone);
+    TechnicianPageRootNode.node.appendChild(page_clone);
   };
 
   /**
@@ -2752,7 +3008,7 @@ function MyExperimentsPage(
    * - initialize pointer to specified dom node
    */
   function bindClassBoundNode(internal_node) {
-    elements = myExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
+    elements = TechnicianPageRootNode.node.getElementsByClassName(internal_node.className);
     console.assert(elements.length === 1);
     internal_node.node = elements[0];
   };
@@ -2782,14 +3038,14 @@ function MyExperimentsPage(
    */
   /**
    * init()
-   * - initialize my experiments page and put it in starting state
+   * - initialize technician page and put it in starting state
    */
   this.init = function() {
-    // Bind top-level my-experiments-page node (we're going to copy the template into this!)
-    myExperimentsPageRootNode.node = document.getElementById(myExperimentsPageRootNode.id);
+    // Bind top-level technician-page node (we're going to copy the template into this!)
+    TechnicianPageRootNode.node = document.getElementById(TechnicianPageRootNode.id);
 
     // Clone template and copy into wrapper
-    synthesizeMyExperimentsPageTemplate();
+    synthesizeTechnicianPageTemplate();
 
     // Bind nodes internal to this template
     bindInternalNodes();
@@ -2800,18 +3056,18 @@ function MyExperimentsPage(
 
   /**
    * hide()
-   * - hide the my-experiments-page
+   * - hide the technician-page
    */
   this.hide = function() {
-    myExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+    TechnicianPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
   };
 
   /**
    * show()
-   * - show the my-experiments-page
+   * - show the technician-page
    */
   this.show = function() {
-    myExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+    TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
   };
 
 };

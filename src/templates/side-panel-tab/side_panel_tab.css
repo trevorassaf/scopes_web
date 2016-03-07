@@ -1,0 +1,14 @@
+.dash-nav-panel-btn {
+  background: #FFFFFF;  
+  padding: 10px;
+  padding-left: 15px;
+}
+
+.dash-nav-panel-btn[selected-side-panel-tab] {
+  background-color: #ECEFF1;
+}
+
+.dash-nav-panel-btn[selected-side-panel-tab] iron-icon {
+  color: rgb(41, 98, 255);
+  color: #3385FF;
+}

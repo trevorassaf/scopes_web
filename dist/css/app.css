@@ -33,10 +33,6 @@
   color: #424242;
 }
 
-#center-panel-page-container .center-page[hidden-page] {
-  display: none;
-} 
-
 #center-panel-page-container .new-exp-container {
   background-color: #FFFFFF;
   /* height: calc(100% - 80px); */
@@ -53,6 +49,26 @@
 
 #settings-admin-btn-container {
   margin-top: 4px;
+}
+
+#center-panel-page-container[start-hidden] {
+  display: none;
+}
+
+#add-exp-center-page[hidden-new-experiment-page] {
+  display: none;
+}
+
+#my-exp-center-page[hidden-my-exp-page] {
+  display: none;
+}
+
+#monitor-exp-center-page[hidden-monitor-exp-page] {
+  display: none;
+}
+
+#technician-center-page[hidden-technician-page] {
+  display: none;
 }
 
 html, body {
@@ -287,21 +303,6 @@ paper-slider {
   margin-bottom: 15px;
 }
 
-.dash-nav-panel-btn {
-  background: #FFFFFF;  
-  padding: 10px;
-  padding-left: 15px;
-}
-
-.dash-nav-panel-btn[selected] {
-  background-color: #ECEFF1;
-}
-
-.dash-nav-panel-btn[selected] iron-icon {
-  color: rgb(41, 98, 255);
-  color: #3385FF;
-}
-
 #nav-btns-container iron-icon {
   margin-right: 20px;
   --iron-icon-height: 24px;
@@ -497,6 +498,7 @@ paper-slider {
   background-color: #EEEEEE;
 }
 
+
 .my-experiments-page-wrapper[hidden-my-experiments-page] {
   display: none;
 }
@@ -585,6 +587,22 @@ paper-slider {
 .short-code-picker-wrapper .short-code-picker-option:hover {
   background-color: #EEEEEE;
 }
+
+.dash-nav-panel-btn {
+  background: #FFFFFF;  
+  padding: 10px;
+  padding-left: 15px;
+}
+
+.dash-nav-panel-btn[selected-side-panel-tab] {
+  background-color: #ECEFF1;
+}
+
+.dash-nav-panel-btn[selected-side-panel-tab] iron-icon {
+  color: rgb(41, 98, 255);
+  color: #3385FF;
+}
+
 
 .time-picker-wrapper {
   cursor: pointer;

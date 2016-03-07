@@ -34,24 +34,7 @@
       </div>
 
       <!-- Page navigation buttons -->
-      <div id='nav-btns-container'>
-        <div id='add-exp-btn' class='dash-nav-panel-btn'>
-          <iron-icon icon='add-circle-outline'></iron-icon>
-          <span class='nav-btn-label'>Add Experiment</span>
-        </div>
-        <div id='my-exp-btn' class='dash-nav-panel-btn'>
-          <iron-icon icon='group-work'></iron-icon>
-          <span class='nav-btn-label'>My Experiments</span>
-        </div>
-        <div id='recorded-exp-btn' class='dash-nav-panel-btn'>
-          <iron-icon icon='cloud-queue'></iron-icon>
-          <span class='nav-btn-label'>Recorded Experiments</span>
-        </div>
-        <div id='monitor-exp-btn' class='dash-nav-panel-btn'>
-          <iron-icon icon='settings-input-svideo'></iron-icon>
-          <span class='nav-btn-label'>Monitor Experiment</span>
-        </div>
-      </div>
+      <div id='nav-btns-container'></div>
     </div>
 
     <!-- Center panel -->
@@ -76,9 +59,9 @@
           </div> 
           
           <!-- Center panel container: contains all main forms -->
-          <div id='center-panel-page-container'>
+          <div id='center-panel-page-container' start-hidden>
             <!-- New Experiment center page -->
-            <div id='add-exp-center-page' class='center-page' hidden-page>
+            <div id='add-exp-center-page' class='center-page'>
               <!-- Card 1: scopes count -->
               <div id='add-exp-input-card-1-container' class='add-exp-input-card'>
                 <!-- Microscope count input form -->
@@ -207,13 +190,14 @@
             </div>
             
             <!-- My Experiments center panel page -->
-            <div id='my-exp-center-page' class='center-page' hidden-page></div>
-            
-            <!-- Recorded Experiments center panel page -->
-            <div id='recorded-exp-center-page' class='center-page' hidden-page></div>
+            <div id='my-exp-center-page' class='center-page'></div>
             
             <!-- Monitor Experiment center panel page -->
-            <div id='monitor-exp-center-page' class='center-page' hidden-page></div>
+            <div id='monitor-exp-center-page' class='center-page'></div>
+            
+            <!-- Technician center panel page -->
+            <div id='technician-center-page' class='center-page'></div>
+
           </div>
         </div>
       </div>

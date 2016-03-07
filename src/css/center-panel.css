@@ -33,10 +33,6 @@
   color: #424242;
 }
 
-#center-panel-page-container .center-page[hidden-page] {
-  display: none;
-} 
-
 #center-panel-page-container .new-exp-container {
   background-color: #FFFFFF;
   /* height: calc(100% - 80px); */
@@ -53,4 +49,24 @@
 
 #settings-admin-btn-container {
   margin-top: 4px;
+}
+
+#center-panel-page-container[start-hidden] {
+  display: none;
+}
+
+#add-exp-center-page[hidden-new-experiment-page] {
+  display: none;
+}
+
+#my-exp-center-page[hidden-my-exp-page] {
+  display: none;
+}
+
+#monitor-exp-center-page[hidden-monitor-exp-page] {
+  display: none;
+}
+
+#technician-center-page[hidden-technician-page] {
+  display: none;
 }
