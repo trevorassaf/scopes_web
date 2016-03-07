@@ -92,6 +92,7 @@ html, body {
   position: absolute;
   left: 80px;
   top: -4px;
+  cursor: pointer;
 }
 
 #scopes-count-input {
