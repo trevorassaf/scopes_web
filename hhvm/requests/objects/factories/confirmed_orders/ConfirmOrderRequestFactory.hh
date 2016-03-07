@@ -6,6 +6,7 @@ class ConfirmOrderApiRequestFactory implements RequestFactory<ConfirmOrderApiReq
   private RequestFieldFactory<Timestamp> $startTimestampFieldFactory;
   private RequestFieldFactory<UnsignedInt> $experimentDurationFieldFactory;
   private RequestFieldFactory<UnsignedInt> $shortCodeIdFieldFactory;
+  private RequestFieldFactory<UnsignedFloat> $priceFieldFactory;
 
   public function __construct(
     private TimestampRequestFieldFactoryBuilder $timestampRequestFieldFactoryBuilder
@@ -23,6 +24,10 @@ class ConfirmOrderApiRequestFactory implements RequestFactory<ConfirmOrderApiReq
     
     // Create short coding field factory
     $this->shortCodeIdFieldFactory = $uint_field_factory_builder->build();
+
+    // Create price field factory
+    $ufloat_field_factory_builder = new UnsignedFloatRequestFieldFactoryBuilder();  
+    $this->priceFieldFactory = $ufloat_field_factory_builder->build();
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): ConfirmOrderApiRequest {
@@ -47,6 +52,11 @@ class ConfirmOrderApiRequestFactory implements RequestFactory<ConfirmOrderApiReq
         case ConfirmOrderApiRequest::SHORT_CODE_KEY:
           $confirmed_order_request_builder->setShortCodeId(
             $this->shortCodeIdFieldFactory->make($key, $value)
+          );
+          break;
+        case ConfirmOrderApiRequest::PRICE_KEY:
+          $confirmed_order_request_builder->setPrice(
+            $this->priceFieldFactory->make($key, $value)
           );
           break;
         default:

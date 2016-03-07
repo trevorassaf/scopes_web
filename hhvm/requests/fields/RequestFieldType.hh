@@ -13,4 +13,5 @@ enum RequestFieldType : int {
   OBJECT_VECTOR = 0x9;
   MAP = 0xA;
   TIME = 0xB;
+  UNSIGNED_FLOAT = 0xC;
 }

@@ -57,6 +57,7 @@ var NewExperimentUiController = (function() {
     var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);   
     confirm_order_api.setScopesCount(ScopesCountUiController.getScopesCount());
     confirm_order_api.setExperimentDuration(ExperimentDurationUiController.getDuration());
+    confirm_order_api.setPrice(ConfirmOrderUiController.getTotalPrice());
 
     var timestamp = Utils.makeTimestampString(
       calendarPicker.getSelectedDate(),
@@ -65,7 +66,6 @@ var NewExperimentUiController = (function() {
     confirm_order_api.setStartTimestamp(timestamp);
     
     confirm_order_api.setShortCodeId(shortCodePicker.getSelectedShortCode().id);
-    console.log(confirm_order_api.getData());
 
     confirm_order_api.setSuccessfulApiCallback(function(api_response) {
       console.log(api_response);

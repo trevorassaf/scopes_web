@@ -84,6 +84,7 @@ class MethodInjector {
   // Gen0 Order Price Policy
   private ?CreateGen0OrderPricePolicyMethod $createGen0OrderPricePolicyMethod; 
   private ?GetGen0OrderPricePolicyByTimeMethod $getGen0OrderPricePolicyByTimeMethod;
+  private ?ApplyGen0OrderPricePolicyMethod $applyGen0OrderPricePolicyMethod;
 
   public function __construct(
     private QueryInjector $queryInjector,
@@ -295,7 +296,7 @@ class MethodInjector {
       $this->confirmOrderMethod = new ConfirmOrderMethod(
         $this->queryInjector->getFetchIsUserOwnedShortCodeQuery(),
         $this->queryInjector->getConcreteInsertConfirmedOrderQuery(),
-        $this->getIsValidReservedOrderMethod(),
+        $this->getApplyGen0OrderPricePolicyMethod(),
         $this->getIsConflictingConfirmedOrderMethod(),
         $this->timestampSegmentFactoryLoader->load(),
         $this->timestampBuilderLoader->load(),
@@ -664,5 +665,14 @@ class MethodInjector {
       );
     }
     return $this->getGen0OrderPricePolicyByTimeMethod;
+  }
+
+  public function getApplyGen0OrderPricePolicyMethod(): ApplyGen0OrderPricePolicyMethod {
+    if ($this->applyGen0OrderPricePolicyMethod === null) {
+      $this->applyGen0OrderPricePolicyMethod = new ApplyGen0OrderPricePolicyMethod(
+        $this->getGetGen0OrderPricePolicyMethod()
+      ); 
+    }
+    return $this->applyGen0OrderPricePolicyMethod;
   }
 }

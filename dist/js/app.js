@@ -111,6 +111,97 @@ var Utils = (function() {
 
 })();
 
+var GetStartupDataApiController = (function() {
+
+  /**
+   * Private state
+   */
+  var getStartupDataApi = null;
+  var successfulApiCallbackListeners = [];
+  var failedLogicalApiCallbackListeners = [];
+  var failedNonLogicalApiCallbackListeners = [];
+
+  /**
+   * fetch()
+   * - fetches startup data
+   */
+  var fetch = function() {
+    // Initialize api and bind event listeners
+    if (getStartupDataApi === null) {
+      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
+
+      // Bind api listeners
+      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
+      getStartupDataApi.setLogicalApiFailureCallback(logicallyFailedApiCallback);
+      getStartupDataApi.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
+    }
+
+    // Fetch startup data from server
+    getStartupDataApi.send();
+  };
+
+  var successfulApiCallback = function(api_response) {
+    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
+      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+  
+  var logicallyFailedApiCallback = function(api_response) {
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
+    
+    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
+      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  var nonLogicallyFailedApiCallback = function(api_response) {
+    console.nonLog("WARNING: Logically failed api response!");
+    console.nonLog(api_response); 
+    
+    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
+      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  /**
+   * registerSuccessfulApiCallback()
+   * - add callback for successful api call
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerSuccessfulApiCallback = function(callback) {
+    successfulApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerLogicalFailedApiCallback()
+   * - add callback for logical failed api call (i.e. api error error rather than network error)
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerNonLogicalFailedApiCallback()
+   * - add callback for non-logical failed api call (i.e. network error rather than api error)
+   * @param FuncPtr callback: function(xhttp_response) {...}
+   */
+  var registerNonLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  return {
+    fetch: fetch,
+    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
+    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
+    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
+  };
+})();
+
 var CenterPanelController = (function() {
 
   /**
@@ -445,6 +536,10 @@ var ConfirmOrderUiController = (function() {
     cancelOrderButtonOnClickListeners.push(callback);
   };
 
+  var getTotalPrice = function() {
+    return totalPrice; 
+  };
+
   var init = function() {
     console.assert(isInitialized === false, "ERROR: don't initialize ConfirmOrderUiController more than once!");
     isInitialized = true;
@@ -462,7 +557,8 @@ var ConfirmOrderUiController = (function() {
     setScopesCount: setScopesCount,
     setExperimentDuration: setExperimentDuration,
     registerConfirmOrderOnClickListener: registerConfirmOrderOnClickListener,
-    registerCancelOrderOnClickListener: registerCancelOrderOnClickListener
+    registerCancelOrderOnClickListener: registerCancelOrderOnClickListener,
+    getTotalPrice: getTotalPrice
   };
 })();
 
@@ -702,6 +798,7 @@ var NewExperimentUiController = (function() {
     var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);   
     confirm_order_api.setScopesCount(ScopesCountUiController.getScopesCount());
     confirm_order_api.setExperimentDuration(ExperimentDurationUiController.getDuration());
+    confirm_order_api.setPrice(ConfirmOrderUiController.getTotalPrice());
 
     var timestamp = Utils.makeTimestampString(
       calendarPicker.getSelectedDate(),
@@ -710,7 +807,6 @@ var NewExperimentUiController = (function() {
     confirm_order_api.setStartTimestamp(timestamp);
     
     confirm_order_api.setShortCodeId(shortCodePicker.getSelectedShortCode().id);
-    console.log(confirm_order_api.getData());
 
     confirm_order_api.setSuccessfulApiCallback(function(api_response) {
       console.log(api_response);
@@ -1135,97 +1231,6 @@ var SidePanelUiController = (function() {
   };
 })();
 
-var GetStartupDataApiController = (function() {
-
-  /**
-   * Private state
-   */
-  var getStartupDataApi = null;
-  var successfulApiCallbackListeners = [];
-  var failedLogicalApiCallbackListeners = [];
-  var failedNonLogicalApiCallbackListeners = [];
-
-  /**
-   * fetch()
-   * - fetches startup data
-   */
-  var fetch = function() {
-    // Initialize api and bind event listeners
-    if (getStartupDataApi === null) {
-      getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
-
-      // Bind api listeners
-      getStartupDataApi.setSuccessfulApiCallback(successfulApiCallback);
-      getStartupDataApi.setLogicalApiFailureCallback(logicallyFailedApiCallback);
-      getStartupDataApi.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
-    }
-
-    // Fetch startup data from server
-    getStartupDataApi.send();
-  };
-
-  var successfulApiCallback = function(api_response) {
-    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
-      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
-    }
-  };
-  
-  var logicallyFailedApiCallback = function(api_response) {
-    console.log("WARNING: Logically failed api response!");
-    console.log(api_response); 
-    
-    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
-      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
-    }
-  };
-
-  var nonLogicallyFailedApiCallback = function(api_response) {
-    console.nonLog("WARNING: Logically failed api response!");
-    console.nonLog(api_response); 
-    
-    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
-      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
-    }
-  };
-
-  /**
-   * registerSuccessfulApiCallback()
-   * - add callback for successful api call
-   * @param FuncPtr callback: function(json_response, api_keys) {...}
-   */
-  var registerSuccessfulApiCallback = function(callback) {
-    successfulApiCallbackListeners.push(callback);
-    return this;
-  };
-
-  /**
-   * registerLogicalFailedApiCallback()
-   * - add callback for logical failed api call (i.e. api error error rather than network error)
-   * @param FuncPtr callback: function(json_response, api_keys) {...}
-   */
-  var registerLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
-    return this;
-  };
-
-  /**
-   * registerNonLogicalFailedApiCallback()
-   * - add callback for non-logical failed api call (i.e. network error rather than api error)
-   * @param FuncPtr callback: function(xhttp_response) {...}
-   */
-  var registerNonLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
-    return this;
-  };
-
-  return {
-    fetch: fetch,
-    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
-    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
-    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
-  };
-})();
-
 ConfirmOrderApi.prototype = new ScopesApi();
 ConfirmOrderApi.prototype.constructor = ConfirmOrderApi;
 
@@ -1238,7 +1243,8 @@ function ConfirmOrderApi(network_module) {
     scopes_count: "scopes-count",
     experiment_duration: "duration",
     start_timestamp: "start-timestamp",
-    short_code_id: "short-code-id"
+    short_code_id: "short-code-id",
+    price: "price"
   };
 }
 
@@ -1266,8 +1272,9 @@ ConfirmOrderApi.prototype.setShortCodeId = function(short_code_id) {
   return this;
 };
 
-ConfirmOrderApi.prototype.getData = function() {
-  return this.data;
+ConfirmOrderApi.prototype.setPrice = function(price) {
+  this.data[this.apiKeys.price] = price;
+  return this;
 };
 
 GetAllUsersApi.prototype = new ScopesApi();

@@ -197,6 +197,10 @@ var ConfirmOrderUiController = (function() {
     cancelOrderButtonOnClickListeners.push(callback);
   };
 
+  var getTotalPrice = function() {
+    return totalPrice; 
+  };
+
   var init = function() {
     console.assert(isInitialized === false, "ERROR: don't initialize ConfirmOrderUiController more than once!");
     isInitialized = true;
@@ -214,6 +218,7 @@ var ConfirmOrderUiController = (function() {
     setScopesCount: setScopesCount,
     setExperimentDuration: setExperimentDuration,
     registerConfirmOrderOnClickListener: registerConfirmOrderOnClickListener,
-    registerCancelOrderOnClickListener: registerCancelOrderOnClickListener
+    registerCancelOrderOnClickListener: registerCancelOrderOnClickListener,
+    getTotalPrice: getTotalPrice
   };
 })();

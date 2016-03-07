@@ -10,7 +10,8 @@ function ConfirmOrderApi(network_module) {
     scopes_count: "scopes-count",
     experiment_duration: "duration",
     start_timestamp: "start-timestamp",
-    short_code_id: "short-code-id"
+    short_code_id: "short-code-id",
+    price: "price"
   };
 }
 
@@ -38,6 +39,7 @@ ConfirmOrderApi.prototype.setShortCodeId = function(short_code_id) {
   return this;
 };
 
-ConfirmOrderApi.prototype.getData = function() {
-  return this.data;
+ConfirmOrderApi.prototype.setPrice = function(price) {
+  this.data[this.apiKeys.price] = price;
+  return this;
 };

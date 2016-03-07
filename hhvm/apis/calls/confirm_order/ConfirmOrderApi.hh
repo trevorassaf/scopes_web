@@ -27,7 +27,8 @@ class ConfirmOrderApi extends Api<ConfirmOrderApiRequest> {
         $request->getScopesCount()->get(),
         $request->getStartTimestamp()->get(),
         $request->getExperimentDuration()->get(),
-        $request->getShortCodeId()->get()
+        $request->getShortCodeId()->get(),
+        $request->getPrice()->get()
       );
 
       return new ConfirmOrderApiResult($confirmed_order->getId());
@@ -41,6 +42,11 @@ class ConfirmOrderApi extends Api<ConfirmOrderApiRequest> {
       $this->logger->info("Confirmed order request rejected due to conflicting order");
       return new FailedConfirmOrderApiResult(
         FailedConfirmOrderApiResultType::CONFLICTING_ORDER
+      );
+    } catch (ConfirmedOrderPriceMismatchPolicyException $ex) {
+      $this->logger->info("Confirmed order rejected due to invalid price provided by client");
+      return new FailedConfirmOrderApiResult(
+        FailedConfirmOrderApiResultType::INVALID_PRICE
       );
     }
   }

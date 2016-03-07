@@ -8,12 +8,14 @@ class ConfirmOrderApiRequest {
   const string DURATION_KEY = "duration";
   const string START_TIMESTAMP_KEY = "start-timestamp";
   const string SHORT_CODE_KEY = 'short-code-id';
+  const string PRICE_KEY = "price";
 
   public function __construct(
     private RequestField<UnsignedInt> $scopesCount,
     private RequestField<Timestamp> $startTimestamp,
     private RequestField<UnsignedInt> $experimentDuration,
-    private RequestField<UnsignedInt> $shortCodeId
+    private RequestField<UnsignedInt> $shortCodeId,
+    private RequestField<UnsignedFloat> $price
   ) {}
 
   public function getScopesCount(): RequestField<UnsignedInt> {
@@ -31,6 +33,10 @@ class ConfirmOrderApiRequest {
   public function getShortCodeId(): RequestField<UnsignedInt> {
     return $this->shortCodeId;
   }
+
+  public function getPrice(): RequestField<UnsignedFloat> {
+    return $this->price;
+  }
 }
 
 class ConfirmOrderApiRequestBuilder {
@@ -39,6 +45,7 @@ class ConfirmOrderApiRequestBuilder {
   private ?RequestField<Timestamp> $startTimestamp;
   private ?RequestField<UnsignedInt> $experimentDuration;
   private ?RequestField<UnsignedInt> $shortCodeId;
+  private ?RequestField<UnsignedFloat> $price;
 
   public function setScopesCount(RequestField<UnsignedInt> $scopes_count): this {
     $this->scopesCount = $scopes_count;
@@ -59,6 +66,12 @@ class ConfirmOrderApiRequestBuilder {
     $this->shortCodeId = $short_code_id;
     return $this;
   }
+
+  public function setPrice(RequestField<UnsignedFloat> $price): this {
+    $this->price = $price;
+    return $this;
+  }
+
   private function checkNotNull<T>(?T $field, string $key): T {
     if ($field === null) {
       throw new UnsetRequestFieldException(
@@ -75,7 +88,8 @@ class ConfirmOrderApiRequestBuilder {
       $this->checkNotNull($this->scopesCount, ConfirmOrderApiRequest::SCOPES_COUNT_KEY),
       $this->checkNotNull($this->startTimestamp, ConfirmOrderApiRequest::START_TIMESTAMP_KEY),
       $this->checkNotNull($this->experimentDuration, ConfirmOrderApiRequest::DURATION_KEY),
-      $this->checkNotNull($this->shortCodeId, ConfirmOrderApiRequest::SHORT_CODE_KEY)
+      $this->checkNotNull($this->shortCodeId, ConfirmOrderApiRequest::SHORT_CODE_KEY),
+      $this->checkNotNull($this->price, ConfirmOrderApiRequest::PRICE_KEY)
     );
   }
 }

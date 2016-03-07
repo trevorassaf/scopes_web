@@ -5,7 +5,7 @@ class ConfirmOrderMethod {
   public function __construct(
     private FetchIsUserOwnedShortCodeQuery $fetchIsUserOwnedShortCodeQuery,
     private InsertConfirmedOrderQuery $confirmedOrderInsertQuery,
-    private IsValidReservedOrderMethod $isValidReservedOrderMethod,
+    private ApplyGen0OrderPricePolicyMethod $applyGen0OrderPricePolicyMethod,
     private IsConflictingConfirmedOrderMethod $isConflictingConfirmedOrderMethod,
     private TimestampSegmentFactory $timestampSegmentFactory,
     private TimestampBuilder $timestampBuilder,
@@ -17,7 +17,8 @@ class ConfirmOrderMethod {
     UnsignedInt $scopes_count,
     Timestamp $start_timestamp,
     UnsignedInt $experiment_duration,
-    UnsignedInt $short_code_id  
+    UnsignedInt $short_code_id,
+    UnsignedFloat $client_price
   ): ConfirmedOrder {
     
     // Fail if short code does not belong to this user
@@ -52,7 +53,21 @@ class ConfirmOrderMethod {
     if (!$this->isConflictingConfirmedOrderMethod->check($experiment_timestamp_segment)) {
       throw new ConflictingConfirmedOrderRequestException();
     }
+
+    // Apply pricing policy
+    $current_timestamp = $this->timestampBuilder->now();
     
+    $server_price = $this->applyGen0OrderPricePolicyMethod->apply(
+      $scopes_count,
+      $experiment_duration,
+      $current_timestamp
+    );
+
+    // Fail if these prices don't match
+    if (!$server_price->equals($client_price)) {
+      throw new ConfirmedOrderPriceMismatchPolicyException();
+    }
+
     // Insert confirmed order into db
     $insert_confirmed_order_query_handle = $this->confirmedOrderInsertQuery->insert(
       $user_id,
@@ -60,8 +75,8 @@ class ConfirmOrderMethod {
       $start_timestamp,
       $end_timestamp,
       $short_code_id,
-      new UnsignedFloat(0.0),
-      $this->timestampBuilder->now()
+      $server_price,
+      $current_timestamp
     );
 
     return $insert_confirmed_order_query_handle
