@@ -143,7 +143,11 @@ var ScopesCountUiController = (function() {
     // Bind dom nodes and attach event listeners
     bindNodes();
 
-    // Initialize scopes count
+    // Initialize scope count and ui
+    setInitialState();
+  };
+
+  var setInitialState = function() {
     setScopesCount(0);
     hideBothValidationIcons();
   };
@@ -171,6 +175,7 @@ var ScopesCountUiController = (function() {
     getScopesCount: getScopesCount,
     setOnChangeCallback: setOnChangeCallback,
     isValidInput: isValidInput,
-    signalInvalidInput: signalInvalidInput
+    signalInvalidInput: signalInvalidInput,
+    setInitialState: setInitialState
   };
 })();

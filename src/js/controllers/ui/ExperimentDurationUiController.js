@@ -144,6 +144,10 @@ var ExperimentDurationUiController = (function() {
     bindNodes();
 
     // Initialize scopes count
+    setInitialState();
+  };
+  
+  var setInitialState = function() {
     setDuration(0);
     hideBothValidationIcons();
   };
@@ -171,6 +175,7 @@ var ExperimentDurationUiController = (function() {
     getDuration: getDuration,
     setOnChangeCallback: setOnChangeCallback,
     isValidInput: isValidInput,
-    signalInvalidInput: signalInvalidInput
+    signalInvalidInput: signalInvalidInput,
+    setInitialState: setInitialState
   };
 })();

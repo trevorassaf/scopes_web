@@ -708,6 +708,10 @@ var ExperimentDurationUiController = (function() {
     bindNodes();
 
     // Initialize scopes count
+    setInitialState();
+  };
+  
+  var setInitialState = function() {
     setDuration(0);
     hideBothValidationIcons();
   };
@@ -735,7 +739,8 @@ var ExperimentDurationUiController = (function() {
     getDuration: getDuration,
     setOnChangeCallback: setOnChangeCallback,
     isValidInput: isValidInput,
-    signalInvalidInput: signalInvalidInput
+    signalInvalidInput: signalInvalidInput,
+    setInitialState: setInitialState
   };
 })();
 
@@ -827,7 +832,10 @@ var NewExperimentUiController = (function() {
    * cancelOrder()
    * - revert all ui elements to original state
    */
-  var cancelOrder = function() {};
+  var cancelOrder = function() {
+    ScopesCountUiController.setInitialState();  
+    ExperimentDurationUiController.setInitialState();  
+  };
 
   var init = function(template_store) {
     // Configure confirm-order controller
@@ -1051,7 +1059,11 @@ var ScopesCountUiController = (function() {
     // Bind dom nodes and attach event listeners
     bindNodes();
 
-    // Initialize scopes count
+    // Initialize scope count and ui
+    setInitialState();
+  };
+
+  var setInitialState = function() {
     setScopesCount(0);
     hideBothValidationIcons();
   };
@@ -1079,7 +1091,8 @@ var ScopesCountUiController = (function() {
     getScopesCount: getScopesCount,
     setOnChangeCallback: setOnChangeCallback,
     isValidInput: isValidInput,
-    signalInvalidInput: signalInvalidInput
+    signalInvalidInput: signalInvalidInput,
+    setInitialState: setInitialState
   };
 })();
 

@@ -86,7 +86,10 @@ var NewExperimentUiController = (function() {
    * cancelOrder()
    * - revert all ui elements to original state
    */
-  var cancelOrder = function() {};
+  var cancelOrder = function() {
+    ScopesCountUiController.setInitialState();  
+    ExperimentDurationUiController.setInitialState();  
+  };
 
   var init = function(template_store) {
     // Configure confirm-order controller
