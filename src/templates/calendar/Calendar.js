@@ -651,6 +651,14 @@ function Calendar(
     calendarRootNodeInfo.node.appendChild(calendar_clone);
   };
 
+  function setInitialStateInternal() {
+    // Cache today's date
+    initDate();
+
+    // Load ui
+    initDisplay();
+  };
+
   /**
    * Privileged functions
    */
@@ -669,11 +677,8 @@ function Calendar(
     // Initialize dom nodes internal to the calendar object
     initInternalCalendarNodes();
 
-    // Cache today's date
-    initDate();
-
-    // Load ui
-    initDisplay();
+    // Initialize and configure calendar date
+    setInitialStateInternal();
   };
 
   /**
@@ -692,11 +697,23 @@ function Calendar(
     isEnabled = true;
   };
 
+  /**
+   * getSelectedDate()
+   * - return selected date
+   */
   this.getSelectedDate = function() {
     return {
       year: selectedDateObj.year,
       month: selectedDateObj.month + 1, // b/c month is 0 indexed internally
       date: selectedDateObj.date
     };
+  };
+
+  /**
+   * setInitialState()
+   * - select initial date
+   */
+  this.setInitialState = function() {
+    setInitialStateInternal();
   };
 };

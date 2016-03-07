@@ -4,7 +4,7 @@ class FloatFieldConverter implements RequestFieldTypeConverter<float> {
 
   public function convert(string $key, mixed $value): float {
     // Validate float type
-    if (!is_float($value)) {
+    if (!(is_float($value) || is_int($value))) {
       throw new RequestFieldTypeConversionException(
         RequestFieldType::FLOAT,
         $key,

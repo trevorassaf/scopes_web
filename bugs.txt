@@ -1,0 +1,1 @@
+-- date picker on new experiment page initializes state to current date, even if it's invalid (ex, a weekend)

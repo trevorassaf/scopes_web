@@ -103,10 +103,22 @@ var Utils = (function() {
       stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
   };
 
+  /**
+   * removeDomChildren()
+   *   - remove all children from dom node
+   * @param DOMElemet dom_node: some dom node
+   */
+  this.removeDomChildren = function(dom_node) {
+    while (dom_node.firstChild) {
+      dom_node.removeChild(dom_node.firstChild);
+    }
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
-    makeTimestampString: makeTimestampString
+    makeTimestampString: makeTimestampString,
+    removeDomChildren: removeDomChildren
   };
 
 })();
@@ -835,6 +847,9 @@ var NewExperimentUiController = (function() {
   var cancelOrder = function() {
     ScopesCountUiController.setInitialState();  
     ExperimentDurationUiController.setInitialState();  
+    calendarPicker.setInitialState();
+    shortCodePicker.setInitialState();
+    timePicker.setInitialState();
   };
 
   var init = function(template_store) {
@@ -2216,6 +2231,14 @@ function Calendar(
     calendarRootNodeInfo.node.appendChild(calendar_clone);
   };
 
+  function setInitialStateInternal() {
+    // Cache today's date
+    initDate();
+
+    // Load ui
+    initDisplay();
+  };
+
   /**
    * Privileged functions
    */
@@ -2234,11 +2257,8 @@ function Calendar(
     // Initialize dom nodes internal to the calendar object
     initInternalCalendarNodes();
 
-    // Cache today's date
-    initDate();
-
-    // Load ui
-    initDisplay();
+    // Initialize and configure calendar date
+    setInitialStateInternal();
   };
 
   /**
@@ -2257,12 +2277,24 @@ function Calendar(
     isEnabled = true;
   };
 
+  /**
+   * getSelectedDate()
+   * - return selected date
+   */
   this.getSelectedDate = function() {
     return {
       year: selectedDateObj.year,
       month: selectedDateObj.month + 1, // b/c month is 0 indexed internally
       date: selectedDateObj.date
     };
+  };
+
+  /**
+   * setInitialState()
+   * - select initial date
+   */
+  this.setInitialState = function() {
+    setInitialStateInternal();
   };
 };
 
@@ -2491,6 +2523,9 @@ function ShortCodePicker(
    * - initialize nodes for short code options
    */
   var initOptionNodes = function() {
+    // Clear existing nodes
+    Utils.removeDomChildren(dropDownNode.node);
+
     // Generate option nodes and insert into parent
     for (var i = 0; i < shortCodes.length; ++i) {
       initOptionNode(shortCodes[i]);
@@ -2521,7 +2556,6 @@ function ShortCodePicker(
    * @param uint option_index: index of the option that is selected
    */
   var selectOptionByIndex = function(option_index) {
-    console.assert(selectedOptionIndex == null);
     console.assert(option_index < shortCodes.length);
 
     // Bind attributes
@@ -2567,6 +2601,11 @@ function ShortCodePicker(
     selectedOptionIndex = null;
   };
 
+  function setInitialStateInternal() {
+    // Update ui with new short-codes
+    initDisplay();
+  };
+
   // Privileged functions
   /**
    * setShortCodes()
@@ -2576,9 +2615,8 @@ function ShortCodePicker(
   this.setShortCodes = function(short_codes) {
     shortCodes = short_codes; 
 
-    // Update ui with new short-codes
     initOptionNodes();
-    initDisplay();
+    setInitialStateInternal();
   };
 
   /**
@@ -2598,17 +2636,19 @@ function ShortCodePicker(
     // Initialize nodes: dom elements and event listeners
     initMainNodes();
 
-    // Initialize option nodes
-    initOptionNodes(); 
-
-    // Initialize the ui
-    initDisplay();
+    // Initialize ui state
+    initOptionNodes();
+    setInitialStateInternal();
   };
 
   this.getSelectedShortCode = function() {
     console.assert(selectedOptionIndex !== null);
     console.assert(selectedOptionIndex < shortCodes.length);
     return shortCodes[selectedOptionIndex];
+  };
+
+  this.setInitialState = function() {
+    setInitialStateInternal();
   };
 };
 
@@ -2644,6 +2684,11 @@ function TimePicker(
   var HOUR_MIN_SEPARATOR = ':';
   var AM_DESIGNATION = 'am';
   var PM_DESIGNATION = 'pm';
+
+  /**
+   * Initial state
+   */
+  var INITIAL_IS_DROP_DOWN_OPEN = false;
 
   // Private state
   var templateStore = template_store;
@@ -2852,7 +2897,7 @@ function TimePicker(
 
   // Start with closed or open drop-down (as specified by default param)
   var initDisplay = function() {
-    if (isDropDownOpen) {
+    if (INITIAL_IS_DROP_DOWN_OPEN) {
       openDropDown();
     } else {
       closeDropDown();
@@ -2865,7 +2910,14 @@ function TimePicker(
     currentTime = starting_time_option;
   };
 
-  // Privileged functions
+  function setInitialStateInternal() {
+    // Initialize the ui
+    initDisplay();
+  };
+
+  /**
+   * Privileged functions
+   */
   this.init = function() {
     // We only init once!
     console.assert(rootNode.node == null);
@@ -2878,12 +2930,10 @@ function TimePicker(
 
     // Initialize nodes: dom elements and event listeners
     initNodes(); 
-    
-    // Compute available times and initialize ui elements 
+  
+    // Compute available times and initialize ui state
     configureAvailableTimes();
-
-    // Initialize the ui
-    initDisplay();
+    setInitialStateInternal();
   };
 
   this.getSelectedTime = function() {
@@ -2894,5 +2944,9 @@ function TimePicker(
       minutes: num_minutes,
       seconds: 0
     };
+  };
+
+  this.setInitialState = function() {
+    setInitialStateInternal();
   };
 };

@@ -82,10 +82,22 @@ var Utils = (function() {
       stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
   };
 
+  /**
+   * removeDomChildren()
+   *   - remove all children from dom node
+   * @param DOMElemet dom_node: some dom node
+   */
+  this.removeDomChildren = function(dom_node) {
+    while (dom_node.firstChild) {
+      dom_node.removeChild(dom_node.firstChild);
+    }
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
-    makeTimestampString: makeTimestampString
+    makeTimestampString: makeTimestampString,
+    removeDomChildren: removeDomChildren
   };
 
 })();

@@ -223,6 +223,9 @@ function ShortCodePicker(
    * - initialize nodes for short code options
    */
   var initOptionNodes = function() {
+    // Clear existing nodes
+    Utils.removeDomChildren(dropDownNode.node);
+
     // Generate option nodes and insert into parent
     for (var i = 0; i < shortCodes.length; ++i) {
       initOptionNode(shortCodes[i]);
@@ -253,7 +256,6 @@ function ShortCodePicker(
    * @param uint option_index: index of the option that is selected
    */
   var selectOptionByIndex = function(option_index) {
-    console.assert(selectedOptionIndex == null);
     console.assert(option_index < shortCodes.length);
 
     // Bind attributes
@@ -299,6 +301,11 @@ function ShortCodePicker(
     selectedOptionIndex = null;
   };
 
+  function setInitialStateInternal() {
+    // Update ui with new short-codes
+    initDisplay();
+  };
+
   // Privileged functions
   /**
    * setShortCodes()
@@ -308,9 +315,8 @@ function ShortCodePicker(
   this.setShortCodes = function(short_codes) {
     shortCodes = short_codes; 
 
-    // Update ui with new short-codes
     initOptionNodes();
-    initDisplay();
+    setInitialStateInternal();
   };
 
   /**
@@ -330,16 +336,18 @@ function ShortCodePicker(
     // Initialize nodes: dom elements and event listeners
     initMainNodes();
 
-    // Initialize option nodes
-    initOptionNodes(); 
-
-    // Initialize the ui
-    initDisplay();
+    // Initialize ui state
+    initOptionNodes();
+    setInitialStateInternal();
   };
 
   this.getSelectedShortCode = function() {
     console.assert(selectedOptionIndex !== null);
     console.assert(selectedOptionIndex < shortCodes.length);
     return shortCodes[selectedOptionIndex];
+  };
+
+  this.setInitialState = function() {
+    setInitialStateInternal();
   };
 };

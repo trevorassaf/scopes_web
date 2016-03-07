@@ -31,6 +31,11 @@ function TimePicker(
   var AM_DESIGNATION = 'am';
   var PM_DESIGNATION = 'pm';
 
+  /**
+   * Initial state
+   */
+  var INITIAL_IS_DROP_DOWN_OPEN = false;
+
   // Private state
   var templateStore = template_store;
   var startTime = start_time;
@@ -238,7 +243,7 @@ function TimePicker(
 
   // Start with closed or open drop-down (as specified by default param)
   var initDisplay = function() {
-    if (isDropDownOpen) {
+    if (INITIAL_IS_DROP_DOWN_OPEN) {
       openDropDown();
     } else {
       closeDropDown();
@@ -251,7 +256,14 @@ function TimePicker(
     currentTime = starting_time_option;
   };
 
-  // Privileged functions
+  function setInitialStateInternal() {
+    // Initialize the ui
+    initDisplay();
+  };
+
+  /**
+   * Privileged functions
+   */
   this.init = function() {
     // We only init once!
     console.assert(rootNode.node == null);
@@ -264,12 +276,10 @@ function TimePicker(
 
     // Initialize nodes: dom elements and event listeners
     initNodes(); 
-    
-    // Compute available times and initialize ui elements 
+  
+    // Compute available times and initialize ui state
     configureAvailableTimes();
-
-    // Initialize the ui
-    initDisplay();
+    setInitialStateInternal();
   };
 
   this.getSelectedTime = function() {
@@ -280,5 +290,9 @@ function TimePicker(
       minutes: num_minutes,
       seconds: 0
     };
+  };
+
+  this.setInitialState = function() {
+    setInitialStateInternal();
   };
 };

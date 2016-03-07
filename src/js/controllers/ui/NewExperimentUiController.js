@@ -89,6 +89,9 @@ var NewExperimentUiController = (function() {
   var cancelOrder = function() {
     ScopesCountUiController.setInitialState();  
     ExperimentDurationUiController.setInitialState();  
+    calendarPicker.setInitialState();
+    shortCodePicker.setInitialState();
+    timePicker.setInitialState();
   };
 
   var init = function(template_store) {
