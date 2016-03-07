@@ -17,4 +17,12 @@ window.onload = function() {
    * Fetch startup data and route to proper views 
    */
   GetStartupDataApiController.fetch();
+
+  var my_experiments_page = new MyExperimentsPage(
+    template_store,
+    'my-exp-center-page',
+    false
+  );
+
+  my_experiments_page.init();
 };

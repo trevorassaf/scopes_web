@@ -1,6 +1,19 @@
 var NewExperimentUiController = (function() {
 
   /**
+   * Ui attributes
+   */
+  var HIDDEN_PAGE_ATTR = 'hidden-new-experiment-page';
+
+  /**
+   * Dom info
+   */
+  var rootNode = {
+    id: 'add-exp-center-page',
+    node: null
+  };
+
+  /**
    * Private state
    */
   var shortCodePicker = null;
@@ -95,6 +108,10 @@ var NewExperimentUiController = (function() {
   };
 
   var init = function(template_store) {
+    // Bind root node
+    rootNode.node = document.getElementById(rootNode.id);
+    console.assert(rootNode.node !== null);
+
     // Configure confirm-order controller
     ConfirmOrderUiController.init();
 
@@ -161,12 +178,24 @@ var NewExperimentUiController = (function() {
 
     // Register event listeners
     registerEventListeners();
+    
+    // Initialize ui to 'show' state
+    show();
+  };
 
+  var hide = function() {
+    rootNode.node.setAttribute(HIDDEN_PAGE_ATTR, '');    
+  };
+
+  var show = function() {
+    rootNode.node.removeAttribute(HIDDEN_PAGE_ATTR);
   };
 
   return {
     init: init,
     confirmOrder: confirmOrder,
-    cancelOrder: cancelOrder
+    cancelOrder: cancelOrder,
+    hide: hide,
+    show: show
   };
 })();

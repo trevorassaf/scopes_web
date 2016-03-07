@@ -205,7 +205,7 @@ function Calendar(
    */
   function fetchClassBoundDomNode(node_info) {
     elements = calendarRootNodeInfo.node.getElementsByClassName(node_info.className);
-    console.assert(elements.length == 1);
+    console.assert(elements.length === 1);
     node_info.node = elements[0];
   };
 

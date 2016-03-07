@@ -497,6 +497,10 @@ paper-slider {
   background-color: #EEEEEE;
 }
 
+.my-experiments-page-wrapper[hidden-my-experiments-page] {
+  display: none;
+}
+
 .short-code-picker-wrapper {
   cursor: pointer;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
