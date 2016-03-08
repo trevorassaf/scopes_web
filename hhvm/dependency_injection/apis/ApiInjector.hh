@@ -179,6 +179,7 @@ class ApiInjector {
       $this->getUsersConfirmedOrdersApi = new GetUsersConfirmedOrdersApi(
         $this->getUsersConfirmedOrdersRequestLoader->load(),
         $this->methodInjector->getGetUsersConfirmedOrdersMethod(),
+        $this->methodInjector->getGetShortCodeByIdMethod(),
         $this->logger,
         $this->timestampSerializerLoader->load()
       ); 

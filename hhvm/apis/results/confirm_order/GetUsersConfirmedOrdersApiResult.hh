@@ -15,7 +15,7 @@ class GetUsersConfirmedOrdersApiResult extends SuccessfulApiResult {
     $raw_fields_vector = Vector{};
     
     foreach ($this->orders as $order) {
-      $raw_fields_vector[] = $order->getRawFields();
+      $raw_fields_vector[] = $order->getResultFields();
     }
 
     return ImmMap{

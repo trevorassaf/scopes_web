@@ -359,7 +359,6 @@ return array(
     'GetUsersConfirmedOrdersApiResult' => $baseDir . '/apis/results/confirm_order/GetUsersConfirmedOrdersApiResult.hh',
     'GetUsersConfirmedOrdersMethod' => $baseDir . '/methods/confirm_order/GetUsersConfirmedOrdersMethod.hh',
     'GetUsersConfirmedOrdersRequest' => $baseDir . '/requests/objects/models/confirmed_orders/GetUsersConfirmedOrdersRequest.hh',
-    'GetUsersConfirmedOrdersRequestBuilder' => $baseDir . '/requests/objects/models/confirmed_orders/GetUsersConfirmedOrdersRequest.hh',
     'GetUsersConfirmedOrdersRequestFactory' => $baseDir . '/requests/objects/factories/confirmed_orders/GetUsersConfirmedOrdersRequestFactory.hh',
     'GetUsersConfirmedOrdersRequestFactoryLazyLoader' => $baseDir . '/dependency_injection/apis/lazy_loaders/GetUsersConfirmedOrdersRequestFactoryLazyLoader.hh',
     'GetUsersReservedOrdersApi' => $baseDir . '/apis/calls/reserve_order/GetUsersReservedOrdersApi.hh',

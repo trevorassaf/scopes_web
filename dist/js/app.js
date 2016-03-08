@@ -10,11 +10,15 @@ window.onload = function() {
    * Configure UI elements
    */
   SidePanelUiController.init(template_store);
-  
+
   /**
    * Fetch startup data and route to proper views 
    */
   GetStartupDataApiController.fetch();
+
+  var my_experiments_view = SidePanelUiController.getMyExperimentsView();
+  MyExperimentsLogicController.init(my_experiments_view);
+
 };
 
 var Utils = (function() {
@@ -121,6 +125,155 @@ var Utils = (function() {
 
 })();
 
+function ConfirmedOrder(
+  id,
+  num_scopes,
+  start_timestamp,
+  end_timestamp,
+  title,
+  description,
+  time_ordered,
+  price,
+  short_code
+) {
+  this.id = id;
+  this.scopesCount = num_scopes;
+  this.startTimestamp = start_timestamp;
+  this.endTimestamp = end_timestamp;
+  this.title = title;
+  this.description = description;
+  this.timeOrdered = time_ordered;
+  this.price = price;
+  this.shortCode = short_code;
+};
+
+ConfirmedOrder.prototype.getId = function() {
+  return this.id;
+};
+
+ConfirmedOrder.prototype.getStartTimestamp = function() {
+  return this.startTimestamp;
+};
+
+ConfirmedOrder.prototype.getEndTimestamp = function() {
+  return this.endTimestamp;
+};
+
+ConfirmedOrder.prototype.getTitle = function() {
+  return this.title;
+};
+
+ConfirmedOrder.prototype.getDescription = function() {
+  return this.description;
+};
+
+ConfirmedOrder.prototype.getTimeOrdered = function() {
+  return this.timeOrdered;
+};
+
+ConfirmedOrder.prototype.getPrice = function() {
+  return this.price;
+};
+
+ConfirmedOrder.prototype.getShortCode = function() {
+  return this.shortCode;
+};
+
+function ShortCode(
+  id,
+  code,
+  alias
+) {
+  this.id = id;
+  this.code = code;
+  this.alias = alias;
+};
+
+ShortCode.prototype.getId = function() {
+  return this.id;
+};
+
+ShortCode.prototype.getCode = function() {
+  return this.code;
+};
+
+ShortCode.prototype.getAlias = function() {
+  return this.alias;
+};
+
+function ApiControllerWrapper(api_object) {
+
+  /**
+   * Private state
+   */
+  var apiObject = api_object;
+  var successfulApiCallbackListeners = [];
+  var failedLogicalApiCallbackListeners = [];
+  var failedNonLogicalApiCallbackListeners = [];
+
+  var successfulApiCallback = function(api_response) {
+    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
+      successfulApiCallbackListeners[i](api_response, apiObject.getApiKeys());
+    }
+  };
+
+  var logicallyFailedApiCallback = function(api_response) {
+    for (var i = 0; i < failedLogicalApiCallbackListeners.length; ++i) {
+      failedLogicalApiCallbackListeners[i](api_response, apiObject.getApiKeys());
+    }
+  };
+
+  var nonLogicallyFailedApiCallback = function(api_response) {
+    for (var i = 0; i < failedNonLogicalApiCallbackListeners.length; ++i) {
+      failedNonLogicalApiCallbackListeners[i](api_response, apiObject.getApiKeys());
+    }
+  };
+  
+  /**
+   * registerSuccessfulApiCallback()
+   * - add callback for successful api call
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  this.registerSuccessfulApiCallback = function(callback) {
+    successfulApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerLogicalFailedApiCallback()
+   * - add callback for logical failed api call (i.e. api error error rather than network error)
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  this.registerLogicalFailedApiCallback = function(callback) {
+    failedLogicalApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerNonLogicalFailedApiCallback()
+   * - add callback for non-logical failed api call (i.e. network error rather than api error)
+   * @param FuncPtr callback: function(xhttp_response) {...}
+   */
+  this.registerNonLogicalFailedApiCallback = function(callback) {
+    failedNonLogicalApiCallbackListeners.push(callback);
+    return this;
+  };
+  
+  /**
+   * fetch()
+   * - fetches startup data
+   */
+  this.fetch = function() {
+    // Bind event listeners
+    apiObject.setSuccessfulApiCallback(successfulApiCallback);
+    apiObject.setLogicalApiFailureCallback(logicallyFailedApiCallback);
+    apiObject.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
+
+    // Fire api request
+    apiObject.send();
+  };
+};
+
 var GetStartupDataApiController = (function() {
 
   /**
@@ -209,6 +362,109 @@ var GetStartupDataApiController = (function() {
     registerSuccessfulApiCallback: registerSuccessfulApiCallback,
     registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
     registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
+  };
+})();
+
+var MyExperimentsLogicController = (function() {
+
+  /**
+   * Private state
+   */
+  var myExperiments = [];
+  var getConfirmedOrdersApiWrapper = null;
+  var myExperimentsView = null;
+
+  /**
+   * Private functions
+   */
+  var initApi = function() {
+    console.assert(getConfirmedOrdersApiWrapper === null); 
+
+    // Initialize get-confirmed-order api
+    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
+    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
+
+    // Bind event listeners to get-confirmed-orders api
+    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
+      clearConfirmedOrders();
+      var orders = json_response[response_keys.orders];
+      var order_response_keys = response_keys.confirmed_order;
+      var short_code_response_keys = response_keys.short_code;
+      
+      for (var i = 0; i < orders.length; ++i) {
+        var order = orders[i];
+        var short_code = order[order_response_keys.short_code];
+
+        var short_code = new ShortCode(
+          short_code[short_code_response_keys.id],
+          short_code[short_code_response_keys.code],
+          short_code[short_code_response_keys.alias]
+        );
+
+        var confirmed_order = new ConfirmedOrder(
+          order[order_response_keys.id],
+          order[order_response_keys.scopes_count],
+          order[order_response_keys.start_time],
+          order[order_response_keys.end_time],
+          order[order_response_keys.title],
+          order[order_response_keys.description],
+          order[order_response_keys.time_ordered],
+          order[order_response_keys.price],
+          short_code
+        );
+
+        addConfirmedOrder(confirmed_order); 
+      }
+    });
+
+    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders'); 
+    });
+
+    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders due to network error'); 
+    });
+  };
+
+  var addConfirmedOrder = function(confirm_order) {
+    // Store in local cache
+    myExperiments.push(confirm_order);  
+
+    // Update MyExperiments view
+    myExperimentsView.pushPendingOrder(confirm_order);
+  };
+
+  var clearConfirmedOrders = function() {
+    // Clear local cache
+    myExperiments = [];
+
+    // Clear MyExperiments view
+    // TODO...   
+  };
+
+  var init = function(my_experiments_view) {
+    myExperimentsView = my_experiments_view;
+
+    // Initialize api module
+    initApi();
+
+    refreshData(); 
+  };
+
+  var refreshData = function() {
+    getConfirmedOrdersApiWrapper.fetch(); 
+  };
+
+  var getMyExperiments = function() {
+    return myExperiments;
+  };
+
+  return {
+    init: init,
+    refreshData: refreshData,
+    getMyExperiments: getMyExperiments
   };
 })();
 
@@ -1174,8 +1430,14 @@ var SidePanelUiController = (function() {
     centerPanelPageContainer.removeAttribute(START_HIDDEN_ATTR);
   };
 
+  var getMyExperimentsView = function() {
+    console.assert(myExperimentsInfo.page_info.page !== null);
+    return myExperimentsInfo.page_info.page;
+  };
+
   return {
-    init: init
+    init: init,
+    getMyExperimentsView: getMyExperimentsView
   };
 })();
 
@@ -1232,6 +1494,36 @@ function GetAllUsersApi(network_module) {
   this.networkModule = network_module;
   this.apiType = 0xD;
 }
+
+GetConfirmedOrdersApi.prototype = new ScopesApi();
+GetConfirmedOrdersApi.prototype.constructor = GetConfirmedOrdersApi;
+
+function GetConfirmedOrdersApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x9;
+};
+
+GetConfirmedOrdersApi.prototype.getApiKeys = function() {
+  return {
+    orders: 'orders',
+    confirmed_order: {
+      id: 'id',
+      scopes_count: 'scopes-count',
+      start_time: 'start-time',
+      end_time: 'end-time',
+      title: 'title',
+      description: 'description',
+      time_ordered: 'time-ordered',
+      price: 'price',
+      short_code: 'short-code'
+    },
+    short_code: {
+      id: 'id',
+      code: 'code',
+      alias: 'alias'
+    }
+  };
+};
 
 GetOrderPricePolicyApi.prototype = new ScopesApi();
 GetOrderPricePolicyApi.prototype.constructor = GetOrderPricePolicyApi;
@@ -1296,33 +1588,12 @@ function ScopesApi(network_module) {
   };
 
   /**
-   * nonLogicalApiFailureCallback()
-   * - callback register for handling non-logical api failures (e.g. bad request)
-   * - user overrides this function to register callback
-   */
-  this.nonLogicalApiFailureCallback = function(xhttp_response) {}
-
-  /**
-   * logicalApiFailureCallback()
-   * - callback for handling logical api failures (e.g. user not found)
-   * - user overrides this function to register callback
-   */
-  this.logicalApiFailureCallback = function(json_response) {}
-
-  /**
-   * successfulApiCallback()
-   * - callback for handling successful api call
-   * - user overrides this function to register callback
-   */
-  this.successfulApiCallback = function(json_response) {};
-
-  /**
    * handleMalformedApiResponseWrapper()
    * - callback for malformed api response
    */
   this.handleMalformedApiResponseWrapper = function(xhttp_response) {
     console.log("API ERROR: Malformed api response", xhttp_response);
-    this.prototype.nonLogicalApiFailureCallback(xhttp_response);
+    this.nonLogicalApiFailureCallback(xhttp_response);
   };
 
   /**
@@ -1331,7 +1602,7 @@ function ScopesApi(network_module) {
    */
   this.handleJsonParseError = function(xhttp_response) {
     console.log("API ERROR: Json parse error");
-    this.prototype.nonLogicalApiFailureCallback(xhttp_response);
+    this.nonLogicalApiFailureCallback(xhttp_response);
   };
 
   /**
@@ -1339,28 +1610,33 @@ function ScopesApi(network_module) {
    * - callback for ScopesNetwork when network call succeeds
    */
   this.networkSuccessCallbackWrapper = function(xhttp_response) {
+    var json_response = null
+
     try {
       // Deserialize json payload
-      var json_response = JSON.parse(xhttp_response.responseText);
-     
-      // Check that wrapper api keys are present (should be here whether api
-      // call succeeded or not...)
-      if (!this.isWellFormedApiResponseWrapper(json_response)) {
-        this.handleMalformedApiResponseWrapper(xhttp_response);
-      }
+      json_response = JSON.parse(xhttp_response.responseText);
 
-      // Check if api call succeeded
-      if (!json_response[this.IS_SUCCESSFUL_KEY]) {
-        // Api logical failure. Should have meaningful api failure code...
-        this.logicalApiFailureCallback(json_response);
-      }
-
-      // Api call succeeded. Pass off to next handler
-      this.successfulApiCallback(json_response);
     } catch (parse_exception) {
       // Failed to parse json api response
       this.handleJsonParseError(xhttp_response);
     }
+
+    console.assert(json_response !== null);
+     
+    // Check that wrapper api keys are present (should be here whether api
+    // call succeeded or not...)
+    if (!this.isWellFormedApiResponseWrapper(json_response)) {
+      this.handleMalformedApiResponseWrapper(xhttp_response);
+    }
+
+    // Check if api call succeeded
+    if (!json_response[this.IS_SUCCESSFUL_KEY]) {
+      // Api logical failure. Should have meaningful api failure code...
+      this.logicalApiFailureCallback(json_response);
+    }
+
+    // Api call succeeded. Pass off to next handler
+    this.successfulApiCallback(json_response);
   };
 
   /**
@@ -1497,132 +1773,6 @@ var ScopesNetwork = (function() {
     }  
   }
 }());
-
-function MonitorExperimentsPage(
-  template_store,
-  root_id,
-  is_displayed_initially
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = '#monitor-experiments-page-template';
-
-  /**
-   * Ui attributes
-   */
-  var HIDDEN_ATTR = "hidden-monitor-experiments-page";
-
-  /**
-   * Private state
-   */
-  // Dom nodes
-  var templateStore = template_store;
-  var isDisplayedInitially = is_displayed_initially;
-  var _this = this;
-
-  // Root node
-  var monitorExperimentsPageRootNode = {
-    id: root_id,
-    node: null
-  };
-
-  // Class-bound nodes
-  var pageWrapperNode = {
-    className: 'monitor-experiments-page-wrapper',
-    node: null 
-  };
-
-  /**
-   * Private functions
-   */
-  function fetchClassBoundDomNode(node_info) {
-    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
-    console.assert(elements.length == 1);
-    node_info.node = elements[0];
-  };
-
-  /**
-   * synthesizeMonitorExperimentsPageTemplate()
-   * - copy monitor-experiments-page template and insert into main dom tree
-   * @pre-condition: 'monitorExperimentsPageRootNode' must be initialized
-   */
-  function synthesizeMonitorExperimentsPageTemplate() {
-    // Bind monitor-experiments-page dom template
-    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
-    var page_clone = document.importNode(page_template.content, true);
-    monitorExperimentsPageRootNode.node.appendChild(page_clone);
-  };
-
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  /**
-   * bindInternalNodes()
-   * - bind class-bound nodes internal to this template
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(pageWrapperNode);     
-  };
-
-  /**
-   * initDisplay()
-   * - render initially ui
-   */
-  function initDisplay() {
-    if (isDisplayedInitially) {
-      _this.show();
-    } else {
-      _this.hide(); 
-    }
-  };
-
-  /**
-   * Privileged functions
-   */
-  /**
-   * init()
-   * - initialize monitor experiments page and put it in starting state
-   */
-  this.init = function() {
-    // Bind top-level monitor-experiments-page node (we're going to copy the template into this!)
-    monitorExperimentsPageRootNode.node = document.getElementById(monitorExperimentsPageRootNode.id);
-
-    // Clone template and copy into wrapper
-    synthesizeMonitorExperimentsPageTemplate();
-
-    // Bind nodes internal to this template
-    bindInternalNodes();
-
-    // Initialize ui
-    initDisplay();
-  };
-
-  /**
-   * hide()
-   * - hide the monitor-experiments-page
-   */
-  this.hide = function() {
-    monitorExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
-  };
-
-  /**
-   * show()
-   * - show the monitor-experiments-page
-   */
-  this.show = function() {
-    monitorExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
-  };
-
-};
 
 function Calendar(
   template_store,
@@ -2344,7 +2494,7 @@ function Calendar(
   };
 };
 
-function MyExperimentsPage(
+function MonitorExperimentsPage(
   template_store,
   root_id,
   is_displayed_initially
@@ -2353,12 +2503,12 @@ function MyExperimentsPage(
   /**
    * Template id
    */
-  var TEMPLATE_ID_SELECTOR = '#my-experiments-page-template';
+  var TEMPLATE_ID_SELECTOR = '#monitor-experiments-page-template';
 
   /**
    * Ui attributes
    */
-  var HIDDEN_ATTR = "hidden-my-experiments-page";
+  var HIDDEN_ATTR = "hidden-monitor-experiments-page";
 
   /**
    * Private state
@@ -2369,14 +2519,14 @@ function MyExperimentsPage(
   var _this = this;
 
   // Root node
-  var myExperimentsPageRootNode = {
+  var monitorExperimentsPageRootNode = {
     id: root_id,
     node: null
   };
 
   // Class-bound nodes
   var pageWrapperNode = {
-    className: 'my-experiments-page-wrapper',
+    className: 'monitor-experiments-page-wrapper',
     node: null 
   };
 
@@ -2384,21 +2534,21 @@ function MyExperimentsPage(
    * Private functions
    */
   function fetchClassBoundDomNode(node_info) {
-    elements = myExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
+    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
     console.assert(elements.length == 1);
     node_info.node = elements[0];
   };
 
   /**
-   * synthesizeMyExperimentsPageTemplate()
-   * - copy my-experiments-page template and insert into main dom tree
-   * @pre-condition: 'myExperimentsPageRootNode' must be initialized
+   * synthesizeMonitorExperimentsPageTemplate()
+   * - copy monitor-experiments-page template and insert into main dom tree
+   * @pre-condition: 'monitorExperimentsPageRootNode' must be initialized
    */
-  function synthesizeMyExperimentsPageTemplate() {
-    // Bind my-experiments-page dom template
+  function synthesizeMonitorExperimentsPageTemplate() {
+    // Bind monitor-experiments-page dom template
     var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
     var page_clone = document.importNode(page_template.content, true);
-    myExperimentsPageRootNode.node.appendChild(page_clone);
+    monitorExperimentsPageRootNode.node.appendChild(page_clone);
   };
 
   /**
@@ -2406,7 +2556,7 @@ function MyExperimentsPage(
    * - initialize pointer to specified dom node
    */
   function bindClassBoundNode(internal_node) {
-    elements = myExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
+    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
     console.assert(elements.length === 1);
     internal_node.node = elements[0];
   };
@@ -2436,14 +2586,14 @@ function MyExperimentsPage(
    */
   /**
    * init()
-   * - initialize my experiments page and put it in starting state
+   * - initialize monitor experiments page and put it in starting state
    */
   this.init = function() {
-    // Bind top-level my-experiments-page node (we're going to copy the template into this!)
-    myExperimentsPageRootNode.node = document.getElementById(myExperimentsPageRootNode.id);
+    // Bind top-level monitor-experiments-page node (we're going to copy the template into this!)
+    monitorExperimentsPageRootNode.node = document.getElementById(monitorExperimentsPageRootNode.id);
 
     // Clone template and copy into wrapper
-    synthesizeMyExperimentsPageTemplate();
+    synthesizeMonitorExperimentsPageTemplate();
 
     // Bind nodes internal to this template
     bindInternalNodes();
@@ -2454,18 +2604,18 @@ function MyExperimentsPage(
 
   /**
    * hide()
-   * - hide the my-experiments-page
+   * - hide the monitor-experiments-page
    */
   this.hide = function() {
-    myExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+    monitorExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
   };
 
   /**
    * show()
-   * - show the my-experiments-page
+   * - show the monitor-experiments-page
    */
   this.show = function() {
-    myExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+    monitorExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
   };
 
 };
@@ -2821,6 +2971,279 @@ function ShortCodePicker(
 
   this.setInitialState = function() {
     setInitialStateInternal();
+  };
+};
+
+function MyExperimentsPage(
+  template_store,
+  root_id,
+  is_displayed_initially
+) {
+
+  /**
+   * Template id
+   */
+  var WRAPPER_TEMPLATE_ID_SELECTOR = '#my-experiments-page-template';
+
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_ATTR = "hidden-my-experiments-page";
+
+  /**
+   * Private state
+   */
+  // Dom nodes
+  var templateStore = template_store;
+  var isDisplayedInitially = is_displayed_initially;
+  var _this = this;
+
+  // Pending experiment views
+  var pendingExperimentViews = [];
+
+  // Root node
+  var myExperimentsPageRootNode = {
+    id: root_id,
+    node: null
+  };
+
+  // Class-bound nodes
+  var pageWrapperNode = {
+    className: 'my-experiments-page-wrapper',
+    node: null 
+  };
+
+  /**
+   * Private functions
+   */
+  function fetchClassBoundDomNode(node_info) {
+    elements = myExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
+    console.assert(elements.length == 1);
+    node_info.node = elements[0];
+  };
+
+  /**
+   * synthesizeMyExperimentsPageTemplate()
+   * - copy my-experiments-page template and insert into main dom tree
+   * @pre-condition: 'myExperimentsPageRootNode' must be initialized
+   */
+  function synthesizeMyExperimentsPageTemplate() {
+    // Bind my-experiments-page dom template
+    var page_template = templateStore.import.querySelector(WRAPPER_TEMPLATE_ID_SELECTOR);
+    var page_clone = document.importNode(page_template.content, true);
+    myExperimentsPageRootNode.node.appendChild(page_clone);
+  };
+
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = myExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  /**
+   * bindInternalNodes()
+   * - bind class-bound nodes internal to this template
+   */
+  function bindInternalNodes() {
+    // Bind internal nodes
+    bindClassBoundNode(pageWrapperNode);     
+  };
+
+  /**
+   * initDisplay()
+   * - render initially ui
+   */
+  function initDisplay() {
+    if (isDisplayedInitially) {
+      _this.show();
+    } else {
+      _this.hide(); 
+    }
+  };
+
+  /**
+   * Privileged functions
+   */
+  /**
+   * init()
+   * - initialize my experiments page and put it in starting state
+   */
+  this.init = function() {
+    // Bind top-level my-experiments-page node (we're going to copy the template into this!)
+    myExperimentsPageRootNode.node = document.getElementById(myExperimentsPageRootNode.id);
+
+    // Clone template and copy into wrapper
+    synthesizeMyExperimentsPageTemplate();
+
+    // Bind nodes internal to this template
+    bindInternalNodes();
+
+    // Initialize ui
+    initDisplay();
+  };
+
+  /**
+   * hide()
+   * - hide the my-experiments-page
+   */
+  this.hide = function() {
+    myExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+  };
+
+  /**
+   * show()
+   * - show the my-experiments-page
+   */
+  this.show = function() {
+    myExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  };
+
+  this.pushPendingOrder = function(confirmed_order) {
+    var pending_experiment_view = new PendingExperimentView(
+      templateStore,
+      pageWrapperNode.node
+    );     
+
+    pendingExperimentViews.push(pending_experiment_view);
+
+    pending_experiment_view.init(confirmed_order);
+  };
+
+  this.clearPendingOrders = function() {
+    // TODO...
+  };
+};
+
+function PendingExperimentView(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Default values 
+   */
+  var DEFAULT_TITLE = 'Untitled';
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = '#pending-experiment-template';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  /**
+   * Dom nodes
+   */
+  var rootNode = {
+    className: 'pending-experiment-wrapper',
+    node: null
+  };
+
+  var titleNode = {
+    className: 'title-label',
+    node: null
+  };
+  
+  var scopesCountNode = {
+    className: 'scopes-count-label',
+    node: null
+  };
+
+  var startDateNode = {
+    className: 'start-date-label',
+    node: null
+  };
+
+  var startTimeNode = {
+    className: 'start-time-label',
+    node: null
+  };
+
+  var durationNode = {
+    className: 'duration-label',
+    node: null
+  };
+
+  var descriptionNode = {
+    className: 'description-label',
+    node: null
+  };
+
+  var timeOrderedNode = {
+    className: 'time-ordered-label',
+    node: null
+  };
+
+  var priceNode = {
+    className: 'price-label',
+    node: null
+  };
+
+  var shortCodeNode = {
+    className: 'short-code-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  function synthesizeTemplate() {
+    // Clone pending-order template
+    var pending_order_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var pending_order_clone = document.importNode(pending_order_template.content, true);
+
+    // Activate by inserting into parent 
+    parentNode.appendChild(pending_order_clone); 
+    var pending_order_list = parentNode.getElementsByClassName(rootNode.className);
+    rootNode.node = pending_order_list[pending_order_list.length - 1];
+  };
+
+  function setTitle(title) {
+    if (title == null || title == '') {
+      titleNode.node.innerHTML = DEFAULT_TITLE; 
+    } else {
+      titleNode.node.innerHTML = title; 
+    }
+  };
+
+  var bindClassBoundNode = function(node_info) {
+    var elements = rootNode.node.getElementsByClassName(node_info.className); 
+    console.assert(elements.length === 1);
+    node_info.node = elements[0];
+  };
+
+  var bindInternalNodes = function() {
+    bindClassBoundNode(titleNode); 
+    bindClassBoundNode(scopesCountNode); 
+    bindClassBoundNode(startDateNode); 
+    bindClassBoundNode(startTimeNode); 
+    bindClassBoundNode(durationNode); 
+    bindClassBoundNode(descriptionNode); 
+    bindClassBoundNode(timeOrderedNode); 
+    bindClassBoundNode(priceNode); 
+    bindClassBoundNode(shortCodeNode); 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(confirmed_order) {
+    // Clone template and copy into pending-experiments list
+    synthesizeTemplate();
+
+    // Init dom pointers to internal nodes
+    bindInternalNodes();
+
+    // Place data in proper ui elements
+    setTitle(confirmed_order.getTitle());
   };
 };
 

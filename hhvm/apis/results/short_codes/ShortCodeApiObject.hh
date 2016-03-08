@@ -7,14 +7,14 @@ class ShortCodeApiObject {
   const string ALIAS_KEY = "alias";
 
   public function __construct(
-    private int $id,
+    private UnsignedInt $id,
     private string $code,
     private string $alias
   ) {}
 
   public function getResultFields(): ImmMap<string, mixed> {
     return ImmMap{
-      self::ID_KEY => $this->id,
+      self::ID_KEY => $this->id->getNumber(),
       self::CODE_KEY => $this->code,
       self::ALIAS_KEY => $this->alias,
     };

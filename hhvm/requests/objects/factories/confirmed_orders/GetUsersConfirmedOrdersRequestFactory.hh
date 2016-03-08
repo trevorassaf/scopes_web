@@ -2,27 +2,19 @@
 
 class GetUsersConfirmedOrdersRequestFactory implements RequestFactory<GetUsersConfirmedOrdersRequest> {
 
-  private RequestFieldFactory<UnsignedInt> $userIdFieldFactory;
+  public function make(
+    ImmMap<string, mixed> $raw_field_map
+  ): GetUsersConfirmedOrdersRequest {
+    if (!$raw_field_map->isEmpty()) {
+      $key = $raw_field_map->firstKey();
+      invariant($key !== null, "key can't be null!");
 
-  public function __construct() {
-    $uint_field_factory_builder = new UnsignedIntRequestFieldFactoryBuilder();
-    $this->userIdFieldFactory = $uint_field_factory_builder->build(); 
-  }
-
-  public function make(ImmMap<string, mixed> $raw_field_map): GetUsersConfirmedOrdersRequest {
-    $request_builder = new GetUsersConfirmedOrdersRequestBuilder();    
-    foreach ($raw_field_map as $key => $value) {
-      switch ($key) {
-        case GetUsersConfirmedOrdersRequest::USER_ID_KEY:
-          $request_builder->setUserId(
-            $this->userIdFieldFactory->make($key, $value)
-          ); 
-          break;
-        default:
-          throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
-          break;
-      }
+      throw new UnexpectedRequestFieldKeyException(
+        __CLASS__,
+        $key
+      );
     }
-    return $request_builder->build();
+
+    return new GetUsersConfirmedOrdersRequest();
   }
 }

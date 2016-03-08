@@ -169,7 +169,13 @@ var SidePanelUiController = (function() {
     centerPanelPageContainer.removeAttribute(START_HIDDEN_ATTR);
   };
 
+  var getMyExperimentsView = function() {
+    console.assert(myExperimentsInfo.page_info.page !== null);
+    return myExperimentsInfo.page_info.page;
+  };
+
   return {
-    init: init
+    init: init,
+    getMyExperimentsView: getMyExperimentsView
   };
 })();

@@ -7,7 +7,7 @@ function MyExperimentsPage(
   /**
    * Template id
    */
-  var TEMPLATE_ID_SELECTOR = '#my-experiments-page-template';
+  var WRAPPER_TEMPLATE_ID_SELECTOR = '#my-experiments-page-template';
 
   /**
    * Ui attributes
@@ -21,6 +21,9 @@ function MyExperimentsPage(
   var templateStore = template_store;
   var isDisplayedInitially = is_displayed_initially;
   var _this = this;
+
+  // Pending experiment views
+  var pendingExperimentViews = [];
 
   // Root node
   var myExperimentsPageRootNode = {
@@ -50,7 +53,7 @@ function MyExperimentsPage(
    */
   function synthesizeMyExperimentsPageTemplate() {
     // Bind my-experiments-page dom template
-    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
+    var page_template = templateStore.import.querySelector(WRAPPER_TEMPLATE_ID_SELECTOR);
     var page_clone = document.importNode(page_template.content, true);
     myExperimentsPageRootNode.node.appendChild(page_clone);
   };
@@ -70,6 +73,7 @@ function MyExperimentsPage(
    * - bind class-bound nodes internal to this template
    */
   function bindInternalNodes() {
+    // Bind internal nodes
     bindClassBoundNode(pageWrapperNode);     
   };
 
@@ -122,4 +126,18 @@ function MyExperimentsPage(
     myExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
   };
 
+  this.pushPendingOrder = function(confirmed_order) {
+    var pending_experiment_view = new PendingExperimentView(
+      templateStore,
+      pageWrapperNode.node
+    );     
+
+    pendingExperimentViews.push(pending_experiment_view);
+
+    pending_experiment_view.init(confirmed_order);
+  };
+
+  this.clearPendingOrders = function() {
+    // TODO...
+  };
 };
