@@ -1,3 +1,93 @@
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
 .my-experiments-page-wrapper[hidden-my-experiments-page] {
   display: none;
 }
+
+.pending-experiment-wrapper {
+  border: 1px solid rgb(228, 228, 228);
+  background-color: #FFFFFF;
+  margin-bottom: 30px;
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  color: #A0A0A0;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+.pending-experiment-wrapper .header-wrapper {
+  padding: 20px;
+  cursor: pointer;
+}
+
+.pending-experiment-wrapper .title-label {
+  display: inline-block;
+  font-size: 24px;
+  padding: 4px;
+  outline: 0px solid transparent;
+}
+
+.pending-experiment-wrapper .title-label:focus {
+  cursor: text;
+}
+
+.pending-experiment-wrapper .header-wrapper {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.pending-experiment-wrapper .title-underline {
+  margin-top: 6px;
+  border-top: 1px solid rgb(228, 228, 228);
+  border-bottom: 1px solid transparent;
+}
+
+.pending-experiment-wrapper .header-wrapper:hover .title-underline, .pending-experiment-wrapper .header-wrapper[editing-title] .title-underline {
+  border-color: rgb(38, 108, 177);
+}
+
+.pending-experiment-wrapper .footer-wrapper {
+  font-size: 0px;
+}
+
+.pending-experiment-wrapper .footer-wrapper div {
+  display: inline-block;
+  font-size: 0px;
+  width: 25%;
+  position: relative;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.pending-experiment-wrapper .footer-wrapper div[selected-btn] iron-icon {
+  color: rgb(38, 108, 177);
+}
+
+.pending-experiment-wrapper .footer-wrapper div:hover {
+  background-color: #ECEFF1;
+}
+
+.pending-experiment-wrapper .footer-wrapper iron-icon {
+  position: relative;
+  left: calc(50% - 12px);
+  width: 24px;
+  height: 24px;
+} 
+
+.pending-experiment-wrapper .order-data-wrapper {
+  display: none;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper div:not([selected-page]) {
+  display: none;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper {
+  min-height: 200px;
+}
+
+
+

@@ -1,3 +1,7 @@
+<template id='monitor-experiments-page-template'>
+  <div class='monitor-experiments-page-wrapper'></div>
+</template>
+
 <template id='calendar-template'>
   <div class='calendar-wrapper'>
     <!-- Collapsed banner -->
@@ -44,8 +48,101 @@
   </div>
 </template>
 
-<template id='monitor-experiments-page-template'>
-  <div class='monitor-experiments-page-wrapper'></div>
+<template id='my-experiments-page-template'>
+  <div class='my-experiments-page-wrapper'></div>
+</template>
+
+<template id='pending-experiment-template'>
+  <div class='pending-experiment-wrapper'>
+    <!-- Wrapper for upper ui row -->
+    <div class='header-wrapper'>
+      <!-- Editable title area -->
+      <div class='title-label' contenteditable='true'></div>
+
+      <!-- Title underline -->
+      <div class='title-underline'></div>
+    </div>
+
+    <!-- Main display space -->
+    <div class='main-stage-wrapper'>
+      <div class='description-page'></div>
+      <div class='hardware-page'></div>
+      <div class='time-page'></div>
+      <div class='payment-page'></div>
+    </div>
+
+    <!-- Wrapper for nav buttons -->
+    <div class='footer-wrapper'>
+      <div class='description-nav-wrapper'>
+        <iron-icon class='description-icon' icon='description'></iron-icon>
+      </div>
+      <div class='hardware-nav-wrapper'>
+        <iron-icon class='hardware-icon' icon='code'></iron-icon>
+      </div>
+      <div class='time-nav-wrapper'>
+        <iron-icon class='time-icon' icon='event'></iron-icon>
+      </div>
+      <div class='payment-nav-wrapper'>
+        <iron-icon class='payment-icon' icon='payment'></iron-icon>
+      </div>
+    </div>
+
+    <!-- Wrapper for second row -->
+    <div class='order-data-wrapper card-row'>
+      
+      <!-- Experiment start time area -->
+      <div class='experiment-timestamp-interval-wrapper'>
+        <span class='experiment-timestamp-interval-label'></span>
+      </div>
+
+      <span class='scopes-count-label field'></span>
+      <span class='scopes-count-unit-label field'></span>
+
+      <span> reserved for </span>
+      
+      <span class='duration-label field'></span>
+      <span class='duration-unit-label field'></span>
+
+      <span> on </span>
+      <span class='start-date-label field'></span>
+
+      <span> at </span>
+      <span class='start-time-label field'></span>
+    <div class='date-ordered-wrapper'>
+      <span class='ordered-date-label'></span>
+    </div>
+
+
+    <div class='scopes-count-wrapper'>
+      <span class='scopes-count-title'>Scopes count:</span>
+    </div>
+    
+    <div class='duration-wrapper'>
+      <span class='duration-title'>Experiment duration:</span>
+    </div>
+    <div class='time-ordered-wrapper'>
+      <span class='time-ordered-title'>Order placed on</span>
+    </div>
+    <div class='price-wrapper'>
+      <span class='price-unit-title'>Price:</span>
+      <span class='price-unit-label'></span>
+      <span class='price-label'></span>
+    </div>
+    <div class='short-code-wrapper'>
+      <span class='short-code-title'>Short code:</span>
+      <span class='short-code-label'></span>
+    </div>
+    <div class='payment-status-wrapper'>
+      <span class='payment-status-title'>Payment status:</span>
+      <span class='payment-status-label'></span>
+    </div>
+    <div class='description-wrapper'>
+      <div class='description-label'></div>
+    </div>
+      
+    </div>
+    
+  </div>
 </template>
 
 <template id='short-code-picker-template'>
@@ -65,42 +162,6 @@
 <template id='short-code-picker-option-template'>
   <div class='short-code-picker-option' local-idx='' tooltip=''>
     <span class='short-code-label'></span>
-  </div>
-</template>
-
-<template id='my-experiments-page-template'>
-  <div class='my-experiments-page-wrapper'></div>
-</template>
-
-<template id='pending-experiment-template'>
-  <div class='pending-experiment-wrapper'>
-    <div class='title-wrapper'>
-      <div class='title-label'></div>
-    </div>
-    <div class='scopes-count-wrapper'>
-      <div class='scopes-count-label'></div>
-    </div>
-    <div class='start-date-wrapper'>
-      <div class='start-date-label'></div>
-    </div>
-    <div class='start-time-wrapper'>
-      <div class='start-time-label'></div>
-    </div>
-    <div class='duration-wrapper'>
-      <div class='duration-label'></div>
-    </div>
-    <div class='time-ordered-wrapper'>
-      <div class='time-ordered-label'></div>
-    </div>
-    <div class='price-wrapper'>
-      <div class='price-label'></div>
-    </div>
-    <div class='short-code-wrapper'>
-      <div class='short-code-label'></div>
-    </div>
-    <div class='description-wrapper'>
-      <div class='description-label'></div>
-    </div>
   </div>
 </template>
 

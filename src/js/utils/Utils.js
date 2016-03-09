@@ -93,11 +93,56 @@ var Utils = (function() {
     }
   };
 
+  this.makeTimestampIntervalString = function(starting_timestamp, ending_timestamp) {
+    // Convert to native js date objects
+    var starting_js_date = new Date(starting_timestamp);
+    var ending_js_date = new Date(ending_timestamp);
+
+    var serializeable_starting_date = new SerializeableDate(
+      starting_js_date.getUTCFullYear(),
+      starting_js_date.getUTCMonth(),
+      starting_js_date.getUTCDate()
+    );
+
+    var serializeable_starting_time = new SerializeableTime(
+      starting_js_date.getHours(),
+      starting_js_date.getMinutes(),
+      starting_js_date.getSeconds()
+    );
+
+    var interval_string = serializeable_starting_date.serialize() + ' ' +
+        serializeable_starting_time.serializeWithoutSeconds() + ' - ';
+
+    var serializeable_ending_time = new SerializeableTime(
+      ending_js_date.getHours(),
+      ending_js_date.getMinutes(),
+      ending_js_date.getSeconds()
+    );
+
+    if (starting_js_date.getUTCFullYear() == ending_js_date.getUTCFullYear() &&
+        starting_js_date.getUTCMonth() == ending_js_date.getUTCMonth() &&
+        starting_js_date.getUTCDate() == ending_js_date.getUTCDate()
+    ) {
+      return interval_string + serializeable_ending_time.serializeWithoutSeconds(); 
+    }
+    
+    var serializeable_ending_date = new SerializeableDate(
+      ending_js_date.getUTCFullYear(),
+      ending_js_date.getUTCMonth(),
+      ending_js_date.getUTCDate()
+    );
+
+    return interval_string + serializeable_ending_date.serialize() + ' ' + 
+        serializeable_ending_time.serializeWithoutSeconds();
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
     makeTimestampString: makeTimestampString,
-    removeDomChildren: removeDomChildren
+    removeDomChildren: removeDomChildren,
+    stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
+    makeTimestampIntervalString: makeTimestampIntervalString
   };
 
 })();

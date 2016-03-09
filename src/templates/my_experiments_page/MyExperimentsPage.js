@@ -115,7 +115,7 @@ function MyExperimentsPage(
    * - hide the my-experiments-page
    */
   this.hide = function() {
-    myExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+    pageWrapperNode.node.setAttribute(HIDDEN_ATTR, '');
   };
 
   /**
@@ -123,7 +123,7 @@ function MyExperimentsPage(
    * - show the my-experiments-page
    */
   this.show = function() {
-    myExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+    pageWrapperNode.node.removeAttribute(HIDDEN_ATTR);
   };
 
   this.pushPendingOrder = function(confirmed_order) {

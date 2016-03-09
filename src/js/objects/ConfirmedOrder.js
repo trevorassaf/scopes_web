@@ -24,6 +24,10 @@ ConfirmedOrder.prototype.getId = function() {
   return this.id;
 };
 
+ConfirmedOrder.prototype.getScopesCount = function() {
+  return this.scopesCount;
+};
+
 ConfirmedOrder.prototype.getStartTimestamp = function() {
   return this.startTimestamp;
 };

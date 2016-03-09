@@ -12,8 +12,8 @@ GetConfirmedOrdersApi.prototype.getApiKeys = function() {
     confirmed_order: {
       id: 'id',
       scopes_count: 'scopes-count',
-      start_time: 'start-time',
-      end_time: 'end-time',
+      start_time: 'start',
+      end_time: 'end',
       title: 'title',
       description: 'description',
       time_ordered: 'time-ordered',
