@@ -45,7 +45,7 @@ var SidePanelUiController = (function() {
   var monitorExperimentInfo = {
     tab_info: {
       button_title: 'Monitor Experiment',
-      icon_type: 'settings-input-svideo',
+      icon_type: 'question-answer',
       tab: null
     },
     page_info: {

@@ -1,0 +1,56 @@
+.static-calendar-wrapper {
+  width: 240px;
+  background-color: #FFFFFF; 
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  border: 1px solid rgb(228, 228, 228); 
+}
+
+.static-calendar-wrapper .selected-date-container {
+  background-color: rgb(38, 108, 177);
+  color: #FFFFFF;
+  height: 42px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+}
+
+.static-calendar-wrapper .selected-date-label {
+  position: relative;
+  top: 8px;
+}
+
+.static-calendar-wrapper .dow-container {
+  margin-top: 10px;
+}
+
+.static-calendar-wrapper .dow-container > div {
+  display: inline-block;
+  width: 14.15%;
+  text-align: center;
+  font-size: 14px;
+  color: #000000;
+}
+
+.static-calendar-wrapper .date {
+  display: inline-block;
+  width: 14.15%;
+  text-align: center;
+  font-size: 16px;
+  height: 35px;
+  position: relative;
+  border-radius: 50%;
+}
+
+.static-calendar-wrapper .date[selected-date] {
+  border: 1px solid rgb(38, 108, 177);
+  color: rgb(38, 108, 177);
+  font-weight: bold;
+}
+
+.static-calendar-wrapper .date .date-label {
+  position: relative; 
+  top: 8px;
+}

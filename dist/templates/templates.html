@@ -44,6 +44,25 @@
   </div>
 </template>
 
+<template id='static-calendar-template'>
+  <div class='static-calendar-wrapper'>
+    <!-- Collapsed banner -->
+    <div class='selected-date-container'>
+      <span class='selected-date-label'></span>
+    </div>
+
+    <!-- Main calendar content (select date here)  -->
+    <div class='calendar-main-container'>
+
+      <!-- Day of the week labels -->
+      <div class='dow-container'><div class='dow date-cell sun-date-cell'>S</div><div class='dow date-cell m-date-cell'>M</div><div class='dow date-cell tu-date-cell'>T</div><div class='dow date-cell wed-date-cell'>W</div><div class='dow date-cell thu-date-cell'>T</div><div class='dow date-cell fri-date-cell'>F</div><div class='dow date-cell sat-date-cell'>S</div></div>
+
+      <!-- Days of the month container -->
+      <div class='dom-container'></div>
+    </div>
+  </div>
+</template>
+
 <template id='monitor-experiments-page-template'>
   <div class='monitor-experiments-page-wrapper'></div>
 </template>
@@ -57,7 +76,7 @@
     <!-- Wrapper for upper ui row -->
     <div class='header-wrapper'>
       <!-- Editable title area -->
-      <div class='title-label' contenteditable='true'>stuff</div>
+      <div class='title-label' contenteditable='true'></div>
 
       <!-- Title underline -->
       <div class='title-underline'></div>
@@ -65,26 +84,72 @@
 
     <!-- Main display space -->
     <div class='main-stage-wrapper'>
+      <div class='time-page'>
+        <div class='static-calendar'></div>
+
+        <div class='time-secondary-container'>
+          <div class='order-status-wrapper'>
+            <span class='order-status-title field-title'>Order status:</span>
+            <span class='order-status-value field-value'>Pending</span>
+          </div>
+
+          <div class='start-time-wrapper'>
+            <span class='start-time-title field-title'>Start time:</span>
+            <span class='start-time-value field-value'></span>
+          </div>
+
+          <div class='experiment-duration-wrapper'>
+            <span class='experiment-duration-title field-title'>Experiment duration:</span>
+            <span class='experiment-duration-value field-value'></span>
+            <span class='experiment-duration-unit field-unit'></span>
+          </div>
+
+          <div class='scopes-count-wrapper'>
+            <span class='scopes-count-title field-title'>Number of scopes:</span>
+            <span class='scopes-count-value field-value'></span>
+          </div>
+        </div>
+
+        <div class='time-payments-container'>
+          <div class='payment-status-wrapper'>
+            <span class='payment-status-title field-title'>Payment status:</span>
+            <span class='payment-status-value field-value'>Pending</span>
+          </div>
+
+          <div class='short-code-wrapper'>
+            <span class='short-code-title field-title'>Short code:</span>
+            <span class='short-code-value field-value'></span>
+          </div>
+
+          <div class='price-wrapper'>
+            <span class='price-title field-title'>Price:</span>
+            <span class='price-value field-value'></span>
+          </div>
+        </div>
+      </div>
       <!-- Description page -->
       <div class='description-page' contenteditable='true'></div>
-      <div class='hardware-page'></div>
-      <div class='time-page'></div>
-      <div class='payment-page'></div>
+      <div class='monitor-page'>
+        <span>Experiment monitoring not available at this time.</span>
+      </div>
+      <div class='recording-page'>
+        <span>Experiment recording not available at this time.</span>
+      </div>
     </div>
 
     <!-- Wrapper for nav buttons -->
     <div class='footer-wrapper'>
-      <div class='description-nav-wrapper'>
-        <iron-icon class='description-icon' icon='description'></iron-icon>
-      </div>
-      <div class='hardware-nav-wrapper'>
-        <iron-icon class='hardware-icon' icon='code'></iron-icon>
-      </div>
       <div class='time-nav-wrapper'>
         <iron-icon class='time-icon' icon='event'></iron-icon>
       </div>
-      <div class='payment-nav-wrapper'>
-        <iron-icon class='payment-icon' icon='payment'></iron-icon>
+      <div class='description-nav-wrapper'>
+        <iron-icon class='description-icon' icon='description'></iron-icon>
+      </div>
+      <div class='monitor-nav-wrapper'>
+        <iron-icon class='monitor-icon' icon='settings-overscan'></iron-icon>
+      </div>
+      <div class='recording-nav-wrapper'>
+        <iron-icon class='recording-icon' icon='av:video-library'></iron-icon>
       </div>
     </div>
 

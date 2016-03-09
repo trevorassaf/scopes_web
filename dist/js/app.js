@@ -23,6 +23,166 @@ window.onload = function() {
 
 };
 
+var Utils = (function() {
+
+  var CLASS_NAME_PROPERTY = "className";
+
+  // Timestamp delimiters
+  var DATE_DELIMITER = "-";
+  var TIME_DELIMITER = ":";
+  var DATE_TIME_SEPERATOR = " ";
+
+  this.hasClass = function(expected_class, node) {
+    if (!(CLASS_NAME_PROPERTY in node)) {
+      return false;
+    }
+
+    var node_class = node[CLASS_NAME_PROPERTY];
+    var class_idx = node_class.indexOf(expected_class);
+    
+    if (class_idx == -1) {
+      return false;
+    }
+
+    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
+      && (expected_class.length + class_idx == node_class.length
+        || node_class.charAt(expected_class.length + class_idx) == ' ');
+  };
+  
+  this.makePriceString = function(price) {
+
+    // Group thousands with commas 
+    var price_str = "";
+    var price_in_dollars = Math.floor(price);
+    
+    var i = 1;
+    var j = 1000;
+
+    while (j < price_in_dollars) {
+      var codon = Math.floor((price_in_dollars % j) / i);
+      price_str = "," + codon.toString().concat(price_str);
+      i = j;
+      j *= 1000;
+    }
+
+    var leading_digits = Math.floor(price_in_dollars / i);
+    price_str = leading_digits.toString().concat(price_str);
+
+    // Stringify decimal digits
+    var cents = Math.floor(price * 100) % 100;
+    var cents_str = cents.toString();
+    if (cents_str.length === 1) {
+      cents_str = "0".concat(cents_str);
+    }
+    console.assert(cents_str.length === 2);
+
+    cents_str = ".".concat(cents_str);
+    return price_str.concat(cents_str);
+  };
+
+  this.stringifyNumberWithEnforcedDigitCount = function(number, digit_count) {
+    var number_string = number.toString();
+    console.assert(number_string.length <= digit_count);
+
+    if (number_string.length < digit_count) {
+      var zero_prefix = "0".repeat(digit_count - number_string.length);
+      number_string = zero_prefix.concat(number_string);
+    }
+
+    return number_string;
+  };
+
+  /**
+   * makeTimestampString()
+   * @param DateObj date: {year, month, date}
+   * @param TimeObj time: {hours, minutes, seconds}
+   *   - 'hours' is in military time
+   */
+  this.makeTimestampString = function(date, time) {
+    return date.year.toString() + DATE_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(date.month, 2) + DATE_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(date.date, 2) + DATE_TIME_SEPERATOR +
+      stringifyNumberWithEnforcedDigitCount(time.hours, 2) + TIME_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(time.minutes, 2) + TIME_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
+  };
+
+  this.makeDateString = function(timestamp) {
+    var js_date = new Date(timestamp);
+    var serializeable_date = new SerializeableDate(
+      js_date.getUTCFullYear(),
+      js_date.getUTCMonth(),
+      js_date.getUTCDate()
+    );
+    return serializeable_date.serialize();
+  };
+
+  /**
+   * removeDomChildren()
+   *   - remove all children from dom node
+   * @param DOMElemet dom_node: some dom node
+   */
+  this.removeDomChildren = function(dom_node) {
+    while (dom_node.firstChild) {
+      dom_node.removeChild(dom_node.firstChild);
+    }
+  };
+
+  this.makeTimestampIntervalString = function(starting_timestamp, ending_timestamp) {
+    // Convert to native js date objects
+    var starting_js_date = new Date(starting_timestamp);
+    var ending_js_date = new Date(ending_timestamp);
+
+    var serializeable_starting_date = new SerializeableDate(
+      starting_js_date.getUTCFullYear(),
+      starting_js_date.getUTCMonth(),
+      starting_js_date.getUTCDate()
+    );
+
+    var serializeable_starting_time = new SerializeableTime(
+      starting_js_date.getHours(),
+      starting_js_date.getMinutes(),
+      starting_js_date.getSeconds()
+    );
+
+    var interval_string = serializeable_starting_date.serialize() + ' ' +
+        serializeable_starting_time.serializeWithoutSeconds() + ' - ';
+
+    var serializeable_ending_time = new SerializeableTime(
+      ending_js_date.getHours(),
+      ending_js_date.getMinutes(),
+      ending_js_date.getSeconds()
+    );
+
+    if (starting_js_date.getUTCFullYear() == ending_js_date.getUTCFullYear() &&
+        starting_js_date.getUTCMonth() == ending_js_date.getUTCMonth() &&
+        starting_js_date.getUTCDate() == ending_js_date.getUTCDate()
+    ) {
+      return interval_string + serializeable_ending_time.serializeWithoutSeconds(); 
+    }
+    
+    var serializeable_ending_date = new SerializeableDate(
+      ending_js_date.getUTCFullYear(),
+      ending_js_date.getUTCMonth(),
+      ending_js_date.getUTCDate()
+    );
+
+    return interval_string + serializeable_ending_date.serialize() + ' ' + 
+        serializeable_ending_time.serializeWithoutSeconds();
+  };
+
+  return {
+    hasClass: hasClass,
+    makePriceString: makePriceString,
+    makeTimestampString: makeTimestampString,
+    makeDateString: makeDateString,
+    removeDomChildren: removeDomChildren,
+    stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
+    makeTimestampIntervalString: makeTimestampIntervalString
+  };
+
+})();
+
 function ConfirmedOrder(
   id,
   num_scopes,
@@ -216,155 +376,6 @@ ShortCode.prototype.getCode = function() {
 ShortCode.prototype.getAlias = function() {
   return this.alias;
 };
-
-var Utils = (function() {
-
-  var CLASS_NAME_PROPERTY = "className";
-
-  // Timestamp delimiters
-  var DATE_DELIMITER = "-";
-  var TIME_DELIMITER = ":";
-  var DATE_TIME_SEPERATOR = " ";
-
-  this.hasClass = function(expected_class, node) {
-    if (!(CLASS_NAME_PROPERTY in node)) {
-      return false;
-    }
-
-    var node_class = node[CLASS_NAME_PROPERTY];
-    var class_idx = node_class.indexOf(expected_class);
-    
-    if (class_idx == -1) {
-      return false;
-    }
-
-    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-      && (expected_class.length + class_idx == node_class.length
-        || node_class.charAt(expected_class.length + class_idx) == ' ');
-  };
-  
-  this.makePriceString = function(price) {
-
-    // Group thousands with commas 
-    var price_str = "";
-    var price_in_dollars = Math.floor(price);
-    
-    var i = 1;
-    var j = 1000;
-
-    while (j < price_in_dollars) {
-      var codon = Math.floor((price_in_dollars % j) / i);
-      price_str = "," + codon.toString().concat(price_str);
-      i = j;
-      j *= 1000;
-    }
-
-    var leading_digits = Math.floor(price_in_dollars / i);
-    price_str = leading_digits.toString().concat(price_str);
-
-    // Stringify decimal digits
-    var cents = Math.floor(price * 100) % 100;
-    var cents_str = cents.toString();
-    if (cents_str.length === 1) {
-      cents_str = "0".concat(cents_str);
-    }
-    console.assert(cents_str.length === 2);
-
-    cents_str = ".".concat(cents_str);
-    return price_str.concat(cents_str);
-  };
-
-  this.stringifyNumberWithEnforcedDigitCount = function(number, digit_count) {
-    var number_string = number.toString();
-    console.assert(number_string.length <= digit_count);
-
-    if (number_string.length < digit_count) {
-      var zero_prefix = "0".repeat(digit_count - number_string.length);
-      number_string = zero_prefix.concat(number_string);
-    }
-
-    return number_string;
-  };
-
-  /**
-   * makeTimestampString()
-   * @param DateObj date: {year, month, date}
-   * @param TimeObj time: {hours, minutes, seconds}
-   *   - 'hours' is in military time
-   */
-  this.makeTimestampString = function(date, time) {
-    return date.year.toString() + DATE_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(date.month, 2) + DATE_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(date.date, 2) + DATE_TIME_SEPERATOR +
-      stringifyNumberWithEnforcedDigitCount(time.hours, 2) + TIME_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(time.minutes, 2) + TIME_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
-  };
-
-  /**
-   * removeDomChildren()
-   *   - remove all children from dom node
-   * @param DOMElemet dom_node: some dom node
-   */
-  this.removeDomChildren = function(dom_node) {
-    while (dom_node.firstChild) {
-      dom_node.removeChild(dom_node.firstChild);
-    }
-  };
-
-  this.makeTimestampIntervalString = function(starting_timestamp, ending_timestamp) {
-    // Convert to native js date objects
-    var starting_js_date = new Date(starting_timestamp);
-    var ending_js_date = new Date(ending_timestamp);
-
-    var serializeable_starting_date = new SerializeableDate(
-      starting_js_date.getUTCFullYear(),
-      starting_js_date.getUTCMonth(),
-      starting_js_date.getUTCDate()
-    );
-
-    var serializeable_starting_time = new SerializeableTime(
-      starting_js_date.getHours(),
-      starting_js_date.getMinutes(),
-      starting_js_date.getSeconds()
-    );
-
-    var interval_string = serializeable_starting_date.serialize() + ' ' +
-        serializeable_starting_time.serializeWithoutSeconds() + ' - ';
-
-    var serializeable_ending_time = new SerializeableTime(
-      ending_js_date.getHours(),
-      ending_js_date.getMinutes(),
-      ending_js_date.getSeconds()
-    );
-
-    if (starting_js_date.getUTCFullYear() == ending_js_date.getUTCFullYear() &&
-        starting_js_date.getUTCMonth() == ending_js_date.getUTCMonth() &&
-        starting_js_date.getUTCDate() == ending_js_date.getUTCDate()
-    ) {
-      return interval_string + serializeable_ending_time.serializeWithoutSeconds(); 
-    }
-    
-    var serializeable_ending_date = new SerializeableDate(
-      ending_js_date.getUTCFullYear(),
-      ending_js_date.getUTCMonth(),
-      ending_js_date.getUTCDate()
-    );
-
-    return interval_string + serializeable_ending_date.serialize() + ' ' + 
-        serializeable_ending_time.serializeWithoutSeconds();
-  };
-
-  return {
-    hasClass: hasClass,
-    makePriceString: makePriceString,
-    makeTimestampString: makeTimestampString,
-    removeDomChildren: removeDomChildren,
-    stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
-    makeTimestampIntervalString: makeTimestampIntervalString
-  };
-
-})();
 
 function ApiControllerWrapper(api_object) {
 
@@ -1471,7 +1482,7 @@ var SidePanelUiController = (function() {
   var monitorExperimentInfo = {
     tab_info: {
       button_title: 'Monitor Experiment',
-      icon_type: 'settings-input-svideo',
+      icon_type: 'question-answer',
       tab: null
     },
     page_info: {
@@ -2659,6 +2670,187 @@ function Calendar(
   };
 };
 
+function StaticCalendar(
+  template_store,
+  parent_node,
+  selected_date_timestamp
+) {
+
+  /**
+   * Template name constants
+   */
+  var TEMPLATE_ID = '#static-calendar-template';
+
+  /**
+   * Html class names
+   */
+  var DATE_CLASS = 'date';
+  var DATE_LABEL_CLASS = 'date-label';
+  var WEEK_CLASS = 'week';
+  var SELECTABLE_DATE_CLASS = 'selectable-date';
+  
+  /**
+   * Html attribute names
+   */
+  var SELECTED_DATE_ATTR = 'selected-date';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var selectedDateTimestamp = selected_date_timestamp;
+  var staticCalendar = null;
+
+  /**
+   * Dom nodes
+   */
+  var rootNode = {
+    className: 'static-calendar-wrapper',
+    node: null
+  };
+
+  var selectedDateDisplayNode = {
+    className: 'selected-date-label',
+    node: null
+  };
+
+  var domContainerNode = {
+    className: 'dom-container',
+    node: null
+  }; 
+
+  /**
+   * Private functions
+   */
+  var bindClassBoundNode = function(node_info) {
+    elements = parentNode.getElementsByClassName(node_info.className);
+    console.assert(elements.length === 1);
+    node_info.node = elements[0];
+  };
+
+  var synthesizeTemplate = function() {
+    // Copy and bind template
+    var static_calendar_template = templateStore.import.querySelector(TEMPLATE_ID);
+    var static_calendar_clone = document.importNode(static_calendar_template.content, true);
+    parentNode.appendChild(static_calendar_clone);
+  };
+
+  var bindInternalNodes = function() {
+    // Bind static html nodes
+    bindClassBoundNode(rootNode);
+    bindClassBoundNode(selectedDateDisplayNode);
+    bindClassBoundNode(domContainerNode);
+  };
+
+  var generateDateLabelNode = function(date) {
+    var date_label_node = document.createElement('div');
+    var label = document.createElement('span');
+    label.className = DATE_LABEL_CLASS;
+    label.innerHTML = date;
+    date_label_node.appendChild(label);
+    return date_label_node;
+  };
+
+  var generateSelectableDateNode = function(date) {
+    var selectable_date_node = generateDateNode();
+    var date_label_node = generateDateLabelNode(date);
+    date_label_node.className = SELECTABLE_DATE_CLASS;
+    selectable_date_node.appendChild(date_label_node);
+    return selectable_date_node; 
+  };
+  
+  var generateDateNode = function() {
+    var date_node = document.createElement('div');
+    date_node.className = DATE_CLASS;
+    return date_node;
+  };
+
+  var generateBlankDateNode = function() {
+    return generateDateNode();
+  };
+  
+  /**
+   * generateWeekNode()
+   * - dynamically generate the node for 1 row in the calendar
+   */
+  function generateWeekNode() {
+    var week_node = document.createElement('div');
+    week_node.className = WEEK_CLASS;
+    return week_node;
+  };
+
+  /**
+   * setMonthDisplayGrid()
+   * @param DateObj selected_date: {year, month, date}
+   */
+  var setMonthDisplayGrid = function(year, month, selected_date) {
+    // Clear existing children nodes 
+    Utils.removeDomChildren(domContainerNode.node);
+
+    // Assemble dynamic month display grid
+    var new_date = new Date(year, month);
+    var starting_day_idx = new_date.getUTCDay();
+
+    // Get number of days in month
+    var num_days_in_month_obj = new Date(year, month + 1, 0); // hacky :/
+    var num_days_in_month = num_days_in_month_obj.getDate();
+
+    // Generate dynamic html nodes for days in last week of previous month that appear
+    // in first week of this month, e.g. last few days
+    var current_week = generateWeekNode();
+    domContainerNode.node.appendChild(current_week);
+
+    console.log('starting day idx');
+    console.log(starting_day_idx);
+
+    for (var i = 0; i < starting_day_idx; ++i) {
+      var blank_node = generateBlankDateNode();
+      current_week.appendChild(blank_node);
+    }
+    
+    // Generate dynamic html nodes for displaying selectable days in month
+    for (var i = 1; i <= num_days_in_month; ++i) { // fewer ops with these loop conditions
+      // Insert rows for calendar weeks
+      if (current_week.childNodes.length == 7) {
+        current_week = generateWeekNode();
+        domContainerNode.node.appendChild(current_week);
+      }
+     
+      var selectable_date = generateSelectableDateNode(i);
+
+      if (i == selected_date) {
+        selectable_date.setAttribute(SELECTED_DATE_ATTR, '');
+        console.log(selectable_date);
+      }
+
+      current_week.appendChild(selectable_date);
+    }
+  };
+
+  var initUi = function() {
+    // Generate timestamp string and copy into display ui node
+    selectedDateDisplayNode.node.innerHTML = Utils.makeDateString(selectedDateTimestamp);
+
+    // Configure dynamic ui nodes
+    var js_date = new Date(selectedDateTimestamp);
+    setMonthDisplayGrid(
+      js_date.getUTCFullYear(),
+      js_date.getUTCMonth(),
+      js_date.getUTCDate()
+    );
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    synthesizeTemplate();
+    bindInternalNodes();
+    initUi();
+  };
+};
+
 function MonitorExperimentsPage(
   template_store,
   root_id,
@@ -2952,6 +3144,13 @@ function PendingExperimentView(
   var SELECTED_PAGE_ATTR = 'selected-page';
   var EDITING_TITLE_ATTR = 'editing-title';
   var EDITING_DESCRIPTION_ATTR = 'editing-description';
+  var CHANGED_TITLE_ATTR = 'changed-title';
+  var CHANGED_DESCRIPTION_ATTR = 'changed-description';
+
+  /**
+   * Unit tokens 
+   */
+  var PRICE_UNIT_TOKEN = '$ ';
 
   /**
    * Template id
@@ -2996,23 +3195,28 @@ function PendingExperimentView(
   /**
    * Page nodes 
    */
+  var timePageNode = {
+    className: 'time-page',
+    node: null
+  };
+
+  var staticCalendarWrapperNode = {
+    className: 'static-calendar',
+    node: null
+  };
+
   var descriptionPageNode = {
     className: 'description-page',
     node: null
   };
   
-  var hardwarePageNode = {
-    className: 'hardware-page',
+  var recordingPageNode = {
+    className: 'recording-page',
     node: null
   };
   
-  var timePageNode = {
-    className: 'time-page',
-    node: null
-  };
-  
-  var paymentPageNode = {
-    className: 'payment-page',
+  var monitorPageNode = {
+    className: 'monitor-page',
     node: null
   };
   
@@ -3024,8 +3228,8 @@ function PendingExperimentView(
     node: null
   };
 
-  var hardwareButtonNode = {
-    className: 'hardware-nav-wrapper',
+  var recordingButtonNode = {
+    className: 'recording-nav-wrapper',
     node: null
   };
 
@@ -3034,81 +3238,43 @@ function PendingExperimentView(
     node: null
   };
 
-  var paymentButtonNode = {
-    className: 'payment-nav-wrapper',
+  var monitorButtonNode = {
+    className: 'monitor-nav-wrapper',
     node: null
   };
 
   /**
    * Main stage wrappers
    */
-
   var scopesCountNode = {
-    value: {
-      className: 'scopes-count-label',
-      node: null
-    },
-    unit: {
-      className: 'scopes-count-unit-label',
-      node: null,
-      singular: 'scope',
-      plural: 'scopes'
-    }
-  };
-
-  var startDateNode = {
-    className: 'start-date-label',
-    node: null
-  };
-
-  var experimentTimestampIntervalNode = {
-    className: 'experiment-timestamp-interval-label',
+    className: 'scopes-count-value',
     node: null
   };
 
   var startTimeNode = {
-    className: 'start-time-label',
+    className: 'start-time-value',
     node: null
   };
 
   var durationNode = {
-    value: {
-      className: 'duration-label',
-      node: null
-    },
-    unit: {
-      className: 'duration-unit-label',
-      node: null,
-      singular: 'hour',
-      plural: 'hours'
-    }
-  };
-
-  var descriptionNode = {
-    className: 'description-label',
+    className: 'experiment-duration-value',
     node: null
   };
 
-  var orderedDateNode = {
-    className: 'ordered-date-label',
-    node: null
+  var durationUnitNode = {
+    className: 'experiment-duration-unit',
+    node: null,
+    singular: 'hour',
+    plural: 'hours'
   };
 
   var priceNode = {
-    value: { 
-      className: 'price-label',
-      node: null
-    },
-    unit: {
-      className: 'price-unit-label',
-      node: null,
-      singular: '$',
-      plural: '$'
-    }
+    className: 'price-value',
+    node: null
   };
 
   var shortCodeNode = {
-    className: 'short-code-label',
+    className: 'short-code-value',
     node: null
   };
 
@@ -3134,10 +3300,16 @@ function PendingExperimentView(
     if (title == null || title == '') {
       titleNode.node.innerHTML = DEFAULT_TITLE; 
       cachedTitle = null;
+      titleNode.node.removeAttribute(CHANGED_TITLE_ATTR);
     } else {
       titleNode.node.innerHTML = title; 
       cachedTitle = title;
+      titleNode.node.setAttribute(CHANGED_TITLE_ATTR, '');
     }
+  };
+
+  function setStartTime(start_time) {
+    startTimeNode.node.innerHTML = start_time; 
   };
 
   /**
@@ -3148,10 +3320,19 @@ function PendingExperimentView(
     if (description == null || description == '') {
       descriptionPageNode.node.innerHTML = DEFAULT_DESCRIPTION; 
       cachedDescription = null;
+      descriptionPageNode.node.removeAttribute(CHANGED_DESCRIPTION_ATTR);
     } else {
       descriptionPageNode.node.innerHTML = description; 
       cachedDescription = description;
+      descriptionPageNode.node.setAttribute(CHANGED_DESCRIPTION_ATTR, '');
     }
+  };
+
+  function setDuration(duration) {
+    durationNode.node.innerHTML = duration;
+    durationUnitNode.node.innerHTML = (duration == 1)
+      ? durationUnitNode.singular
+      : durationUnitNode.plural;
   };
 
   function setShortCode(short_code) {
@@ -3159,40 +3340,22 @@ function PendingExperimentView(
   };
 
   function setScopesCount(scopes_count) {
-    updateNodeWithUnit(scopes_count, scopesCountNode);
+    scopesCountNode.node.innerHTML = scopes_count;
   };
 
   function setPrice(price) {
-    updateNodeWithUnit(price, priceNode);  
+    priceNode.node.innerHTML = PRICE_UNIT_TOKEN + price;
   };
 
   function setOrderedDate(ordered_date) {
     orderedDateNode.node.innerHTML = ordered_date.serialize();
   };
 
-  function setExperimentTimestampInterval(experiment_timestamp_interval) {
-    experimentTimestampIntervalNode.node.innerHTML = experiment_timestamp_interval;
-  }
-
-  function updateNodeWithUnit(value, node) {
-    // Place value in ui node
-    node.value.node.innerHTML = value;
-    
-    // Adjust unit
-    node.unit.node.innerHTML = (value === 1)
-      ? node.unit.singular
-      : node.unit.plural;
-  };
-
   var bindClassBoundNode = function(node_info) {
+    console.log(node_info.className);
     var elements = rootNode.node.getElementsByClassName(node_info.className); 
     console.assert(elements.length === 1);
     node_info.node = elements[0];
-  };
-
-  var bindClassBoundNodeWithUnit = function(node_info) {
-    bindClassBoundNode(node_info.value);
-    bindClassBoundNode(node_info.unit);
   };
 
   var unselectButton = function() {
@@ -3268,6 +3431,12 @@ function PendingExperimentView(
         cachedDescription = null;
       }
 
+      if (cachedDescription != null) {
+        descriptionPageNode.node.setAttribute(CHANGED_DESCRIPTION_ATTR, '');
+      } else {
+        descriptionPageNode.node.removeAttribute(CHANGED_DESCRIPTION_ATTR); 
+      }
+
       console.log(cachedDescription);
 
       for (var i = 0; i < changedDescriptionListeners.length; ++i) {
@@ -3277,6 +3446,18 @@ function PendingExperimentView(
 
     // Return description to non-editing state
     setNotEditingDescription();
+  };
+
+  var bindTimeNodes = function() {
+    bindClassBoundNode(timePageNode);
+    bindClassBoundNode(staticCalendarWrapperNode);
+    
+    bindClassBoundNode(shortCodeNode);
+    bindClassBoundNode(scopesCountNode);
+    bindClassBoundNode(priceNode);
+    bindClassBoundNode(startTimeNode);
+    bindClassBoundNode(durationNode);
+    bindClassBoundNode(durationUnitNode);
   };
 
   var bindDescriptionNodes = function() {
@@ -3313,31 +3494,31 @@ function PendingExperimentView(
 
   var bindPageNodes = function() {
     // Bind nodes
+    bindTimeNodes();
     bindDescriptionNodes();
-    bindClassBoundNode(hardwarePageNode);
-    bindClassBoundNode(timePageNode);
-    bindClassBoundNode(paymentPageNode);
+    bindClassBoundNode(recordingPageNode);
+    bindClassBoundNode(monitorPageNode);
   };
 
   var bindFooterNodes = function() {
     // Bind nodes
     bindClassBoundNode(descriptionButtonNode);
-    bindClassBoundNode(hardwareButtonNode);
+    bindClassBoundNode(recordingButtonNode);
     bindClassBoundNode(timeButtonNode);
-    bindClassBoundNode(paymentButtonNode);
+    bindClassBoundNode(monitorButtonNode);
 
     // Configure event listeners
     descriptionButtonNode.node.onclick = function() {
       changePage(descriptionButtonNode, descriptionPageNode); 
     }; 
-    hardwareButtonNode.node.onclick = function() {
-      changePage(hardwareButtonNode, hardwarePageNode); 
+    recordingButtonNode.node.onclick = function() {
+      changePage(recordingButtonNode, recordingPageNode); 
     }; 
     timeButtonNode.node.onclick = function() {
       changePage(timeButtonNode, timePageNode); 
     }; 
-    paymentButtonNode.node.onclick = function() {
-      changePage(paymentButtonNode, paymentPageNode); 
+    monitorButtonNode.node.onclick = function() {
+      changePage(monitorButtonNode, monitorPageNode); 
     }; 
   };
 
@@ -3384,6 +3565,12 @@ function PendingExperimentView(
 
       if (cachedTitle == '') {
         cachedTitle = null;
+      }
+
+      if (cachedTitle != null) {
+        titleNode.node.setAttribute(CHANGED_TITLE_ATTR, '');  
+      } else {
+        titleNode.node.removeAttribute(CHANGED_TITLE_ATTR);  
       }
       
       console.log(cachedTitle);
@@ -3442,42 +3629,42 @@ function PendingExperimentView(
     bindHeaderNodes();
     bindPageNodes();
     bindFooterNodes();
-
-    // Bind unitless nodes
-    bindClassBoundNode(experimentTimestampIntervalNode);
-    bindClassBoundNode(descriptionNode); 
-    bindClassBoundNode(orderedDateNode); 
-    bindClassBoundNode(shortCodeNode); 
-  
-    // Bind nodes with unit
-    bindClassBoundNodeWithUnit(scopesCountNode); 
-    bindClassBoundNodeWithUnit(priceNode); 
   };
 
   var initUiData = function(confirmed_order) {
+    // Update header data
     setTitle(confirmed_order.getTitle());
-    setDescription(confirmed_order.getDescription());
+
+    // Update time data
+    staticCalendar = new StaticCalendar(
+      templateStore,
+      staticCalendarWrapperNode.node,
+      confirmed_order.getStartTimestamp()
+    );
+    staticCalendar.init();
+    
     setScopesCount(confirmed_order.getScopesCount());
     setPrice(confirmed_order.getPrice());
     setShortCode(confirmed_order.getShortCode());
 
-    // Set date ordered
-    var ordered_date = new Date(confirmed_order.getTimeOrdered());
-    var serializeable_ordered_date = new SerializeableDate(
-      ordered_date.getUTCFullYear(),
-      ordered_date.getUTCMonth(),
-      ordered_date.getUTCDate()
-    );
-    setOrderedDate(serializeable_ordered_date);
-
-    var experiment_timestamp_interval = Utils.makeTimestampIntervalString(
-      confirmed_order.getStartTimestamp(),
-      confirmed_order.getEndTimestamp()
+    var experiment_start_time = new Date(confirmed_order.getStartTimestamp());
+    var serializeable_experiment_start_time = new SerializeableTime(
+      experiment_start_time.getHours(),
+      experiment_start_time.getMinutes(),
+      experiment_start_time.getSeconds()
     );
 
-    console.log(experiment_timestamp_interval);
+    setStartTime(serializeable_experiment_start_time.serializeWithoutSeconds());
+    
+    var experiment_end_time = new Date(confirmed_order.getEndTimestamp());
 
-    setExperimentTimestampInterval(experiment_timestamp_interval);
+    setDuration(DateOperator.getDifferenceInHours(
+      experiment_end_time,
+      experiment_start_time
+    ));
+
+    // Init description-page data
+    setDescription(confirmed_order.getDescription());
   };
 
   /**
@@ -3493,8 +3680,8 @@ function PendingExperimentView(
     // Place data in proper ui elements
     initUiData(confirmed_order);
 
-    selectButton(descriptionButtonNode);
-    selectPage(descriptionPageNode);
+    selectButton(timeButtonNode);
+    selectPage(timePageNode);
   };
 
   /**

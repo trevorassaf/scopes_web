@@ -21,6 +21,13 @@ function PendingExperimentView(
   var SELECTED_PAGE_ATTR = 'selected-page';
   var EDITING_TITLE_ATTR = 'editing-title';
   var EDITING_DESCRIPTION_ATTR = 'editing-description';
+  var CHANGED_TITLE_ATTR = 'changed-title';
+  var CHANGED_DESCRIPTION_ATTR = 'changed-description';
+
+  /**
+   * Unit tokens 
+   */
+  var PRICE_UNIT_TOKEN = '$ ';
 
   /**
    * Template id
@@ -65,23 +72,28 @@ function PendingExperimentView(
   /**
    * Page nodes 
    */
+  var timePageNode = {
+    className: 'time-page',
+    node: null
+  };
+
+  var staticCalendarWrapperNode = {
+    className: 'static-calendar',
+    node: null
+  };
+
   var descriptionPageNode = {
     className: 'description-page',
     node: null
   };
   
-  var hardwarePageNode = {
-    className: 'hardware-page',
+  var recordingPageNode = {
+    className: 'recording-page',
     node: null
   };
   
-  var timePageNode = {
-    className: 'time-page',
-    node: null
-  };
-  
-  var paymentPageNode = {
-    className: 'payment-page',
+  var monitorPageNode = {
+    className: 'monitor-page',
     node: null
   };
   
@@ -93,8 +105,8 @@ function PendingExperimentView(
     node: null
   };
 
-  var hardwareButtonNode = {
-    className: 'hardware-nav-wrapper',
+  var recordingButtonNode = {
+    className: 'recording-nav-wrapper',
     node: null
   };
 
@@ -103,81 +115,43 @@ function PendingExperimentView(
     node: null
   };
 
-  var paymentButtonNode = {
-    className: 'payment-nav-wrapper',
+  var monitorButtonNode = {
+    className: 'monitor-nav-wrapper',
     node: null
   };
 
   /**
    * Main stage wrappers
    */
-
   var scopesCountNode = {
-    value: {
-      className: 'scopes-count-label',
-      node: null
-    },
-    unit: {
-      className: 'scopes-count-unit-label',
-      node: null,
-      singular: 'scope',
-      plural: 'scopes'
-    }
-  };
-
-  var startDateNode = {
-    className: 'start-date-label',
-    node: null
-  };
-
-  var experimentTimestampIntervalNode = {
-    className: 'experiment-timestamp-interval-label',
+    className: 'scopes-count-value',
     node: null
   };
 
   var startTimeNode = {
-    className: 'start-time-label',
+    className: 'start-time-value',
     node: null
   };
 
   var durationNode = {
-    value: {
-      className: 'duration-label',
-      node: null
-    },
-    unit: {
-      className: 'duration-unit-label',
-      node: null,
-      singular: 'hour',
-      plural: 'hours'
-    }
-  };
-
-  var descriptionNode = {
-    className: 'description-label',
+    className: 'experiment-duration-value',
     node: null
   };
 
-  var orderedDateNode = {
-    className: 'ordered-date-label',
-    node: null
+  var durationUnitNode = {
+    className: 'experiment-duration-unit',
+    node: null,
+    singular: 'hour',
+    plural: 'hours'
   };
 
   var priceNode = {
-    value: { 
-      className: 'price-label',
-      node: null
-    },
-    unit: {
-      className: 'price-unit-label',
-      node: null,
-      singular: '$',
-      plural: '$'
-    }
+    className: 'price-value',
+    node: null
   };
 
   var shortCodeNode = {
-    className: 'short-code-label',
+    className: 'short-code-value',
     node: null
   };
 
@@ -203,10 +177,16 @@ function PendingExperimentView(
     if (title == null || title == '') {
       titleNode.node.innerHTML = DEFAULT_TITLE; 
       cachedTitle = null;
+      titleNode.node.removeAttribute(CHANGED_TITLE_ATTR);
     } else {
       titleNode.node.innerHTML = title; 
       cachedTitle = title;
+      titleNode.node.setAttribute(CHANGED_TITLE_ATTR, '');
     }
+  };
+
+  function setStartTime(start_time) {
+    startTimeNode.node.innerHTML = start_time; 
   };
 
   /**
@@ -217,10 +197,19 @@ function PendingExperimentView(
     if (description == null || description == '') {
       descriptionPageNode.node.innerHTML = DEFAULT_DESCRIPTION; 
       cachedDescription = null;
+      descriptionPageNode.node.removeAttribute(CHANGED_DESCRIPTION_ATTR);
     } else {
       descriptionPageNode.node.innerHTML = description; 
       cachedDescription = description;
+      descriptionPageNode.node.setAttribute(CHANGED_DESCRIPTION_ATTR, '');
     }
+  };
+
+  function setDuration(duration) {
+    durationNode.node.innerHTML = duration;
+    durationUnitNode.node.innerHTML = (duration == 1)
+      ? durationUnitNode.singular
+      : durationUnitNode.plural;
   };
 
   function setShortCode(short_code) {
@@ -228,40 +217,22 @@ function PendingExperimentView(
   };
 
   function setScopesCount(scopes_count) {
-    updateNodeWithUnit(scopes_count, scopesCountNode);
+    scopesCountNode.node.innerHTML = scopes_count;
   };
 
   function setPrice(price) {
-    updateNodeWithUnit(price, priceNode);  
+    priceNode.node.innerHTML = PRICE_UNIT_TOKEN + price;
   };
 
   function setOrderedDate(ordered_date) {
     orderedDateNode.node.innerHTML = ordered_date.serialize();
   };
 
-  function setExperimentTimestampInterval(experiment_timestamp_interval) {
-    experimentTimestampIntervalNode.node.innerHTML = experiment_timestamp_interval;
-  }
-
-  function updateNodeWithUnit(value, node) {
-    // Place value in ui node
-    node.value.node.innerHTML = value;
-    
-    // Adjust unit
-    node.unit.node.innerHTML = (value === 1)
-      ? node.unit.singular
-      : node.unit.plural;
-  };
-
   var bindClassBoundNode = function(node_info) {
+    console.log(node_info.className);
     var elements = rootNode.node.getElementsByClassName(node_info.className); 
     console.assert(elements.length === 1);
     node_info.node = elements[0];
-  };
-
-  var bindClassBoundNodeWithUnit = function(node_info) {
-    bindClassBoundNode(node_info.value);
-    bindClassBoundNode(node_info.unit);
   };
 
   var unselectButton = function() {
@@ -337,6 +308,12 @@ function PendingExperimentView(
         cachedDescription = null;
       }
 
+      if (cachedDescription != null) {
+        descriptionPageNode.node.setAttribute(CHANGED_DESCRIPTION_ATTR, '');
+      } else {
+        descriptionPageNode.node.removeAttribute(CHANGED_DESCRIPTION_ATTR); 
+      }
+
       console.log(cachedDescription);
 
       for (var i = 0; i < changedDescriptionListeners.length; ++i) {
@@ -346,6 +323,18 @@ function PendingExperimentView(
 
     // Return description to non-editing state
     setNotEditingDescription();
+  };
+
+  var bindTimeNodes = function() {
+    bindClassBoundNode(timePageNode);
+    bindClassBoundNode(staticCalendarWrapperNode);
+    
+    bindClassBoundNode(shortCodeNode);
+    bindClassBoundNode(scopesCountNode);
+    bindClassBoundNode(priceNode);
+    bindClassBoundNode(startTimeNode);
+    bindClassBoundNode(durationNode);
+    bindClassBoundNode(durationUnitNode);
   };
 
   var bindDescriptionNodes = function() {
@@ -382,31 +371,31 @@ function PendingExperimentView(
 
   var bindPageNodes = function() {
     // Bind nodes
+    bindTimeNodes();
     bindDescriptionNodes();
-    bindClassBoundNode(hardwarePageNode);
-    bindClassBoundNode(timePageNode);
-    bindClassBoundNode(paymentPageNode);
+    bindClassBoundNode(recordingPageNode);
+    bindClassBoundNode(monitorPageNode);
   };
 
   var bindFooterNodes = function() {
     // Bind nodes
     bindClassBoundNode(descriptionButtonNode);
-    bindClassBoundNode(hardwareButtonNode);
+    bindClassBoundNode(recordingButtonNode);
     bindClassBoundNode(timeButtonNode);
-    bindClassBoundNode(paymentButtonNode);
+    bindClassBoundNode(monitorButtonNode);
 
     // Configure event listeners
     descriptionButtonNode.node.onclick = function() {
       changePage(descriptionButtonNode, descriptionPageNode); 
     }; 
-    hardwareButtonNode.node.onclick = function() {
-      changePage(hardwareButtonNode, hardwarePageNode); 
+    recordingButtonNode.node.onclick = function() {
+      changePage(recordingButtonNode, recordingPageNode); 
     }; 
     timeButtonNode.node.onclick = function() {
       changePage(timeButtonNode, timePageNode); 
     }; 
-    paymentButtonNode.node.onclick = function() {
-      changePage(paymentButtonNode, paymentPageNode); 
+    monitorButtonNode.node.onclick = function() {
+      changePage(monitorButtonNode, monitorPageNode); 
     }; 
   };
 
@@ -453,6 +442,12 @@ function PendingExperimentView(
 
       if (cachedTitle == '') {
         cachedTitle = null;
+      }
+
+      if (cachedTitle != null) {
+        titleNode.node.setAttribute(CHANGED_TITLE_ATTR, '');  
+      } else {
+        titleNode.node.removeAttribute(CHANGED_TITLE_ATTR);  
       }
       
       console.log(cachedTitle);
@@ -511,42 +506,42 @@ function PendingExperimentView(
     bindHeaderNodes();
     bindPageNodes();
     bindFooterNodes();
-
-    // Bind unitless nodes
-    bindClassBoundNode(experimentTimestampIntervalNode);
-    bindClassBoundNode(descriptionNode); 
-    bindClassBoundNode(orderedDateNode); 
-    bindClassBoundNode(shortCodeNode); 
-  
-    // Bind nodes with unit
-    bindClassBoundNodeWithUnit(scopesCountNode); 
-    bindClassBoundNodeWithUnit(priceNode); 
   };
 
   var initUiData = function(confirmed_order) {
+    // Update header data
     setTitle(confirmed_order.getTitle());
-    setDescription(confirmed_order.getDescription());
+
+    // Update time data
+    staticCalendar = new StaticCalendar(
+      templateStore,
+      staticCalendarWrapperNode.node,
+      confirmed_order.getStartTimestamp()
+    );
+    staticCalendar.init();
+    
     setScopesCount(confirmed_order.getScopesCount());
     setPrice(confirmed_order.getPrice());
     setShortCode(confirmed_order.getShortCode());
 
-    // Set date ordered
-    var ordered_date = new Date(confirmed_order.getTimeOrdered());
-    var serializeable_ordered_date = new SerializeableDate(
-      ordered_date.getUTCFullYear(),
-      ordered_date.getUTCMonth(),
-      ordered_date.getUTCDate()
-    );
-    setOrderedDate(serializeable_ordered_date);
-
-    var experiment_timestamp_interval = Utils.makeTimestampIntervalString(
-      confirmed_order.getStartTimestamp(),
-      confirmed_order.getEndTimestamp()
+    var experiment_start_time = new Date(confirmed_order.getStartTimestamp());
+    var serializeable_experiment_start_time = new SerializeableTime(
+      experiment_start_time.getHours(),
+      experiment_start_time.getMinutes(),
+      experiment_start_time.getSeconds()
     );
 
-    console.log(experiment_timestamp_interval);
+    setStartTime(serializeable_experiment_start_time.serializeWithoutSeconds());
+    
+    var experiment_end_time = new Date(confirmed_order.getEndTimestamp());
 
-    setExperimentTimestampInterval(experiment_timestamp_interval);
+    setDuration(DateOperator.getDifferenceInHours(
+      experiment_end_time,
+      experiment_start_time
+    ));
+
+    // Init description-page data
+    setDescription(confirmed_order.getDescription());
   };
 
   /**
@@ -562,8 +557,8 @@ function PendingExperimentView(
     // Place data in proper ui elements
     initUiData(confirmed_order);
 
-    selectButton(descriptionButtonNode);
-    selectPage(descriptionPageNode);
+    selectButton(timeButtonNode);
+    selectPage(timePageNode);
   };
 
   /**

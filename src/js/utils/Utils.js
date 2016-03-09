@@ -82,6 +82,16 @@ var Utils = (function() {
       stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
   };
 
+  this.makeDateString = function(timestamp) {
+    var js_date = new Date(timestamp);
+    var serializeable_date = new SerializeableDate(
+      js_date.getUTCFullYear(),
+      js_date.getUTCMonth(),
+      js_date.getUTCDate()
+    );
+    return serializeable_date.serialize();
+  };
+
   /**
    * removeDomChildren()
    *   - remove all children from dom node
@@ -140,6 +150,7 @@ var Utils = (function() {
     hasClass: hasClass,
     makePriceString: makePriceString,
     makeTimestampString: makeTimestampString,
+    makeDateString: makeDateString,
     removeDomChildren: removeDomChildren,
     stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
     makeTimestampIntervalString: makeTimestampIntervalString

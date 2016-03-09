@@ -498,6 +498,63 @@ paper-slider {
   background-color: #EEEEEE;
 }
 
+.static-calendar-wrapper {
+  width: 240px;
+  background-color: #FFFFFF; 
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  border: 1px solid rgb(228, 228, 228); 
+}
+
+.static-calendar-wrapper .selected-date-container {
+  background-color: rgb(38, 108, 177);
+  color: #FFFFFF;
+  height: 42px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+}
+
+.static-calendar-wrapper .selected-date-label {
+  position: relative;
+  top: 8px;
+}
+
+.static-calendar-wrapper .dow-container {
+  margin-top: 10px;
+}
+
+.static-calendar-wrapper .dow-container > div {
+  display: inline-block;
+  width: 14.15%;
+  text-align: center;
+  font-size: 14px;
+  color: #000000;
+}
+
+.static-calendar-wrapper .date {
+  display: inline-block;
+  width: 14.15%;
+  text-align: center;
+  font-size: 16px;
+  height: 35px;
+  position: relative;
+  border-radius: 50%;
+}
+
+.static-calendar-wrapper .date[selected-date] {
+  border: 1px solid rgb(38, 108, 177);
+  color: rgb(38, 108, 177);
+  font-weight: bold;
+}
+
+.static-calendar-wrapper .date .date-label {
+  position: relative; 
+  top: 8px;
+}
+
 
 * {
   margin: 0px;
@@ -529,6 +586,10 @@ paper-slider {
   font-size: 24px;
   padding: 4px;
   outline: 0px solid transparent;
+}
+
+.pending-experiment-wrapper .title-label[changed-title], .pending-experiment-wrapper .description-page[changed-description] {
+  color: #424242;
 }
 
 .pending-experiment-wrapper .title-label:focus {
@@ -588,12 +649,12 @@ paper-slider {
   display: none;
 }
 
-.pending-experiment-wrapper .main-stage-wrapper div:not([selected-page]) {
+.pending-experiment-wrapper .main-stage-wrapper > div:not([selected-page]) {
   display: none;
 }
 
 .pending-experiment-wrapper .main-stage-wrapper {
-  height: 260px;
+  height: 320px;
 }
 
 .pending-experiment-wrapper .main-stage-wrapper .description-page {
@@ -603,7 +664,7 @@ paper-slider {
   margin-top: 1px;
   margin-bottom: 1px;
 
-  height: 220px;
+  height: 270px;
   overflow-y: auto;
   cursor: pointer;
   padding: 10px;
@@ -624,6 +685,53 @@ paper-slider {
   margin-right: 19px;
   padding-top: 9px;
   cursor: text;
+}
+
+/* Time styles */
+.pending-experiment-wrapper .main-stage-wrapper .scopes-icon {
+  height: 38px;
+  width: 38px;
+  background-color: blue;
+}
+.pending-experiment-wrapper .main-stage-wrapper .time-page {
+  padding-left: 20px;
+  padding-right: 20px;
+  position: relative;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .time-page > div {
+  display: inline-block;
+}
+
+
+.pending-experiment-wrapper .main-stage-wrapper .time-secondary-container {
+  padding-left: 40px;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .time-secondary-container > div {
+  margin-bottom: 50px;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .time-payments-container {
+  padding-left: 40px;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .time-payments-container > div {
+  margin-bottom: 50px;
+  position: relative;
+  top: -74px;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .time-page .field-title {
+  color: #424242;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .monitor-page {
+  text-align: center;
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .recording-page {
+  text-align: center;
 }
 
 .short-code-picker-wrapper {
