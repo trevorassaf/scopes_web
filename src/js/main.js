@@ -20,5 +20,10 @@ window.onload = function() {
 
   var my_experiments_view = SidePanelUiController.getMyExperimentsView();
   MyExperimentsLogicController.init(my_experiments_view);
+  
+  NewExperimentUiController.registerOrderConfirmedListener(function() {
+    MyExperimentsLogicController.refreshData();
+  });
+
 
 };

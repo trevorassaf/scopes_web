@@ -221,7 +221,7 @@ function PendingExperimentView(
   };
 
   function setPrice(price) {
-    priceNode.node.innerHTML = PRICE_UNIT_TOKEN + price;
+    priceNode.node.innerHTML = PRICE_UNIT_TOKEN + Utils.makePriceString(price);
   };
 
   function setOrderedDate(ordered_date) {

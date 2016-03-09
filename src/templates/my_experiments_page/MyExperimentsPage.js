@@ -138,6 +138,7 @@ function MyExperimentsPage(
   };
 
   this.clearPendingOrders = function() {
-    // TODO...
+    pendingExperimentViews = [];
+    Utils.removeDomChildren(pageWrapperNode.node);
   };
 };

@@ -20,6 +20,11 @@ window.onload = function() {
 
   var my_experiments_view = SidePanelUiController.getMyExperimentsView();
   MyExperimentsLogicController.init(my_experiments_view);
+  
+  NewExperimentUiController.registerOrderConfirmedListener(function() {
+    MyExperimentsLogicController.refreshData();
+  });
+
 
 };
 
@@ -630,6 +635,7 @@ var MyExperimentsLogicController = (function() {
   };
 
   var refreshData = function() {
+    myExperimentsView.clearPendingOrders();
     getConfirmedOrdersApiWrapper.fetch(); 
   };
 
@@ -1072,6 +1078,7 @@ var NewExperimentUiController = (function() {
   var shortCodePicker = null;
   var calendarPicker = null;
   var timePicker = null;
+  var confirmedOrderListeners = [];
 
   /**
    * Private functions
@@ -1135,6 +1142,10 @@ var NewExperimentUiController = (function() {
 
     confirm_order_api.setSuccessfulApiCallback(function(api_response) {
       console.log(api_response);
+      for (var i = 0; i < confirmedOrderListeners.length; ++i) {
+        confirmedOrderListeners[i]();
+      }
+      
     });
 
     confirm_order_api.setLogicalApiFailureCallback(function(api_response) {
@@ -1219,7 +1230,7 @@ var NewExperimentUiController = (function() {
         disallowed_week_days,
         {},
         3,
-        0 
+        7 
     );
     calendarPicker.init();
 
@@ -1244,12 +1255,17 @@ var NewExperimentUiController = (function() {
     rootNode.node.removeAttribute(HIDDEN_PAGE_ATTR);
   };
 
+  var registerOrderConfirmedListener = function(callback) {
+    confirmedOrderListeners.push(callback);
+  };
+
   return {
     init: init,
     confirmOrder: confirmOrder,
     cancelOrder: cancelOrder,
     hide: hide,
-    show: show
+    show: show,
+    registerOrderConfirmedListener: registerOrderConfirmedListener
   };
 })();
 
@@ -3318,7 +3334,8 @@ function MyExperimentsPage(
   };
 
   this.clearPendingOrders = function() {
-    // TODO...
+    pendingExperimentViews = [];
+    Utils.removeDomChildren(pageWrapperNode.node);
   };
 };
 
@@ -3545,7 +3562,7 @@ function PendingExperimentView(
   };
 
   function setPrice(price) {
-    priceNode.node.innerHTML = PRICE_UNIT_TOKEN + price;
+    priceNode.node.innerHTML = PRICE_UNIT_TOKEN + Utils.makePriceString(price);
   };
 
   function setOrderedDate(ordered_date) {

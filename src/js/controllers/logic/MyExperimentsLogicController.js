@@ -87,6 +87,7 @@ var MyExperimentsLogicController = (function() {
   };
 
   var refreshData = function() {
+    myExperimentsView.clearPendingOrders();
     getConfirmedOrdersApiWrapper.fetch(); 
   };
 
