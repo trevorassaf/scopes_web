@@ -42,11 +42,17 @@
 .pending-experiment-wrapper .title-underline {
   margin-top: 6px;
   border-top: 1px solid rgb(228, 228, 228);
-  border-bottom: 1px solid transparent;
+  margin-bottom: 1px;
 }
 
-.pending-experiment-wrapper .header-wrapper:hover .title-underline, .pending-experiment-wrapper .header-wrapper[editing-title] .title-underline {
+.pending-experiment-wrapper .header-wrapper:hover .title-underline {
   border-color: rgb(38, 108, 177);
+}
+
+.pending-experiment-wrapper .header-wrapper[editing-title] .title-underline {
+  border-color: rgb(38, 108, 177);
+  border-width: 2px;
+  margin-bottom: 0px;
 }
 
 .pending-experiment-wrapper .footer-wrapper {
@@ -86,8 +92,35 @@
 }
 
 .pending-experiment-wrapper .main-stage-wrapper {
-  min-height: 200px;
+  height: 260px;
 }
 
+.pending-experiment-wrapper .main-stage-wrapper .description-page {
+  margin-left: 20px;
+  margin-right: 20px;
+  border: 1px solid rgb(228, 228, 228);
+  margin-top: 1px;
+  margin-bottom: 1px;
 
+  height: 220px;
+  overflow-y: auto;
+  cursor: pointer;
+  padding: 10px;
+  font: 16px;
+  outline: 0px solid transparent;
+}
 
+.pending-experiment-wrapper .main-stage-wrapper .description-page:hover {
+  border-color: rgb(38, 108, 177); 
+}
+
+.pending-experiment-wrapper .main-stage-wrapper .description-page[editing-description] {
+  border-color: rgb(38, 108, 177); 
+  border-width: 2px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 19px;
+  margin-right: 19px;
+  padding-top: 9px;
+  cursor: text;
+}

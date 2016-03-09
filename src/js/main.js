@@ -1,5 +1,7 @@
 window.onload = function() {
 
+  document.execCommand('defaultParagraphSeparator', false, 'p');
+
   /**
    * Capture import node for html templates
    */

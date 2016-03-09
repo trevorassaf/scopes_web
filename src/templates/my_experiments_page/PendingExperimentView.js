@@ -12,7 +12,7 @@ function PendingExperimentView(
    * Default values 
    */
   var DEFAULT_TITLE = 'Add title...';
-  var DEFAULT_DESCRIPTION = 'Add description...';
+  var DEFAULT_DESCRIPTION = 'Add notes...';
 
   /**
    * Ui attributes
@@ -20,6 +20,7 @@ function PendingExperimentView(
   var SELECTED_BUTTON_ATTR = "selected-btn";
   var SELECTED_PAGE_ATTR = 'selected-page';
   var EDITING_TITLE_ATTR = 'editing-title';
+  var EDITING_DESCRIPTION_ATTR = 'editing-description';
 
   /**
    * Template id
@@ -34,8 +35,11 @@ function PendingExperimentView(
   var selectedButton = null;
   var selectedPageWrapper = null;
   var isEditingTitle = false;
+  var isEditingDescription = false;
   var cachedTitle = null;
   var changedTitleListeners = [];
+  var cachedDescription = null;
+  var changedDescriptionListeners = [];
 
   /**
    * Dom nodes
@@ -198,8 +202,10 @@ function PendingExperimentView(
   function setTitle(title) {
     if (title == null || title == '') {
       titleNode.node.innerHTML = DEFAULT_TITLE; 
+      cachedTitle = null;
     } else {
       titleNode.node.innerHTML = title; 
+      cachedTitle = title;
     }
   };
 
@@ -209,9 +215,11 @@ function PendingExperimentView(
    */
   function setDescription(description) {
     if (description == null || description == '') {
-      descriptionNode.node.innerHTML = DEFAULT_DESCRIPTION; 
+      descriptionPageNode.node.innerHTML = DEFAULT_DESCRIPTION; 
+      cachedDescription = null;
     } else {
-      descriptionNode.node.innerHTML = description; 
+      descriptionPageNode.node.innerHTML = description; 
+      cachedDescription = description;
     }
   };
 
@@ -290,9 +298,91 @@ function PendingExperimentView(
     selectPage(page);
   };
 
+  var setEditingDescription = function() {
+    console.assert(!isEditingDescription);
+    isEditingDescription = true;
+    descriptionPageNode.node.setAttribute(EDITING_DESCRIPTION_ATTR, '');
+
+    // Highlight default description if no description provided
+    if (cachedDescription == null || '') {
+      var range = document.createRange();
+      range.selectNodeContents(descriptionPageNode.node);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+
+  var setNotEditingDescription = function() {
+    console.assert(isEditingDescription);
+    descriptionPageNode.node.removeAttribute(EDITING_DESCRIPTION_ATTR);
+    isEditingDescription = false;
+
+    // Restore default description if user removed the description
+    if (cachedDescription == null || cachedDescription == '') {
+      descriptionPageNode.node.innerHTML = DEFAULT_DESCRIPTION;
+    }
+  };
+
+  var finishedEditingDescription = function() {
+    // Notify listeners that the description has changed!
+    if (cachedDescription != descriptionPageNode.node.innerHTML &&
+        !(cachedDescription == null && descriptionPageNode.node.innerHTML == DEFAULT_DESCRIPTION) &&
+        !(cachedDescription == null && descriptionPageNode.node.innerHTML == '')
+    ) {
+      // Update cached description value
+      cachedDescription = descriptionPageNode.node.innerHTML;
+
+      if (cachedDescription == '') {
+        cachedDescription = null;
+      }
+
+      console.log(cachedDescription);
+
+      for (var i = 0; i < changedDescriptionListeners.length; ++i) {
+        changedDescriptionListeners[i](cachedDescription);
+      }
+    }
+
+    // Return description to non-editing state
+    setNotEditingDescription();
+  };
+
+  var bindDescriptionNodes = function() {
+    // Bind dom nodes
+    bindClassBoundNode(descriptionPageNode);
+
+    // Bind event listeners
+    descriptionPageNode.node.onclick = function() {
+      // Short circuit b/c we're already editing the description
+      if (isEditingDescription) {
+        return;
+      }
+
+      setEditingDescription();
+    }; 
+
+    document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
+      // Short circuit b/c description isn't being edited currently anyway
+      if (!isEditingDescription) {
+        return;
+      }
+
+      for (var node_idx in event.path) {
+        var node = event.path[node_idx];
+        if (Utils.hasClass(descriptionPageNode.className, node)) {
+          return;
+        }
+      }   
+
+      // Signal that we've finished editing the description
+      finishedEditingDescription();
+    });
+  };
+
   var bindPageNodes = function() {
     // Bind nodes
-    bindClassBoundNode(descriptionPageNode);
+    bindDescriptionNodes();
     bindClassBoundNode(hardwarePageNode);
     bindClassBoundNode(timePageNode);
     bindClassBoundNode(paymentPageNode);
@@ -336,18 +426,35 @@ function PendingExperimentView(
 
   var setNotEditingTitle = function() {
     console.assert(isEditingTitle);
+    isEditingTitle = false;
+
     headerNode.node.removeAttribute(EDITING_TITLE_ATTR);
     titleNode.node.blur();
-    window.getSelection().removeAllRanges();
-    isEditingTitle = false;
+
+    var selection = window.getSelection();
+    if (Utils.hasClass(titleNode.node.className, selection.anchorNode.parentElement)) {
+      selection.removeAllRanges(); 
+    }
+
+    // Restore default title if user removed title
+    if (cachedTitle == null || cachedTitle == '') {
+      titleNode.node.innerHTML = DEFAULT_TITLE; 
+    }
   };
 
   var finishedEditingTitle = function() {
     // Notify listeners that the title has changed!
-    if (cachedTitle != titleNode.node.innerHTML) {
+    if (cachedTitle != titleNode.node.innerHTML &&
+        !(cachedTitle == null && titleNode.node.innerHTML == DEFAULT_TITLE) &&
+        !(cachedTitle == null && titleNode.node.innerHTML == '')
+    ) {
       // Update cached title value
       cachedTitle = titleNode.node.innerHTML;
 
+      if (cachedTitle == '') {
+        cachedTitle = null;
+      }
+      
       console.log(cachedTitle);
 
       for (var i = 0; i < changedTitleListeners.length; ++i) {
@@ -355,7 +462,7 @@ function PendingExperimentView(
       }
     }
     
-    // Return title to unselected state
+    // Return title to non-editing state
     setNotEditingTitle();
   };
 
