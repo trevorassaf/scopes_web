@@ -42,14 +42,14 @@ var SidePanelUiController = (function() {
     }
   };
 
-  var monitorExperimentInfo = {
+  var feedbackInfo = {
     tab_info: {
-      button_title: 'Monitor Experiment',
+      button_title: 'Feedback',
       icon_type: 'question-answer',
       tab: null
     },
     page_info: {
-      id: 'monitor-exp-center-page',
+      id: 'feedback-center-page',
       page: null
     }
   };
@@ -123,13 +123,13 @@ var SidePanelUiController = (function() {
     );
     myExperimentsInfo.page_info.page.init();
 
-    // Init monitor experiment page
-    monitorExperimentInfo.page_info.page = new MonitorExperimentsPage(
+    // Init feedback experiment page
+    feedbackInfo.page_info.page = new FeedbackPage(
       template_store,
-      monitorExperimentInfo.page_info.id,
+      feedbackInfo.page_info.id,
       false
     );
-    monitorExperimentInfo.page_info.page.init();
+    feedbackInfo.page_info.page.init();
 
     // Init technician page
     technicianInfo.page_info.page = new TechnicianPage(
@@ -142,7 +142,7 @@ var SidePanelUiController = (function() {
     // Configure tabs
     initTabInfo(template_store, tab_parent_node, newExperimentInfo); 
     initTabInfo(template_store, tab_parent_node, myExperimentsInfo); 
-    initTabInfo(template_store, tab_parent_node, monitorExperimentInfo); 
+    initTabInfo(template_store, tab_parent_node, feedbackInfo); 
     initTabInfo(template_store, tab_parent_node, technicianInfo); 
   };
 

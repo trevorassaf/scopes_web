@@ -229,7 +229,6 @@ function PendingExperimentView(
   };
 
   var bindClassBoundNode = function(node_info) {
-    console.log(node_info.className);
     var elements = rootNode.node.getElementsByClassName(node_info.className); 
     console.assert(elements.length === 1);
     node_info.node = elements[0];

@@ -23,166 +23,6 @@ window.onload = function() {
 
 };
 
-var Utils = (function() {
-
-  var CLASS_NAME_PROPERTY = "className";
-
-  // Timestamp delimiters
-  var DATE_DELIMITER = "-";
-  var TIME_DELIMITER = ":";
-  var DATE_TIME_SEPERATOR = " ";
-
-  this.hasClass = function(expected_class, node) {
-    if (!(CLASS_NAME_PROPERTY in node)) {
-      return false;
-    }
-
-    var node_class = node[CLASS_NAME_PROPERTY];
-    var class_idx = node_class.indexOf(expected_class);
-    
-    if (class_idx == -1) {
-      return false;
-    }
-
-    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-      && (expected_class.length + class_idx == node_class.length
-        || node_class.charAt(expected_class.length + class_idx) == ' ');
-  };
-  
-  this.makePriceString = function(price) {
-
-    // Group thousands with commas 
-    var price_str = "";
-    var price_in_dollars = Math.floor(price);
-    
-    var i = 1;
-    var j = 1000;
-
-    while (j < price_in_dollars) {
-      var codon = Math.floor((price_in_dollars % j) / i);
-      price_str = "," + codon.toString().concat(price_str);
-      i = j;
-      j *= 1000;
-    }
-
-    var leading_digits = Math.floor(price_in_dollars / i);
-    price_str = leading_digits.toString().concat(price_str);
-
-    // Stringify decimal digits
-    var cents = Math.floor(price * 100) % 100;
-    var cents_str = cents.toString();
-    if (cents_str.length === 1) {
-      cents_str = "0".concat(cents_str);
-    }
-    console.assert(cents_str.length === 2);
-
-    cents_str = ".".concat(cents_str);
-    return price_str.concat(cents_str);
-  };
-
-  this.stringifyNumberWithEnforcedDigitCount = function(number, digit_count) {
-    var number_string = number.toString();
-    console.assert(number_string.length <= digit_count);
-
-    if (number_string.length < digit_count) {
-      var zero_prefix = "0".repeat(digit_count - number_string.length);
-      number_string = zero_prefix.concat(number_string);
-    }
-
-    return number_string;
-  };
-
-  /**
-   * makeTimestampString()
-   * @param DateObj date: {year, month, date}
-   * @param TimeObj time: {hours, minutes, seconds}
-   *   - 'hours' is in military time
-   */
-  this.makeTimestampString = function(date, time) {
-    return date.year.toString() + DATE_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(date.month, 2) + DATE_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(date.date, 2) + DATE_TIME_SEPERATOR +
-      stringifyNumberWithEnforcedDigitCount(time.hours, 2) + TIME_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(time.minutes, 2) + TIME_DELIMITER +
-      stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
-  };
-
-  this.makeDateString = function(timestamp) {
-    var js_date = new Date(timestamp);
-    var serializeable_date = new SerializeableDate(
-      js_date.getUTCFullYear(),
-      js_date.getUTCMonth(),
-      js_date.getUTCDate()
-    );
-    return serializeable_date.serialize();
-  };
-
-  /**
-   * removeDomChildren()
-   *   - remove all children from dom node
-   * @param DOMElemet dom_node: some dom node
-   */
-  this.removeDomChildren = function(dom_node) {
-    while (dom_node.firstChild) {
-      dom_node.removeChild(dom_node.firstChild);
-    }
-  };
-
-  this.makeTimestampIntervalString = function(starting_timestamp, ending_timestamp) {
-    // Convert to native js date objects
-    var starting_js_date = new Date(starting_timestamp);
-    var ending_js_date = new Date(ending_timestamp);
-
-    var serializeable_starting_date = new SerializeableDate(
-      starting_js_date.getUTCFullYear(),
-      starting_js_date.getUTCMonth(),
-      starting_js_date.getUTCDate()
-    );
-
-    var serializeable_starting_time = new SerializeableTime(
-      starting_js_date.getHours(),
-      starting_js_date.getMinutes(),
-      starting_js_date.getSeconds()
-    );
-
-    var interval_string = serializeable_starting_date.serialize() + ' ' +
-        serializeable_starting_time.serializeWithoutSeconds() + ' - ';
-
-    var serializeable_ending_time = new SerializeableTime(
-      ending_js_date.getHours(),
-      ending_js_date.getMinutes(),
-      ending_js_date.getSeconds()
-    );
-
-    if (starting_js_date.getUTCFullYear() == ending_js_date.getUTCFullYear() &&
-        starting_js_date.getUTCMonth() == ending_js_date.getUTCMonth() &&
-        starting_js_date.getUTCDate() == ending_js_date.getUTCDate()
-    ) {
-      return interval_string + serializeable_ending_time.serializeWithoutSeconds(); 
-    }
-    
-    var serializeable_ending_date = new SerializeableDate(
-      ending_js_date.getUTCFullYear(),
-      ending_js_date.getUTCMonth(),
-      ending_js_date.getUTCDate()
-    );
-
-    return interval_string + serializeable_ending_date.serialize() + ' ' + 
-        serializeable_ending_time.serializeWithoutSeconds();
-  };
-
-  return {
-    hasClass: hasClass,
-    makePriceString: makePriceString,
-    makeTimestampString: makeTimestampString,
-    makeDateString: makeDateString,
-    removeDomChildren: removeDomChildren,
-    stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
-    makeTimestampIntervalString: makeTimestampIntervalString
-  };
-
-})();
-
 function ConfirmedOrder(
   id,
   num_scopes,
@@ -376,6 +216,166 @@ ShortCode.prototype.getCode = function() {
 ShortCode.prototype.getAlias = function() {
   return this.alias;
 };
+
+var Utils = (function() {
+
+  var CLASS_NAME_PROPERTY = "className";
+
+  // Timestamp delimiters
+  var DATE_DELIMITER = "-";
+  var TIME_DELIMITER = ":";
+  var DATE_TIME_SEPERATOR = " ";
+
+  this.hasClass = function(expected_class, node) {
+    if (!(CLASS_NAME_PROPERTY in node)) {
+      return false;
+    }
+
+    var node_class = node[CLASS_NAME_PROPERTY];
+    var class_idx = node_class.indexOf(expected_class);
+    
+    if (class_idx == -1) {
+      return false;
+    }
+
+    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
+      && (expected_class.length + class_idx == node_class.length
+        || node_class.charAt(expected_class.length + class_idx) == ' ');
+  };
+  
+  this.makePriceString = function(price) {
+
+    // Group thousands with commas 
+    var price_str = "";
+    var price_in_dollars = Math.floor(price);
+    
+    var i = 1;
+    var j = 1000;
+
+    while (j < price_in_dollars) {
+      var codon = Math.floor((price_in_dollars % j) / i);
+      price_str = "," + codon.toString().concat(price_str);
+      i = j;
+      j *= 1000;
+    }
+
+    var leading_digits = Math.floor(price_in_dollars / i);
+    price_str = leading_digits.toString().concat(price_str);
+
+    // Stringify decimal digits
+    var cents = Math.floor(price * 100) % 100;
+    var cents_str = cents.toString();
+    if (cents_str.length === 1) {
+      cents_str = "0".concat(cents_str);
+    }
+    console.assert(cents_str.length === 2);
+
+    cents_str = ".".concat(cents_str);
+    return price_str.concat(cents_str);
+  };
+
+  this.stringifyNumberWithEnforcedDigitCount = function(number, digit_count) {
+    var number_string = number.toString();
+    console.assert(number_string.length <= digit_count);
+
+    if (number_string.length < digit_count) {
+      var zero_prefix = "0".repeat(digit_count - number_string.length);
+      number_string = zero_prefix.concat(number_string);
+    }
+
+    return number_string;
+  };
+
+  /**
+   * makeTimestampString()
+   * @param DateObj date: {year, month, date}
+   * @param TimeObj time: {hours, minutes, seconds}
+   *   - 'hours' is in military time
+   */
+  this.makeTimestampString = function(date, time) {
+    return date.year.toString() + DATE_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(date.month, 2) + DATE_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(date.date, 2) + DATE_TIME_SEPERATOR +
+      stringifyNumberWithEnforcedDigitCount(time.hours, 2) + TIME_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(time.minutes, 2) + TIME_DELIMITER +
+      stringifyNumberWithEnforcedDigitCount(time.seconds, 2);
+  };
+
+  this.makeDateString = function(timestamp) {
+    var js_date = new Date(timestamp);
+    var serializeable_date = new SerializeableDate(
+      js_date.getUTCFullYear(),
+      js_date.getUTCMonth(),
+      js_date.getUTCDate()
+    );
+    return serializeable_date.serialize();
+  };
+
+  /**
+   * removeDomChildren()
+   *   - remove all children from dom node
+   * @param DOMElemet dom_node: some dom node
+   */
+  this.removeDomChildren = function(dom_node) {
+    while (dom_node.firstChild) {
+      dom_node.removeChild(dom_node.firstChild);
+    }
+  };
+
+  this.makeTimestampIntervalString = function(starting_timestamp, ending_timestamp) {
+    // Convert to native js date objects
+    var starting_js_date = new Date(starting_timestamp);
+    var ending_js_date = new Date(ending_timestamp);
+
+    var serializeable_starting_date = new SerializeableDate(
+      starting_js_date.getUTCFullYear(),
+      starting_js_date.getUTCMonth(),
+      starting_js_date.getUTCDate()
+    );
+
+    var serializeable_starting_time = new SerializeableTime(
+      starting_js_date.getHours(),
+      starting_js_date.getMinutes(),
+      starting_js_date.getSeconds()
+    );
+
+    var interval_string = serializeable_starting_date.serialize() + ' ' +
+        serializeable_starting_time.serializeWithoutSeconds() + ' - ';
+
+    var serializeable_ending_time = new SerializeableTime(
+      ending_js_date.getHours(),
+      ending_js_date.getMinutes(),
+      ending_js_date.getSeconds()
+    );
+
+    if (starting_js_date.getUTCFullYear() == ending_js_date.getUTCFullYear() &&
+        starting_js_date.getUTCMonth() == ending_js_date.getUTCMonth() &&
+        starting_js_date.getUTCDate() == ending_js_date.getUTCDate()
+    ) {
+      return interval_string + serializeable_ending_time.serializeWithoutSeconds(); 
+    }
+    
+    var serializeable_ending_date = new SerializeableDate(
+      ending_js_date.getUTCFullYear(),
+      ending_js_date.getUTCMonth(),
+      ending_js_date.getUTCDate()
+    );
+
+    return interval_string + serializeable_ending_date.serialize() + ' ' + 
+        serializeable_ending_time.serializeWithoutSeconds();
+  };
+
+  return {
+    hasClass: hasClass,
+    makePriceString: makePriceString,
+    makeTimestampString: makeTimestampString,
+    makeDateString: makeDateString,
+    removeDomChildren: removeDomChildren,
+    stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
+    makeTimestampIntervalString: makeTimestampIntervalString
+  };
+
+})();
 
 function ApiControllerWrapper(api_object) {
 
@@ -1479,14 +1479,14 @@ var SidePanelUiController = (function() {
     }
   };
 
-  var monitorExperimentInfo = {
+  var feedbackInfo = {
     tab_info: {
-      button_title: 'Monitor Experiment',
+      button_title: 'Feedback',
       icon_type: 'question-answer',
       tab: null
     },
     page_info: {
-      id: 'monitor-exp-center-page',
+      id: 'feedback-center-page',
       page: null
     }
   };
@@ -1560,13 +1560,13 @@ var SidePanelUiController = (function() {
     );
     myExperimentsInfo.page_info.page.init();
 
-    // Init monitor experiment page
-    monitorExperimentInfo.page_info.page = new MonitorExperimentsPage(
+    // Init feedback experiment page
+    feedbackInfo.page_info.page = new FeedbackPage(
       template_store,
-      monitorExperimentInfo.page_info.id,
+      feedbackInfo.page_info.id,
       false
     );
-    monitorExperimentInfo.page_info.page.init();
+    feedbackInfo.page_info.page.init();
 
     // Init technician page
     technicianInfo.page_info.page = new TechnicianPage(
@@ -1579,7 +1579,7 @@ var SidePanelUiController = (function() {
     // Configure tabs
     initTabInfo(template_store, tab_parent_node, newExperimentInfo); 
     initTabInfo(template_store, tab_parent_node, myExperimentsInfo); 
-    initTabInfo(template_store, tab_parent_node, monitorExperimentInfo); 
+    initTabInfo(template_store, tab_parent_node, feedbackInfo); 
     initTabInfo(template_store, tab_parent_node, technicianInfo); 
   };
 
@@ -2851,7 +2851,7 @@ function StaticCalendar(
   };
 };
 
-function MonitorExperimentsPage(
+function FeedbackPage(
   template_store,
   root_id,
   is_displayed_initially
@@ -2860,52 +2860,65 @@ function MonitorExperimentsPage(
   /**
    * Template id
    */
-  var TEMPLATE_ID_SELECTOR = '#monitor-experiments-page-template';
+  var TEMPLATE_ID_SELECTOR = '#feedback-page-template';
 
   /**
    * Ui attributes
    */
-  var HIDDEN_ATTR = "hidden-monitor-experiments-page";
+  var HIDDEN_ATTR = "hidden-feedback-page";
 
   /**
    * Private state
    */
-  // Dom nodes
   var templateStore = template_store;
   var isDisplayedInitially = is_displayed_initially;
   var _this = this;
+  var feedbackQuestionList = [];
 
+  /**
+   * Dom nodes
+   */
   // Root node
-  var monitorExperimentsPageRootNode = {
+  var feedbackPageRootNode = {
     id: root_id,
     node: null
   };
 
   // Class-bound nodes
   var pageWrapperNode = {
-    className: 'monitor-experiments-page-wrapper',
+    className: 'feedback-page-wrapper',
     node: null 
+  };
+
+  var questionListNode = {
+    className: 'questions-wrapper',
+    node: null
+  };
+
+  var submitBtnNode = {
+    className: 'submit-btn',
+    node: null
   };
 
   /**
    * Private functions
    */
   function fetchClassBoundDomNode(node_info) {
-    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(node_info.className);
+    elements = feedbackPageRootNode.node.getElementsByClassName(node_info.className);
     console.assert(elements.length == 1);
     node_info.node = elements[0];
   };
 
   /**
-   * synthesizeMonitorExperimentsPageTemplate()
-   * - copy monitor-experiments-page template and insert into main dom tree
-   * @pre-condition: 'monitorExperimentsPageRootNode' must be initialized
+   * synthesizeFeedbackPageTemplate()
+   * - copy feedback-page template and insert into main dom tree
+   * @pre-condition: 'feedbackPageRootNode' must be initialized
    */
-  function synthesizeMonitorExperimentsPageTemplate() {
-    // Bind monitor-experiments-page dom template
+  function synthesizeFeedbackPageTemplate() {
+    // Bind feedback-page dom template
     var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
     var page_clone = document.importNode(page_template.content, true);
-    monitorExperimentsPageRootNode.node.appendChild(page_clone);
+    feedbackPageRootNode.node.appendChild(page_clone);
   };
 
   /**
@@ -2913,7 +2926,7 @@ function MonitorExperimentsPage(
    * - initialize pointer to specified dom node
    */
   function bindClassBoundNode(internal_node) {
-    elements = monitorExperimentsPageRootNode.node.getElementsByClassName(internal_node.className);
+    elements = feedbackPageRootNode.node.getElementsByClassName(internal_node.className);
     console.assert(elements.length === 1);
     internal_node.node = elements[0];
   };
@@ -2924,6 +2937,14 @@ function MonitorExperimentsPage(
    */
   function bindInternalNodes() {
     bindClassBoundNode(pageWrapperNode);     
+    bindClassBoundNode(questionListNode);     
+    bindClassBoundNode(submitBtnNode);     
+
+    submitBtnNode.node.onclick = function() {
+      for (var i = 0; i < feedbackQuestionList.length; ++i) {
+        feedbackQuestionList[i].clearResponse();
+      }
+    };
   };
 
   /**
@@ -2936,6 +2957,39 @@ function MonitorExperimentsPage(
     } else {
       _this.hide(); 
     }
+
+    // Initialize feedback questions
+    feedbackQuestionList = [];
+    Utils.removeDomChildren(questionListNode.node);
+
+    // Question 1
+    var question_1 = new FeedbackQuestion(
+      templateStore,
+      questionListNode.node,
+      'What is one thing that MVS did especially well? Why?'
+    );
+    question_1.init();
+
+    feedbackQuestionList.push(question_1);
+
+    // Question 2
+    var question_2 = new FeedbackQuestion(
+      templateStore,
+      questionListNode.node,
+      'What is one thing that you would like to see MVS change going forward? Why?'
+    );
+    question_2.init();
+    feedbackQuestionList.push(question_2);
+    
+    // Question 3
+    var question_3 = new FeedbackQuestion(
+      templateStore,
+      questionListNode.node,
+      'Any other comments/suggestions?'
+    );
+    question_3.init();
+
+    feedbackQuestionList.push(question_3);
   };
 
   /**
@@ -2946,11 +3000,11 @@ function MonitorExperimentsPage(
    * - initialize monitor experiments page and put it in starting state
    */
   this.init = function() {
-    // Bind top-level monitor-experiments-page node (we're going to copy the template into this!)
-    monitorExperimentsPageRootNode.node = document.getElementById(monitorExperimentsPageRootNode.id);
+    // Bind top-level feedback-page node (we're going to copy the template into this!)
+    feedbackPageRootNode.node = document.getElementById(feedbackPageRootNode.id);
 
     // Clone template and copy into wrapper
-    synthesizeMonitorExperimentsPageTemplate();
+    synthesizeFeedbackPageTemplate();
 
     // Bind nodes internal to this template
     bindInternalNodes();
@@ -2961,18 +3015,165 @@ function MonitorExperimentsPage(
 
   /**
    * hide()
-   * - hide the monitor-experiments-page
+   * - hide the feedback-page
    */
   this.hide = function() {
-    monitorExperimentsPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+    feedbackPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
   };
 
   /**
    * show()
-   * - show the monitor-experiments-page
+   * - show the feedback-page
    */
   this.show = function() {
-    monitorExperimentsPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+    feedbackPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  };
+
+};
+
+function FeedbackQuestion(
+  template_store,
+  parent_node,
+  question_title
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = '#feedback-question-template';
+
+  /**
+   * Default ui string
+   */
+  var DEFAULT_FEEDBACK_PROMPT = 'Add feedback...';
+
+  /**
+   * Ui attributes
+   */
+  var EDITING_RESPONSE_ATTR = 'editing-response';
+  var CHANGED_RESPONSE_ATTR = 'changed-response';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var questionTitle = question_title;
+  var isEditingResponse = false;
+  var isChangedResponse = false;
+
+  /**
+   * Dom nodes
+   */
+  var rootNode = {
+    className: 'feedback-question-wrapper',
+    node: null
+  };
+
+  var questionLabelNode = {
+    className: 'question-label',
+    node: null
+  };
+
+  var responseAreaNode = {
+    className: 'response-area',
+    node: null
+  };
+
+  var synthesizeTemplate = function() {
+    // Clone pending-order template
+    var feedback_question_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var feedback_question_clone = document.importNode(feedback_question_template.content, true);
+
+    // Activate by inserting into parent 
+    parentNode.appendChild(feedback_question_clone); 
+    var feedback_question_list = parentNode.getElementsByClassName(rootNode.className);
+    rootNode.node = feedback_question_list[feedback_question_list.length - 1];
+  };
+
+  var bindClassBoundNode = function(node_info) {
+    var elements = rootNode.node.getElementsByClassName(node_info.className); 
+    console.assert(elements.length === 1);
+    node_info.node = elements[0];
+  };
+
+  var bindInternalNodes = function() {
+    bindClassBoundNode(questionLabelNode);
+    bindClassBoundNode(responseAreaNode);
+
+    responseAreaNode.node.onclick = function() {
+      // Short circuit b/c we're already editing this
+      if (isEditingResponse) {
+        return;
+      }
+
+      isEditingResponse = true;
+      responseAreaNode.node.setAttribute(EDITING_RESPONSE_ATTR, '');
+
+      if (!isChangedResponse) {
+        var range = document.createRange();
+        range.selectNodeContents(responseAreaNode.node);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    };
+    
+    document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
+      // Short circuit b/c question isn't being edited currently anyway
+      if (!isEditingResponse) {
+        return;
+      }
+
+      for (var node_idx in event.path) {
+        var node = event.path[node_idx];
+        if (Utils.hasClass(responseAreaNode.className, node)) {
+          return;
+        }
+      }   
+
+      if (responseAreaNode.node.innerHTML == '' || responseAreaNode.node.innerHTML == null ||
+        responseAreaNode.node.innerHTML == DEFAULT_FEEDBACK_PROMPT
+      ) {
+        responseAreaNode.node.innerHTML = DEFAULT_FEEDBACK_PROMPT;
+        responseAreaNode.node.setAttribute(CHANGED_RESPONSE_ATTR, '');
+        isChangedResponse = false;
+      } else {
+        responseAreaNode.node.removeAttribute(CHANGED_RESPONSE_ATTR);
+        isChangedResponse = true;
+      }
+
+      isEditingResponse = false;
+      responseAreaNode.node.removeAttribute(EDITING_RESPONSE_ATTR);
+    });
+  }
+
+  var initUi = function() {
+    questionLabelNode.node.innerHTML = questionTitle; 
+    responseAreaNode.node.innerHTML = DEFAULT_FEEDBACK_PROMPT;
+    isEditingResponse = false;
+    responseAreaNode.node.removeAttribute(EDITING_RESPONSE_ATTR);
+  };
+
+  this.clearResponse = function() {
+    isEditingResponse = false;
+    responseAreaNode.node.removeAttribute(EDITING_RESPONSE_ATTR);
+
+    isChangedResponse = false;
+    responseAreaNode.node.removeAttribute(CHANGED_RESPONSE_ATTR);
+    responseAreaNode.node.innerHTML = DEFAULT_FEEDBACK_PROMPT;
+  };
+
+  this.getResponse = function() {
+    return (isChangedResponse)
+      ? responseAreaNode.node.innerHTML
+      : null;
+  };
+
+  this.init = function() {
+    synthesizeTemplate();
+    bindInternalNodes();
+    initUi();
   };
 
 };
@@ -3352,7 +3553,6 @@ function PendingExperimentView(
   };
 
   var bindClassBoundNode = function(node_info) {
-    console.log(node_info.className);
     var elements = rootNode.node.getElementsByClassName(node_info.className); 
     console.assert(elements.length === 1);
     node_info.node = elements[0];
