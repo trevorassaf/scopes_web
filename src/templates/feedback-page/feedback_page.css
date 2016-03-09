@@ -43,6 +43,10 @@
   padding-top: 9px;
 }
 
+.feedback-question-wrapper .response-area[changed-response] {
+  color: #424242;
+}
+
 .feedback-page-wrapper .submit-btn {
   cursor: pointer;
   padding: 10px;

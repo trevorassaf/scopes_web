@@ -102,11 +102,11 @@ function FeedbackQuestion(
       if (responseAreaNode.node.innerHTML == '' || responseAreaNode.node.innerHTML == null ||
         responseAreaNode.node.innerHTML == DEFAULT_FEEDBACK_PROMPT
       ) {
+        responseAreaNode.node.removeAttribute(CHANGED_RESPONSE_ATTR);
         responseAreaNode.node.innerHTML = DEFAULT_FEEDBACK_PROMPT;
-        responseAreaNode.node.setAttribute(CHANGED_RESPONSE_ATTR, '');
         isChangedResponse = false;
       } else {
-        responseAreaNode.node.removeAttribute(CHANGED_RESPONSE_ATTR);
+        responseAreaNode.node.setAttribute(CHANGED_RESPONSE_ATTR, '');
         isChangedResponse = true;
       }
 

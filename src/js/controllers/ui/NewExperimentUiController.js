@@ -98,6 +98,9 @@ var NewExperimentUiController = (function() {
     });
 
     confirm_order_api.send();
+    
+    // Reset order ui
+    cancelOrder();
   };
 
   /**
