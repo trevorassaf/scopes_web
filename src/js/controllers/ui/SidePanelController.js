@@ -132,18 +132,18 @@ var SidePanelUiController = (function() {
     feedbackInfo.page_info.page.init();
 
     // Init technician page
-    technicianInfo.page_info.page = new TechnicianPage(
-      template_store,
-      technicianInfo.page_info.id,
-      false
-    );
-    technicianInfo.page_info.page.init();
+    // technicianInfo.page_info.page = new TechnicianPage(
+    //   template_store,
+    //   technicianInfo.page_info.id,
+    //   false
+    // );
+    // technicianInfo.page_info.page.init();
 
     // Configure tabs
     initTabInfo(template_store, tab_parent_node, newExperimentInfo); 
     initTabInfo(template_store, tab_parent_node, myExperimentsInfo); 
     initTabInfo(template_store, tab_parent_node, feedbackInfo); 
-    initTabInfo(template_store, tab_parent_node, technicianInfo); 
+    // initTabInfo(template_store, tab_parent_node, technicianInfo); 
   };
 
   function initSelectedTabAndPage(tab_and_page_info) {

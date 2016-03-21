@@ -1,4 +1,6 @@
 .hhconfig
 files
 ssl
-logs/*
+logs/access.log
+logs/error.log
+logs/rewrite.log
