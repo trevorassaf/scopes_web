@@ -146,6 +146,54 @@ var Utils = (function() {
         serializeable_ending_time.serializeWithoutSeconds();
   };
 
+  this.synthesizeTemplate = function(
+    template_store,
+    template_id,
+    parent_node,
+    class_name
+  ) {
+    // Clear children from parent-node
+    Utils.removeDomChildren(parent_node);
+
+    // Clone template
+    var raw_template = template_store.import.querySelector('#' + template_id);  
+    var template_clone = document.importNode(raw_template.content, true);
+
+    // Insert clone
+    parent_node.appendChild(template_clone);
+    var activated_clones = parent_node.getElementsByClassName(class_name);
+    console.assert(activated_clones.length == 1);
+    
+    return activated_clones[0];
+  };
+
+  this.synthesizeTemplateIntoList = function(
+    template_store,
+    template_id,
+    parent_node,
+    class_name
+  ) {
+    // Clone template
+    var raw_template = template_store.import.querySelector('#' + template_id);
+    var template_clone = document.importNode(raw_template.content, true);
+
+    // Insert clone
+    parent_node.appendChild(template_clone);
+    var activated_clones = parent_node.getElementsByClassName(class_name);
+    console.assert(activated_clones.length > 0);
+
+    return activated_clones[activated_clones.length - 1];
+  };
+
+  this.bindNode = function(
+    parent_node,
+    class_name
+  ) {
+    var node_list = parent_node.getElementsByClassName(class_name);
+    console.assert(node_list.length == 1);
+    return node_list[0];
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -153,7 +201,10 @@ var Utils = (function() {
     makeDateString: makeDateString,
     removeDomChildren: removeDomChildren,
     stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
-    makeTimestampIntervalString: makeTimestampIntervalString
+    makeTimestampIntervalString: makeTimestampIntervalString,
+    synthesizeTemplate: synthesizeTemplate,
+    synthesizeTemplateIntoList: synthesizeTemplateIntoList,
+    bindNode: bindNode
   };
 
 })();

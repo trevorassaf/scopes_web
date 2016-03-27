@@ -9,23 +9,738 @@ window.onload = function() {
   console.assert(template_store != null);
 
   /**
-   * Configure UI elements
+   * Initialize pages
    */
-  SidePanelUiController.init(template_store);
+  var center_page_node = document.getElementById('center-panel');
+
+  var center_page_view = new CenterPageView(
+    template_store,
+    center_page_node
+  );
+  center_page_view.init();
+
+  // New experiment page
+  // var new_experiment_parent_node = null;
+  // var new_experiment_page_view = new NewExperimentPageView(
+  //   template_store,
+  //   page_parent_node
+  // );
+  //
+  // new_experiment_page_view.init();
+
+  // Initialize side panel
+  var side_panel_parent_root = document.getElementById('side-panel');
+
+  var side_panel_view = new SidePanelView(
+    template_store,
+    side_panel_parent_root
+  );
+  side_panel_view.init();
+
+  // Initialize page controller
+  // var page_controller = new PageController(
+  //   side_panel_view,
+  //   new_experiment_page_view
+  // );
+  // page_controller.init();
+
+  // Initialize pages
+
+  // #<{(|*
+  //  * Configure UI elements
+  //  |)}>#
+  // SidePanelUiController.init(template_store);
+  //
+  // #<{(|*
+  //  * Fetch startup data and route to proper views 
+  //  |)}>#
+  // GetStartupDataApiController.fetch();
+  //
+  // var my_experiments_view = SidePanelUiController.getMyExperimentsView();
+  // MyExperimentsLogicController.init(my_experiments_view);
+  //
+  // NewExperimentUiController.registerOrderConfirmedListener(function() {
+  //   MyExperimentsLogicController.refreshData();
+  // });
+};
+
+var MyExperimentController = function() {
 
   /**
-   * Fetch startup data and route to proper views 
+   * Private state
    */
-  GetStartupDataApiController.fetch();
+  var myExperimentView = null;
+  var myExperimentModel = null; 
+  var isActive = false;
 
-  var my_experiments_view = SidePanelUiController.getMyExperimentsView();
-  MyExperimentsLogicController.init(my_experiments_view);
-  
-  NewExperimentUiController.registerOrderConfirmedListener(function() {
-    MyExperimentsLogicController.refreshData();
-  });
+  /**
+   * Protected functions
+   */
+  var changeTitle = function(title) {
+    // Update model
+    myExperimentModel.setTitle(title);
+
+    // TODO persist...
+  };
+
+  var changeDescription = function(description) {
+    // Update model
+    myExperimentModel.setDescription(description);
+
+    // TODO persist...
+  };
+
+  var deleteExperiment = function() {
+    isActive = false;
+
+    myExperimentView.remove();
+    
+    // TODO... persist
+  };
+
+  /**
+   * Public functions
+   */
+  this.init = function(
+    template_store,
+    parent_node,
+    model
+  ) {
+    // Check: controller must be inactive to initialize!
+    console.assert(!isActive);
+    this.isActive = true;
+
+    // We need a reference to this model (we don't own!)
+    myExperimentModel = model;
+
+    // Create view and bind event listeners
+    myExperimentView = new MyExperimentView(
+      template_store,
+      parent_node
+    );
+
+    myExperimentView.registerChangedTitleListener(changeTitle);
+    myExperimentView.registerChangedDescriptionListener(changeDescription);
 
 
+    // Init ui and bind model
+    myExperimentView.init(model);
+  };
+
+  this.getModel = function() {
+    return myExperimentModel;
+  };
+};
+
+var MyExperimentsPageController = function() {
+
+  /**
+   * Private state
+   */
+  var isActive = false;
+  var templateStore = null;
+  var parentNode = null;
+  var getConfirmedOrdersApiWrapper = null;
+  var myExperimentControllers = []; // unordered_map keyed on experiment-id
+  var myExperimentsPageView = null;
+
+  /**
+   * Private functions
+   */
+  var update = function(experiment_controller) {};
+
+  var updateLocalExperiment = function(fresh_experiment, stale_experiment_controller) {
+    var stale_model = stale_experiment_controller.getModel();
+
+    // Check: must be same experiment!
+    console.assert(fresh_experiment.getId() == stale_model.getId());
+
+    // Diff fields and update accordingly
+    if (fresh_experiment.getTitle() != stale_model.getTitle()) {
+      stale_model.setTitle(fresh_experiment.getTitle());    
+    }
+    
+    if (fresh_experiment.getDescription() != stale_model.getDescription()) {
+      stale_model.setDescription(fresh_experiment.getDescription());    
+    }
+
+    if (fresh_experiment.getPrice() != stale_model.getPrice()) {
+      stale_model.setPrice(fresh_experiment.getPrice());    
+    }
+
+    if (fresh_experiment.getScopesCount() != stale_model.getScopesCount()) {
+      stale_model.setScopesCount(fresh_experiment.getScopesCount());    
+    }
+
+    if (fresh_experiment.getExperimentDuration() != stale_model.getExperimentDuration()) {
+      stale_model.setExperimentDuration(fresh_experiment.getExperimentDuration());    
+    }
+
+    if (fresh_experiment.getStartTime() != stale_model.getStartTime()) {
+      stale_model.setStartTime(fresh_experiment.getStartTime());    
+    }
+
+    if (fresh_experiment.getStartDate() != stale_model.getStartDate()) {
+      stale_model.setStartDate(fresh_experiment.getStartDate());    
+    }
+    
+    if (fresh_experiment.getPaymentStatus() != stale_model.getPaymentStatus()) {
+      stale_model.setPaymentStatus(fresh_experiment.getPaymentStatus());    
+    }
+  };
+
+  var createNewLocalExperiment = function(fresh_experiment) {
+    // Check: can't have order with this id!
+    console.assert(!myExperimentController.has(fresh_experiment.getId()));
+
+    // Initialize new model
+    var model = (new MyExperimentModel())
+      .setId(fresh_experiment.getId())
+      .setTitle(fresh_experiment.getTitle())
+      .setDescription(fresh_experiment.getDescription())
+      .setPrice(fresh_experiment.getPrice())
+      .setScopesCount(fresh_experiment.getScopesCount())
+      .setExperimentDuration(fresh_experiment.getExperimentDuration())
+      .setStartTime(fresh_experiment.getStartTime())
+      .setStartDate(fresh_experiment.getStartDate())
+      .setPaymentStatus(fresh_experiment.getPaymentStatus())
+      .setShortCode(fresh_experiment.getShortCode());
+
+    // Create controller, initialize it, add it to local list
+    var controller = new MyExperimentController();
+    
+    controller.init(
+      templateStore,
+      parentNode,
+      model
+    );
+
+    myExperimentControllers.set(model.getId(), controller);
+  };
+
+  var fetchExperimentsCallback = function(experiments) {
+    for (var i = 0; i < experiments.length; ++i) {
+      var fresh_experiment = experiments[i];
+      if (myExperimentControllers.has(fresh_experiment.getId())) {
+        updateLocalExperiment(fresh_experiment, myExperimentControllers[fresh_experiment.getId()]);   
+      } else {
+      createNewLocalExperiment(fresh_experiment); 
+      }
+    }
+  };
+
+  var initApi = function() {
+    console.assert(getConfirmedOrdersApiWrapper === null); 
+
+    // Initialize get-confirmed-order api
+    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
+    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
+
+    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
+      // Deserialize orders
+      var orders = json_response[response_keys.orders];
+      var order_response_keys = response_keys.confirmed_order;
+      var short_code_response_keys = response_keys.short_code;
+     
+      var confirmed_orders = [];
+
+      for (var i = 0; i < orders.length; ++i) {
+        var order = orders[i];
+        var short_code = order[order_response_keys.short_code];
+
+        var short_code = new ShortCode(
+          short_code[short_code_response_keys.id],
+          short_code[short_code_response_keys.code],
+          short_code[short_code_response_keys.alias]
+        );
+
+        var confirmed_order = new ConfirmedOrder(
+          order[order_response_keys.id],
+          order[order_response_keys.scopes_count],
+          order[order_response_keys.start_time],
+          order[order_response_keys.end_time],
+          order[order_response_keys.title],
+          order[order_response_keys.description],
+          order[order_response_keys.time_ordered],
+          order[order_response_keys.price],
+          short_code
+        );
+        
+        confirmed_orders.push(confirmed_order);
+      }
+
+      fetchExperimentsCallback(confirmed_orders);
+    });
+
+    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders'); 
+    });
+
+    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders due to network error'); 
+    });
+
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.refresh = function() {
+    var successful_callback = function(experiments) {
+      // TODO...
+    };
+
+    // Make api call
+    fetchExperiments(successful_callback);
+  };
+
+  this.init = function(
+    template_store,
+    parent_node,
+    is_displayed_initially
+  ) {
+    // Check: view must be inactive to initialize!
+    console.assert(!isActive);
+    isActive = true;
+
+    templateStore = template_store;
+    parentNode = parent_node;
+
+    // Initialize view
+    myExperimentsPageView = new MyExperimentsPageView(
+      template_store,
+      parent_node,
+      is_displayed_initially
+    );
+  };
+
+  this.show = function() {};
+  this.hide = function() {};
+};
+
+var PageController = function(
+  side_panel_view,
+  new_experiment_view
+) {
+
+  /**
+   * Ui Views
+   */
+  var sidePanelView = side_panel_view;
+  var newExperimentView = new_experiment_view;
+
+  var currentPageView = null;
+
+  /**
+   * Private functions
+   */
+  var hideCurrentPage = function() {
+    console.assert(currentPageView != null);
+    currentPageView.hide();
+    currentPageView = null;
+  };
+
+  var changePage = function(next_page_view) {
+    hideCurrentPage();
+    showPage(next_page_view);
+  };
+
+  var showPage = function(next_page_view) {
+    console.assert(currentPageView == null);
+    next_page_view.show();
+    currentPageView = next_page_view;
+  };
+
+  var bindSidePanelButtons = function() {
+    sidePanelView.bindNewExperimentTabClick(function() {
+      changePage(newExperimentView); 
+    });
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Select initial page
+    sidePanelView.selectNewExperimentTab();
+    showPage(newExperimentView);
+
+    // Bind event listeners to side-panel button clicks
+    bindSidePanelButtons();
+  };
+};
+
+var SidePanelController = function(
+    template_store,
+    new_experiment_page_controller,
+    my_experiments_page_controller,
+    feedback_page_controller,
+    technician_page_controller
+) {
+
+  /**
+   * Private state
+   */
+  var sidePanelView = null;
+  var templateStore = template_store;
+
+  var newExperimentPageController = new_experiment_page_controller;
+  var myExperimentsPageController = my_experiments_page_controller;
+  var feedbackPageController = feedback_page_controller;
+  var technicianPageController = technician_page_controller;
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    /**
+     * Initialize the tab views
+     */
+    sidePanelView = new SidePanelView(templateStore);
+    sidePanelView.init();
+  };
+};
+
+var ConfirmedOrderModel = function() {
+
+  // Order state
+  this.id = null;
+  this.title = null;
+  this.description = null;
+  this.price = null;
+  this.scopesCount = null;
+  this.experimentDuration = null;
+  this.startTime = null;
+  this.startDate = null;
+  this.paymentStatus = null;
+  this.shortCode = null;
+
+  // State change event listeners
+  this.titleChangeListeners = [];
+  this.descriptionChangeListeners = [];
+  this.priceChangeListeners = [];
+  this.scopesCountChangeListeners = [];
+  this.experimentDurationChangeListeners = [];
+  this.startTimeChangeListeners = [];
+  this.startDateChangeListeners = [];
+  this.shortCodeChangeListeners = [];
+};
+
+/**
+ * ConfirmedOrder state getters
+ */
+ConfirmedOrderModel.prototype.getId = function() {
+  return this.id;
+};
+
+ConfirmedOrderModel.prototype.getTitle = function() {
+  return this.title;
+};
+
+ConfirmedOrderModel.prototype.getDescription = function() {
+  return this.description;
+};
+
+/**
+ * Setters w/callbacks
+ */
+ConfirmedOrderModel.prototype.setId = function(id) {
+  this.id = id;
+  return this;
+}
+
+ConfirmedOrderModel.prototype.setTitle = function(title) {
+  this.title = title;
+
+  for (var i = 0; i < this.titleChangeListeners.length; ++i) {
+    this.titleChangeListeners[i](title);
+  }
+
+  return this;
+};
+
+ConfirmedOrderModel.prototype.setDescription = function(description) {
+  this.description = description;
+
+  for (var i = 0; i < this.descriptionChangeListeners.length; ++i) {
+    this.descriptionChangeListeners[i](description);
+  }
+
+  return this;
+};
+
+ConfirmedOrderModel.prototype.setPrice = function(price) {
+  this.price = price;
+
+  for (var i = 0; i < this.priceChangeListeners.length; ++i) {
+    this.priceChangeListeners[i](price);
+  }
+
+  return this;
+};
+
+ConfirmedOrderModel.prototype.setScopesCount = function(scopesCount) {
+  this.scopesCount = scopesCount;
+
+  for (var i = 0; i < this.scopesCountChangeListeners.length; ++i) {
+    this.scopesCountChangeListeners[i](scopesCount);
+  }
+
+  return this;
+};
+
+ConfirmedOrderModel.prototype.setExperimentDuration = function(experimentDuration) {
+  this.experimentDuration = experimentDuration;
+
+  for (var i = 0; i < this.experimentDurationChangeListeners.length; ++i) {
+    this.experimentDurationChangeListeners[i](experimentDuration);
+  }
+
+  return this;
+};
+
+ConfirmedOrderModel.prototype.setStartTime = function(startTime) {
+  this.startTime = startTime;
+
+  for (var i = 0; i < this.startTimeChangeListeners.length; ++i) {
+    this.startTimeChangeListeners[i](startTime);
+  }
+
+  return this;
+};
+
+ConfirmedOrderModel.prototype.setStartDate = function(startDate) {
+  this.startDate = startDate;
+
+  for (var i = 0; i < this.startDateChangeListeners.length; ++i) {
+    this.startDateChangeListeners[i](startDate);
+  }
+
+  return this;
+};
+
+ConfirmedOrderModel.prototype.setShortCode = function(shortCode) {
+  this.shortCode = shortCode;
+
+  for (var i = 0; i < this.shortCodeChangeListeners.length; ++i) {
+    this.shortCodeChangeListeners[i](shortCode);
+  }
+
+  return this;
+};
+
+/**
+ * Register state change listeners
+ */
+ConfirmedOrderModel.prototype.bindTitle = function(callback) {
+  callback(this.title);
+  this.titleChangeListeners.push(callback);
+  return this;
+};
+
+ConfirmedOrderModel.prototype.bindDescription = function(callback) {
+  callback(this.description);
+  this.descriptionChangeListeners.push(callback);
+  return this;
+};
+
+ConfirmedOrderModel.prototype.bindPrice = function(callback) {
+  callback(this.price);
+  this.priceChangeListeners.push(callback);
+  return this;
+};
+
+ConfirmedOrderModel.prototype.bindScopesCount = function(callback) {
+  callback(this.scopesCount);
+  this.scopesCountChangeListeners.push(callback);
+  return this;
+};
+
+ConfirmedOrderModel.prototype.bindExperimentDuration = function(callback) {
+  callback(this.experimentDuration);
+  this.experimentDurationChangeListeners.push(callback);
+  return this;
+};
+
+ConfirmedOrderModel.prototype.bindStartTime = function(callback) {
+  callback(this.startTime);
+  this.startTimeChangeListeners.push(callback);
+  return this;
+};
+
+ConfirmedOrderModel.prototype.bindStartDate = function(callback) {
+  callback(this.startDate);
+  this.startDateChangeListeners.push(callback);
+  return this;
+};
+
+ConfirmedOrderModel.prototype.bindShortCode = function(callback) {
+  callback(this.shortCode);
+  this.shortCodeChangeListeners.push(callback);
+  return this;
+};
+
+var OrderRequestModel = function() {
+
+  // Order request state
+  this.scopesCount = null;
+  this.experimentDuration = null; // num hours
+  this.startTime = null; // seconds from start of day
+  this.startDate = null; // DateObj
+  this.shortCodeId = null;
+
+  // State change listeners
+  this.scopesCountChangeListeners = [];
+  this.experimentDurationChangeListeners = [];
+  this.startTimeChangeListeners = [];
+  this.startDateChangeListeners = [];
+  this.shortCodeIdChangeListeners = [];
+};
+
+/**
+ * Getters
+ */
+OrderRequestModel.prototype.getScopesCount = function() {
+  return this.scopesCount;
+};
+
+OrderRequestModel.prototype.getExperimentDuration = function() {
+  return this.experimentDuration;
+};
+
+OrderRequestModel.prototype.getStartTime = function() {
+  return this.startTime;
+};
+
+OrderRequestModel.prototype.getStartDate = function() {
+  return this.startDate;
+};
+
+OrderRequestModel.prototype.getShortCodeId = function() {
+  return this.shortCodeId;
+};
+
+/**
+ * Setters
+ */
+
+/**
+ * Register event listeners
+ */
+OrderRequestModel.prototype.bindScopesCount = function(callback) {
+  this.scopesCountChangeListeners.push(callback);
+  return this;
+};
+
+OrderRequestModel.prototype.bindExperimentDuration = function(callback) {
+  this.experimentDurationChangeListeners.push(callback);
+  return this;
+};
+
+OrderRequestModel.prototype.bindStartTime = function(callback) {
+  this.startTimeChangeListeners.push(callback);
+  return this;
+};
+
+OrderRequestModel.prototype.bindStartDate = function(callback) {
+  this.startDateChangeListeners.push(callback);
+  return this;
+};
+
+OrderRequestModel.prototype.bindShortCode = function(callback) {
+  this.shortCodeChangeListeners.push(callback);
+  return this;
+};
+
+var UserModel = function() {
+
+  // User state
+  this.id = null;
+  this.firstName = null;
+  this.lastName = null;
+  this.email = null;
+
+  // State change event listeners
+  this.firstNameChangeListeners = [];
+  this.lastNameChangeListeners = [];
+  this.emailChangeListeners = [];
+};
+
+/**
+ * User state getters
+ */
+UserModel.prototype.getId = function() {
+  return this.id;
+};
+
+UserModel.prototype.getFirstName = function() {
+  return this.firstName;
+};
+
+UserModel.prototype.getLastName = function() {
+  return this.lastName;
+};
+
+UserModel.prototype.getEmail = function() {
+  return this.email;
+};
+
+/**
+ * User state setters w/callbacks
+ */
+UserModel.prototype.setId = function(id) {
+  this.id = id;
+  return this;
+};
+
+UserModel.prototype.setFirstName = function(first_name) {
+  this.firstName = first_name;
+
+  for (var i = 0; i < this.firstNameChangeListeners.length; ++i) {
+    this.firstNameChangeListeners[i](firstName);
+  }
+
+  return this;
+};
+
+UserModel.prototype.setLastName = function(last_name) {
+  this.lastName = last_name;
+
+  for (var i = 0; i < this.lastNameChangeListeners.length; ++i) {
+    this.lastNameChangeListeners[i](lastName);
+  }
+
+  return this;
+};
+
+UserModel.prototype.setEmail = function(email) {
+  this.email = email;
+
+  for (var i = 0; i < this.emailChangeListeners.length; ++i) {
+    this.emailChangeListeners[i](email);
+  }
+
+  return this;
+};
+
+/**
+ * Register event listeners 
+ */
+UserModel.prototype.bindFirstName = function(callback) {
+  this.firstNameChangeListeners.push(callback); 
+  return this;
+};
+
+UserModel.prototype.bindLastName = function(callback) {
+  this.lastNameChangeListeners.push(callback); 
+  return this;
+};
+
+UserModel.prototype.bindEmail = function(callback) {
+  this.emailChangeListeners.push(callback); 
+  return this;
 };
 
 function ConfirmedOrder(
@@ -222,6 +937,65 @@ ShortCode.prototype.getAlias = function() {
   return this.alias;
 };
 
+var UpdateConfirmedOrderRequestBuilder = function() {
+
+  this.orderId = null;
+  this.title = null;
+  this.removeTitle = false;
+  this.description = null;
+  this.removeDescription = false;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
+  this.orderId = id;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
+  this.title = title;
+  this.removeTitle = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
+  this.title = null;
+  this.removeTitle = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
+  this.description = description;
+  this.removeDescription = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
+  this.description = null;
+  this.removeDescription = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
+  // Check: id must be set!
+  console.assert(this.orderId != null);
+
+  // Check: at least one other field must be set 
+  console.assert(
+      this.title != null ||
+      this.isTitleRemoved != null ||
+      this.description != null ||
+      this.isDescriptionRemoved != null
+  );
+
+  return new UpdateConfirmedOrderRequest(
+    this.orderId,
+    this.title,
+    this.isTitleRemoved,
+    this.description,
+    this.isDescriptionRemoved
+  );
+};
+
 var Utils = (function() {
 
   var CLASS_NAME_PROPERTY = "className";
@@ -370,6 +1144,54 @@ var Utils = (function() {
         serializeable_ending_time.serializeWithoutSeconds();
   };
 
+  this.synthesizeTemplate = function(
+    template_store,
+    template_id,
+    parent_node,
+    class_name
+  ) {
+    // Clear children from parent-node
+    Utils.removeDomChildren(parent_node);
+
+    // Clone template
+    var raw_template = template_store.import.querySelector('#' + template_id);  
+    var template_clone = document.importNode(raw_template.content, true);
+
+    // Insert clone
+    parent_node.appendChild(template_clone);
+    var activated_clones = parent_node.getElementsByClassName(class_name);
+    console.assert(activated_clones.length == 1);
+    
+    return activated_clones[0];
+  };
+
+  this.synthesizeTemplateIntoList = function(
+    template_store,
+    template_id,
+    parent_node,
+    class_name
+  ) {
+    // Clone template
+    var raw_template = template_store.import.querySelector('#' + template_id);
+    var template_clone = document.importNode(raw_template.content, true);
+
+    // Insert clone
+    parent_node.appendChild(template_clone);
+    var activated_clones = parent_node.getElementsByClassName(class_name);
+    console.assert(activated_clones.length > 0);
+
+    return activated_clones[activated_clones.length - 1];
+  };
+
+  this.bindNode = function(
+    parent_node,
+    class_name
+  ) {
+    var node_list = parent_node.getElementsByClassName(class_name);
+    console.assert(node_list.length == 1);
+    return node_list[0];
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -377,7 +1199,10 @@ var Utils = (function() {
     makeDateString: makeDateString,
     removeDomChildren: removeDomChildren,
     stringifyNumberWithEnforcedDigitCount: stringifyNumberWithEnforcedDigitCount,
-    makeTimestampIntervalString: makeTimestampIntervalString
+    makeTimestampIntervalString: makeTimestampIntervalString,
+    synthesizeTemplate: synthesizeTemplate,
+    synthesizeTemplateIntoList: synthesizeTemplateIntoList,
+    bindNode: bindNode
   };
 
 })();
@@ -545,6 +1370,129 @@ var GetStartupDataApiController = (function() {
     registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
   };
 })();
+
+var UpdateConfirmedOrderApiController = (function() {
+
+  /**
+   * Private state
+   */
+  var updateConfirmedOrderApi = null;
+  var successfulApiCallbackListeners = [];
+  var failedLogicalApiCallbackListeners = [];
+  var failedNonLogicalApiCallbackListeners = [];
+
+  /**
+   * update()
+   * - update the specified confirmed order
+   * @param UpdateConfirmedOrderRequest request: update request
+   */
+  var update = function(request) {
+    
+  };
+  
+  var successfulApiCallback = function(api_response) {
+    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
+      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+  
+  var logicallyFailedApiCallback = function(api_response) {
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
+    
+    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
+      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  var nonLogicallyFailedApiCallback = function(api_response) {
+    console.nonLog("WARNING: Logically failed api response!");
+    console.nonLog(api_response); 
+    
+    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
+      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    }
+  };
+
+  /**
+   * registerSuccessfulApiCallback()
+   * - add callback for successful api call
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerSuccessfulApiCallback = function(callback) {
+    successfulApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerLogicalFailedApiCallback()
+   * - add callback for logical failed api call (i.e. api error error rather than network error)
+   * @param FuncPtr callback: function(json_response, api_keys) {...}
+   */
+  var registerLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  /**
+   * registerNonLogicalFailedApiCallback()
+   * - add callback for non-logical failed api call (i.e. network error rather than api error)
+   * @param FuncPtr callback: function(xhttp_response) {...}
+   */
+  var registerNonLogicalFailedApiCallback = function(callback) {
+    logicallyFailedApiCallbackListeners.push(callback);
+    return this;
+  };
+
+  return {
+    update: update,
+    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
+    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
+    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
+  };
+
+})();
+
+var UpdateConfirmedOrderRequest = function(
+    order_id,
+    title,
+    is_title_removed,
+    description,
+   is_description_removed 
+) {
+
+  this.orderId = order_id;
+  this.title = title;
+  this.isTitleRemoved = is_title_removed;
+  this.description = description;
+  this.isDescriptionRemoved = is_description_removed;
+
+  // Check: can't remove title and supply a new one
+  console.assert(!this.isTitleRemoved || this.title == null);
+
+  // Check: can't remove description and supply a new one
+  console.assert(!this.isDescriptionRemoved || this.description == null);
+};
+
+UpdateConfirmedOrderRequest.prototype.getId = function() {
+  return this.orderId;
+};
+
+UpdateConfirmedOrderRequest.prototype.isTitleRemoved = function() {
+  return this.isTitleRemoved;
+};
+
+UpdateConfirmedOrderRequest.prototype.getTitle = function() {
+  return this.title;
+};
+
+UpdateConfirmedOrderRequest.prototype.isDescriptionRemoved = function() {
+  return this.isDescriptionRemoved;
+};
+
+UpdateConfirmedOrderRequest.prototype.getDescription = function() {
+  return this.description;
+};
 
 var MyExperimentsLogicController = (function() {
 
@@ -1746,6 +2694,46 @@ GetStartupDataApi.prototype.getApiKeys = function() {
   };
 };
 
+UpdateConfirmOrderApi.prototype = new ScopesApi();
+UpdateConfirmOrderApi.prototype.constructor = UpdateConfirmOrderApi;
+
+function UpdateConfirmOrderApi(network_module) {
+  this.networkModule = network_module;
+  this.apiType = 0x4;
+
+  // Api request field keys
+  this.apiKeys = {
+    id: 'cid',
+    title: 'title',
+    description: 'desc',
+    short_code_id: 'code'
+  };
+}
+
+UpdateConfirmOrderApi.prototype.getApiKeys = function() {
+  return this.apiKeys;
+};
+
+UpdateConfirmOrderApi.prototype.setConfirmedOrderId = function(id) {
+  this.data[this.apiKeys.id] = id;
+  return this;
+};
+
+UpdateConfirmOrderApi.prototype.setTitle = function(title) {
+  this.data[this.apiKeys.title] = title;
+  return this;
+};
+
+UpdateConfirmOrderApi.prototype.setDescription = function(description) {
+  this.data[this.apiKeys.description] = description;
+  return this;
+};
+
+UpdateConfirmOrderApi.prototype.setShortCodeId = function(id) {
+  this.data[this.apiKeys.short_code_id] = id;
+  return this;
+};
+
 /**
  * ScopesApi
  * - base class for all api calls.
@@ -2870,6 +3858,100 @@ function StaticCalendar(
   };
 };
 
+var CenterPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'center-page-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'center-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var rootNode = null;
+
+  var newExperimentPageView = null;
+
+  /**
+   * Dom nodes
+   */
+  var pageTitleNode = {
+    className: 'center-page-title-label',
+    node: null
+  };
+
+  var centerPanelPageContainerNode = {
+    className: 'center-panel-page-container',
+    node: null
+  };
+
+  var adminButtonContainerNode = {
+    className: 'admin-btn-container',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    pageTitleNode.node = Utils.bindNode(
+      rootNode,
+      pageTitleNode.className
+    ); 
+
+    centerPanelPageContainerNode.node = Utils.bindNode(
+      rootNode,
+      centerPanelPageContainerNode.className
+    );
+
+    adminButtonContainerNode.node = Utils.bindNode(
+      rootNode,
+      adminButtonContainerNode.className
+    );
+  };
+
+  var initPageViews = function() {
+    // Init new experiment page view
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );     
+
+    newExperimentPageView.init();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );
+
+    bindNodes();
+
+    return this;
+  };
+
+  this.setTitle = function(title) {
+    pageTitleNode.node.innerHTML = title;
+    return this;
+  };
+};
+
 function FeedbackPage(
   template_store,
   root_id,
@@ -3197,7 +4279,7 @@ function FeedbackQuestion(
 
 };
 
-function MyExperimentsPage(
+function MyExperimentsPageView(
   template_store,
   root_id,
   is_displayed_initially
@@ -3391,6 +4473,8 @@ function PendingExperimentView(
   var changedTitleListeners = [];
   var cachedDescription = null;
   var changedDescriptionListeners = [];
+  var confirmedOrderModel = null;
+  var isActive = false;
 
   /**
    * Dom nodes
@@ -3529,6 +4613,10 @@ function PendingExperimentView(
     }
   };
 
+  /**
+   * setStartTime()
+   * @param string start_time : timestamp string
+   */
   function setStartTime(start_time) {
     startTimeNode.node.innerHTML = start_time; 
   };
@@ -3549,6 +4637,10 @@ function PendingExperimentView(
     }
   };
 
+  /**
+   * setDuration()
+   * @param uint duration : duration in hours
+   */
   function setDuration(duration) {
     durationNode.node.innerHTML = duration;
     durationUnitNode.node.innerHTML = (duration == 1)
@@ -3887,10 +4979,28 @@ function PendingExperimentView(
     setDescription(confirmed_order.getDescription());
   };
 
+  var bindModel = function(confirmed_order_model) {
+    confirmedOrderModel = confirmed_order_model; 
+
+    // Bind event listeners (also initializes ui data)
+    confirmedOrderModel.bindTitle(setTitle);
+    confirmedOrderModel.bindDescription(setDescription);
+    confirmedOrderModel.bindPrice(setPrice);
+    confirmedOderModel.bindScopesCount(setScopesCount);
+    confirmedOderModel.bindExperimentDuration(setDuration);
+    confirmedOderModel.bindStartTime(setStartTime);
+    confirmedOderModel.bindStartDate(setOrderedDate);
+    confirmedOderModel.bindShortCode(setShortCode);
+  };
+
   /**
    * Privileged functions
    */
-  this.init = function(confirmed_order) {
+  this.init = function(confirmed_order_model) {
+    // Check: view must be inactive to initialize!
+    console.assert(!isActive);
+    isActive = true;
+
     // Clone template and copy into pending-experiments list
     synthesizeTemplate();
 
@@ -3898,10 +5008,16 @@ function PendingExperimentView(
     bindInternalNodes();
 
     // Place data in proper ui elements
-    initUiData(confirmed_order);
+    // initUiData(confirmed_order_model);
+    bindModel(confirmed_order_model);
 
     selectButton(timeButtonNode);
     selectPage(timePageNode);
+  };
+
+  this.remove = function() {
+    rootNode.node.remove();  
+    isActive = false;
   };
 
   /**
@@ -3911,6 +5027,30 @@ function PendingExperimentView(
   this.registerChangedTitleListener = function(callback) {
     changedTitleListeners.push(callback);
   }
+
+  /**
+   * registerChangedDescriptionListener()
+   * @param FuncPtr callback: function(title) {...}
+   */
+  this.registerChangedDescriptionListener = function(callback) {
+    changedDescriptionListeners.push(callback);
+  };
+};
+
+var ScopesCountFormView = function(template_store) {
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(parent_node) {
+    parentNode = parent_node;
+  };
 };
 
 function ShortCodePicker(
@@ -4264,6 +5404,221 @@ function ShortCodePicker(
 
   this.setInitialState = function() {
     setInitialStateInternal();
+  };
+};
+
+var SidePanelView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'side-panel-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'side-panel-wrapper';
+  
+  /**
+   * Ui attributes
+   */
+  var START_HIDDEN_ATTR = "start-hidden";
+  
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var currentlySelectedTabAndPageInfo = null;
+  var centerPageTitleLabel = null;
+  var centerPanelPageContainer = null;
+  
+  var currentlySelectedTab = null;
+  var tabParentNode = null;
+  
+  /**
+   * Tab infos
+   */
+  var tabContainerRootInfo = {
+    className: 'nav-btns-container',
+    node: null
+  };
+
+  var homeButtonNode = {
+    className: 'home-nav-container',
+    node: null
+  };
+
+  var userNameNode = {
+    className: 'side-panel-user-label',
+    node: null
+  };
+
+  var newExperimentInfo = {
+    button_title: 'Add Experiment',
+    icon_type: 'add-circle-outline',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var myExperimentsInfo = {
+    button_title: 'My Experiments',
+    icon_type: 'group-work',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var feedbackInfo = {
+    button_title: 'Feedback',
+    icon_type: 'question-answer',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var technicianInfo = {
+    button_title: 'Technician',
+    icon_type: 'build',
+    tab: null,
+    callback_listeners: []
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * initTabInfo()
+   * - initialize SidePanelTab view
+   * - bind event listeners
+   * @param TabInfo (see above)
+   */
+  var initTabInfo = function(tab_info) {
+    // Initialize tab view 
+    tab_info.tab = new SidePanelTab(
+      templateStore,
+      tabContainerRootInfo.node,
+      tab_info.button_title,
+      tab_info.icon_type
+    );    
+
+    // Register 'onclick' callback
+    tab_info.tab.registerOnClickListener(function() {
+      // Unselect previous tab
+      currentlySelectedTab.deselect();
+
+      // Select new tab
+      currentlySelectedTab = tab_info.tab;
+      currentlySelectedTab.select();
+
+      // Invoke callback listeners
+      for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
+        tab_info.callback_listeners[i]();
+      }
+    });
+
+    // Initialize tab ui
+    tab_info.tab.init();
+  };
+
+  /**
+   * initTabInfos()
+   * - initialize all tabs (bind nodes and event listeners)
+   */
+  var initTabInfos = function() {
+    // Initialize tab parent node
+    tabContainerRootInfo.node = Utils.bindNode(
+      rootNode,
+      tabContainerRootInfo.className
+    ); 
+
+    // Initialize tab views
+    initTabInfo(newExperimentInfo);
+    initTabInfo(myExperimentsInfo);
+    initTabInfo(technicianInfo);
+    initTabInfo(feedbackInfo);
+  };
+
+  var selectTab = function(tab) {
+    if (currentlySelectedTab != null) {
+      currentlySelectedTab.deselect();
+    }
+    tab.select();
+    currentlySelectedTab = tab;
+  };
+
+  var bindNodes = function() {
+    // Initialize user-name ui node
+    userNameNode.node = Utils.bindNode(
+      rootNode,
+      userNameNode.className
+    );
+
+    // Initialize home burron ui node
+    homeButtonNode.node = Utils.bindNode(
+      rootNode,
+      homeButtonNode.className
+    );
+
+    // Initialize tabs
+    initTabInfos();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize html template and insert into main document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );    
+
+    bindNodes();
+  
+    return this;
+  };
+
+  /**
+   * Onclick event listeners for tabs
+   */
+  this.bindNewExperimentTabClick = function(callback) {
+    newExperimentInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindMyExperimentsTabClick = function() {
+    myExperimentsInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindFeedbackTabClick = function() {
+    feedbackInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindTechnicianTabClick = function() {
+    technicianInfo.callback_listeners.push(callback); 
+  };
+
+  /**
+   * Select tab
+   */
+  this.selectNewExperimentTab = function() {
+    selectTab(newExperimentInfo.tab);
+  };
+
+  this.selectMyExperimentsTab = function() {
+    selectTab(myExperimentsInfo.tab);
+  };
+
+  this.selectFeedbackTab = function() {
+    selectTab(feedbackInfo.tab);
+  };
+
+  this.selectTechnicianTab = function() {
+    selectTab(technicianInfo.tab);
   };
 };
 
@@ -4811,5 +6166,299 @@ function TimePicker(
 
   this.setInitialState = function() {
     setInitialStateInternal();
+  };
+};
+
+var NewExperimentPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Page title
+   */
+  var PAGE_TITLE = 'Add Experiment';
+
+  /**
+   * New Experiments Template Id
+   */
+  var NEW_EXPERIMENT_PAGE_TEMPLATE_ID = 'new-experiment-page-template';
+
+  /**
+   * New Experiments Wrapper Class
+   */
+  var NEW_EXPERIMENT_WRAPPER_CLASS = 'new-experiment-page-wrapper';
+
+  /**
+   * Hide page attribute
+   */
+  var HIDDEN_PAGE_ATTR = 'hidden-page';
+
+  /**
+   * Scopes count form view
+   */
+  var scopesCountNode = {
+    className: 'scopes-count-form',
+    node: null
+  };
+
+  var SCOPES_COUNT_TITLE_LABEL = 'How many scopes would you like?';
+
+  var SCOPES_COUNT_UNIT_LABELS = {
+    singular: 'scope',
+    plural: 'scopes'
+  };
+
+  var SCOPES_COUNT_VALUE_RANGE = {
+    min: 0,
+    max: 15,
+    step: 1
+  };
+
+  /**
+   * Experiment form view info
+   */
+  var experimentDurationNode = {
+    className: 'experiment-duration-form',
+    node: null
+  };
+
+  var EXPERIMENT_DURATION_TITLE_LABEL = 'How long is your experiment?';
+
+  var EXPERIMENT_DURATION_UNIT_LABELS = {
+    singular: 'hour',
+    plural: 'hours'
+  };
+
+  var EXPERIMENT_DURATION_VALUE_RANGE = {
+    min: 0,
+    max: 12,
+    step: 1
+  };
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var rootNode = null;
+
+  var scopesCountFormView = null;
+  var experimentDurationFormView = null;
+
+  /**
+   * Private functions
+   */
+  var initScopeCountView = function() {
+    var slider_form_view = new SliderFormView(
+      templateStore,
+      SCOPES_COUNT_TITLE_LABEL,
+      SCOPES_COUNT_UNIT_LABELS,
+      SCOPES_COUNT_VALUE_RANGE
+    ); 
+
+    slider_form_view.init(scopesCountNode.node);
+    slider_form_view.setValue(0);
+    return slider_form_view;
+  };
+
+  var initExperimentDurationView = function() {
+    var slider_form_view = new SliderFormView(
+      templateStore,    
+      EXPERIMENT_DURATION_TITLE_LABEL,
+      EXPERIMENT_DURATION_UNIT_LABELS,
+      EXPERIMENT_DURATION_VALUE_RANGE
+    );
+
+    slider_form_view.init(experimentDurationNode.node);
+    slider_form_view.setValue(0);
+    return slider_form_view;
+  };
+
+  var bindNodes = function() {
+    scopesCountNode.node = Utils.bindNode(
+      rootNode,
+      scopesCountNode.className
+    );
+
+    experimentDurationNode.node = Utils.bindNode(
+      rootNode,
+      experimentDurationNode.className
+    );
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      NEW_EXPERIMENT_PAGE_TEMPLATE_ID,
+      parentNode,
+      NEW_EXPERIMENT_WRAPPER_CLASS
+    );
+
+    // Bind all ui dom nodes
+    bindNodes();
+    
+    // Initialize child views
+    scopesCountFormView = initScopeCountView(); 
+    experimentDurationFormView = initExperimentDurationView();
+  };
+
+  this.getPageTitle = function() {
+    return PAGE_TITLE;
+  };
+
+  this.hide = function() {
+    rootNode.setAttribute(HIDDEN_PAGE_ATTR, ''); 
+  };
+
+  this.show = function() {
+    rootNode.removeAttribute(HIDDEN_PAGE_ATTR); 
+  };
+};
+
+var SliderFormView = function(
+  template_store,
+  title_label,
+  unit_labels, // {singular, plural}
+  value_range // {min, max, step}
+) {
+
+  /**
+   * Template Id
+   */
+  var TEMPLATE_ID = 'slider-input-form-template';
+
+  /**
+   * Wrapper root node
+   */
+  var WRAPPER_ROOT_NODE_CLASS = 'slider-input-form-wrapper';
+
+  /**
+   * Paper slider ui attributes
+   */
+  var PAPER_SLIDER_MIN_ATTR = 'min';
+  var PAPER_SLIDER_MAX_ATTR = 'max';
+  var PAPER_SLIDER_STEP_ATTR = 'step';
+  var PAPER_SLIDER_VALUE_ATTR = 'value';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = null;
+  var unitLabels = unit_labels;
+  var valueRange = value_range;
+  var titleLabel = title_label;
+  
+  var _this = this;
+
+  var rootNode = null;
+
+  var changedValueListeners = [];
+
+  /**
+   * Dom node info
+   */
+  var formTitleNode = {
+    class_name: 'form-title-label',
+    node: null
+  };
+
+  var valueDisplayNode = {
+    class_name: 'value-display',
+    node: null
+  };
+
+  var unitDisplayNode = {
+    class_name: 'unit-display',
+    node: null
+  };
+
+  var sliderNode = {
+    class_name: 'slider-input',
+    node: null
+  };
+
+  var bindNodes = function() {
+    // Bind nodes
+    formTitleNode.node = Utils.bindNode(rootNode, formTitleNode.class_name); 
+    valueDisplayNode.node = Utils.bindNode(rootNode, valueDisplayNode.class_name); 
+    unitDisplayNode.node = Utils.bindNode(rootNode, unitDisplayNode.class_name); 
+    sliderNode.node = Utils.bindNode(rootNode, sliderNode.class_name); 
+
+    // Bind onchange event listeners
+    sliderNode.node.onchange = function() {
+     
+      // Update display
+      _this.setValue(this.immediateValue);  
+     
+      // Notify listeners
+      for (var i = 0; i < changedValueListeners.length; ++i) {
+        changedValueListeners[i](this.immediateValue);
+      }
+    };
+  };
+
+  var initUi = function() {
+    // Initialize slider
+    formTitleNode.node.innerHTML = titleLabel;
+    
+    // Initialize slider state
+    sliderNode.node.setAttribute(
+      PAPER_SLIDER_MIN_ATTR,
+      valueRange.min
+    ); 
+    
+    sliderNode.node.setAttribute(
+      PAPER_SLIDER_MAX_ATTR,
+      valueRange.max
+    ); 
+    
+    sliderNode.node.setAttribute(
+      PAPER_SLIDER_STEP_ATTR,
+      valueRange.step
+    ); 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(parent_node) {
+    parentNode = parent_node;
+
+    // Initialize root node
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      WRAPPER_ROOT_NODE_CLASS
+    );
+
+    // Initialize nodes and bind event listeners
+    bindNodes();
+
+    // Init ui elements
+    initUi();
+  };
+
+  this.setValue = function(value) {
+    // Update slider
+    sliderNode.node.value = value;  
+
+    // Update value display
+    valueDisplayNode.node.innerHTML = value; 
+
+    // Update unit display
+    unitDisplayNode.node.innerHTML = (value == 1)
+      ? unitLabels.singular
+      : unitLabels.plural;
+  };
+
+  this.bindValueChange = function(callback) {
+    changedValueListeners.push(callback);  
   };
 };

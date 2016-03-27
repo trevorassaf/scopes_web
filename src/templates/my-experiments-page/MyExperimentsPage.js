@@ -1,4 +1,4 @@
-function MyExperimentsPage(
+function MyExperimentsPageView(
   template_store,
   root_id,
   is_displayed_initially

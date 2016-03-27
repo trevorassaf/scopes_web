@@ -1,0 +1,28 @@
+#center-panel {
+  background-color: #FAFAFA;
+  width: calc(100% - 281px);
+  height: 100%;
+}
+
+.center-page-wrapper {
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.center-page-wrapper .admin-btn-container {
+  float: right;
+}
+
+.center-page-wrapper .admin-btn-container > div {
+  margin-bottom: 3px;
+}
+
+.center-page-wrapper {
+}
+.center-page-wrapper {
+}
+.center-page-wrapper {
+}
+.center-page-wrapper {
+}

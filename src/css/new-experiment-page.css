@@ -33,9 +33,9 @@
   display: inline-block;
 }
 
-paper-slider {
-  width: 400px;
-}
+/* paper-slider { */
+/*   width: 400px; */
+/* } */
 
 .add-exp-validation-icon-container iron-icon {
   /* display: block; */

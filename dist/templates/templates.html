@@ -63,6 +63,37 @@
   </div>
 </template>
 
+<template id='center-page-template'>
+  <div class='center-page-wrapper'>
+
+    <!-- Upper-most row of center page. Container page title and admin btns -->
+    <div class='title-and-admin-btn-row'>
+      
+      <!-- Title for the center page -->
+      <div class='center-page-title-container'>
+        <span class='center-page-title-label'></span> 
+      </div> 
+
+      <!-- Admin icon buttons -->
+      <div class='admin-btn-container'>
+        <div class='user-profile-admin-btn-container'>
+          <iron-icon class='user-circle-icon' icon='account-circle'></iron-icon>
+        </div>
+        <div class='settings-admin-btn-container'>
+          <iron-icon class='settings-icon' icon='settings'></iron-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center panel inner container: contains title and associated content -->
+    <div class='center-panel-inner-container'>
+      <!-- Center panel container: contains all main pages -->
+      <div class='center-panel-page-container'></div>
+    </div>
+
+  </div>
+</template>
+
 <template id='feedback-page-template'>
   <div class='feedback-page-wrapper'>
     <div class='questions-wrapper'></div>
@@ -246,6 +277,37 @@
   </div>
 </template>
 
+<template id='side-panel-template'>
+  <div class='side-panel-wrapper'>
+    <!-- User name -->
+    <div class='side-panel-user-container'>
+      <img class='side-panel-user-profile-pic' src='../../../../assets/default_profile_images/blue-ring.png' />
+      <span class='side-panel-user-label'>Kalyna Petrusha</span>
+    </div>
+
+    <!-- Mvs home button -->
+    <div class='home-nav-container'>
+      <div class='home-nav-label'>
+        <span><iron-icon class='home-nav-label-back-icon' icon='chevron-left'></iron-icon></span>  
+        <div class='home-nav-label-home-icon-container'><iron-icon class='home-nav-label-home-icon' icon='home'></iron-icon></div>
+        <span class='home-nav-label-name'>MVS Home</span>
+      </div>
+    </div>
+
+    <!-- Mvs dashboard title -->
+    <div class='dash-title-container'>
+      <div class='dash-title-label'>
+        <span><iron-icon icon='dashboard' class='dash-title-label-icon'></iron-icon></span>
+        <span class='dash-title-label-name'>MVS Dashboard</span>
+        <span class='dash-title-label-version'>1.0.0</span>
+      </div>
+    </div>
+
+    <!-- Page navigation buttons -->
+    <div class='nav-btns-container'></div>
+  </div>
+</template>
+
 <!-- specify icon type with 'icon' attribute in iron-icon element -->
 <!-- Add tab label in innerHTML of 'nav-btn-label '-->
 <template id='side-panel-tab-template'>
@@ -276,5 +338,104 @@
 <template id='time-picker-option-template'>
   <div class='time-picker-option'>
     <span class='time-label'></span>
+  </div>
+</template>
+
+<template id='confirm-order-form-template'>
+  
+  <!-- Form title -->
+  <div class='title'>
+    <span class='title-label'>Confirm order</span>
+  </div>
+
+  <!-- Display pricing information-->
+  <div class='confirm-payment-input-container'>
+    
+    <!-- Payment information -->
+    <div class='payment-info-container'></div>
+
+    <!-- Payment confirmation/cancelation form -->
+    <div class='confirm-payment-container'>
+      <!-- Confirm button -->
+      <div class='confirm-payment-button'>
+        <span class='confirm-payment-button-label'>Confirm</span>
+      </div>
+
+      <!-- Cancel button -->
+      <div class='cancel-payment-button'>
+        <span class='cancel-payment-button-label'>Cancel</span>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<template id='new-experiment-page-template'>
+  <div class='new-experiment-page-wrapper'>
+    <!-- Scopes count input form input -->
+    <div class='scopes-count-form'></div>
+
+    <!-- Experiment duration input -->
+    <div class='experiment-duration-form'></div>
+    
+    <!-- Experiment date input -->
+    <div class='experiment-date-form'></div>
+
+    <!-- Short code selection input -->
+    <div class='short-code-form'></div>
+
+    <!-- Confirm payment input -->
+    <div class='confirm-payment-form'></div>
+  </div>
+</template>
+
+<template id='experiment-date-form-template'>
+    
+  <!-- Form title -->
+  <div class='title-container'>
+    <span class='title-label'>When would you like to start?</span>
+  </div>
+
+  <!-- Date and time input fields -->
+  <div class='input-container'>
+    <!-- Experiment time picker -->
+    <div class='exp-time-picker'></div> 
+    
+    <!-- Experiment date picker -->
+    <div class='exp-date-picker'></div>    
+  </div>
+</template>
+
+<template id='short_code_form_template'>
+  <!-- Form title -->
+  <div class='title-container'>
+    <span class='title-label'>Select short-code</span>
+  </div>
+
+  <!-- Select short codes -->
+  <div class='short-code-picker'></div>
+</template>
+
+<template id='slider-input-form-template'>
+  <div class='slider-input-form-wrapper'>
+    <!-- Form title -->
+    <div class='form-title'>
+      <span class='form-title-label'>How many microscopes?</span>
+    </div>
+    
+    <!-- Form input field -->
+    <div class='input-container'>
+      <span class='value-display'></span>
+      <span class='unit-display'></span>
+      <paper-slider class='slider-input' pin='true'></paper-slider>
+    </div>
+
+    <!-- Validation icon -->
+    <div class='validation-container'></div>
+
+    <!-- <div id='validation&#45;icon&#45;container' class='add&#45;exp&#45;validation&#45;icon&#45;container'> -->
+    <!--   <iron&#45;icon id='scopes&#45;count&#45;valid&#45;icon' class='valid&#45;input&#45;icon validation&#45;input&#45;icon' icon='check&#45;circle'></iron&#45;icon> -->
+    <!--   <iron&#45;icon id='scopes&#45;count&#45;invalid&#45;icon' class='invalid&#45;input&#45;icon validation&#45;input&#45;icon' icon='cancel'></iron&#45;icon> -->
+    <!-- </div> -->
   </div>
 </template>

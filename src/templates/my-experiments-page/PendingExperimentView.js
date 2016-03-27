@@ -47,6 +47,8 @@ function PendingExperimentView(
   var changedTitleListeners = [];
   var cachedDescription = null;
   var changedDescriptionListeners = [];
+  var confirmedOrderModel = null;
+  var isActive = false;
 
   /**
    * Dom nodes
@@ -185,6 +187,10 @@ function PendingExperimentView(
     }
   };
 
+  /**
+   * setStartTime()
+   * @param string start_time : timestamp string
+   */
   function setStartTime(start_time) {
     startTimeNode.node.innerHTML = start_time; 
   };
@@ -205,6 +211,10 @@ function PendingExperimentView(
     }
   };
 
+  /**
+   * setDuration()
+   * @param uint duration : duration in hours
+   */
   function setDuration(duration) {
     durationNode.node.innerHTML = duration;
     durationUnitNode.node.innerHTML = (duration == 1)
@@ -543,10 +553,28 @@ function PendingExperimentView(
     setDescription(confirmed_order.getDescription());
   };
 
+  var bindModel = function(confirmed_order_model) {
+    confirmedOrderModel = confirmed_order_model; 
+
+    // Bind event listeners (also initializes ui data)
+    confirmedOrderModel.bindTitle(setTitle);
+    confirmedOrderModel.bindDescription(setDescription);
+    confirmedOrderModel.bindPrice(setPrice);
+    confirmedOderModel.bindScopesCount(setScopesCount);
+    confirmedOderModel.bindExperimentDuration(setDuration);
+    confirmedOderModel.bindStartTime(setStartTime);
+    confirmedOderModel.bindStartDate(setOrderedDate);
+    confirmedOderModel.bindShortCode(setShortCode);
+  };
+
   /**
    * Privileged functions
    */
-  this.init = function(confirmed_order) {
+  this.init = function(confirmed_order_model) {
+    // Check: view must be inactive to initialize!
+    console.assert(!isActive);
+    isActive = true;
+
     // Clone template and copy into pending-experiments list
     synthesizeTemplate();
 
@@ -554,10 +582,16 @@ function PendingExperimentView(
     bindInternalNodes();
 
     // Place data in proper ui elements
-    initUiData(confirmed_order);
+    // initUiData(confirmed_order_model);
+    bindModel(confirmed_order_model);
 
     selectButton(timeButtonNode);
     selectPage(timePageNode);
+  };
+
+  this.remove = function() {
+    rootNode.node.remove();  
+    isActive = false;
   };
 
   /**
@@ -567,4 +601,12 @@ function PendingExperimentView(
   this.registerChangedTitleListener = function(callback) {
     changedTitleListeners.push(callback);
   }
+
+  /**
+   * registerChangedDescriptionListener()
+   * @param FuncPtr callback: function(title) {...}
+   */
+  this.registerChangedDescriptionListener = function(callback) {
+    changedDescriptionListeners.push(callback);
+  };
 };

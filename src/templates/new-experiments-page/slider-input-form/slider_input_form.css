@@ -1,0 +1,31 @@
+.slider-input-form-wrapper {
+  border: 1px solid rgb(228, 228, 228);
+  background-color: #FFFFFF;
+  margin-bottom: 30px;
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding: 20px;
+  position: relative;
+}
+
+.slider-input-form-wrapper .form-title {
+  color: #424242;
+  font-size: 24px;
+}
+
+.slider-input-form-wrapper .input-container {
+  color: #A0A0A0;
+  font-size: 18px;
+  position: relative;
+  margin-top: 20px;
+}
+
+.slider-input-form-wrapper .slider-input {
+  position: absolute;
+  left: 80px;
+  top: -4px;
+  cursor: pointer;
+  /* width: 400px; */
+  width: 80%;
+  max-width: 400px;
+}

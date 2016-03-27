@@ -1,0 +1,41 @@
+#side-panel {
+  border-right: 1px solid rgb(228, 228, 228);
+  background-color: #FFFFFF;
+  width: 280px;
+  height: 100%;
+}
+
+.side-panel-wrapper {}
+
+.side-panel-wrapper .side-panel-user-container {
+  margin-top: 20px;
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.side-panel-wrapper .side-panel-user-container > * {
+  display: inline-block; 
+}
+
+.side-panel-wrapper .side-panel-user-profile-pic {
+  height: 50px; 
+  width: 50px; 
+  margin-right: 20px;
+}
+
+.side-panel-wrapper .side-panel-user-label {
+  color: #424242;
+  font-size: 20px;
+  font-weight: bold;
+  position: relative;
+  top: -20px;
+}
+
+.side-panel-wrapper {
+}
+.side-panel-wrapper {
+}
+.side-panel-wrapper {
+}
+.side-panel-wrapper {
+}
