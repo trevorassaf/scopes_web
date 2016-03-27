@@ -4,6 +4,17 @@
   padding-left: 18px;
 }
 
+.dash-nav-panel-btn .nav-btn-icon {
+  margin-right: 20px;
+  --iron-icon-height: 24px;
+  --iron-icon-width: 24px;
+}
+
+.dash-nav-panel-btn .nav-btn-label {
+  position: relative;
+  top: 2px;
+}
+
 .dash-nav-panel-btn[selected-side-panel-tab] {
   background-color: #ECEFF1;
 }

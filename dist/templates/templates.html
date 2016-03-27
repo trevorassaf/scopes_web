@@ -277,6 +277,15 @@
   </div>
 </template>
 
+<!-- specify icon type with 'icon' attribute in iron-icon element -->
+<!-- Add tab label in innerHTML of 'nav-btn-label '-->
+<template id='side-panel-tab-template'>
+  <div class='dash-nav-panel-btn'>
+    <iron-icon class='nav-btn-icon'></iron-icon>
+    <span class='nav-btn-label'></span>
+  </div>
+</template>
+
 <template id='side-panel-template'>
   <div class='side-panel-wrapper'>
     <!-- User name -->
@@ -287,33 +296,20 @@
 
     <!-- Mvs home button -->
     <div class='home-nav-container'>
-      <div class='home-nav-label'>
-        <span><iron-icon class='home-nav-label-back-icon' icon='chevron-left'></iron-icon></span>  
-        <div class='home-nav-label-home-icon-container'><iron-icon class='home-nav-label-home-icon' icon='home'></iron-icon></div>
-        <span class='home-nav-label-name'>MVS Home</span>
-      </div>
+      <iron-icon class='back-icon' icon='chevron-left'></iron-icon>
+      <div class='home-icon-container'><iron-icon class='home-icon' icon='home'></iron-icon></div>
+      <div class='home-label'>MVS Home</div>
     </div>
 
     <!-- Mvs dashboard title -->
     <div class='dash-title-container'>
-      <div class='dash-title-label'>
-        <span><iron-icon icon='dashboard' class='dash-title-label-icon'></iron-icon></span>
-        <span class='dash-title-label-name'>MVS Dashboard</span>
-        <span class='dash-title-label-version'>1.0.0</span>
-      </div>
+      <iron-icon icon='dashboard' class='dash-icon'></iron-icon>
+      <span class='title-label'>MVS Dashboard</span>
+      <span class='version-label'>1.0.0</span>
     </div>
 
     <!-- Page navigation buttons -->
     <div class='nav-btns-container'></div>
-  </div>
-</template>
-
-<!-- specify icon type with 'icon' attribute in iron-icon element -->
-<!-- Add tab label in innerHTML of 'nav-btn-label '-->
-<template id='side-panel-tab-template'>
-  <div class='dash-nav-panel-btn'>
-    <iron-icon class='nav-btn-icon'></iron-icon>
-    <span class='nav-btn-label'></span>
   </div>
 </template>
 
