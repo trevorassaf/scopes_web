@@ -18,6 +18,7 @@ window.onload = function() {
     center_page_node
   );
   center_page_view.init();
+  center_page_view.showNewExperimentPage();
 
   // New experiment page
   // var new_experiment_parent_node = null;
@@ -36,6 +37,7 @@ window.onload = function() {
     side_panel_parent_root
   );
   side_panel_view.init();
+  side_panel_view.selectNewExperimentTab();
 
   // Initialize page controller
   // var page_controller = new PageController(
@@ -1000,6 +1002,8 @@ var Utils = (function() {
 
   var CLASS_NAME_PROPERTY = "className";
 
+  var HIDDEN_ATTR = 'hidden';
+
   // Timestamp delimiters
   var DATE_DELIMITER = "-";
   var TIME_DELIMITER = ":";
@@ -1192,6 +1196,14 @@ var Utils = (function() {
     return node_list[0];
   };
 
+  this.hideNode = function(node) {
+    node.setAttribute(HIDDEN_ATTR, ''); 
+  };
+
+  this.showNode = function(node) {
+    node.removeAttribute(HIDDEN_ATTR);
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -1202,7 +1214,9 @@ var Utils = (function() {
     makeTimestampIntervalString: makeTimestampIntervalString,
     synthesizeTemplate: synthesizeTemplate,
     synthesizeTemplateIntoList: synthesizeTemplateIntoList,
-    bindNode: bindNode
+    bindNode: bindNode,
+    hideNode: hideNode,
+    showNode: showNode
   };
 
 })();
@@ -3880,18 +3894,23 @@ var CenterPageView = function(
   var parentNode = parent_node;
   var rootNode = null;
 
+  var currentPageView = null;
+
   var newExperimentPageView = null;
+  var myExperimentsPageView = null;
+  var feedbackPageView = null;
+  var technicianPageView = null;
 
   /**
    * Dom nodes
    */
   var pageTitleNode = {
-    className: 'center-page-title-label',
+    className: 'title-label',
     node: null
   };
 
   var centerPanelPageContainerNode = {
-    className: 'center-panel-page-container',
+    className: 'page-container',
     node: null
   };
 
@@ -3903,21 +3922,40 @@ var CenterPageView = function(
   /**
    * Private functions
    */
+
+  var initNewExperimentPage = function() {
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    ); 
+    newExperimentPageView.init();
+  };
+
+  var initPages = function() {
+    initNewExperimentPage(); 
+  };
+
   var bindNodes = function() {
+    // Bind page title node
     pageTitleNode.node = Utils.bindNode(
       rootNode,
       pageTitleNode.className
     ); 
 
+    // Bind container node for admin buttons
+    adminButtonContainerNode.node = Utils.bindNode(
+      rootNode,
+      adminButtonContainerNode.className
+    );
+    
+    // Bind node that contains the pages
     centerPanelPageContainerNode.node = Utils.bindNode(
       rootNode,
       centerPanelPageContainerNode.className
     );
 
-    adminButtonContainerNode.node = Utils.bindNode(
-      rootNode,
-      adminButtonContainerNode.className
-    );
+    // Initialize pages
+    initPages();
   };
 
   var initPageViews = function() {
@@ -3928,6 +3966,20 @@ var CenterPageView = function(
     );     
 
     newExperimentPageView.init();
+  };
+
+  var changePage = function(next_page_view) {
+    console.assert(next_page_view != null);
+
+    // Hide current page
+    if (currentPageView != null) {
+      currentPageView.hide();
+    }
+
+    // Show next page and update title
+    currentPageView = next_page_view;
+    pageTitleNode.node.innerHTML = currentPageView.getTitle();
+    currentPageView.show();
   };
 
   /**
@@ -3946,9 +3998,23 @@ var CenterPageView = function(
     return this;
   };
 
-  this.setTitle = function(title) {
-    pageTitleNode.node.innerHTML = title;
-    return this;
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    changePage(newExperimentPageView);       
+  };
+
+  this.showMyExperimentsPage = function() {
+    changePage(myExperimentsPageView);       
+  };
+
+  this.showFeedbackPage = function() {
+    changePage(feedbackPageView);       
+  };
+
+  this.showTechnicianPage = function() {
+    changePage(technicianPageView);       
   };
 };
 
@@ -5407,128 +5473,6 @@ function ShortCodePicker(
   };
 };
 
-function SidePanelTab(
-  template_store,
-  parent_node,
-  button_title,
-  iron_icon_type
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
-
-  /**
-   * Ui attributes
-   */
-  var SELECTED_ATTR = "selected-side-panel-tab";
-  var IRON_ICON_TYPE_ATTR = "icon";
-
-  /**
-   * Private state
-   */
-  var _this = this;
-  var templateStore = template_store;
-  var buttonTitle = button_title;
-  var ironIconType = iron_icon_type;
-  var onClickListeners = [];
-
-  // Root dom node
-  var rootNode = {
-    className: 'dash-nav-panel-btn',
-    node: null
-  };
-
-  var ironIconNode = {
-    className: 'nav-btn-icon',
-    node: null
-  };
-
-  var buttonTitleNode = {
-    className: 'nav-btn-label',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = rootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  function synthesizeSidePanelTemplate() {
-    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
-    var tab_clone = document.importNode(tab_template.content, true);
-    parent_node.appendChild(tab_clone);
-
-    // Initialize root node and configure event listener
-    var tabs = parent_node.getElementsByClassName(rootNode.className);
-    rootNode.node = tabs[tabs.length - 1];
-
-    rootNode.node.onclick = function() {
-      for (var i = 0; i < onClickListeners.length; ++i) {
-        onClickListeners[i]();
-      }
-    };
-  };
-
-  /**
-   * bindInternalNodes()
-   * @pre-condition: 'rootNode' must already be bound
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(ironIconNode); 
-    bindClassBoundNode(buttonTitleNode);
-  };
-
-  /**
-   * initDisplay()
-   * - initializes text/graphics for this tab
-   * @pre-condition: all internal nodes bound
-   */
-  function initDisplay() {
-    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
-    buttonTitleNode.node.innerHTML = buttonTitle; 
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Initialize template and append to parent dom node
-    synthesizeSidePanelTemplate();
-
-    // Initialize pointers to internal nodes
-    bindInternalNodes();
-
-    // Initialize the ui
-    initDisplay();
-  }; 
-
-  this.select = function() {
-    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
-  };
-
-  this.deselect = function() {
-    rootNode.node.removeAttribute(SELECTED_ATTR);
-  };
-
-  /**
-   * registerOnClickListener()
-   * @param FuncPtr callback: function(_this) {...}
-   */
-  this.registerOnClickListener = function(callback) {
-    onClickListeners.push(callback); 
-  };
-};
-
 var SidePanelView = function(
   template_store,
   parent_node
@@ -5870,9 +5814,131 @@ function TechnicianPage(
 
 };
 
+function SidePanelTab(
+  template_store,
+  parent_node,
+  button_title,
+  iron_icon_type
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+
+  /**
+   * Ui attributes
+   */
+  var SELECTED_ATTR = "selected-side-panel-tab";
+  var IRON_ICON_TYPE_ATTR = "icon";
+
+  /**
+   * Private state
+   */
+  var _this = this;
+  var templateStore = template_store;
+  var buttonTitle = button_title;
+  var ironIconType = iron_icon_type;
+  var onClickListeners = [];
+
+  // Root dom node
+  var rootNode = {
+    className: 'dash-nav-panel-btn',
+    node: null
+  };
+
+  var ironIconNode = {
+    className: 'nav-btn-icon',
+    node: null
+  };
+
+  var buttonTitleNode = {
+    className: 'nav-btn-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  function synthesizeSidePanelTemplate() {
+    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var tab_clone = document.importNode(tab_template.content, true);
+    parent_node.appendChild(tab_clone);
+
+    // Initialize root node and configure event listener
+    var tabs = parent_node.getElementsByClassName(rootNode.className);
+    rootNode.node = tabs[tabs.length - 1];
+
+    rootNode.node.onclick = function() {
+      for (var i = 0; i < onClickListeners.length; ++i) {
+        onClickListeners[i]();
+      }
+    };
+  };
+
+  /**
+   * bindInternalNodes()
+   * @pre-condition: 'rootNode' must already be bound
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(ironIconNode); 
+    bindClassBoundNode(buttonTitleNode);
+  };
+
+  /**
+   * initDisplay()
+   * - initializes text/graphics for this tab
+   * @pre-condition: all internal nodes bound
+   */
+  function initDisplay() {
+    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
+    buttonTitleNode.node.innerHTML = buttonTitle; 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize template and append to parent dom node
+    synthesizeSidePanelTemplate();
+
+    // Initialize pointers to internal nodes
+    bindInternalNodes();
+
+    // Initialize the ui
+    initDisplay();
+  }; 
+
+  this.select = function() {
+    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
+  };
+
+  this.deselect = function() {
+    rootNode.node.removeAttribute(SELECTED_ATTR);
+  };
+
+  /**
+   * registerOnClickListener()
+   * @param FuncPtr callback: function(_this) {...}
+   */
+  this.registerOnClickListener = function(callback) {
+    onClickListeners.push(callback); 
+  };
+};
+
 function TimePicker(
   template_store,
-  id,
+  parent_node,
   start_time, // {minute, hour}
   end_time,   // {minute, hour}
   time_interval // min
@@ -5889,12 +5955,13 @@ function TimePicker(
    */
   var TIME_LABEL_CLASS = 'time-label';
   var TIME_PICKER_OPTION_CLASS = 'time-picker-option';
+  var ROOT_WRAPPER_CLASS = 'time-picker-wrapper';
 
   /**
    * Html template id name
    */
-  var MAIN_TEMPLATE_ID = '#time-picker-template';
-  var OPTION_TEMPLATE_ID = '#time-picker-option-template';
+  var MAIN_TEMPLATE_ID = 'time-picker-template';
+  var OPTION_TEMPLATE_ID = 'time-picker-option-template';
 
   /**
    * Meridian designations 
@@ -5910,62 +5977,42 @@ function TimePicker(
 
   // Private state
   var templateStore = template_store;
+  var parentNode = parent_node;
+
   var startTime = start_time;
   var endTime = end_time;
   var timeInterval = time_interval; 
   var isDropDownOpen = false;
   var currentTime = null; // hours * 60 + minutes
 
-  // Dom Nodes
-  var rootNode = {
-    nodeId: id,
-    node: null
-  };
-  
   /**
    * Internal dom nodes
    */
-  var timePickerWrapperNode = {
-    class: 'time-picker-wrapper',
-    node: null
-  };
-
   var inputFieldNode = {
-    class: 'input-field',
+    className: 'input-field',
     node: null
   };
 
   var inputFieldWrapperNode = {
-    class: 'input-field-wrapper',
+    className: 'input-field-wrapper',
     node: null
   };
 
   var dropDownNode = {
-    class: 'time-dropdown',
+    className: 'time-dropdown',
     node: null
   };
 
   // Private functions
-  /**
-   * synthesizeTimePickerTemplate()
-   * - copy template and insert into root node
-   * @pre-condition: root node is initialized 
-   */
-  var synthesizeTimePickerTemplate = function() {
-    var time_picker_template = templateStore.import.querySelector(MAIN_TEMPLATE_ID);
-    var time_picker_clone = document.importNode(time_picker_template.content, true);
-    rootNode.node.appendChild(time_picker_clone);
-  };
-
   var openDropDown = function() {
     isDropDownOpen = true;    
-    timePickerWrapperNode.node.removeAttribute(HIDDEN_ATTR);
+    rootNode.removeAttribute(HIDDEN_ATTR);
     inputFieldNode.node.setAttribute(SHADOW_BORDER_ATTR, '');
   };
 
   var closeDropDown = function() {
     isDropDownOpen = false;    
-    timePickerWrapperNode.node.setAttribute(HIDDEN_ATTR, '');
+    rootNode.setAttribute(HIDDEN_ATTR, '');
     inputFieldNode.node.removeAttribute(SHADOW_BORDER_ATTR);
   };
 
@@ -5975,26 +6022,23 @@ function TimePicker(
    * @pre-condition: root initialized and dom synthesized
    */
   var configureAvailableTimes = function() {
-    // Bind template node for time-picker-option
-    var time_picker_option_template = templateStore.import.querySelector(OPTION_TEMPLATE_ID);
-
     var current_time = startTime.hours * 60 + startTime.minutes;
     var next_time = current_time + time_interval;
     var end_time = endTime.hours * 60 + endTime.minutes;
 
     while (next_time <= end_time) {
-      // Create new time-picker-option html element
-      var current_time_string = stringifyTime(current_time); 
-      var time_picker_option_clone = document.importNode(time_picker_option_template.content, true);
+      // Synthesize time-picker-option template
+      var time_picker_option = Utils.synthesizeTemplateIntoList(
+        templateStore,
+        OPTION_TEMPLATE_ID,
+        dropDownNode.node,
+        TIME_PICKER_OPTION_CLASS
+      );
 
-      // Incorporate into time-option list
-      dropDownNode.node.appendChild(time_picker_option_clone);
-
-      var new_time_picker_option_list = document.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
-      var new_time_picker_option = new_time_picker_option_list[new_time_picker_option_list.length - 1];
-      new_time_picker_option.setAttribute(TIME_ATTR, current_time);
-      var time_label = new_time_picker_option.querySelector('.' + TIME_LABEL_CLASS);
-      time_label.innerHTML = current_time_string;
+      // Hack!
+      time_picker_option.setAttribute(TIME_ATTR, current_time);
+      var time_label = time_picker_option.querySelector('.' + TIME_LABEL_CLASS);
+      time_label.innerHTML = stringifyTime(current_time);
 
       current_time = next_time;
       next_time += time_interval;
@@ -6040,36 +6084,27 @@ function TimePicker(
   };
 
   /**
-   * bindInternalNode()
-   * - bind the specified dom node (must be internal to this time-picker)
-   * @param: Obj internal_node: internal dom node (see 'inputFieldNode' for structure)
-   * @pre-condition: root node bound 
-   */
-  var bindInternalNode = function(internal_node) {
-    // We bind internal nodes once only!
-    console.assert(internal_node.node == null); 
-
-    // Fetch internal node by class
-    var node_set = rootNode.node.getElementsByClassName(internal_node.class);
-
-    // We should only find one *internal* node with this class
-    console.assert(node_set.length == 1);
-
-    internal_node.node = node_set[0];
-  };
-
-  /**
    * initNodes()
    * - bind all internal nodes and configure event listeners
    */
   var initNodes = function() {
-    // Bind top-level node in time-picker template 
-    bindInternalNode(timePickerWrapperNode);
+    // Bind dom nodes
+    inputFieldNode.node = Utils.bindNode(
+      rootNode,
+      inputFieldNode.className
+    );
+    
+    inputFieldWrapperNode.node = Utils.bindNode(
+      rootNode,
+      inputFieldWrapperNode.className
+    );
+    
+    dropDownNode.node = Utils.bindNode(
+      rootNode,
+      dropDownNode.className
+    );
 
-    // Bind input field and configure event listener
-    bindInternalNode(inputFieldNode);
-    bindInternalNode(inputFieldWrapperNode);
-
+    // Configure event listeners
     inputFieldWrapperNode.node.onclick = function(event) {
       if (isDropDownOpen) {
         closeDropDown(); 
@@ -6077,9 +6112,6 @@ function TimePicker(
         openDropDown();
       }
     };
-
-    // Bind time dropdown field and configure event listener
-    bindInternalNode(dropDownNode);
 
     dropDownNode.node.onclick = function(event) {
       if (isDropDownOpen) {
@@ -6103,7 +6135,7 @@ function TimePicker(
       for (var node_id in event.path) {
         var node = event.path[node_id];
         // User clicked on the time-picker, so don't hide it!
-        if (node.id == rootNode.node.id) {
+        if (node == rootNode) {
           return;
         }
       }    
@@ -6122,7 +6154,7 @@ function TimePicker(
     }
 
     // Initialize start time
-    var time_picker_options = rootNode.node.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
+    var time_picker_options = rootNode.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
     var starting_time_option = time_picker_options[0].getAttribute(TIME_ATTR);
     inputFieldNode.node.innerHTML = stringifyTimeForInputField(starting_time_option);
     currentTime = starting_time_option;
@@ -6137,14 +6169,13 @@ function TimePicker(
    * Privileged functions
    */
   this.init = function() {
-    // We only init once!
-    console.assert(rootNode.node == null);
-
-    // Bind root node
-    rootNode.node = document.getElementById(rootNode.nodeId);
-    
-    // Synthesize the template and copy into root node
-    synthesizeTimePickerTemplate();
+    // Synthesize html template into document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      MAIN_TEMPLATE_ID,
+      parentNode,
+      ROOT_WRAPPER_CLASS
+    );
 
     // Initialize nodes: dom elements and event listeners
     initNodes(); 
@@ -6190,11 +6221,6 @@ var NewExperimentPageView = function(
   var NEW_EXPERIMENT_WRAPPER_CLASS = 'new-experiment-page-wrapper';
 
   /**
-   * Hide page attribute
-   */
-  var HIDDEN_PAGE_ATTR = 'hidden-page';
-
-  /**
    * Scopes count form view
    */
   var scopesCountNode = {
@@ -6216,10 +6242,18 @@ var NewExperimentPageView = function(
   };
 
   /**
-   * Experiment form view info
+   * Experiment duration form node 
    */
   var experimentDurationNode = {
     className: 'experiment-duration-form',
+    node: null
+  };
+
+  /**
+   * Experiment time form node
+   */
+  var experimentTimeNode = {
+    className: 'experiment-time-form',
     node: null
   };
 
@@ -6245,6 +6279,7 @@ var NewExperimentPageView = function(
 
   var scopesCountFormView = null;
   var experimentDurationFormView = null;
+  var experimentTimeFormView = null;
 
   /**
    * Private functions
@@ -6275,6 +6310,16 @@ var NewExperimentPageView = function(
     return slider_form_view;
   };
 
+  var initExperimentTimeFormView = function() {
+    var form_view = new ExperimentTimeFormView(
+      templateStore,
+      experimentTimeNode.node
+    );
+
+    form_view.init();
+    return form_view;
+  };
+
   var bindNodes = function() {
     scopesCountNode.node = Utils.bindNode(
       rootNode,
@@ -6284,6 +6329,11 @@ var NewExperimentPageView = function(
     experimentDurationNode.node = Utils.bindNode(
       rootNode,
       experimentDurationNode.className
+    );
+
+    experimentTimeNode.node = Utils.bindNode(
+      rootNode,
+      experimentTimeNode.className
     );
   };
 
@@ -6305,18 +6355,106 @@ var NewExperimentPageView = function(
     // Initialize child views
     scopesCountFormView = initScopeCountView(); 
     experimentDurationFormView = initExperimentDurationView();
+    experimentTimeFormView = initExperimentTimeFormView();
   };
 
-  this.getPageTitle = function() {
+  this.getTitle = function() {
     return PAGE_TITLE;
   };
 
   this.hide = function() {
-    rootNode.setAttribute(HIDDEN_PAGE_ATTR, ''); 
+    Utils.hideNode(rootNode);
   };
 
   this.show = function() {
-    rootNode.removeAttribute(HIDDEN_PAGE_ATTR); 
+    Utils.showNode(rootNode);
+  };
+};
+
+var ExperimentTimeFormView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'experiment-time-form-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'experiment-time-form-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  var experimentTimePickerView = null;
+  var experimentDatePickerView = null;
+
+  /**
+   * Dom nodes
+   */
+  var experimentTimePickerNode = {
+    className: 'exp-time-picker',
+    node: null
+  };
+  
+  var experimentDatePickerNode = {
+    className: 'exp-date-picker',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var initExperimentTimePickerView = function() {
+    // Bind nodes
+    experimentTimePickerNode.node = Utils.bindNode(
+      rootNode,
+      experimentTimePickerNode.className
+    );
+
+    // Initialize view
+    experimentTimePickerView = new TimePicker(
+      templateStore,
+      experimentTimePickerNode.node,
+      {minutes: 0, hours: 10},
+      {minutes: 0, hours: 19},
+      30
+    ); 
+
+    experimentTimePickerView.init();
+  };
+
+  var initExperimentDatePickerView = function() {
+  
+  };
+
+  var initFormElements = function() {
+    initExperimentTimePickerView();
+    initExperimentDatePickerView();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize template into document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS
+    ); 
+
+    // Initialize form elements 
+    initFormElements();
   };
 };
 

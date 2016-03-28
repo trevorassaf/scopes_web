@@ -70,8 +70,8 @@
     <div class='title-and-admin-btn-row'>
       
       <!-- Title for the center page -->
-      <div class='center-page-title-container'>
-        <span class='center-page-title-label'></span> 
+      <div class='title-container'>
+        <span class='title-label'></span> 
       </div> 
 
       <!-- Admin icon buttons -->
@@ -85,11 +85,8 @@
       </div>
     </div>
 
-    <!-- Center panel inner container: contains title and associated content -->
-    <div class='center-panel-inner-container'>
-      <!-- Center panel container: contains all main pages -->
-      <div class='center-panel-page-container'></div>
-    </div>
+    <!-- Center panel container: contains all main pages -->
+    <div class='page-container'></div>
 
   </div>
 </template>
@@ -277,15 +274,6 @@
   </div>
 </template>
 
-<!-- specify icon type with 'icon' attribute in iron-icon element -->
-<!-- Add tab label in innerHTML of 'nav-btn-label '-->
-<template id='side-panel-tab-template'>
-  <div class='dash-nav-panel-btn'>
-    <iron-icon class='nav-btn-icon'></iron-icon>
-    <span class='nav-btn-label'></span>
-  </div>
-</template>
-
 <template id='side-panel-template'>
   <div class='side-panel-wrapper'>
     <!-- User name -->
@@ -315,6 +303,15 @@
 
 <template id='technician-page-template'>
   <div class='technician-page-wrapper'></div>
+</template>
+
+<!-- specify icon type with 'icon' attribute in iron-icon element -->
+<!-- Add tab label in innerHTML of 'nav-btn-label '-->
+<template id='side-panel-tab-template'>
+  <div class='dash-nav-panel-btn'>
+    <iron-icon class='nav-btn-icon'></iron-icon>
+    <span class='nav-btn-label'></span>
+  </div>
 </template>
 
 <template id='time-picker-template'>
@@ -367,15 +364,15 @@
 </template>
 
 <template id='new-experiment-page-template'>
-  <div class='new-experiment-page-wrapper'>
+  <div class='new-experiment-page-wrapper' hidden>
     <!-- Scopes count input form input -->
     <div class='scopes-count-form'></div>
 
     <!-- Experiment duration input -->
     <div class='experiment-duration-form'></div>
     
-    <!-- Experiment date input -->
-    <div class='experiment-date-form'></div>
+    <!-- Experiment time input -->
+    <div class='experiment-time-form'></div>
 
     <!-- Short code selection input -->
     <div class='short-code-form'></div>
@@ -385,20 +382,22 @@
   </div>
 </template>
 
-<template id='experiment-date-form-template'>
+<template id='experiment-time-form-template'>
+  <div class='experiment-time-form-wrapper new-exp-input-form'>
     
-  <!-- Form title -->
-  <div class='title-container'>
-    <span class='title-label'>When would you like to start?</span>
-  </div>
+    <!-- Form title -->
+    <div class='form-title'>
+      <span class='form-title-label'>When would you like to start?</span>
+    </div>
 
-  <!-- Date and time input fields -->
-  <div class='input-container'>
-    <!-- Experiment time picker -->
-    <div class='exp-time-picker'></div> 
-    
-    <!-- Experiment date picker -->
-    <div class='exp-date-picker'></div>    
+    <!-- Date and time input fields -->
+    <div class='input-container'>
+      <!-- Experiment time picker -->
+      <div class='exp-time-picker'></div> 
+      
+      <!-- Experiment date picker -->
+      <div class='exp-date-picker'></div>    
+    </div>
   </div>
 </template>
 
@@ -413,7 +412,7 @@
 </template>
 
 <template id='slider-input-form-template'>
-  <div class='slider-input-form-wrapper'>
+  <div class='slider-input-form-wrapper new-exp-input-form'>
     <!-- Form title -->
     <div class='form-title'>
       <span class='form-title-label'>How many microscopes?</span>

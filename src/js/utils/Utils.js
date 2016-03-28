@@ -2,6 +2,8 @@ var Utils = (function() {
 
   var CLASS_NAME_PROPERTY = "className";
 
+  var HIDDEN_ATTR = 'hidden';
+
   // Timestamp delimiters
   var DATE_DELIMITER = "-";
   var TIME_DELIMITER = ":";
@@ -194,6 +196,14 @@ var Utils = (function() {
     return node_list[0];
   };
 
+  this.hideNode = function(node) {
+    node.setAttribute(HIDDEN_ATTR, ''); 
+  };
+
+  this.showNode = function(node) {
+    node.removeAttribute(HIDDEN_ATTR);
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -204,7 +214,9 @@ var Utils = (function() {
     makeTimestampIntervalString: makeTimestampIntervalString,
     synthesizeTemplate: synthesizeTemplate,
     synthesizeTemplateIntoList: synthesizeTemplateIntoList,
-    bindNode: bindNode
+    bindNode: bindNode,
+    hideNode: hideNode,
+    showNode: showNode
   };
 
 })();

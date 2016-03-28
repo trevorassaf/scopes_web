@@ -18,6 +18,7 @@ window.onload = function() {
     center_page_node
   );
   center_page_view.init();
+  center_page_view.showNewExperimentPage();
 
   // New experiment page
   // var new_experiment_parent_node = null;
@@ -36,6 +37,7 @@ window.onload = function() {
     side_panel_parent_root
   );
   side_panel_view.init();
+  side_panel_view.selectNewExperimentTab();
 
   // Initialize page controller
   // var page_controller = new PageController(

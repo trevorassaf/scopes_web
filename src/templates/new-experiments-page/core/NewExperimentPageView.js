@@ -19,11 +19,6 @@ var NewExperimentPageView = function(
   var NEW_EXPERIMENT_WRAPPER_CLASS = 'new-experiment-page-wrapper';
 
   /**
-   * Hide page attribute
-   */
-  var HIDDEN_PAGE_ATTR = 'hidden-page';
-
-  /**
    * Scopes count form view
    */
   var scopesCountNode = {
@@ -45,10 +40,18 @@ var NewExperimentPageView = function(
   };
 
   /**
-   * Experiment form view info
+   * Experiment duration form node 
    */
   var experimentDurationNode = {
     className: 'experiment-duration-form',
+    node: null
+  };
+
+  /**
+   * Experiment time form node
+   */
+  var experimentTimeNode = {
+    className: 'experiment-time-form',
     node: null
   };
 
@@ -74,6 +77,7 @@ var NewExperimentPageView = function(
 
   var scopesCountFormView = null;
   var experimentDurationFormView = null;
+  var experimentTimeFormView = null;
 
   /**
    * Private functions
@@ -104,6 +108,16 @@ var NewExperimentPageView = function(
     return slider_form_view;
   };
 
+  var initExperimentTimeFormView = function() {
+    var form_view = new ExperimentTimeFormView(
+      templateStore,
+      experimentTimeNode.node
+    );
+
+    form_view.init();
+    return form_view;
+  };
+
   var bindNodes = function() {
     scopesCountNode.node = Utils.bindNode(
       rootNode,
@@ -113,6 +127,11 @@ var NewExperimentPageView = function(
     experimentDurationNode.node = Utils.bindNode(
       rootNode,
       experimentDurationNode.className
+    );
+
+    experimentTimeNode.node = Utils.bindNode(
+      rootNode,
+      experimentTimeNode.className
     );
   };
 
@@ -134,17 +153,18 @@ var NewExperimentPageView = function(
     // Initialize child views
     scopesCountFormView = initScopeCountView(); 
     experimentDurationFormView = initExperimentDurationView();
+    experimentTimeFormView = initExperimentTimeFormView();
   };
 
-  this.getPageTitle = function() {
+  this.getTitle = function() {
     return PAGE_TITLE;
   };
 
   this.hide = function() {
-    rootNode.setAttribute(HIDDEN_PAGE_ATTR, ''); 
+    Utils.hideNode(rootNode);
   };
 
   this.show = function() {
-    rootNode.removeAttribute(HIDDEN_PAGE_ATTR); 
+    Utils.showNode(rootNode);
   };
 };

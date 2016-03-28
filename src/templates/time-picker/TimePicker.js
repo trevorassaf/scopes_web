@@ -1,6 +1,6 @@
 function TimePicker(
   template_store,
-  id,
+  parent_node,
   start_time, // {minute, hour}
   end_time,   // {minute, hour}
   time_interval // min
@@ -17,12 +17,13 @@ function TimePicker(
    */
   var TIME_LABEL_CLASS = 'time-label';
   var TIME_PICKER_OPTION_CLASS = 'time-picker-option';
+  var ROOT_WRAPPER_CLASS = 'time-picker-wrapper';
 
   /**
    * Html template id name
    */
-  var MAIN_TEMPLATE_ID = '#time-picker-template';
-  var OPTION_TEMPLATE_ID = '#time-picker-option-template';
+  var MAIN_TEMPLATE_ID = 'time-picker-template';
+  var OPTION_TEMPLATE_ID = 'time-picker-option-template';
 
   /**
    * Meridian designations 
@@ -38,62 +39,42 @@ function TimePicker(
 
   // Private state
   var templateStore = template_store;
+  var parentNode = parent_node;
+
   var startTime = start_time;
   var endTime = end_time;
   var timeInterval = time_interval; 
   var isDropDownOpen = false;
   var currentTime = null; // hours * 60 + minutes
 
-  // Dom Nodes
-  var rootNode = {
-    nodeId: id,
-    node: null
-  };
-  
   /**
    * Internal dom nodes
    */
-  var timePickerWrapperNode = {
-    class: 'time-picker-wrapper',
-    node: null
-  };
-
   var inputFieldNode = {
-    class: 'input-field',
+    className: 'input-field',
     node: null
   };
 
   var inputFieldWrapperNode = {
-    class: 'input-field-wrapper',
+    className: 'input-field-wrapper',
     node: null
   };
 
   var dropDownNode = {
-    class: 'time-dropdown',
+    className: 'time-dropdown',
     node: null
   };
 
   // Private functions
-  /**
-   * synthesizeTimePickerTemplate()
-   * - copy template and insert into root node
-   * @pre-condition: root node is initialized 
-   */
-  var synthesizeTimePickerTemplate = function() {
-    var time_picker_template = templateStore.import.querySelector(MAIN_TEMPLATE_ID);
-    var time_picker_clone = document.importNode(time_picker_template.content, true);
-    rootNode.node.appendChild(time_picker_clone);
-  };
-
   var openDropDown = function() {
     isDropDownOpen = true;    
-    timePickerWrapperNode.node.removeAttribute(HIDDEN_ATTR);
+    rootNode.removeAttribute(HIDDEN_ATTR);
     inputFieldNode.node.setAttribute(SHADOW_BORDER_ATTR, '');
   };
 
   var closeDropDown = function() {
     isDropDownOpen = false;    
-    timePickerWrapperNode.node.setAttribute(HIDDEN_ATTR, '');
+    rootNode.setAttribute(HIDDEN_ATTR, '');
     inputFieldNode.node.removeAttribute(SHADOW_BORDER_ATTR);
   };
 
@@ -103,26 +84,23 @@ function TimePicker(
    * @pre-condition: root initialized and dom synthesized
    */
   var configureAvailableTimes = function() {
-    // Bind template node for time-picker-option
-    var time_picker_option_template = templateStore.import.querySelector(OPTION_TEMPLATE_ID);
-
     var current_time = startTime.hours * 60 + startTime.minutes;
     var next_time = current_time + time_interval;
     var end_time = endTime.hours * 60 + endTime.minutes;
 
     while (next_time <= end_time) {
-      // Create new time-picker-option html element
-      var current_time_string = stringifyTime(current_time); 
-      var time_picker_option_clone = document.importNode(time_picker_option_template.content, true);
+      // Synthesize time-picker-option template
+      var time_picker_option = Utils.synthesizeTemplateIntoList(
+        templateStore,
+        OPTION_TEMPLATE_ID,
+        dropDownNode.node,
+        TIME_PICKER_OPTION_CLASS
+      );
 
-      // Incorporate into time-option list
-      dropDownNode.node.appendChild(time_picker_option_clone);
-
-      var new_time_picker_option_list = document.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
-      var new_time_picker_option = new_time_picker_option_list[new_time_picker_option_list.length - 1];
-      new_time_picker_option.setAttribute(TIME_ATTR, current_time);
-      var time_label = new_time_picker_option.querySelector('.' + TIME_LABEL_CLASS);
-      time_label.innerHTML = current_time_string;
+      // Hack!
+      time_picker_option.setAttribute(TIME_ATTR, current_time);
+      var time_label = time_picker_option.querySelector('.' + TIME_LABEL_CLASS);
+      time_label.innerHTML = stringifyTime(current_time);
 
       current_time = next_time;
       next_time += time_interval;
@@ -168,36 +146,27 @@ function TimePicker(
   };
 
   /**
-   * bindInternalNode()
-   * - bind the specified dom node (must be internal to this time-picker)
-   * @param: Obj internal_node: internal dom node (see 'inputFieldNode' for structure)
-   * @pre-condition: root node bound 
-   */
-  var bindInternalNode = function(internal_node) {
-    // We bind internal nodes once only!
-    console.assert(internal_node.node == null); 
-
-    // Fetch internal node by class
-    var node_set = rootNode.node.getElementsByClassName(internal_node.class);
-
-    // We should only find one *internal* node with this class
-    console.assert(node_set.length == 1);
-
-    internal_node.node = node_set[0];
-  };
-
-  /**
    * initNodes()
    * - bind all internal nodes and configure event listeners
    */
   var initNodes = function() {
-    // Bind top-level node in time-picker template 
-    bindInternalNode(timePickerWrapperNode);
+    // Bind dom nodes
+    inputFieldNode.node = Utils.bindNode(
+      rootNode,
+      inputFieldNode.className
+    );
+    
+    inputFieldWrapperNode.node = Utils.bindNode(
+      rootNode,
+      inputFieldWrapperNode.className
+    );
+    
+    dropDownNode.node = Utils.bindNode(
+      rootNode,
+      dropDownNode.className
+    );
 
-    // Bind input field and configure event listener
-    bindInternalNode(inputFieldNode);
-    bindInternalNode(inputFieldWrapperNode);
-
+    // Configure event listeners
     inputFieldWrapperNode.node.onclick = function(event) {
       if (isDropDownOpen) {
         closeDropDown(); 
@@ -205,9 +174,6 @@ function TimePicker(
         openDropDown();
       }
     };
-
-    // Bind time dropdown field and configure event listener
-    bindInternalNode(dropDownNode);
 
     dropDownNode.node.onclick = function(event) {
       if (isDropDownOpen) {
@@ -231,7 +197,7 @@ function TimePicker(
       for (var node_id in event.path) {
         var node = event.path[node_id];
         // User clicked on the time-picker, so don't hide it!
-        if (node.id == rootNode.node.id) {
+        if (node == rootNode) {
           return;
         }
       }    
@@ -250,7 +216,7 @@ function TimePicker(
     }
 
     // Initialize start time
-    var time_picker_options = rootNode.node.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
+    var time_picker_options = rootNode.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
     var starting_time_option = time_picker_options[0].getAttribute(TIME_ATTR);
     inputFieldNode.node.innerHTML = stringifyTimeForInputField(starting_time_option);
     currentTime = starting_time_option;
@@ -265,14 +231,13 @@ function TimePicker(
    * Privileged functions
    */
   this.init = function() {
-    // We only init once!
-    console.assert(rootNode.node == null);
-
-    // Bind root node
-    rootNode.node = document.getElementById(rootNode.nodeId);
-    
-    // Synthesize the template and copy into root node
-    synthesizeTimePickerTemplate();
+    // Synthesize html template into document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      MAIN_TEMPLATE_ID,
+      parentNode,
+      ROOT_WRAPPER_CLASS
+    );
 
     // Initialize nodes: dom elements and event listeners
     initNodes(); 

@@ -1,3 +1,25 @@
 .new-experiment-page-wrapper[hidden-page] {
   display: none; 
 }
+
+.new-experiment-page-wrapper .new-exp-input-form {
+  border: 1px solid rgb(228, 228, 228);
+  background-color: #FFFFFF;
+  margin-bottom: 30px;
+  font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding: 20px;
+  position: relative;
+}
+
+.new-experiment-page-wrapper .form-title-label {
+  color: #424242;
+  font-size: 24px;
+}
+
+.new-experiment-page-wrapper .input-container {
+  color: #A0A0A0;
+  font-size: 18px;
+  position: relative;
+  margin-top: 20px;
+}

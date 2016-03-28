@@ -10,6 +10,28 @@
   padding-right: 20px;
 }
 
+.center-page-wrapper .title-and-admin-btn-row {
+  height: 52px;
+  margin-bottom: 10px;
+}
+
+.center-page-wrapper .title-and-admin-btn-row > * {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.center-page-wrapper .title-container {
+  position: relative;
+}
+
+.center-page-wrapper .title-label {
+  position: relative;
+  top: 12px;
+  font-weight: bold;
+  font-size: 20px;
+  color: #424242;
+}
+
 .center-page-wrapper .admin-btn-container {
   float: right;
 }
@@ -18,8 +40,6 @@
   margin-bottom: 3px;
 }
 
-.center-page-wrapper {
-}
 .center-page-wrapper {
 }
 .center-page-wrapper {
