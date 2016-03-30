@@ -707,10 +707,10 @@ DatePickerModel.prototype.setMinAdvanceDayCount = function(count) {
   return this;
 };
 
-DatePickerModel.prototype.setMaxAdvanceDayCount = function(count) {
-  this.maxAdvanceDayCount = count;
-  this.maxAdvanceDayCountCallbacks.forEach(function(callback) {
-    callback(maxAdvanceDayCount);
+DatePickerModel.prototype.setMaxAdvanceMonthCount = function(count) {
+  this.maxAdvanceMonthCount = count;
+  this.maxAdvanceMonthCountCallbacks.forEach(function(callback) {
+    callback(maxAdvanceMonthCount);
   });
   return this;
 };
@@ -752,13 +752,7 @@ DatePickerModel.prototype.bindSelectedYear = function(callback) {
 
 DatePickerModel.prototype.bindViewedMonth = function(callback) {
   this.viewedMonthCallbacks.push(callback);
-  callback(this.viewedMonth);
-  return this;
-};
-
-DatePickerModel.prototype.bindViewedYear = function(callback) {
-  this.viewedYearCallbacks.push(callback);
-  callback(this.viewedYear);
+  callback(this.viewedMonth, this.viewedYear);
   return this;
 };
 
@@ -768,9 +762,9 @@ DatePickerModel.prototype.bindMinAdvanceDayCount = function(callback) {
   return this;
 };
 
-DatePickerModel.prototype.bindMaxAdvanceDayCount = function(callback) {
-  this.maxAdvanceDayCountCallbacks.push(callback);
-  callback(this.maxAdvanceDayCount);
+DatePickerModel.prototype.bindMaxAdvanceMonthCount = function(callback) {
+  this.maxAdvanceMonthCountCallbacks.push(callback);
+  callback(this.maxAdvanceMonthCount);
   return this;
 };
 
@@ -789,6 +783,22 @@ DatePickerModel.prototype.bindInvalidDates = function(callback) {
 // Getters
 DatePickerModel.prototype.getSelectedDate = function() {
   return this.selectedDate;
+};
+
+DatePickerModel.prototype.getSelectedMonth = function() {
+  return this.selectedMonth;
+};
+
+DatePickerModel.prototype.getSelectedYear = function() {
+  return this.selectedYear;
+};
+
+DatePickerModel.prototype.getViewedMonth = function() {
+  return this.viewedMonth;
+};
+
+DatePickerModel.prototype.getViewedYear = function() {
+  return this.viewedYear;
 };
 
 DatePickerModel.prototype.getMinAdvanceDayCount = function() {
@@ -1664,7 +1674,7 @@ var Utils = (function() {
       return -1;
     }
 
-    if (date.getFullYear() > date2.getFullYear()) {
+    if (date1.getFullYear() > date2.getFullYear()) {
       return 1;
     }
 
@@ -1673,7 +1683,7 @@ var Utils = (function() {
       return -1;
     }
 
-    if (date.getMonth() > date2.getMonth()) {
+    if (date1.getMonth() > date2.getMonth()) {
       return 1;
     }
 
@@ -1682,7 +1692,7 @@ var Utils = (function() {
       return -1;
     }
 
-    if (date.getDate() > date2.getDate()) {
+    if (date1.getDate() > date2.getDate()) {
       return 1;
     }
 
@@ -4190,7 +4200,7 @@ var DatePickerView = function(
    */
   var MAIN_TEMPLATE_ID = 'calendar-template';
   var WEEK_TEMPLATE_ID = 'date-picker-week-template';
-  var DATE_TEMPLATE_ID = 'date-template';
+  var DATE_TEMPLATE_ID = 'date-picker-date-template';
 
   /**
    * Class names
@@ -4204,6 +4214,30 @@ var DatePickerView = function(
    * Attribute names
    */
   var UNSELECTABLE_DATE_ATTR = 'unselectable-date';
+  var CLOSED_DATE_PICKER_ATTR = 'closed-calendar';
+
+  /**
+   * Month names
+   */
+  var SHORT_MONTH_NAMES = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  /**
+   * Ui tokens
+   */
+  DATE_DELIMITER = ',';
 
   /**
    * Private state
@@ -4213,6 +4247,8 @@ var DatePickerView = function(
   var templateStore = template_store;
   var parentNode = parent_node;
   var datePickerRootNode = null;
+
+  var isDatePickerClosed = true;
 
   /**
    * Dom nodes
@@ -4268,12 +4304,35 @@ var DatePickerView = function(
   /**
    * Private functions
    */
+
+  var open = function() {
+    isDatePickerClosed = false;
+    selectedDateDisplayContainerNodeInfo.node.removeAttribute(CLOSED_DATE_PICKER_ATTR); 
+    Utils.showNode(calendarMainContainerNodeInfo.node);
+  };
+
+  var close = function() {
+    isDatePickerClosed = true;
+    selectedDateDisplayContainerNodeInfo.node.setAttribute(CLOSED_DATE_PICKER_ATTR, '');
+    Utils.hideNode(calendarMainContainerNodeInfo.node);
+  };
+
   var bindNodes = function() {
     // Top banner nodes
-    Utils.bindNodeInfo(parentNode, selectedDateDisplayContainer);
+    Utils.bindNodeInfo(parentNode, selectedDateDisplayContainerNodeInfo);
+
+    selectedDateDisplayContainerNodeInfo.node.onclick = function() {
+      if (isDatePickerClosed) {
+        open(); 
+      } else {
+        close(); 
+      }
+    };
+
     Utils.bindNodeInfo(parentNode, selectedMonthLabelNodeInfo);
-    Utils.bindNodeInfo(parentNode, selectedDomLabelNodeInfo);
+    Utils.bindNodeInfo(parentNode, selectedDateLabelNodeInfo);
     Utils.bindNodeInfo(parentNode, selectedYearLabelNodeInfo);
+
 
     // Month nav/display
     Utils.bindNodeInfo(parentNode, monthNavDisplayNodeInfo);
@@ -4283,14 +4342,15 @@ var DatePickerView = function(
     // Selectable dates
     Utils.bindNodeInfo(parentNode, weeksContainerNodeInfo);
     Utils.bindNodeInfo(parentNode, calendarMainContainerNodeInfo);
+
   };
 
   var setSelectedDate = function(selected_date) {
-    selectedDateLabelNodeInfo.node.innerHTML = selected_date; 
+    selectedDateLabelNodeInfo.node.innerHTML = "" + selected_date + DATE_DELIMITER; 
   };
 
   var setSelectedMonth = function(selected_month) {
-    selectedMonthLabelNodeInfo.node.innerHTML = selected_month;
+    selectedMonthLabelNodeInfo.node.innerHTML = SHORT_MONTH_NAMES[selected_month];
   };
 
   var setSelectedYear = function(selected_year) {
@@ -4303,7 +4363,10 @@ var DatePickerView = function(
 
   var refreshCalendar = function(month, year) {
     // Remove previous date nodes
-    Utils.removeChildren(weeksContainerNodeInfo.node); 
+    Utils.removeDomChildren(weeksContainerNodeInfo.node); 
+
+    // Update viewed month name
+    monthNavDisplayNodeInfo.node.innerHTML = SHORT_MONTH_NAMES[month];
 
     // Render calendar for specified month/year
     // Get starting day-of-week idx
@@ -4316,11 +4379,13 @@ var DatePickerView = function(
 
     // Generate blank date nodes for days in final week of previous
     // month that appear in the first week of this calendar month
-    var current_week = genWeekNode();
+    var current_week = makeWeekNode();
+    var day_count = 0;
 
     for (var i = 0; i < starting_day_idx; ++i) {
       var date = makeDateNode(current_week);
       date.setAttribute(UNSELECTABLE_DATE_ATTR, '');
+      ++day_count;
     }
 
     // Determine which date is the first selectable one
@@ -4332,8 +4397,9 @@ var DatePickerView = function(
     // Generate nodes for displaying selectable days
     for (var i = 1; i <= num_days_in_month; ++i) {
       // Insert rows for calendar weeks
-      if (current_week.childNodes.length == 7) {
+      if (day_count == 7) {
         current_week = makeWeekNode();
+        day_count = 0;
       }
 
       // Initialize date and insert into week
@@ -4342,11 +4408,19 @@ var DatePickerView = function(
       // Create date node. Node is 'unselectable' iff it is...
       // 1. On either of the 'disallowed' lists *OR*
       // 2. It falls too close to the current date 
-      if (Utils.compareDates(first_selectable_date, date) < 0 || isInvalidDate(date)) {
-        date.setAttribute(UNSELECTABLE_DATE_ATTR, '');     
-      }
-    }
+      var validation_check_date = new Date(year, month, i);
 
+      if (Utils.compareDates(first_selectable_date, validation_check_date) > 0 ||
+          isInvalidDate(validation_check_date)) {
+        date.setAttribute(UNSELECTABLE_DATE_ATTR, '');     
+      } 
+      
+      var date_labels = date.getElementsByClassName(DATE_LABEL_CLASS);
+      console.assert(date_labels.length == 1);
+      date_labels[0].innerHTML = i;
+
+      ++day_count;
+    }
   };
 
   var isInvalidDate = function(date) {
@@ -4367,12 +4441,21 @@ var DatePickerView = function(
     return false;
   };
 
-  var genWeekNode = function() {
+  var makeWeekNode = function() {
     return Utils.synthesizeTemplateIntoList(
       templateStore,
       WEEK_TEMPLATE_ID,
       weeksContainerNodeInfo.node,
       WEEK_WRAPPER_CLASS
+    );
+  };
+
+  var makeDateNode = function(week_node) {
+    return Utils.synthesizeTemplateIntoList(
+      templateStore,
+      DATE_TEMPLATE_ID,
+      week_node,
+      DATE_WRAPPER_CLASS
     );
   };
 
@@ -7470,10 +7553,8 @@ var ExperimentTimeFormView = function(
    */
   var initExperimentTimePickerView = function() {
     // Bind nodes
-    experimentTimePickerNode.node = Utils.bindNode(
-      rootNode,
-      experimentTimePickerNode.className
-    );
+    Utils.bindNodeInfo(rootNode, experimentTimePickerNode);
+
 
     // Create data model
     var drop_down_items = [
@@ -7515,7 +7596,38 @@ var ExperimentTimeFormView = function(
   };
 
   var initExperimentDatePickerView = function() {
-  
+    // Bind nodes
+    Utils.bindNodeInfo(rootNode, experimentDatePickerNode);
+
+    // Create data model
+    var min_advance_day_count = 14;
+    var max_advance_month_count = 4;
+    var invalid_days_of_the_week = [0, 6];
+    var invalid_dates = [
+      new Date(2016, 4, 3),
+      new Date(2016, 4, 4),
+      new Date(2016, 4, 5)
+    ];
+
+    // Create model
+    var date_picker_model = new DatePickerModel();
+    date_picker_model
+      .setSelectedDate(6)
+      .setSelectedMonth(3)
+      .setSelectedYear(2016)
+      .setViewedMonthAndYear(3, 2016)
+      .setMinAdvanceDayCount(min_advance_day_count)
+      .setMaxAdvanceMonthCount(max_advance_month_count)
+      .setInvalidDaysOfTheWeek(invalid_days_of_the_week)
+      .setInvalidDates(invalid_dates);
+
+    // Create view
+    var date_picker_view = new DatePickerView(
+      templateStore,
+      experimentDatePickerNode.node
+    );
+
+    date_picker_view.init(date_picker_model);
   };
 
   var initFormElements = function() {

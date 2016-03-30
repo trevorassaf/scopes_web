@@ -23,3 +23,13 @@
   position: relative;
   margin-top: 20px;
 }
+
+.new-experiment-page-wrapper .experiment-time-form .input-container > div {
+  display: inline-block;
+}
+
+.new-experiment-page-wrapper .experiment-time-form .exp-time-picker {
+  /* position: relative; */
+  /* top: -10px; */
+  margin-right: 40px;
+}

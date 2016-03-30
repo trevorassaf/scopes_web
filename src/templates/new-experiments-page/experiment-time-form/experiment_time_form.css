@@ -1,2 +1,3 @@
-.experiment-time-form-wrapper {
+.experiment-time-form-wrapper .input-container > div {
+  vertical-align: top; 
 }

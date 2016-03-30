@@ -231,7 +231,7 @@ var Utils = (function() {
       return -1;
     }
 
-    if (date.getFullYear() > date2.getFullYear()) {
+    if (date1.getFullYear() > date2.getFullYear()) {
       return 1;
     }
 
@@ -240,7 +240,7 @@ var Utils = (function() {
       return -1;
     }
 
-    if (date.getMonth() > date2.getMonth()) {
+    if (date1.getMonth() > date2.getMonth()) {
       return 1;
     }
 
@@ -249,7 +249,7 @@ var Utils = (function() {
       return -1;
     }
 
-    if (date.getDate() > date2.getDate()) {
+    if (date1.getDate() > date2.getDate()) {
       return 1;
     }
 

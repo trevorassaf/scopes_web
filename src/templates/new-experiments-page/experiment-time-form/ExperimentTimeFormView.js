@@ -45,10 +45,8 @@ var ExperimentTimeFormView = function(
    */
   var initExperimentTimePickerView = function() {
     // Bind nodes
-    experimentTimePickerNode.node = Utils.bindNode(
-      rootNode,
-      experimentTimePickerNode.className
-    );
+    Utils.bindNodeInfo(rootNode, experimentTimePickerNode);
+
 
     // Create data model
     var drop_down_items = [
@@ -90,7 +88,38 @@ var ExperimentTimeFormView = function(
   };
 
   var initExperimentDatePickerView = function() {
-  
+    // Bind nodes
+    Utils.bindNodeInfo(rootNode, experimentDatePickerNode);
+
+    // Create data model
+    var min_advance_day_count = 14;
+    var max_advance_month_count = 4;
+    var invalid_days_of_the_week = [0, 6];
+    var invalid_dates = [
+      new Date(2016, 4, 3),
+      new Date(2016, 4, 4),
+      new Date(2016, 4, 5)
+    ];
+
+    // Create model
+    var date_picker_model = new DatePickerModel();
+    date_picker_model
+      .setSelectedDate(6)
+      .setSelectedMonth(3)
+      .setSelectedYear(2016)
+      .setViewedMonthAndYear(3, 2016)
+      .setMinAdvanceDayCount(min_advance_day_count)
+      .setMaxAdvanceMonthCount(max_advance_month_count)
+      .setInvalidDaysOfTheWeek(invalid_days_of_the_week)
+      .setInvalidDates(invalid_dates);
+
+    // Create view
+    var date_picker_view = new DatePickerView(
+      templateStore,
+      experimentDatePickerNode.node
+    );
+
+    date_picker_view.init(date_picker_model);
   };
 
   var initFormElements = function() {

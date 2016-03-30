@@ -82,10 +82,10 @@ DatePickerModel.prototype.setMinAdvanceDayCount = function(count) {
   return this;
 };
 
-DatePickerModel.prototype.setMaxAdvanceDayCount = function(count) {
-  this.maxAdvanceDayCount = count;
-  this.maxAdvanceDayCountCallbacks.forEach(function(callback) {
-    callback(maxAdvanceDayCount);
+DatePickerModel.prototype.setMaxAdvanceMonthCount = function(count) {
+  this.maxAdvanceMonthCount = count;
+  this.maxAdvanceMonthCountCallbacks.forEach(function(callback) {
+    callback(maxAdvanceMonthCount);
   });
   return this;
 };
@@ -127,13 +127,7 @@ DatePickerModel.prototype.bindSelectedYear = function(callback) {
 
 DatePickerModel.prototype.bindViewedMonth = function(callback) {
   this.viewedMonthCallbacks.push(callback);
-  callback(this.viewedMonth);
-  return this;
-};
-
-DatePickerModel.prototype.bindViewedYear = function(callback) {
-  this.viewedYearCallbacks.push(callback);
-  callback(this.viewedYear);
+  callback(this.viewedMonth, this.viewedYear);
   return this;
 };
 
@@ -143,9 +137,9 @@ DatePickerModel.prototype.bindMinAdvanceDayCount = function(callback) {
   return this;
 };
 
-DatePickerModel.prototype.bindMaxAdvanceDayCount = function(callback) {
-  this.maxAdvanceDayCountCallbacks.push(callback);
-  callback(this.maxAdvanceDayCount);
+DatePickerModel.prototype.bindMaxAdvanceMonthCount = function(callback) {
+  this.maxAdvanceMonthCountCallbacks.push(callback);
+  callback(this.maxAdvanceMonthCount);
   return this;
 };
 
@@ -164,6 +158,22 @@ DatePickerModel.prototype.bindInvalidDates = function(callback) {
 // Getters
 DatePickerModel.prototype.getSelectedDate = function() {
   return this.selectedDate;
+};
+
+DatePickerModel.prototype.getSelectedMonth = function() {
+  return this.selectedMonth;
+};
+
+DatePickerModel.prototype.getSelectedYear = function() {
+  return this.selectedYear;
+};
+
+DatePickerModel.prototype.getViewedMonth = function() {
+  return this.viewedMonth;
+};
+
+DatePickerModel.prototype.getViewedYear = function() {
+  return this.viewedYear;
 };
 
 DatePickerModel.prototype.getMinAdvanceDayCount = function() {

@@ -11,7 +11,7 @@
   height: 32px;
 }
 
-.calendar-wrapper:not([closed]) .selected-date-display-container {
+.calendar-wrapper .selected-date-display-container:not([closed-calendar]) {
   background-color: rgb(38, 108, 177);
   color: #FFFFFF;
   height: 32px;
@@ -21,19 +21,22 @@
   width: 226px;
 }
 
-.calendar-wrapper:not([closed]) .selected-date-display-container .icon-wrapper {
+.calendar-wrapper .selected-date-display-container:not([closed-calendar]) .icon-wrapper {
   display: none;
 }
 
-.calendar-wrapper[closed] .selected-date-display-container {
-  position: relative;
+.calendar-wrapper .selected-date-display-container {
   cursor: pointer;
+}
+
+.calendar-wrapper .selected-date-display-container[closed-calendar] {
+  position: relative;
   overflow: auto;
   min-width: 120px;
   display: inline-block;
 }
 
-.calendar-wrapper[closed] .selected-date-display-container .selected-date-container {
+.calendar-wrapper .selected-date-display-container[closed-calendar] .selected-date-container {
   padding-left: 8px;
   position: relative;
   top: 6px;
@@ -41,11 +44,11 @@
 }
 
 /* Transition to a bigger shadow on hover */
-.calendar-wrapper[closed] .selected-date-display-container:hover {
+.calendar-wrapper .selected-date-display-container[closed-calendar]:hover {
   box-shadow: 0px 0px 2px 2px rgba(38, 108, 177, 0.5);
 }
 
-.calendar-wrapper[closed] .selected-date-display-container div {
+.calendar-wrapper .selected-date-display-container[closed-calendar] > div {
   display: inline-block;
 }
 
@@ -112,9 +115,14 @@
   position: relative;
 }
 
-.calendar-wrapper .calendar-main-container .selectable-dates-container {
+.calendar-wrapper .calendar-main-container .weeks-container {
   padding-left: 5px;
   margin-top: 5px;
+}
+
+.calendar-wrapper .month-label {
+  position: relative;
+  top: 3px;
 }
 
 .calendar-wrapper .decrement-month-container {
@@ -133,51 +141,29 @@
   cursor: pointer;
 }
 
-.calendar-wrapper .month-nav-container iron-icon:hover {
-  background-color: #EEEEEE;
-  border-radius: 50%;
+.calendar-wrapper .weeks-container {
+  font-size: 0px;
 }
 
-.calendar-wrapper .selectable-dates-container .date {
+.calendar-wrapper .weeks-container .date-wrapper {
   display: inline-block;
-  width: 14.2%;
+  vertical-align: top;
+  width: 14.285%;
   color: black;
-}
-
-.calendar-wrapper .selectable-dates-container .selectable-date {
-  text-align: center;
+  position: relative;
   font-size: 14px;
-  border-radius: 50%;
-  /* position: relative; */
+  text-align: center;
   height: 30px;
 }
 
-.calendar-wrapper .selectable-dates-container .unselectable-date {
-  text-align: center;
-  font-size: 14px;
-  position: relative;
-  height: 30px;
-  top: 6px;
-  color: #777777;
-};
-
-.calendar-wrapper .selectable-dates-container .unselectable-date .date-label {
-  color: #777777;
-  position: relative;
-  top: 6px;
+.calendar-wrapper .weeks-container .date-wrapper[unselectable-date] {
+  color: #777;
 }
 
-.calendar-wrapper .selectable-dates-container .selectable-date .date-label {
-  position: relative;
-  top: 6px;
+.calendar-wrapper .weeks-container .date-wrapper:not([unselectable-date]) {
+  color: #000;
 }
 
-.calendar-wrapper .selectable-dates-container div.selectable-date:hover:not([selected]) {
-  background-color: #EEEEEE;
+.calendar-wrapper .weeks-container .date-wrapper:not([unselectable-date]):hover {
   cursor: pointer;
-  border-radius: 50%;
-}
-
-.calendar-wrapper .selectable-dates-container div.date[selected] {
-  background-color: #EEEEEE;
 }
