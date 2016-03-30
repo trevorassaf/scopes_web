@@ -44,6 +44,16 @@
   </div>
 </template>
 
+<template id='date-picker-week-template'>
+  <div class='week-wrapper'></div>
+</template>
+
+<template id='date-picker-date-template'>
+  <div class='date-wrapper'>
+    <span class='date-label'></span> 
+  </div>
+</template>
+
 <template id='static-calendar-template'>
   <div class='static-calendar-wrapper'>
     <!-- Collapsed banner -->
@@ -88,6 +98,36 @@
     <!-- Center panel container: contains all main pages -->
     <div class='page-container'></div>
 
+  </div>
+</template>
+
+<!-- Template for dropdown form -->
+<template id='dropdown-picker-template'>
+  <div class='dropdown-picker-wrapper'>
+
+    <!-- Input field container -->
+    <div class='input-field-wrapper'><!--
+
+      --><!-- Display for selected input --><!--
+      --><div class='input-field-label'></div><!--
+
+      --><!-- Icon for drop-down type --><!--
+      --><div class='icon-wrapper'>
+        <iron-icon class='dropdown-icon'></iron-icon>
+      </div>
+    </div>
+
+    <!-- Dropdown list wrapper -->
+    <div class='dropdown-wrapper'>
+      <div class='dropdown-list' hidden></div>
+    </div>
+  </div>
+</template>
+
+<!-- Template for selectable dropdown item -->
+<template id='dropdown-item-template'>
+  <div class='dropdown-item-wrapper'>
+    <span class='item-label'></span>
   </div>
 </template>
 
@@ -301,10 +341,6 @@
   </div>
 </template>
 
-<template id='technician-page-template'>
-  <div class='technician-page-wrapper'></div>
-</template>
-
 <!-- specify icon type with 'icon' attribute in iron-icon element -->
 <!-- Add tab label in innerHTML of 'nav-btn-label '-->
 <template id='side-panel-tab-template'>
@@ -312,6 +348,10 @@
     <iron-icon class='nav-btn-icon'></iron-icon>
     <span class='nav-btn-label'></span>
   </div>
+</template>
+
+<template id='technician-page-template'>
+  <div class='technician-page-wrapper'></div>
 </template>
 
 <template id='time-picker-template'>

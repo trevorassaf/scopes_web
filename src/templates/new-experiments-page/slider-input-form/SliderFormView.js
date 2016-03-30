@@ -1,8 +1,8 @@
 var SliderFormView = function(
   template_store,
+  parent_node,
   title_label,
-  unit_labels, // {singular, plural}
-  value_range // {min, max, step}
+  unit_labels // {singular, plural}
 ) {
 
   /**
@@ -27,9 +27,8 @@ var SliderFormView = function(
    * Private state
    */
   var templateStore = template_store;
-  var parentNode = null;
+  var parentNode = parent_node;
   var unitLabels = unit_labels;
-  var valueRange = value_range;
   var titleLabel = title_label;
   
   var _this = this;
@@ -81,33 +80,35 @@ var SliderFormView = function(
     };
   };
 
+  var setMinValue = function(min_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MIN_ATTR, min_value); 
+  };
+
+  var setMaxValue = function(max_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MAX_ATTR, max_value); 
+  };
+
+  var setStep = function(step) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_STEP_ATTR, step); 
+  };
+
   var initUi = function() {
     // Initialize slider
     formTitleNode.node.innerHTML = titleLabel;
-    
-    // Initialize slider state
-    sliderNode.node.setAttribute(
-      PAPER_SLIDER_MIN_ATTR,
-      valueRange.min
-    ); 
-    
-    sliderNode.node.setAttribute(
-      PAPER_SLIDER_MAX_ATTR,
-      valueRange.max
-    ); 
-    
-    sliderNode.node.setAttribute(
-      PAPER_SLIDER_STEP_ATTR,
-      valueRange.step
-    ); 
+  };
+
+  var bindModel = function(slider_model) {
+    slider_model
+      .bindMinValue(setMinValue)
+      .bindMaxValue(setMaxValue)
+      .bindStep(setStep)
+      .bindCurrentValue(_this.setValue);
   };
 
   /**
    * Privileged functions
    */
-  this.init = function(parent_node) {
-    parentNode = parent_node;
-
+  this.init = function(slider_model) {
     // Initialize root node
     rootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -119,7 +120,10 @@ var SliderFormView = function(
     // Initialize nodes and bind event listeners
     bindNodes();
 
-    // Init ui elements
+    // Bind model and init ui
+    bindModel(slider_model);
+
+    // Init ui elements (e.g. form title)
     initUi();
   };
 

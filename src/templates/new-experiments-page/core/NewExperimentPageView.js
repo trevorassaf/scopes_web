@@ -83,28 +83,42 @@ var NewExperimentPageView = function(
    * Private functions
    */
   var initScopeCountView = function() {
+    // Initialize and configure slider model
+    var slider_model = new SliderModel();
+    slider_model
+      .setMinValue(0)
+      .setMaxValue(15)
+      .setStep(1)
+      .setCurrentValue(0);
+
     var slider_form_view = new SliderFormView(
       templateStore,
+      scopesCountNode.node,
       SCOPES_COUNT_TITLE_LABEL,
-      SCOPES_COUNT_UNIT_LABELS,
-      SCOPES_COUNT_VALUE_RANGE
+      SCOPES_COUNT_UNIT_LABELS
     ); 
 
-    slider_form_view.init(scopesCountNode.node);
-    slider_form_view.setValue(0);
+    slider_form_view.init(slider_model);
     return slider_form_view;
   };
 
   var initExperimentDurationView = function() {
+    // Initialize and configure slider model
+    var slider_model = new SliderModel();
+    slider_model
+      .setMinValue(0)
+      .setMaxValue(15)
+      .setStep(1)
+      .setCurrentValue(0);
+
     var slider_form_view = new SliderFormView(
       templateStore,    
+      experimentDurationNode.node,
       EXPERIMENT_DURATION_TITLE_LABEL,
-      EXPERIMENT_DURATION_UNIT_LABELS,
-      EXPERIMENT_DURATION_VALUE_RANGE
+      EXPERIMENT_DURATION_UNIT_LABELS
     );
 
-    slider_form_view.init(experimentDurationNode.node);
-    slider_form_view.setValue(0);
+    slider_form_view.init(slider_model);
     return slider_form_view;
   };
 

@@ -22,6 +22,9 @@ var ExperimentTimeFormView = function(
   var rootNode = null;
 
   var experimentTimePickerView = null;
+  var experimentTimePickerModel = null;
+  var experimentTimePickerController = null;
+
   var experimentDatePickerView = null;
 
   /**
@@ -47,16 +50,43 @@ var ExperimentTimeFormView = function(
       experimentTimePickerNode.className
     );
 
-    // Initialize view
-    experimentTimePickerView = new TimePicker(
-      templateStore,
-      experimentTimePickerNode.node,
-      {minutes: 0, hours: 10},
-      {minutes: 0, hours: 19},
-      30
-    ); 
+    // Create data model
+    var drop_down_items = [
+      new DropDownItemModel("10:00", "10:00", {}),
+      new DropDownItemModel("10:30", "10:30", {}),
+      new DropDownItemModel("11:00", "11:00", {})
+    ];
 
-    experimentTimePickerView.init();
+    experimentTimePickerModel = new DropDownModel();
+    experimentTimePickerModel.setDropDownItems(drop_down_items);
+
+    // Create view
+    experimentTimePickerView = new DropDownView(
+      templateStore,
+      experimentTimePickerNode.node
+    );
+
+    experimentTimePickerView.init(
+      experimentTimePickerModel,
+      'device:access-time'
+    );
+
+    // Create controller
+    experimentTimePickerController = new DropDownController();
+    experimentTimePickerController
+      .setModel(experimentTimePickerModel)
+      .setView(experimentTimePickerView);
+
+    // Initialize view
+    // experimentTimePickerView = new TimePicker(
+    //   templateStore,
+    //   experimentTimePickerNode.node,
+    //   {minutes: 0, hours: 10},
+    //   {minutes: 0, hours: 19},
+    //   30
+    // ); 
+    //
+    // experimentTimePickerView.init();
   };
 
   var initExperimentDatePickerView = function() {

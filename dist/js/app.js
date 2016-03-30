@@ -66,6 +66,45 @@ window.onload = function() {
   // });
 };
 
+var DropDownController = function() {
+
+  /**
+   * Private state
+   */
+  var dropDownView = null;
+  var dropDownModel = null;
+
+  /**
+   * Private functions
+   */
+  var handleClick = function(view, idx) {
+    // Exit early if we're no longer monitoring this view
+    if (view != dropDownView) {
+      return;
+    }
+
+    // Handle click
+    dropDownModel.setSelectedItemIdx(idx);
+  }
+
+  /**
+   * Privileged functions
+   */
+  this.setView = function(view) {
+    dropDownView = view;
+
+    // Bind event listeners
+    dropDownView.bindClick(handleClick); 
+    return this;
+  };
+
+  this.setModel = function(model) {
+    dropDownModel = model;
+    return this;
+  };
+
+};
+
 var MyExperimentController = function() {
 
   /**
@@ -584,6 +623,311 @@ ConfirmedOrderModel.prototype.bindShortCode = function(callback) {
   return this;
 };
 
+var DatePickerModel = function() {
+
+  // Privat state
+  this.selectedDate = null;
+  this.selectedMonth = null;
+  this.selectedYear = null;
+  this.viewedMonth = null;
+  this.viewedYear = null;
+
+  this.minAdvanceDayCount = null;
+  this.maxAdvanceMonthCount = null;
+  this.invalidDaysOfTheWeek = [];
+  this.invalidDates = [];
+
+  // Callbacks
+  this.selectedDateCallbacks = []; 
+  this.selectedMonthCallbacks = []; 
+  this.selectedYearCallbacks = []; 
+  this.viewedMonthCallbacks = []; 
+
+  this.minAdvanceDayCountCallbacks = [];
+  this.maxAdvanceMonthCountCallbacks = [];
+  this.invalidDaysOfTheWeekCallbacks = [];
+  this.invalidDatesCallbacks = [];
+};
+
+// Setters
+DatePickerModel.prototype.setSelectedDate = function(selected_date) {
+  this.selectedDate = selected_date;
+  this.selectedDateCallbacks.forEach(function(callback) {
+    callback(selectedDate);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setSelectedMonth = function(selected_month) {
+  this.selectedMonth = selected_month;
+  this.selectedMonthCallbacks.forEach(function(callback) {
+    callback(selectedMonth);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setSelectedYear = function(selected_year) {
+  this.selectedYear = selected_year;
+  this.selectedYearCallbacks.forEach(function(callback) {
+    callback(selectedYear);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setViewedMonthAndYear = function(viewed_month, viewed_year) {
+  this.viewedMonth = viewed_month;
+  this.viewedYear = viewed_year;
+  this.viewedMonthCallbacks.forEach(function(callback) {
+    callback(viewedMonth, viewedYear);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setViewedMonth = function(viewed_month) {
+  this.viewedMonth = viewed_month;
+  this.viewedMonthCallbacks.forEach(function(callback) {
+    callback(viewedMonth, viewedYear);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setViewedYear = function(viewed_year) {
+  this.viewedYear = viewed_year;
+  this.viewedMonthCallbacks.forEach(function(callback) {
+    callback(viewedMonth, viewedYear);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setMinAdvanceDayCount = function(count) {
+  this.minAdvanceDayCount = count;
+  this.minAdvanceDayCountCallbacks.forEach(function(callback) {
+    callback(minAdvanceDayCount);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setMaxAdvanceDayCount = function(count) {
+  this.maxAdvanceDayCount = count;
+  this.maxAdvanceDayCountCallbacks.forEach(function(callback) {
+    callback(maxAdvanceDayCount);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setInvalidDaysOfTheWeek = function(invalid_days) {
+  this.invalidDaysOfTheWeek = invalid_days;
+  this.invalidDaysOfTheWeekCallbacks.forEach(function(callback) {
+    callback(invalidDaysOfTheWeek);
+  });
+  return this;
+};
+
+DatePickerModel.prototype.setInvalidDates = function(invalid_dates) {
+  this.invalidDates = invalid_dates;
+  this.invalidDatesCallbacks.forEach(function(callback) {
+    callback(invalidDates);
+  });
+  return this;
+};
+
+// Callback listeners
+DatePickerModel.prototype.bindSelectedDate = function(callback) {
+  this.selectedDateCallbacks.push(callback);
+  callback(this.selectedDate);
+  return this;
+};
+
+DatePickerModel.prototype.bindSelectedMonth = function(callback) {
+  this.selectedMonthCallbacks.push(callback);
+  callback(this.selectedMonth);
+  return this;
+};
+
+DatePickerModel.prototype.bindSelectedYear = function(callback) {
+  this.selectedYearCallbacks.push(callback);
+  callback(this.selectedYear);
+  return this;
+};
+
+DatePickerModel.prototype.bindViewedMonth = function(callback) {
+  this.viewedMonthCallbacks.push(callback);
+  callback(this.viewedMonth);
+  return this;
+};
+
+DatePickerModel.prototype.bindViewedYear = function(callback) {
+  this.viewedYearCallbacks.push(callback);
+  callback(this.viewedYear);
+  return this;
+};
+
+DatePickerModel.prototype.bindMinAdvanceDayCount = function(callback) {
+  this.minAdvanceDayCountCallbacks.push(callback);
+  callback(this.minAdvanceDayCount);
+  return this;
+};
+
+DatePickerModel.prototype.bindMaxAdvanceDayCount = function(callback) {
+  this.maxAdvanceDayCountCallbacks.push(callback);
+  callback(this.maxAdvanceDayCount);
+  return this;
+};
+
+DatePickerModel.prototype.bindInvalidDaysOfTheWeek = function(callback) {
+  this.invalidDaysOfTheWeekCallbacks.push(callback);
+  callback(this.invalidDaysOfTheWeek);
+  return this;
+};
+
+DatePickerModel.prototype.bindInvalidDates = function(callback) {
+  this.invalidDatesCallbacks.push(callback);
+  callback(this.invalidDates);
+  return this;
+};
+
+// Getters
+DatePickerModel.prototype.getSelectedDate = function() {
+  return this.selectedDate;
+};
+
+DatePickerModel.prototype.getMinAdvanceDayCount = function() {
+  return this.minAdvanceDayCount;
+};
+
+DatePickerModel.prototype.getMaxAdvanceMonthCount = function() {
+  return this.maxAdvanceMonthCount;
+};
+
+DatePickerModel.prototype.getInvalidDaysOfTheWeek = function() {
+  return this.invalidDaysOfTheWeek;
+};
+
+DatePickerModel.prototype.getInvalidDates = function() {
+  return this.invalidDates;
+};
+
+var DropDownItemModel = function(
+  label,
+  tooltip,
+  data
+) {
+  // Private state
+  this.label = label
+  this.tooltip = tooltip;
+  this.data = data;
+
+  // Event listeners
+  this.labelChangeCallbacks = [];
+  this.tooltipChangeCallbacks = [];
+};
+
+// Setters
+DropDownItemModel.prototype.setLabel = function(label) {
+  this.label = label;
+  this.labelChangeCallbacks.forEach(function(callback) {
+    callback(label);
+  });
+  return this;
+};
+
+DropDownItemModel.prototype.setTooltip = function(tooltip) {
+  this.tooltip = tooltip;
+  this.tooltipChangeCallbacks.forEach(function(callback) {
+    callback(tooltip);
+  });
+  return this;
+};
+
+// Bind event listeners
+DropDownItemModel.prototype.bindLabel = function(callback) {
+  this.labelChangeCallbacks.push(callback);
+  callback(this.label);
+  return this;
+};
+
+DropDownItemModel.prototype.bindTooltip = function(callback) {
+  this.tooltipChangeCallbacks.push(callback);
+  callback(this.tooltip);
+  return this;
+};
+
+// Getters
+DropDownItemModel.prototype.getLabel = function() {
+  return this.label;
+};
+
+DropDownItemModel.prototype.getTooltip = function() {
+  return this.tooltip;
+};
+
+DropDownItemModel.prototype.getData = function() {
+  return this.data;
+};
+
+var DropDownModel = function() {
+  // Private state
+  this.selectedItemIdx = 0;
+  this.dropDownItemModels = [];
+
+  // Callback listeners
+  this.selectedItemChangeCallbacks = [];
+  this.dropDownItemModelsChangeCallbacks = [];
+};
+
+// Callback functions
+DropDownModel.prototype.bindSelectedItem = function(callback) {
+  this.selectedItemChangeCallbacks.push(callback);
+  callback(this.dropDownItemModels[this.selectedItemIdx]);
+
+  // Handle click
+  return this;
+};
+
+DropDownModel.prototype.bindDropDownItemModels = function(callback) {
+  this.dropDownItemModelsChangeCallbacks.push(callback);
+  callback(this.dropDownItemModels);
+  return this;
+};
+
+// Setters
+DropDownModel.prototype.setSelectedItemIdx = function(index) {
+  // Check: 'index' isn't out of bounds
+  console.assert(index < this.dropDownItemModels.length);
+
+  this.selectedItemIdx = index;
+  this.selectedItemChangeCallbacks.forEach(function(callback) {
+    callback(this.dropDownItemModels[this.selectedItemIdx]);
+  }, this);
+  return this;
+};
+
+DropDownModel.prototype.setDropDownItems = function(drop_down_item_models) {
+  this.dropDownItemModels = drop_down_item_models;
+  this.dropDownItemModelsChangeCallbacks.forEach(function(callback) {
+    callback(dropDownItemModels);
+  });
+  return this;
+};
+
+// Getters
+DropDownModel.prototype.getSelectedItem = function() {
+  return this.dropDownItemModels[this.selectedItemIdx];
+};
+
+DropDownModel.prototype.getDropDownItemModels = function() {
+  return this.dropDownItemModels;
+};
+
+var NewExperimentModel = function() {
+
+  this.scopeCountPickerModel = null;
+  this.experimentDurationPickerModel = null;
+  this.startTimePickerModel = null;
+  this.startDatePickerModel = null;
+  this.shortCodePickerModel = null;
+};
+
 var OrderRequestModel = function() {
 
   // Order request state
@@ -654,6 +998,95 @@ OrderRequestModel.prototype.bindStartDate = function(callback) {
 OrderRequestModel.prototype.bindShortCode = function(callback) {
   this.shortCodeChangeListeners.push(callback);
   return this;
+};
+
+var SliderModel = function() {
+  // State
+  this.minValue = 0;
+  this.maxValue = 0;
+  this.step = 0;
+  this.currentValue = 0;
+
+  // Callback listeners
+  this.minValueCallbacks = [];
+  this.maxValueCallbacks = [];
+  this.stepCallbacks = [];
+  this.currentValueCallbacks = [];
+};
+
+// Callback registration
+SliderModel.prototype.bindMinValue = function(callback) {
+  this.minValueCallbacks.push(callback);
+  callback(this.minValue);
+  return this;
+};
+
+SliderModel.prototype.bindMaxValue = function(callback) {
+  this.maxValueCallbacks.push(callback);
+  callback(this.maxValue);
+  return this;
+};
+
+SliderModel.prototype.bindStep = function(callback) {
+  this.stepCallbacks.push(callback);
+  callback(this.step);
+  return this;
+};
+
+SliderModel.prototype.bindCurrentValue = function(callback) {
+  this.currentValueCallbacks.push(callback);
+  callback(this.currentValue);
+  return this;
+};
+
+// Setters
+SliderModel.prototype.setMinValue = function(value) {
+  this.minValue = value;
+  this.minValueCallbacks.forEach(function(callback) {
+    callback(minValue);
+  });
+  return this;
+};
+
+SliderModel.prototype.setMaxValue = function(value) {
+  this.maxValue = value;
+  this.maxValueCallbacks.forEach(function(callback) {
+    callback(maxValue);
+  });
+  return this;
+};
+
+SliderModel.prototype.setStep = function(value) {
+  this.step = value;
+  this.stepCallbacks.forEach(function(callback) {
+    callback(step);
+  });
+  return this;
+};
+
+SliderModel.prototype.setCurrentValue = function(value) {
+  this.currentValue = value;
+  this.currentValueCallbacks.forEach(function(callback) {
+    callback(currentValue);
+  });
+  return this;
+};
+
+// Getters
+SliderModel.prototype.getMinValue = function() {
+  return this.minValue;
+};
+
+SliderModel.prototype.getMaxValue = function() {
+  return this.maxValue;
+};
+
+SliderModel.prototype.getStep = function() {
+  return this.step;
+};
+
+SliderModel.prototype.getCurrentValue = function() {
+  return this.currentValue;
 };
 
 var UserModel = function() {
@@ -1196,12 +1629,65 @@ var Utils = (function() {
     return node_list[0];
   };
 
+  this.bindNodeInfo = function(parent_node, node_info) {
+    node_info.node = Utils.bindNode(
+      parent_node,
+      node_info.className
+    );
+  };
+
   this.hideNode = function(node) {
     node.setAttribute(HIDDEN_ATTR, ''); 
   };
 
   this.showNode = function(node) {
     node.removeAttribute(HIDDEN_ATTR);
+  };
+
+  this.bindClickBeyondNode = function(node, callback) {
+    document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
+      for (var node_idx in event.path) {
+        var current_node = event.path[node_idx];
+        // User clicked on the time-picker, so don't hide it!
+        if (current_node == node) {
+          return;
+        }
+      }    
+
+      callback();
+    });
+  };
+
+  var compareDates = function(date1, date2) {
+    // Compare years
+    if (date1.getFullYear() < date2.getFullYear()) {
+      return -1;
+    }
+
+    if (date.getFullYear() > date2.getFullYear()) {
+      return 1;
+    }
+
+    // Compare months
+    if (date1.getMonth() < date2.getMonth()) {
+      return -1;
+    }
+
+    if (date.getMonth() > date2.getMonth()) {
+      return 1;
+    }
+
+    // Compare days
+    if (date1.getDate() < date2.getDate()) {
+      return -1;
+    }
+
+    if (date.getDate() > date2.getDate()) {
+      return 1;
+    }
+
+    // Dates are equal
+    return 0;
   };
 
   return {
@@ -1215,8 +1701,11 @@ var Utils = (function() {
     synthesizeTemplate: synthesizeTemplate,
     synthesizeTemplateIntoList: synthesizeTemplateIntoList,
     bindNode: bindNode,
+    bindNodeInfo: bindNodeInfo,
     hideNode: hideNode,
-    showNode: showNode
+    showNode: showNode,
+    bindClickBeyondNode: bindClickBeyondNode,
+    compareDates: compareDates
   };
 
 })();
@@ -3691,6 +4180,263 @@ function Calendar(
   };
 };
 
+var DatePickerView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template ids
+   */
+  var MAIN_TEMPLATE_ID = 'calendar-template';
+  var WEEK_TEMPLATE_ID = 'date-picker-week-template';
+  var DATE_TEMPLATE_ID = 'date-template';
+
+  /**
+   * Class names
+   */
+  var ROOT_WRAPPER_CLASS = 'calendar-wrapper';
+  var WEEK_WRAPPER_CLASS = 'week-wrapper';
+  var DATE_WRAPPER_CLASS = 'date-wrapper';
+  var DATE_LABEL_CLASS = 'date-label';
+
+  /**
+   * Attribute names
+   */
+  var UNSELECTABLE_DATE_ATTR = 'unselectable-date';
+
+  /**
+   * Private state
+   */
+  var datePickerModel = null;
+
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var datePickerRootNode = null;
+
+  /**
+   * Dom nodes
+   */
+  // Top banner elements
+  var selectedDateDisplayContainerNodeInfo = {
+    className: 'selected-date-display-container',
+    node: null
+  };
+
+  var selectedMonthLabelNodeInfo = {
+    className: 'selected-month-label',
+    node: null
+  };
+  
+  var selectedDateLabelNodeInfo = {
+    className: 'selected-dom-label',
+    node: null
+  };
+
+  var selectedYearLabelNodeInfo = {
+    className: 'selected-year-label',
+    node: null
+  };
+
+  // Month nav node info (current month & left/right month controls)
+  var monthNavDisplayNodeInfo = {
+    className: 'month-label',
+    node: null
+  };
+
+  var decrementMonthNavNodeInfo = {
+    className: 'decrement-month-container',
+    node: null
+  };
+  
+  var incrementMonthNavNodeInfo = {
+    className: 'increment-month-container',
+    node: null
+  };
+  
+  // Selectable dates node info
+  var weeksContainerNodeInfo = {
+    className: 'weeks-container',
+    node: null
+  };
+
+  var calendarMainContainerNodeInfo = {
+    className: 'calendar-main-container',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    // Top banner nodes
+    Utils.bindNodeInfo(parentNode, selectedDateDisplayContainer);
+    Utils.bindNodeInfo(parentNode, selectedMonthLabelNodeInfo);
+    Utils.bindNodeInfo(parentNode, selectedDomLabelNodeInfo);
+    Utils.bindNodeInfo(parentNode, selectedYearLabelNodeInfo);
+
+    // Month nav/display
+    Utils.bindNodeInfo(parentNode, monthNavDisplayNodeInfo);
+    Utils.bindNodeInfo(parentNode, decrementMonthNavNodeInfo);
+    Utils.bindNodeInfo(parentNode, incrementMonthNavNodeInfo);
+
+    // Selectable dates
+    Utils.bindNodeInfo(parentNode, weeksContainerNodeInfo);
+    Utils.bindNodeInfo(parentNode, calendarMainContainerNodeInfo);
+  };
+
+  var setSelectedDate = function(selected_date) {
+    selectedDateLabelNodeInfo.node.innerHTML = selected_date; 
+  };
+
+  var setSelectedMonth = function(selected_month) {
+    selectedMonthLabelNodeInfo.node.innerHTML = selected_month;
+  };
+
+  var setSelectedYear = function(selected_year) {
+    selectedYearLabelNodeInfo.node.innerHTML = selected_year;
+  };
+
+  var setViewedMonth = function(month, year) {
+    refreshCalendar(month, year);
+  }
+
+  var refreshCalendar = function(month, year) {
+    // Remove previous date nodes
+    Utils.removeChildren(weeksContainerNodeInfo.node); 
+
+    // Render calendar for specified month/year
+    // Get starting day-of-week idx
+    var starting_day_obj = new Date(year, month);  
+    var starting_day_idx = starting_day_obj.getUTCDay();
+
+    // Get number of days in month
+    var num_days_in_month_obj = new Date(year, month + 1, 0);
+    var num_days_in_month = num_days_in_month_obj.getDate();
+
+    // Generate blank date nodes for days in final week of previous
+    // month that appear in the first week of this calendar month
+    var current_week = genWeekNode();
+
+    for (var i = 0; i < starting_day_idx; ++i) {
+      var date = makeDateNode(current_week);
+      date.setAttribute(UNSELECTABLE_DATE_ATTR, '');
+    }
+
+    // Determine which date is the first selectable one
+    var first_selectable_date = new Date();
+    first_selectable_date.setDate(
+      first_selectable_date.getDate() + datePickerModel.getMinAdvanceDayCount()
+    );
+
+    // Generate nodes for displaying selectable days
+    for (var i = 1; i <= num_days_in_month; ++i) {
+      // Insert rows for calendar weeks
+      if (current_week.childNodes.length == 7) {
+        current_week = makeWeekNode();
+      }
+
+      // Initialize date and insert into week
+      var date = makeDateNode(current_week);
+
+      // Create date node. Node is 'unselectable' iff it is...
+      // 1. On either of the 'disallowed' lists *OR*
+      // 2. It falls too close to the current date 
+      if (Utils.compareDates(first_selectable_date, date) < 0 || isInvalidDate(date)) {
+        date.setAttribute(UNSELECTABLE_DATE_ATTR, '');     
+      }
+    }
+
+  };
+
+  var isInvalidDate = function(date) {
+    // Check if this date's 'day of the week' is marked invalid
+    if (datePickerModel.getInvalidDaysOfTheWeek().includes(date.getDay())) {
+      return true;
+    }
+
+    // Check if this date is one of the irregular dates marked invalid
+    var invalid_dates = datePickerModel.getInvalidDates();
+    for (var i = 0; i < invalid_dates.length; ++i) {
+      var invalid_date = invalid_dates[i];
+      if (Utils.compareDates(date, invalid_date) == 0) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  var genWeekNode = function() {
+    return Utils.synthesizeTemplateIntoList(
+      templateStore,
+      WEEK_TEMPLATE_ID,
+      weeksContainerNodeInfo.node,
+      WEEK_WRAPPER_CLASS
+    );
+  };
+
+  var setMinAdvanceDayCount = function(count) {
+    refreshCalendar(
+      datePickerModel.getViewedMonth(),
+      datePickerModel.getViewedYear()
+    ); 
+  };
+
+  var setMaxAdvanceMonthCount = function(count) {
+    refreshCalendar(
+      datePickerModel.getViewedMonth(),
+      datePickerModel.getViewedYear()
+    ); 
+  };
+
+  var setInvalidDaysOfTheWeek = function(invalid_days) {
+    refreshCalendar(
+      datePickerModel.getViewedMonth(),
+      datePickerModel.getViewedYear()
+    ); 
+  };
+
+  var setInvalidDates = function(dates) {
+    refreshCalendar(
+      datePickerModel.getViewedMonth(),
+      datePickerModel.getViewedYear()
+    ); 
+  };
+
+  var bindModel = function(date_picker_model) {
+    datePickerModel = date_picker_model;
+    datePickerModel 
+      .bindSelectedDate(setSelectedDate)
+      .bindSelectedMonth(setSelectedMonth)
+      .bindSelectedYear(setSelectedYear)
+      .bindViewedMonth(setViewedMonth)
+      .bindMinAdvanceDayCount(setMinAdvanceDayCount)
+      .bindMaxAdvanceMonthCount(setMaxAdvanceMonthCount)
+      .bindInvalidDaysOfTheWeek(setInvalidDaysOfTheWeek)
+      .bindInvalidDates(setInvalidDates);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(date_picker_model) {
+    // Synthesize template into document
+    datePickerRootNode = Utils.synthesizeTemplate(
+      templateStore,
+      MAIN_TEMPLATE_ID,
+      parentNode,
+      ROOT_WRAPPER_CLASS
+    ); 
+
+    // Bind nodes
+    bindNodes();
+
+    // Bind model and init ui
+    bindModel(date_picker_model);
+  };
+};
+
 function StaticCalendar(
   template_store,
   parent_node,
@@ -4015,6 +4761,295 @@ var CenterPageView = function(
 
   this.showTechnicianPage = function() {
     changePage(technicianPageView);       
+  };
+};
+
+var DropDownItemView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'dropdown-item-template';
+
+  /**
+   * Root wrapper class
+   */
+  var ROOT_WRAPPER_CLASS = 'dropdown-item-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var dropDownItemRootNode = null;
+  var dropDownItemIndex = null;
+  var onClickCallbacks = [];
+
+  /**
+   * Dom nodes
+   */
+  var itemLabelNode = {
+    className: 'item-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    // Bind item label node
+    itemLabelNode.node = Utils.bindNode(
+      dropDownItemRootNode,
+      itemLabelNode.className
+    );      
+
+    // Configure onclick event listener
+    dropDownItemRootNode.onclick = function() {
+      onClickCallbacks.forEach(function(callback) {
+        callback(dropDownItemIndex); 
+      });
+    };
+  };
+
+  var setLabel = function(label) {
+    itemLabelNode.node.innerHTML = label;    
+  };
+
+  var setTooltip = function(tooltip) {
+    // TODO...
+  };
+
+  var bindModel = function(drop_down_item_model) {
+    drop_down_item_model
+      .bindLabel(setLabel)
+      .bindTooltip(setTooltip);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(index, drop_down_item_model) {
+    // Synthesize template into document
+    dropDownItemRootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_WRAPPER_CLASS
+    ); 
+    
+    dropDownItemIndex = index;
+
+    // Bind nodes and configure event listeners
+    bindNodes();
+
+    // Bind model and init ui
+    bindModel(drop_down_item_model);
+
+    return this;
+  };
+
+  this.bindClick = function(callback) {
+    onClickCallbacks.push(callback);
+    return this;
+  };
+};
+
+var DropDownView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'dropdown-picker-template';
+
+  /**
+   * Revealed dropdown attribute
+   */
+  var REVEALED_DROPDOWN_ATTR = 'revealed-dropdown';
+
+  /**
+   * Root wrapper class
+   */
+  var ROOT_WRAPPER_CLASS = 'dropdown-picker-wrapper';
+
+  /**
+   * Icon type attribute
+   */
+  var ICON_TYPE_ATTR = 'icon';
+
+  /**
+   * Private vars
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var dropDownRootNode = null;
+
+  var isDropDownOpen = false;
+  var dropDownItemViews = [];
+  var onClickCallbacks = [];
+
+  var _this = this;
+
+  /**
+   * Dom nodes
+   */
+  var inputFieldWrapperNode = {
+    className: 'input-field-wrapper',
+    node: null
+  };
+
+  var inputFieldLabelNode = {
+    className: 'input-field-label',
+    node: null
+  };
+
+  var dropDownIconNode = {
+    className: 'dropdown-icon',
+    node: null
+  }; 
+
+  var dropDownListNode = {
+    className: 'dropdown-list',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    // Input field wrapper
+    inputFieldWrapperNode.node = Utils.bindNode(
+      dropDownRootNode,
+      inputFieldWrapperNode.className
+    );
+
+    // Input field label
+    inputFieldLabelNode.node = Utils.bindNode(
+      dropDownRootNode,
+      inputFieldLabelNode.className
+    );
+
+    // Dropdown icon
+    dropDownIconNode.node = Utils.bindNode(
+      dropDownRootNode,
+      dropDownIconNode.className
+    );
+
+    // Dropdown list
+    dropDownListNode.node = Utils.bindNode(
+      dropDownRootNode,
+      dropDownListNode.className
+    );
+
+    // Attach click event listener
+    dropDownRootNode.onclick = function() {
+      if (isDropDownOpen) {
+        closeDropDown();
+      } else {
+        openDropDown(); 
+      }
+    }; 
+
+    // Close dropdown when user clicks away from ui element 
+    Utils.bindClickBeyondNode(dropDownRootNode, closeDropDown);
+  };
+
+  var closeDropDown = function() {
+    isDropDownOpen = false;
+    Utils.hideNode(dropDownListNode.node);
+    dropDownRootNode.removeAttribute(REVEALED_DROPDOWN_ATTR);
+  };
+
+  var openDropDown = function() {
+    isDropDownOpen = true;
+    Utils.showNode(dropDownListNode.node);
+    dropDownRootNode.setAttribute(REVEALED_DROPDOWN_ATTR, '');
+  };
+
+  var bindModel = function(drop_down_model) {
+    // Bind to model state
+    drop_down_model
+      .bindSelectedItem(setSelectedItem)
+      .bindDropDownItemModels(setDropDownItemModels);
+  };
+
+  var configureDropDownItems = function(drop_down_data) {
+    for (var i = 0; i < drop_down_data.length; ++i) {
+      var label = drop_down_data[i]; 
+      var drop_down_item_view = new DropDownItemView(
+        templateStore,
+        dropDownListNode.node
+      );
+
+      drop_down_item_view.init(label, i);
+      drop_down_item_view.bindClick(invokeOnclickCallbacks);
+      dropDownItemViews.push(drop_down_item_view);
+    }
+  };
+
+  var invokeOnclickCallbacks = function(index) {
+    onClickCallbacks.forEach(function(callback) {
+      callback(this, index);
+    }, _this); 
+  };
+
+  var setIcon = function(icon_type) {
+    dropDownIconNode.node.setAttribute(ICON_TYPE_ATTR, icon_type); 
+  };
+
+  var setSelectedItem = function(drop_down_item) {
+    inputFieldLabelNode.node.innerHTML = drop_down_item.getLabel();
+  };
+
+  var setDropDownItemModels = function(drop_down_item_models) {
+    for (var i = 0; i < drop_down_item_models.length; ++i) {
+      // Initialize drop down view
+      var drop_down_item_view = new DropDownItemView(
+        templateStore,
+        dropDownListNode.node
+      );
+
+      drop_down_item_view.init(i, drop_down_item_models[i]);
+
+      // Bind click event listeners
+      drop_down_item_view.bindClick(invokeOnclickCallbacks);
+
+      dropDownItemViews.push(drop_down_item_view);
+    }
+  };
+
+  /**
+   * Privileged functions 
+   */
+  this.init = function(
+      drop_down_model,
+      icon_type
+  ) {
+    // Synthesize template into document
+    dropDownRootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_WRAPPER_CLASS
+    );  
+
+    // Bind nodes
+    bindNodes();
+
+    // Configure icon
+    setIcon(icon_type);
+
+    // Bind model
+    bindModel(drop_down_model);
+  };
+
+  this.bindClick = function(callback) {
+    onClickCallbacks.push(callback);
   };
 };
 
@@ -5688,6 +6723,128 @@ var SidePanelView = function(
   };
 };
 
+function SidePanelTab(
+  template_store,
+  parent_node,
+  button_title,
+  iron_icon_type
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+
+  /**
+   * Ui attributes
+   */
+  var SELECTED_ATTR = "selected-side-panel-tab";
+  var IRON_ICON_TYPE_ATTR = "icon";
+
+  /**
+   * Private state
+   */
+  var _this = this;
+  var templateStore = template_store;
+  var buttonTitle = button_title;
+  var ironIconType = iron_icon_type;
+  var onClickListeners = [];
+
+  // Root dom node
+  var rootNode = {
+    className: 'dash-nav-panel-btn',
+    node: null
+  };
+
+  var ironIconNode = {
+    className: 'nav-btn-icon',
+    node: null
+  };
+
+  var buttonTitleNode = {
+    className: 'nav-btn-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  function synthesizeSidePanelTemplate() {
+    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var tab_clone = document.importNode(tab_template.content, true);
+    parent_node.appendChild(tab_clone);
+
+    // Initialize root node and configure event listener
+    var tabs = parent_node.getElementsByClassName(rootNode.className);
+    rootNode.node = tabs[tabs.length - 1];
+
+    rootNode.node.onclick = function() {
+      for (var i = 0; i < onClickListeners.length; ++i) {
+        onClickListeners[i]();
+      }
+    };
+  };
+
+  /**
+   * bindInternalNodes()
+   * @pre-condition: 'rootNode' must already be bound
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(ironIconNode); 
+    bindClassBoundNode(buttonTitleNode);
+  };
+
+  /**
+   * initDisplay()
+   * - initializes text/graphics for this tab
+   * @pre-condition: all internal nodes bound
+   */
+  function initDisplay() {
+    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
+    buttonTitleNode.node.innerHTML = buttonTitle; 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize template and append to parent dom node
+    synthesizeSidePanelTemplate();
+
+    // Initialize pointers to internal nodes
+    bindInternalNodes();
+
+    // Initialize the ui
+    initDisplay();
+  }; 
+
+  this.select = function() {
+    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
+  };
+
+  this.deselect = function() {
+    rootNode.node.removeAttribute(SELECTED_ATTR);
+  };
+
+  /**
+   * registerOnClickListener()
+   * @param FuncPtr callback: function(_this) {...}
+   */
+  this.registerOnClickListener = function(callback) {
+    onClickListeners.push(callback); 
+  };
+};
+
 function TechnicianPage(
   template_store,
   root_id,
@@ -5814,128 +6971,6 @@ function TechnicianPage(
 
 };
 
-function SidePanelTab(
-  template_store,
-  parent_node,
-  button_title,
-  iron_icon_type
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
-
-  /**
-   * Ui attributes
-   */
-  var SELECTED_ATTR = "selected-side-panel-tab";
-  var IRON_ICON_TYPE_ATTR = "icon";
-
-  /**
-   * Private state
-   */
-  var _this = this;
-  var templateStore = template_store;
-  var buttonTitle = button_title;
-  var ironIconType = iron_icon_type;
-  var onClickListeners = [];
-
-  // Root dom node
-  var rootNode = {
-    className: 'dash-nav-panel-btn',
-    node: null
-  };
-
-  var ironIconNode = {
-    className: 'nav-btn-icon',
-    node: null
-  };
-
-  var buttonTitleNode = {
-    className: 'nav-btn-label',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = rootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  function synthesizeSidePanelTemplate() {
-    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
-    var tab_clone = document.importNode(tab_template.content, true);
-    parent_node.appendChild(tab_clone);
-
-    // Initialize root node and configure event listener
-    var tabs = parent_node.getElementsByClassName(rootNode.className);
-    rootNode.node = tabs[tabs.length - 1];
-
-    rootNode.node.onclick = function() {
-      for (var i = 0; i < onClickListeners.length; ++i) {
-        onClickListeners[i]();
-      }
-    };
-  };
-
-  /**
-   * bindInternalNodes()
-   * @pre-condition: 'rootNode' must already be bound
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(ironIconNode); 
-    bindClassBoundNode(buttonTitleNode);
-  };
-
-  /**
-   * initDisplay()
-   * - initializes text/graphics for this tab
-   * @pre-condition: all internal nodes bound
-   */
-  function initDisplay() {
-    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
-    buttonTitleNode.node.innerHTML = buttonTitle; 
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Initialize template and append to parent dom node
-    synthesizeSidePanelTemplate();
-
-    // Initialize pointers to internal nodes
-    bindInternalNodes();
-
-    // Initialize the ui
-    initDisplay();
-  }; 
-
-  this.select = function() {
-    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
-  };
-
-  this.deselect = function() {
-    rootNode.node.removeAttribute(SELECTED_ATTR);
-  };
-
-  /**
-   * registerOnClickListener()
-   * @param FuncPtr callback: function(_this) {...}
-   */
-  this.registerOnClickListener = function(callback) {
-    onClickListeners.push(callback); 
-  };
-};
-
 function TimePicker(
   template_store,
   parent_node,
@@ -6006,13 +7041,13 @@ function TimePicker(
   // Private functions
   var openDropDown = function() {
     isDropDownOpen = true;    
-    rootNode.removeAttribute(HIDDEN_ATTR);
+    timePickerRootNode.removeAttribute(HIDDEN_ATTR);
     inputFieldNode.node.setAttribute(SHADOW_BORDER_ATTR, '');
   };
 
   var closeDropDown = function() {
     isDropDownOpen = false;    
-    rootNode.setAttribute(HIDDEN_ATTR, '');
+    timePickerRootNode.setAttribute(HIDDEN_ATTR, '');
     inputFieldNode.node.removeAttribute(SHADOW_BORDER_ATTR);
   };
 
@@ -6036,7 +7071,7 @@ function TimePicker(
       );
 
       // Hack!
-      time_picker_option.setAttribute(TIME_ATTR, current_time);
+      time_picker_option.time = current_time;
       var time_label = time_picker_option.querySelector('.' + TIME_LABEL_CLASS);
       time_label.innerHTML = stringifyTime(current_time);
 
@@ -6090,17 +7125,17 @@ function TimePicker(
   var initNodes = function() {
     // Bind dom nodes
     inputFieldNode.node = Utils.bindNode(
-      rootNode,
+      timePickerRootNode,
       inputFieldNode.className
     );
     
     inputFieldWrapperNode.node = Utils.bindNode(
-      rootNode,
+      timePickerRootNode,
       inputFieldWrapperNode.className
     );
     
     dropDownNode.node = Utils.bindNode(
-      rootNode,
+      timePickerRootNode,
       dropDownNode.className
     );
 
@@ -6122,9 +7157,7 @@ function TimePicker(
       for (var i in event.path) {
         var node = event.path[i];
         if (hasClass(TIME_PICKER_OPTION_CLASS, node)) {
-          var numeric_time = node.getAttribute(TIME_ATTR); 
-          inputFieldNode.node.innerHTML = stringifyTimeForInputField(numeric_time);
-          currentTime = numeric_time;
+          setTimeByIndex(node.picker_index);
           return;
         }
       }
@@ -6135,7 +7168,7 @@ function TimePicker(
       for (var node_id in event.path) {
         var node = event.path[node_id];
         // User clicked on the time-picker, so don't hide it!
-        if (node == rootNode) {
+        if (node == timePickerRootNode) {
           return;
         }
       }    
@@ -6154,7 +7187,7 @@ function TimePicker(
     }
 
     // Initialize start time
-    var time_picker_options = rootNode.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
+    var time_picker_options = timePickerRootNode.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
     var starting_time_option = time_picker_options[0].getAttribute(TIME_ATTR);
     inputFieldNode.node.innerHTML = stringifyTimeForInputField(starting_time_option);
     currentTime = starting_time_option;
@@ -6170,7 +7203,7 @@ function TimePicker(
    */
   this.init = function() {
     // Synthesize html template into document
-    rootNode = Utils.synthesizeTemplate(
+    timePickerRootNode = Utils.synthesizeTemplate(
       templateStore,
       MAIN_TEMPLATE_ID,
       parentNode,
@@ -6197,6 +7230,11 @@ function TimePicker(
 
   this.setInitialState = function() {
     setInitialStateInternal();
+  };
+
+  this.setTimeByIndex = function(time) {
+    inputFieldNode.node.innerHTML = stringifyTimeForInputField(time);
+    currentTime = time;
   };
 };
 
@@ -6285,28 +7323,42 @@ var NewExperimentPageView = function(
    * Private functions
    */
   var initScopeCountView = function() {
+    // Initialize and configure slider model
+    var slider_model = new SliderModel();
+    slider_model
+      .setMinValue(0)
+      .setMaxValue(15)
+      .setStep(1)
+      .setCurrentValue(0);
+
     var slider_form_view = new SliderFormView(
       templateStore,
+      scopesCountNode.node,
       SCOPES_COUNT_TITLE_LABEL,
-      SCOPES_COUNT_UNIT_LABELS,
-      SCOPES_COUNT_VALUE_RANGE
+      SCOPES_COUNT_UNIT_LABELS
     ); 
 
-    slider_form_view.init(scopesCountNode.node);
-    slider_form_view.setValue(0);
+    slider_form_view.init(slider_model);
     return slider_form_view;
   };
 
   var initExperimentDurationView = function() {
+    // Initialize and configure slider model
+    var slider_model = new SliderModel();
+    slider_model
+      .setMinValue(0)
+      .setMaxValue(15)
+      .setStep(1)
+      .setCurrentValue(0);
+
     var slider_form_view = new SliderFormView(
       templateStore,    
+      experimentDurationNode.node,
       EXPERIMENT_DURATION_TITLE_LABEL,
-      EXPERIMENT_DURATION_UNIT_LABELS,
-      EXPERIMENT_DURATION_VALUE_RANGE
+      EXPERIMENT_DURATION_UNIT_LABELS
     );
 
-    slider_form_view.init(experimentDurationNode.node);
-    slider_form_view.setValue(0);
+    slider_form_view.init(slider_model);
     return slider_form_view;
   };
 
@@ -6395,6 +7447,9 @@ var ExperimentTimeFormView = function(
   var rootNode = null;
 
   var experimentTimePickerView = null;
+  var experimentTimePickerModel = null;
+  var experimentTimePickerController = null;
+
   var experimentDatePickerView = null;
 
   /**
@@ -6420,16 +7475,43 @@ var ExperimentTimeFormView = function(
       experimentTimePickerNode.className
     );
 
-    // Initialize view
-    experimentTimePickerView = new TimePicker(
-      templateStore,
-      experimentTimePickerNode.node,
-      {minutes: 0, hours: 10},
-      {minutes: 0, hours: 19},
-      30
-    ); 
+    // Create data model
+    var drop_down_items = [
+      new DropDownItemModel("10:00", "10:00", {}),
+      new DropDownItemModel("10:30", "10:30", {}),
+      new DropDownItemModel("11:00", "11:00", {})
+    ];
 
-    experimentTimePickerView.init();
+    experimentTimePickerModel = new DropDownModel();
+    experimentTimePickerModel.setDropDownItems(drop_down_items);
+
+    // Create view
+    experimentTimePickerView = new DropDownView(
+      templateStore,
+      experimentTimePickerNode.node
+    );
+
+    experimentTimePickerView.init(
+      experimentTimePickerModel,
+      'device:access-time'
+    );
+
+    // Create controller
+    experimentTimePickerController = new DropDownController();
+    experimentTimePickerController
+      .setModel(experimentTimePickerModel)
+      .setView(experimentTimePickerView);
+
+    // Initialize view
+    // experimentTimePickerView = new TimePicker(
+    //   templateStore,
+    //   experimentTimePickerNode.node,
+    //   {minutes: 0, hours: 10},
+    //   {minutes: 0, hours: 19},
+    //   30
+    // ); 
+    //
+    // experimentTimePickerView.init();
   };
 
   var initExperimentDatePickerView = function() {
@@ -6460,9 +7542,9 @@ var ExperimentTimeFormView = function(
 
 var SliderFormView = function(
   template_store,
+  parent_node,
   title_label,
-  unit_labels, // {singular, plural}
-  value_range // {min, max, step}
+  unit_labels // {singular, plural}
 ) {
 
   /**
@@ -6487,9 +7569,8 @@ var SliderFormView = function(
    * Private state
    */
   var templateStore = template_store;
-  var parentNode = null;
+  var parentNode = parent_node;
   var unitLabels = unit_labels;
-  var valueRange = value_range;
   var titleLabel = title_label;
   
   var _this = this;
@@ -6541,33 +7622,35 @@ var SliderFormView = function(
     };
   };
 
+  var setMinValue = function(min_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MIN_ATTR, min_value); 
+  };
+
+  var setMaxValue = function(max_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MAX_ATTR, max_value); 
+  };
+
+  var setStep = function(step) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_STEP_ATTR, step); 
+  };
+
   var initUi = function() {
     // Initialize slider
     formTitleNode.node.innerHTML = titleLabel;
-    
-    // Initialize slider state
-    sliderNode.node.setAttribute(
-      PAPER_SLIDER_MIN_ATTR,
-      valueRange.min
-    ); 
-    
-    sliderNode.node.setAttribute(
-      PAPER_SLIDER_MAX_ATTR,
-      valueRange.max
-    ); 
-    
-    sliderNode.node.setAttribute(
-      PAPER_SLIDER_STEP_ATTR,
-      valueRange.step
-    ); 
+  };
+
+  var bindModel = function(slider_model) {
+    slider_model
+      .bindMinValue(setMinValue)
+      .bindMaxValue(setMaxValue)
+      .bindStep(setStep)
+      .bindCurrentValue(_this.setValue);
   };
 
   /**
    * Privileged functions
    */
-  this.init = function(parent_node) {
-    parentNode = parent_node;
-
+  this.init = function(slider_model) {
     // Initialize root node
     rootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -6579,7 +7662,10 @@ var SliderFormView = function(
     // Initialize nodes and bind event listeners
     bindNodes();
 
-    // Init ui elements
+    // Bind model and init ui
+    bindModel(slider_model);
+
+    // Init ui elements (e.g. form title)
     initUi();
   };
 

@@ -196,12 +196,65 @@ var Utils = (function() {
     return node_list[0];
   };
 
+  this.bindNodeInfo = function(parent_node, node_info) {
+    node_info.node = Utils.bindNode(
+      parent_node,
+      node_info.className
+    );
+  };
+
   this.hideNode = function(node) {
     node.setAttribute(HIDDEN_ATTR, ''); 
   };
 
   this.showNode = function(node) {
     node.removeAttribute(HIDDEN_ATTR);
+  };
+
+  this.bindClickBeyondNode = function(node, callback) {
+    document.getElementsByTagName('html')[0].addEventListener('click', function(event) {
+      for (var node_idx in event.path) {
+        var current_node = event.path[node_idx];
+        // User clicked on the time-picker, so don't hide it!
+        if (current_node == node) {
+          return;
+        }
+      }    
+
+      callback();
+    });
+  };
+
+  var compareDates = function(date1, date2) {
+    // Compare years
+    if (date1.getFullYear() < date2.getFullYear()) {
+      return -1;
+    }
+
+    if (date.getFullYear() > date2.getFullYear()) {
+      return 1;
+    }
+
+    // Compare months
+    if (date1.getMonth() < date2.getMonth()) {
+      return -1;
+    }
+
+    if (date.getMonth() > date2.getMonth()) {
+      return 1;
+    }
+
+    // Compare days
+    if (date1.getDate() < date2.getDate()) {
+      return -1;
+    }
+
+    if (date.getDate() > date2.getDate()) {
+      return 1;
+    }
+
+    // Dates are equal
+    return 0;
   };
 
   return {
@@ -215,8 +268,11 @@ var Utils = (function() {
     synthesizeTemplate: synthesizeTemplate,
     synthesizeTemplateIntoList: synthesizeTemplateIntoList,
     bindNode: bindNode,
+    bindNodeInfo: bindNodeInfo,
     hideNode: hideNode,
-    showNode: showNode
+    showNode: showNode,
+    bindClickBeyondNode: bindClickBeyondNode,
+    compareDates: compareDates
   };
 
 })();

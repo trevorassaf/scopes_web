@@ -68,13 +68,13 @@ function TimePicker(
   // Private functions
   var openDropDown = function() {
     isDropDownOpen = true;    
-    rootNode.removeAttribute(HIDDEN_ATTR);
+    timePickerRootNode.removeAttribute(HIDDEN_ATTR);
     inputFieldNode.node.setAttribute(SHADOW_BORDER_ATTR, '');
   };
 
   var closeDropDown = function() {
     isDropDownOpen = false;    
-    rootNode.setAttribute(HIDDEN_ATTR, '');
+    timePickerRootNode.setAttribute(HIDDEN_ATTR, '');
     inputFieldNode.node.removeAttribute(SHADOW_BORDER_ATTR);
   };
 
@@ -98,7 +98,7 @@ function TimePicker(
       );
 
       // Hack!
-      time_picker_option.setAttribute(TIME_ATTR, current_time);
+      time_picker_option.time = current_time;
       var time_label = time_picker_option.querySelector('.' + TIME_LABEL_CLASS);
       time_label.innerHTML = stringifyTime(current_time);
 
@@ -152,17 +152,17 @@ function TimePicker(
   var initNodes = function() {
     // Bind dom nodes
     inputFieldNode.node = Utils.bindNode(
-      rootNode,
+      timePickerRootNode,
       inputFieldNode.className
     );
     
     inputFieldWrapperNode.node = Utils.bindNode(
-      rootNode,
+      timePickerRootNode,
       inputFieldWrapperNode.className
     );
     
     dropDownNode.node = Utils.bindNode(
-      rootNode,
+      timePickerRootNode,
       dropDownNode.className
     );
 
@@ -184,9 +184,7 @@ function TimePicker(
       for (var i in event.path) {
         var node = event.path[i];
         if (hasClass(TIME_PICKER_OPTION_CLASS, node)) {
-          var numeric_time = node.getAttribute(TIME_ATTR); 
-          inputFieldNode.node.innerHTML = stringifyTimeForInputField(numeric_time);
-          currentTime = numeric_time;
+          setTimeByIndex(node.picker_index);
           return;
         }
       }
@@ -197,7 +195,7 @@ function TimePicker(
       for (var node_id in event.path) {
         var node = event.path[node_id];
         // User clicked on the time-picker, so don't hide it!
-        if (node == rootNode) {
+        if (node == timePickerRootNode) {
           return;
         }
       }    
@@ -216,7 +214,7 @@ function TimePicker(
     }
 
     // Initialize start time
-    var time_picker_options = rootNode.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
+    var time_picker_options = timePickerRootNode.getElementsByClassName(TIME_PICKER_OPTION_CLASS);
     var starting_time_option = time_picker_options[0].getAttribute(TIME_ATTR);
     inputFieldNode.node.innerHTML = stringifyTimeForInputField(starting_time_option);
     currentTime = starting_time_option;
@@ -232,7 +230,7 @@ function TimePicker(
    */
   this.init = function() {
     // Synthesize html template into document
-    rootNode = Utils.synthesizeTemplate(
+    timePickerRootNode = Utils.synthesizeTemplate(
       templateStore,
       MAIN_TEMPLATE_ID,
       parentNode,
@@ -259,5 +257,10 @@ function TimePicker(
 
   this.setInitialState = function() {
     setInitialStateInternal();
+  };
+
+  this.setTimeByIndex = function(time) {
+    inputFieldNode.node.innerHTML = stringifyTimeForInputField(time);
+    currentTime = time;
   };
 };
