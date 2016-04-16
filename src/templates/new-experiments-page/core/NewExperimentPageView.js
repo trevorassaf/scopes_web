@@ -59,6 +59,8 @@ var NewExperimentPageView = function(
     max: 12,
     step: 1
   };
+
+  var experimentDurationController = null;
   
   /**
    * Experiment time form node
@@ -79,6 +81,14 @@ var NewExperimentPageView = function(
   var SHORT_CODE_TITLE_LABEL = 'Select a payment method';
 
   /**
+   * Confirm order form view dom node
+   */
+  var confirmOrderFormViewNode = {
+    className: 'confirm-order-form',
+    node: null
+  };
+
+  /**
    * Private state
    */
   var templateStore = template_store;
@@ -89,6 +99,7 @@ var NewExperimentPageView = function(
   var experimentDurationFormView = null;
   var experimentTimeFormView = null;
   var shortCodePickerFormView = null;
+  var confirmExperimentFormView = null;
 
   /**
    * Private functions
@@ -130,6 +141,13 @@ var NewExperimentPageView = function(
     );
 
     slider_form_view.init(slider_model);
+
+    experimentDurationController = new SliderController();
+    experimentDurationController.init(
+      slider_form_view,
+      slider_model
+    );
+
     return slider_form_view;
   };
 
@@ -168,26 +186,30 @@ var NewExperimentPageView = function(
     return form_view;
   };
 
+  var initConfirmExperimentFormView = function() {
+    // Initialize form view
+    var form_view = new ConfirmOrderFormView(
+      templateStore,
+      confirmOrderFormViewNode.node
+    );
+
+    form_view.init();
+
+    // Initialize form controller
+    var form_controller = new ConfirmOrderFormController();
+    form_controller.init(
+      form_view,
+      experimentDurationController.getModel()
+    );
+    return form_view;
+  };
+
   var bindNodes = function() {
-    scopesCountNode.node = Utils.bindNode(
-      rootNode,
-      scopesCountNode.className
-    );
-
-    experimentDurationNode.node = Utils.bindNode(
-      rootNode,
-      experimentDurationNode.className
-    );
-
-    experimentTimeNode.node = Utils.bindNode(
-      rootNode,
-      experimentTimeNode.className
-    );
-
-    shortCodePickerNode.node = Utils.bindNode(
-      rootNode,
-      shortCodePickerNode.className
-    );
+    Utils.bindNodeInfo(rootNode, scopesCountNode);
+    Utils.bindNodeInfo(rootNode, experimentDurationNode);
+    Utils.bindNodeInfo(rootNode, experimentTimeNode);
+    Utils.bindNodeInfo(rootNode, shortCodePickerNode);
+    Utils.bindNodeInfo(rootNode, confirmOrderFormViewNode);
   };
 
   /**
@@ -210,6 +232,7 @@ var NewExperimentPageView = function(
     experimentDurationFormView = initExperimentDurationView();
     experimentTimeFormView = initExperimentTimeFormView();
     shortCodePickerFormView = initShortCodePickerFormView();
+    confirmExperimentFormView = initConfirmExperimentFormView();
   };
 
   this.getTitle = function() {

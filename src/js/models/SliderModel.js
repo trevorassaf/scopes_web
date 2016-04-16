@@ -41,32 +41,32 @@ SliderModel.prototype.bindCurrentValue = function(callback) {
 SliderModel.prototype.setMinValue = function(value) {
   this.minValue = value;
   this.minValueCallbacks.forEach(function(callback) {
-    callback(minValue);
-  });
+    callback(this.minValue);
+  }, this);
   return this;
 };
 
 SliderModel.prototype.setMaxValue = function(value) {
   this.maxValue = value;
   this.maxValueCallbacks.forEach(function(callback) {
-    callback(maxValue);
-  });
+    callback(this.maxValue);
+  }, this);
   return this;
 };
 
 SliderModel.prototype.setStep = function(value) {
   this.step = value;
   this.stepCallbacks.forEach(function(callback) {
-    callback(step);
-  });
+    callback(this.step);
+  }, this);
   return this;
 };
 
 SliderModel.prototype.setCurrentValue = function(value) {
   this.currentValue = value;
   this.currentValueCallbacks.forEach(function(callback) {
-    callback(currentValue);
-  });
+    callback(this.currentValue);
+  }, this);
   return this;
 };
 

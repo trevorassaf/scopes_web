@@ -66,6 +66,49 @@ window.onload = function() {
   // });
 };
 
+var ConfirmOrderFormController = function() {
+
+  /**
+   * Private state
+   */
+  var confirmOrderView = null;
+  var experimentDurationModel = null;
+  var pricePerHour = 20;
+
+  /**
+   * Private functions
+   */
+  var configureCallbacks = function() {
+    // Bind to experiment-duration change 
+    experimentDurationModel.bindCurrentValue(handleNewExperimentDuration);
+  };
+
+  var handleNewExperimentDuration = function(experiment_duration) {
+    // Calculate price
+    var total_price = pricePerHour * experiment_duration;
+    confirmOrderView.setPricingInformation(
+      experiment_duration,
+      pricePerHour,
+      total_price
+    );
+  };
+
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(
+    confirm_order_view,
+    experiment_duration_model
+  ) {
+    confirmOrderView = confirm_order_view;
+    experimentDurationModel = experiment_duration_model;
+
+    // Attach models to views
+    configureCallbacks(); 
+  };
+};
+
 var DatePickerController = function() {
 
   /**
@@ -566,6 +609,45 @@ var SidePanelController = function(
      */
     sidePanelView = new SidePanelView(templateStore);
     sidePanelView.init();
+  };
+};
+
+var SliderController = function() {
+
+  /**
+   * Private state
+   */
+  var sliderView = null;
+  var sliderModel = null;
+
+  /**
+   * Private functions
+   */
+  var configureCallbacks = function() {
+    sliderView.bindValueChange(updateValue);
+  };
+
+  var updateValue = function(value) {
+    sliderModel.setCurrentValue(value);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(view, model) {
+    sliderView = view;
+    sliderModel = model;
+
+    // Attach view to model
+    configureCallbacks();
+  };
+
+  this.getModel = function() {
+    return sliderModel;
+  };
+
+  this.getView = function() {
+    return sliderView;
   };
 };
 
@@ -1178,32 +1260,32 @@ SliderModel.prototype.bindCurrentValue = function(callback) {
 SliderModel.prototype.setMinValue = function(value) {
   this.minValue = value;
   this.minValueCallbacks.forEach(function(callback) {
-    callback(minValue);
-  });
+    callback(this.minValue);
+  }, this);
   return this;
 };
 
 SliderModel.prototype.setMaxValue = function(value) {
   this.maxValue = value;
   this.maxValueCallbacks.forEach(function(callback) {
-    callback(maxValue);
-  });
+    callback(this.maxValue);
+  }, this);
   return this;
 };
 
 SliderModel.prototype.setStep = function(value) {
   this.step = value;
   this.stepCallbacks.forEach(function(callback) {
-    callback(step);
-  });
+    callback(this.step);
+  }, this);
   return this;
 };
 
 SliderModel.prototype.setCurrentValue = function(value) {
   this.currentValue = value;
   this.currentValueCallbacks.forEach(function(callback) {
-    callback(currentValue);
-  });
+    callback(this.currentValue);
+  }, this);
   return this;
 };
 
@@ -4964,6 +5046,152 @@ function StaticCalendar(
   };
 };
 
+var CenterPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'center-page-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'center-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var rootNode = null;
+
+  var currentPageView = null;
+
+  var newExperimentPageView = null;
+  var myExperimentsPageView = null;
+  var feedbackPageView = null;
+  var technicianPageView = null;
+
+  /**
+   * Dom nodes
+   */
+  var pageTitleNode = {
+    className: 'title-label',
+    node: null
+  };
+
+  var centerPanelPageContainerNode = {
+    className: 'page-container',
+    node: null
+  };
+
+  var adminButtonContainerNode = {
+    className: 'admin-btn-container',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+
+  var initNewExperimentPage = function() {
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    ); 
+    newExperimentPageView.init();
+  };
+
+  var initPages = function() {
+    initNewExperimentPage(); 
+  };
+
+  var bindNodes = function() {
+    // Bind page title node
+    pageTitleNode.node = Utils.bindNode(
+      rootNode,
+      pageTitleNode.className
+    ); 
+
+    // Bind container node for admin buttons
+    adminButtonContainerNode.node = Utils.bindNode(
+      rootNode,
+      adminButtonContainerNode.className
+    );
+    
+    // Bind node that contains the pages
+    centerPanelPageContainerNode.node = Utils.bindNode(
+      rootNode,
+      centerPanelPageContainerNode.className
+    );
+
+    // Initialize pages
+    initPages();
+  };
+
+  var initPageViews = function() {
+    // Init new experiment page view
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );     
+
+    newExperimentPageView.init();
+  };
+
+  var changePage = function(next_page_view) {
+    console.assert(next_page_view != null);
+
+    // Hide current page
+    if (currentPageView != null) {
+      currentPageView.hide();
+    }
+
+    // Show next page and update title
+    currentPageView = next_page_view;
+    pageTitleNode.node.innerHTML = currentPageView.getTitle();
+    currentPageView.show();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );
+
+    bindNodes();
+
+    return this;
+  };
+
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    changePage(newExperimentPageView);       
+  };
+
+  this.showMyExperimentsPage = function() {
+    changePage(myExperimentsPageView);       
+  };
+
+  this.showFeedbackPage = function() {
+    changePage(feedbackPageView);       
+  };
+
+  this.showTechnicianPage = function() {
+    changePage(technicianPageView);       
+  };
+};
+
 var DropDownItemView = function(
   template_store,
   parent_node
@@ -5250,152 +5478,6 @@ var DropDownView = function(
 
   this.bindClick = function(callback) {
     onClickCallbacks.push(callback);
-  };
-};
-
-var CenterPageView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'center-page-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'center-page-wrapper';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-  var rootNode = null;
-
-  var currentPageView = null;
-
-  var newExperimentPageView = null;
-  var myExperimentsPageView = null;
-  var feedbackPageView = null;
-  var technicianPageView = null;
-
-  /**
-   * Dom nodes
-   */
-  var pageTitleNode = {
-    className: 'title-label',
-    node: null
-  };
-
-  var centerPanelPageContainerNode = {
-    className: 'page-container',
-    node: null
-  };
-
-  var adminButtonContainerNode = {
-    className: 'admin-btn-container',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-
-  var initNewExperimentPage = function() {
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    ); 
-    newExperimentPageView.init();
-  };
-
-  var initPages = function() {
-    initNewExperimentPage(); 
-  };
-
-  var bindNodes = function() {
-    // Bind page title node
-    pageTitleNode.node = Utils.bindNode(
-      rootNode,
-      pageTitleNode.className
-    ); 
-
-    // Bind container node for admin buttons
-    adminButtonContainerNode.node = Utils.bindNode(
-      rootNode,
-      adminButtonContainerNode.className
-    );
-    
-    // Bind node that contains the pages
-    centerPanelPageContainerNode.node = Utils.bindNode(
-      rootNode,
-      centerPanelPageContainerNode.className
-    );
-
-    // Initialize pages
-    initPages();
-  };
-
-  var initPageViews = function() {
-    // Init new experiment page view
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );     
-
-    newExperimentPageView.init();
-  };
-
-  var changePage = function(next_page_view) {
-    console.assert(next_page_view != null);
-
-    // Hide current page
-    if (currentPageView != null) {
-      currentPageView.hide();
-    }
-
-    // Show next page and update title
-    currentPageView = next_page_view;
-    pageTitleNode.node.innerHTML = currentPageView.getTitle();
-    currentPageView.show();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );
-
-    bindNodes();
-
-    return this;
-  };
-
-  /**
-   * Functions for showing main pages
-   */
-  this.showNewExperimentPage = function() {
-    changePage(newExperimentPageView);       
-  };
-
-  this.showMyExperimentsPage = function() {
-    changePage(myExperimentsPageView);       
-  };
-
-  this.showFeedbackPage = function() {
-    changePage(feedbackPageView);       
-  };
-
-  this.showTechnicianPage = function() {
-    changePage(technicianPageView);       
   };
 };
 
@@ -6854,6 +6936,128 @@ function ShortCodePicker(
   };
 };
 
+function SidePanelTab(
+  template_store,
+  parent_node,
+  button_title,
+  iron_icon_type
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+
+  /**
+   * Ui attributes
+   */
+  var SELECTED_ATTR = "selected-side-panel-tab";
+  var IRON_ICON_TYPE_ATTR = "icon";
+
+  /**
+   * Private state
+   */
+  var _this = this;
+  var templateStore = template_store;
+  var buttonTitle = button_title;
+  var ironIconType = iron_icon_type;
+  var onClickListeners = [];
+
+  // Root dom node
+  var rootNode = {
+    className: 'dash-nav-panel-btn',
+    node: null
+  };
+
+  var ironIconNode = {
+    className: 'nav-btn-icon',
+    node: null
+  };
+
+  var buttonTitleNode = {
+    className: 'nav-btn-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  function synthesizeSidePanelTemplate() {
+    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var tab_clone = document.importNode(tab_template.content, true);
+    parent_node.appendChild(tab_clone);
+
+    // Initialize root node and configure event listener
+    var tabs = parent_node.getElementsByClassName(rootNode.className);
+    rootNode.node = tabs[tabs.length - 1];
+
+    rootNode.node.onclick = function() {
+      for (var i = 0; i < onClickListeners.length; ++i) {
+        onClickListeners[i]();
+      }
+    };
+  };
+
+  /**
+   * bindInternalNodes()
+   * @pre-condition: 'rootNode' must already be bound
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(ironIconNode); 
+    bindClassBoundNode(buttonTitleNode);
+  };
+
+  /**
+   * initDisplay()
+   * - initializes text/graphics for this tab
+   * @pre-condition: all internal nodes bound
+   */
+  function initDisplay() {
+    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
+    buttonTitleNode.node.innerHTML = buttonTitle; 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize template and append to parent dom node
+    synthesizeSidePanelTemplate();
+
+    // Initialize pointers to internal nodes
+    bindInternalNodes();
+
+    // Initialize the ui
+    initDisplay();
+  }; 
+
+  this.select = function() {
+    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
+  };
+
+  this.deselect = function() {
+    rootNode.node.removeAttribute(SELECTED_ATTR);
+  };
+
+  /**
+   * registerOnClickListener()
+   * @param FuncPtr callback: function(_this) {...}
+   */
+  this.registerOnClickListener = function(callback) {
+    onClickListeners.push(callback); 
+  };
+};
+
 var SidePanelView = function(
   template_store,
   parent_node
@@ -7069,126 +7273,130 @@ var SidePanelView = function(
   };
 };
 
-function SidePanelTab(
+function TechnicianPage(
   template_store,
-  parent_node,
-  button_title,
-  iron_icon_type
+  root_id,
+  is_displayed_initially
 ) {
 
   /**
    * Template id
    */
-  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+  var TEMPLATE_ID_SELECTOR = '#technician-page-template';
 
   /**
    * Ui attributes
    */
-  var SELECTED_ATTR = "selected-side-panel-tab";
-  var IRON_ICON_TYPE_ATTR = "icon";
+  var HIDDEN_ATTR = "hidden-technician-page";
 
   /**
    * Private state
    */
-  var _this = this;
+  // Dom nodes
   var templateStore = template_store;
-  var buttonTitle = button_title;
-  var ironIconType = iron_icon_type;
-  var onClickListeners = [];
+  var isDisplayedInitially = is_displayed_initially;
+  var _this = this;
 
-  // Root dom node
-  var rootNode = {
-    className: 'dash-nav-panel-btn',
+  // Root node
+  var TechnicianPageRootNode = {
+    id: root_id,
     node: null
   };
 
-  var ironIconNode = {
-    className: 'nav-btn-icon',
-    node: null
-  };
-
-  var buttonTitleNode = {
-    className: 'nav-btn-label',
-    node: null
+  // Class-bound nodes
+  var pageWrapperNode = {
+    className: 'technician-page-wrapper',
+    node: null 
   };
 
   /**
    * Private functions
    */
+  function fetchClassBoundDomNode(node_info) {
+    elements = TechnicianPageRootNode.node.getElementsByClassName(node_info.className);
+    console.assert(elements.length == 1);
+    node_info.node = elements[0];
+  };
+
+  /**
+   * synthesizeTechnicianPageTemplate()
+   * - copy technician-page template and insert into main dom tree
+   * @pre-condition: 'TechnicianPageRootNode' must be initialized
+   */
+  function synthesizeTechnicianPageTemplate() {
+    // Bind technician-page dom template
+    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
+    var page_clone = document.importNode(page_template.content, true);
+    TechnicianPageRootNode.node.appendChild(page_clone);
+  };
+
   /**
    * bindClassBoundNode()
    * - initialize pointer to specified dom node
    */
   function bindClassBoundNode(internal_node) {
-    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    elements = TechnicianPageRootNode.node.getElementsByClassName(internal_node.className);
     console.assert(elements.length === 1);
     internal_node.node = elements[0];
   };
 
-  function synthesizeSidePanelTemplate() {
-    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
-    var tab_clone = document.importNode(tab_template.content, true);
-    parent_node.appendChild(tab_clone);
-
-    // Initialize root node and configure event listener
-    var tabs = parent_node.getElementsByClassName(rootNode.className);
-    rootNode.node = tabs[tabs.length - 1];
-
-    rootNode.node.onclick = function() {
-      for (var i = 0; i < onClickListeners.length; ++i) {
-        onClickListeners[i]();
-      }
-    };
-  };
-
   /**
    * bindInternalNodes()
-   * @pre-condition: 'rootNode' must already be bound
+   * - bind class-bound nodes internal to this template
    */
   function bindInternalNodes() {
-    bindClassBoundNode(ironIconNode); 
-    bindClassBoundNode(buttonTitleNode);
+    bindClassBoundNode(pageWrapperNode);     
   };
 
   /**
    * initDisplay()
-   * - initializes text/graphics for this tab
-   * @pre-condition: all internal nodes bound
+   * - render initially ui
    */
   function initDisplay() {
-    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
-    buttonTitleNode.node.innerHTML = buttonTitle; 
+    if (isDisplayedInitially) {
+      _this.show();
+    } else {
+      _this.hide(); 
+    }
   };
 
   /**
    * Privileged functions
    */
+  /**
+   * init()
+   * - initialize technician page and put it in starting state
+   */
   this.init = function() {
-    // Initialize template and append to parent dom node
-    synthesizeSidePanelTemplate();
+    // Bind top-level technician-page node (we're going to copy the template into this!)
+    TechnicianPageRootNode.node = document.getElementById(TechnicianPageRootNode.id);
 
-    // Initialize pointers to internal nodes
+    // Clone template and copy into wrapper
+    synthesizeTechnicianPageTemplate();
+
+    // Bind nodes internal to this template
     bindInternalNodes();
 
-    // Initialize the ui
+    // Initialize ui
     initDisplay();
-  }; 
-
-  this.select = function() {
-    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
-  };
-
-  this.deselect = function() {
-    rootNode.node.removeAttribute(SELECTED_ATTR);
   };
 
   /**
-   * registerOnClickListener()
-   * @param FuncPtr callback: function(_this) {...}
+   * hide()
+   * - hide the technician-page
    */
-  this.registerOnClickListener = function(callback) {
-    onClickListeners.push(callback); 
+  this.hide = function() {
+    TechnicianPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
   };
+
+  /**
+   * show()
+   * - show the technician-page
+   */
+  this.show = function() {
+    TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  };
+
 };
 
 function TimePicker(
@@ -7458,130 +7666,141 @@ function TimePicker(
   };
 };
 
-function TechnicianPage(
+var ConfirmOrderFormView = function(
   template_store,
-  root_id,
-  is_displayed_initially
+  parent_node
 ) {
 
   /**
    * Template id
    */
-  var TEMPLATE_ID_SELECTOR = '#technician-page-template';
+  var TEMPLATE_ID = 'confirm-order-form-template';
 
   /**
-   * Ui attributes
+   * Root wrapper class
    */
-  var HIDDEN_ATTR = "hidden-technician-page";
+  var ROOT_CLASS = 'confirm-order-form-wrapper';
+
+  /**
+   * UI text
+   */
+  var HOUR_UNIT = {
+    singular: 'hour',
+    plural: 'hours'
+  };
 
   /**
    * Private state
    */
-  // Dom nodes
   var templateStore = template_store;
-  var isDisplayedInitially = is_displayed_initially;
+  var parentNode = parent_node;
+
+  // Callbacks
+  var cancelOrderCallbacks = [];
+  var confirmOrderCallbacks = [];
+
+  // Cached 'this' pointer
   var _this = this;
 
-  // Root node
-  var TechnicianPageRootNode = {
-    id: root_id,
+  /**
+   * Dom nodes
+   */
+  var cancelPaymentButtonNode = {
+    className: 'cancel-payment-button',
     node: null
   };
 
-  // Class-bound nodes
-  var pageWrapperNode = {
-    className: 'technician-page-wrapper',
-    node: null 
+  var confirmPaymentButtonNode = {
+    className: 'confirm-payment-button',
+    node: null
+  };
+
+  var hoursValueNode = {
+    className: 'hours-value-field-label',
+    node: null
+  };
+
+  var hoursUnitNode = {
+    className: 'hours-unit-field-label',
+    node: null
+  };
+
+  var hourlyRateValueNode = {
+    className: 'hourly-rate-field-label',
+    node: null
+  }; 
+
+  var totalPriceValueNode = {
+    className: 'total-price-field-label',
+    node: null
   };
 
   /**
    * Private functions
    */
-  function fetchClassBoundDomNode(node_info) {
-    elements = TechnicianPageRootNode.node.getElementsByClassName(node_info.className);
-    console.assert(elements.length == 1);
-    node_info.node = elements[0];
-  };
+  var bindNodes = function() {
+    // Bind nodes
+    Utils.bindNodeInfo(rootNode, cancelPaymentButtonNode); 
+    Utils.bindNodeInfo(rootNode, confirmPaymentButtonNode); 
+    Utils.bindNodeInfo(rootNode, hoursValueNode); 
+    Utils.bindNodeInfo(rootNode, hoursUnitNode); 
+    Utils.bindNodeInfo(rootNode, hourlyRateValueNode); 
+    Utils.bindNodeInfo(rootNode, totalPriceValueNode); 
 
-  /**
-   * synthesizeTechnicianPageTemplate()
-   * - copy technician-page template and insert into main dom tree
-   * @pre-condition: 'TechnicianPageRootNode' must be initialized
-   */
-  function synthesizeTechnicianPageTemplate() {
-    // Bind technician-page dom template
-    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
-    var page_clone = document.importNode(page_template.content, true);
-    TechnicianPageRootNode.node.appendChild(page_clone);
-  };
+    // Attach event listeners
+    confirmPaymentButtonNode.node.onclick = function() {
+      for (var i = 0; i < confirmOrderCallbacks.length; ++i) {
+        var callback = confirmOrderCallbacks[i];
+        callback(_this);
+      } 
+    };
 
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = TechnicianPageRootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  /**
-   * bindInternalNodes()
-   * - bind class-bound nodes internal to this template
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(pageWrapperNode);     
-  };
-
-  /**
-   * initDisplay()
-   * - render initially ui
-   */
-  function initDisplay() {
-    if (isDisplayedInitially) {
-      _this.show();
-    } else {
-      _this.hide(); 
-    }
+    cancelPaymentButtonNode.node.onclick = function() {
+      for (var i = 0; i < cancelOrderCallbacks.length; ++i) {
+        var callback = cancelOrderCallbacks[i];
+        callback(_this);
+      } 
+    };
   };
 
   /**
    * Privileged functions
    */
-  /**
-   * init()
-   * - initialize technician page and put it in starting state
-   */
   this.init = function() {
-    // Bind top-level technician-page node (we're going to copy the template into this!)
-    TechnicianPageRootNode.node = document.getElementById(TechnicianPageRootNode.id);
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
 
-    // Clone template and copy into wrapper
-    synthesizeTechnicianPageTemplate();
-
-    // Bind nodes internal to this template
-    bindInternalNodes();
-
-    // Initialize ui
-    initDisplay();
+    // Bind all ui dom nodes
+    bindNodes();
   };
 
-  /**
-   * hide()
-   * - hide the technician-page
-   */
-  this.hide = function() {
-    TechnicianPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+  this.bindCancelOrder = function(callback) {
+    cancelOrderCallbacks.push(callback);
+    return this;
   };
 
-  /**
-   * show()
-   * - show the technician-page
-   */
-  this.show = function() {
-    TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  this.bindConfirmOrder = function(callback) {
+    confirmOrderCallbacks.push(callback);
+    return this;
   };
 
+  this.setPricingInformation = function(
+    hours_count,
+    hourly_rate,
+    total_price
+  ) {
+    hoursValueNode.node.innerHTML = hours_count;
+    hoursUnitNode.node.innerHTML = (hours_count == 1)
+      ? HOUR_UNIT.singular
+      : HOUR_UNIT.plural;
+    hourlyRateValueNode.node.innerHTML = hourly_rate;
+    totalPriceValueNode.node.innerHTML = total_price;
+  };
 };
 
 var NewExperimentPageView = function(
@@ -7645,6 +7864,8 @@ var NewExperimentPageView = function(
     max: 12,
     step: 1
   };
+
+  var experimentDurationController = null;
   
   /**
    * Experiment time form node
@@ -7665,6 +7886,14 @@ var NewExperimentPageView = function(
   var SHORT_CODE_TITLE_LABEL = 'Select a payment method';
 
   /**
+   * Confirm order form view dom node
+   */
+  var confirmOrderFormViewNode = {
+    className: 'confirm-order-form',
+    node: null
+  };
+
+  /**
    * Private state
    */
   var templateStore = template_store;
@@ -7675,6 +7904,7 @@ var NewExperimentPageView = function(
   var experimentDurationFormView = null;
   var experimentTimeFormView = null;
   var shortCodePickerFormView = null;
+  var confirmExperimentFormView = null;
 
   /**
    * Private functions
@@ -7716,6 +7946,13 @@ var NewExperimentPageView = function(
     );
 
     slider_form_view.init(slider_model);
+
+    experimentDurationController = new SliderController();
+    experimentDurationController.init(
+      slider_form_view,
+      slider_model
+    );
+
     return slider_form_view;
   };
 
@@ -7754,26 +7991,30 @@ var NewExperimentPageView = function(
     return form_view;
   };
 
+  var initConfirmExperimentFormView = function() {
+    // Initialize form view
+    var form_view = new ConfirmOrderFormView(
+      templateStore,
+      confirmOrderFormViewNode.node
+    );
+
+    form_view.init();
+
+    // Initialize form controller
+    var form_controller = new ConfirmOrderFormController();
+    form_controller.init(
+      form_view,
+      experimentDurationController.getModel()
+    );
+    return form_view;
+  };
+
   var bindNodes = function() {
-    scopesCountNode.node = Utils.bindNode(
-      rootNode,
-      scopesCountNode.className
-    );
-
-    experimentDurationNode.node = Utils.bindNode(
-      rootNode,
-      experimentDurationNode.className
-    );
-
-    experimentTimeNode.node = Utils.bindNode(
-      rootNode,
-      experimentTimeNode.className
-    );
-
-    shortCodePickerNode.node = Utils.bindNode(
-      rootNode,
-      shortCodePickerNode.className
-    );
+    Utils.bindNodeInfo(rootNode, scopesCountNode);
+    Utils.bindNodeInfo(rootNode, experimentDurationNode);
+    Utils.bindNodeInfo(rootNode, experimentTimeNode);
+    Utils.bindNodeInfo(rootNode, shortCodePickerNode);
+    Utils.bindNodeInfo(rootNode, confirmOrderFormViewNode);
   };
 
   /**
@@ -7796,6 +8037,7 @@ var NewExperimentPageView = function(
     experimentDurationFormView = initExperimentDurationView();
     experimentTimeFormView = initExperimentTimeFormView();
     shortCodePickerFormView = initShortCodePickerFormView();
+    confirmExperimentFormView = initConfirmExperimentFormView();
   };
 
   this.getTitle = function() {

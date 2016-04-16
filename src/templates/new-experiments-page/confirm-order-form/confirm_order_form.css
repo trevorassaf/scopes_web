@@ -1,0 +1,28 @@
+.confirm-order-form-wrapper .confirm-payment-container {
+  margin-top: 20px;
+}
+
+.confirm-order-form-wrapper .confirm-payment-container > div {
+  display: inline-block;
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: 20px;
+  cursor: pointer;
+  color: #FFF;
+}
+
+.confirm-order-form-wrapper .confirm-payment-container .confirm-payment-button {
+  background-color: #4D90FE;
+}
+
+.confirm-order-form-wrapper .confirm-payment-container .confirm-payment-button:hover {
+  background-image: -webkit-linear-gradient(top, #4D90FE, #2478FD);
+}
+
+.confirm-order-form-wrapper .confirm-payment-container .cancel-payment-button {
+  background-color: #FF3B45;
+}
+
+.confirm-order-form-wrapper .confirm-payment-container .cancel-payment-button:hover {
+  background-image: -webkit-linear-gradient(top, #FF3B45, #FF0E1A);
+}
