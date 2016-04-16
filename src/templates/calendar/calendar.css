@@ -173,4 +173,6 @@
 
 .calendar-wrapper .weeks-container .date-wrapper:not([unselectable-date]):hover {
   cursor: pointer;
+  color: rgb(38, 108, 177);
+  /* font-weight: bold; */
 }

@@ -1313,6 +1313,259 @@ UserModel.prototype.bindEmail = function(callback) {
   return this;
 };
 
+function ConfirmedOrder(
+  id,
+  num_scopes,
+  start_timestamp,
+  end_timestamp,
+  title,
+  description,
+  time_ordered,
+  price,
+  short_code
+) {
+  this.id = id;
+  this.scopesCount = num_scopes;
+  this.startTimestamp = start_timestamp;
+  this.endTimestamp = end_timestamp;
+  this.title = title;
+  this.description = description;
+  this.timeOrdered = time_ordered;
+  this.price = price;
+  this.shortCode = short_code;
+};
+
+ConfirmedOrder.prototype.getId = function() {
+  return this.id;
+};
+
+ConfirmedOrder.prototype.getScopesCount = function() {
+  return this.scopesCount;
+};
+
+ConfirmedOrder.prototype.getStartTimestamp = function() {
+  return this.startTimestamp;
+};
+
+ConfirmedOrder.prototype.getEndTimestamp = function() {
+  return this.endTimestamp;
+};
+
+ConfirmedOrder.prototype.getTitle = function() {
+  return this.title;
+};
+
+ConfirmedOrder.prototype.getDescription = function() {
+  return this.description;
+};
+
+ConfirmedOrder.prototype.getTimeOrdered = function() {
+  return this.timeOrdered;
+};
+
+ConfirmedOrder.prototype.getPrice = function() {
+  return this.price;
+};
+
+ConfirmedOrder.prototype.getShortCode = function() {
+  return this.shortCode;
+};
+
+var DateOperator = (function() {
+
+  // Date constants
+  var HOURS_IN_MICROSECONDS = 3.6e6;
+
+  /**
+   * Privileged methods
+   */
+
+  this.getDifferenceInHours = function(
+    date_a,
+    date_b
+  ) {
+    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
+  };
+
+  return {
+    getDifferenceInHours: getDifferenceInHours
+  };
+
+})();
+
+function SerializeableDate(
+  year,
+  month,
+  date
+) {
+
+  // Ui constants
+  this.DATE_DELIMITER = ',';
+
+  this.SHORT_MONTH_NAMES = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  /**
+   * getShortMonthName()
+   * @param uint month: 0 < month < 11
+   */
+  this.getShortMonthName = function(month) {
+    return this.SHORT_MONTH_NAMES[month];
+  };
+
+  // Private state
+  this.year = year;
+
+  console.assert(month >= 0 && month < 12);
+  this.month = month;
+
+  console.assert(date >= 0 && date < 31);
+  this.date = date;
+};
+
+SerializeableDate.prototype.serialize = function() {
+  return this.getShortMonthName(this.month) + ' ' + this.date
+    + this.DATE_DELIMITER + ' ' + this.year;
+};
+
+function SerializeableTime(
+  hours,    // military time
+  minutes,
+  seconds
+) {
+
+  this.TIME_DELIMITER = ':';
+  this.AM_TOKEN = 'am';
+  this.PM_TOKEN = 'pm';
+
+  this.convertHourToNonMilitaryTime = function(military_hours) {
+    return (military_hours > 12)
+      ? military_hours - 12
+      : military_hours;
+  };
+
+  this.getMeridianToken = function(military_hours) {
+    return (military_hours >= 12 && military_hours !== 24)
+      ? this.PM_TOKEN
+      : this.AM_TOKEN;
+  };
+
+  this.hours = hours;
+  this.minutes = minutes;
+  this.seconds = seconds;
+};
+
+SerializeableTime.prototype.serialize = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
+};
+
+SerializeableTime.prototype.serializeWithoutSeconds = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
+    " " + meridian_token;
+};
+
+function ShortCode(
+  id,
+  code,
+  alias
+) {
+  this.id = id;
+  this.code = code;
+  this.alias = alias;
+};
+
+ShortCode.prototype.getId = function() {
+  return this.id;
+};
+
+ShortCode.prototype.getCode = function() {
+  return this.code;
+};
+
+ShortCode.prototype.getAlias = function() {
+  return this.alias;
+};
+
+var UpdateConfirmedOrderRequestBuilder = function() {
+
+  this.orderId = null;
+  this.title = null;
+  this.removeTitle = false;
+  this.description = null;
+  this.removeDescription = false;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
+  this.orderId = id;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
+  this.title = title;
+  this.removeTitle = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
+  this.title = null;
+  this.removeTitle = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
+  this.description = description;
+  this.removeDescription = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
+  this.description = null;
+  this.removeDescription = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
+  // Check: id must be set!
+  console.assert(this.orderId != null);
+
+  // Check: at least one other field must be set 
+  console.assert(
+      this.title != null ||
+      this.isTitleRemoved != null ||
+      this.description != null ||
+      this.isDescriptionRemoved != null
+  );
+
+  return new UpdateConfirmedOrderRequest(
+    this.orderId,
+    this.title,
+    this.isTitleRemoved,
+    this.description,
+    this.isDescriptionRemoved
+  );
+};
+
 var Utils = (function() {
 
   var CLASS_NAME_PROPERTY = "className";
@@ -1606,259 +1859,6 @@ var Utils = (function() {
   };
 
 })();
-
-function ConfirmedOrder(
-  id,
-  num_scopes,
-  start_timestamp,
-  end_timestamp,
-  title,
-  description,
-  time_ordered,
-  price,
-  short_code
-) {
-  this.id = id;
-  this.scopesCount = num_scopes;
-  this.startTimestamp = start_timestamp;
-  this.endTimestamp = end_timestamp;
-  this.title = title;
-  this.description = description;
-  this.timeOrdered = time_ordered;
-  this.price = price;
-  this.shortCode = short_code;
-};
-
-ConfirmedOrder.prototype.getId = function() {
-  return this.id;
-};
-
-ConfirmedOrder.prototype.getScopesCount = function() {
-  return this.scopesCount;
-};
-
-ConfirmedOrder.prototype.getStartTimestamp = function() {
-  return this.startTimestamp;
-};
-
-ConfirmedOrder.prototype.getEndTimestamp = function() {
-  return this.endTimestamp;
-};
-
-ConfirmedOrder.prototype.getTitle = function() {
-  return this.title;
-};
-
-ConfirmedOrder.prototype.getDescription = function() {
-  return this.description;
-};
-
-ConfirmedOrder.prototype.getTimeOrdered = function() {
-  return this.timeOrdered;
-};
-
-ConfirmedOrder.prototype.getPrice = function() {
-  return this.price;
-};
-
-ConfirmedOrder.prototype.getShortCode = function() {
-  return this.shortCode;
-};
-
-var DateOperator = (function() {
-
-  // Date constants
-  var HOURS_IN_MICROSECONDS = 3.6e6;
-
-  /**
-   * Privileged methods
-   */
-
-  this.getDifferenceInHours = function(
-    date_a,
-    date_b
-  ) {
-    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
-  };
-
-  return {
-    getDifferenceInHours: getDifferenceInHours
-  };
-
-})();
-
-function SerializeableDate(
-  year,
-  month,
-  date
-) {
-
-  // Ui constants
-  this.DATE_DELIMITER = ',';
-
-  this.SHORT_MONTH_NAMES = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
-
-  /**
-   * getShortMonthName()
-   * @param uint month: 0 < month < 11
-   */
-  this.getShortMonthName = function(month) {
-    return this.SHORT_MONTH_NAMES[month];
-  };
-
-  // Private state
-  this.year = year;
-
-  console.assert(month >= 0 && month < 12);
-  this.month = month;
-
-  console.assert(date >= 0 && date < 31);
-  this.date = date;
-};
-
-SerializeableDate.prototype.serialize = function() {
-  return this.getShortMonthName(this.month) + ' ' + this.date
-    + this.DATE_DELIMITER + ' ' + this.year;
-};
-
-function SerializeableTime(
-  hours,    // military time
-  minutes,
-  seconds
-) {
-
-  this.TIME_DELIMITER = ':';
-  this.AM_TOKEN = 'am';
-  this.PM_TOKEN = 'pm';
-
-  this.convertHourToNonMilitaryTime = function(military_hours) {
-    return (military_hours > 12)
-      ? military_hours - 12
-      : military_hours;
-  };
-
-  this.getMeridianToken = function(military_hours) {
-    return (military_hours >= 12 && military_hours !== 24)
-      ? this.PM_TOKEN
-      : this.AM_TOKEN;
-  };
-
-  this.hours = hours;
-  this.minutes = minutes;
-  this.seconds = seconds;
-};
-
-SerializeableTime.prototype.serialize = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
-};
-
-SerializeableTime.prototype.serializeWithoutSeconds = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
-    " " + meridian_token;
-};
-
-function ShortCode(
-  id,
-  code,
-  alias
-) {
-  this.id = id;
-  this.code = code;
-  this.alias = alias;
-};
-
-ShortCode.prototype.getId = function() {
-  return this.id;
-};
-
-ShortCode.prototype.getCode = function() {
-  return this.code;
-};
-
-ShortCode.prototype.getAlias = function() {
-  return this.alias;
-};
-
-var UpdateConfirmedOrderRequestBuilder = function() {
-
-  this.orderId = null;
-  this.title = null;
-  this.removeTitle = false;
-  this.description = null;
-  this.removeDescription = false;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
-  this.orderId = id;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
-  this.title = title;
-  this.removeTitle = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
-  this.title = null;
-  this.removeTitle = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
-  this.description = description;
-  this.removeDescription = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
-  this.description = null;
-  this.removeDescription = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
-  // Check: id must be set!
-  console.assert(this.orderId != null);
-
-  // Check: at least one other field must be set 
-  console.assert(
-      this.title != null ||
-      this.isTitleRemoved != null ||
-      this.description != null ||
-      this.isDescriptionRemoved != null
-  );
-
-  return new UpdateConfirmedOrderRequest(
-    this.orderId,
-    this.title,
-    this.isTitleRemoved,
-    this.description,
-    this.isDescriptionRemoved
-  );
-};
 
 function ApiControllerWrapper(api_object) {
 
@@ -3610,152 +3610,6 @@ var ScopesNetwork = (function() {
   }
 }());
 
-var CenterPageView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'center-page-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'center-page-wrapper';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-  var rootNode = null;
-
-  var currentPageView = null;
-
-  var newExperimentPageView = null;
-  var myExperimentsPageView = null;
-  var feedbackPageView = null;
-  var technicianPageView = null;
-
-  /**
-   * Dom nodes
-   */
-  var pageTitleNode = {
-    className: 'title-label',
-    node: null
-  };
-
-  var centerPanelPageContainerNode = {
-    className: 'page-container',
-    node: null
-  };
-
-  var adminButtonContainerNode = {
-    className: 'admin-btn-container',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-
-  var initNewExperimentPage = function() {
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    ); 
-    newExperimentPageView.init();
-  };
-
-  var initPages = function() {
-    initNewExperimentPage(); 
-  };
-
-  var bindNodes = function() {
-    // Bind page title node
-    pageTitleNode.node = Utils.bindNode(
-      rootNode,
-      pageTitleNode.className
-    ); 
-
-    // Bind container node for admin buttons
-    adminButtonContainerNode.node = Utils.bindNode(
-      rootNode,
-      adminButtonContainerNode.className
-    );
-    
-    // Bind node that contains the pages
-    centerPanelPageContainerNode.node = Utils.bindNode(
-      rootNode,
-      centerPanelPageContainerNode.className
-    );
-
-    // Initialize pages
-    initPages();
-  };
-
-  var initPageViews = function() {
-    // Init new experiment page view
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );     
-
-    newExperimentPageView.init();
-  };
-
-  var changePage = function(next_page_view) {
-    console.assert(next_page_view != null);
-
-    // Hide current page
-    if (currentPageView != null) {
-      currentPageView.hide();
-    }
-
-    // Show next page and update title
-    currentPageView = next_page_view;
-    pageTitleNode.node.innerHTML = currentPageView.getTitle();
-    currentPageView.show();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );
-
-    bindNodes();
-
-    return this;
-  };
-
-  /**
-   * Functions for showing main pages
-   */
-  this.showNewExperimentPage = function() {
-    changePage(newExperimentPageView);       
-  };
-
-  this.showMyExperimentsPage = function() {
-    changePage(myExperimentsPageView);       
-  };
-
-  this.showFeedbackPage = function() {
-    changePage(feedbackPageView);       
-  };
-
-  this.showTechnicianPage = function() {
-    changePage(technicianPageView);       
-  };
-};
-
 function Calendar(
   template_store,
   calendar_id,
@@ -4664,6 +4518,9 @@ var DatePickerView = function(
             var callback = dateSelectionCallbacks[j];   
             callback(_this, date_idx);
           }
+
+          // Close date-picker
+          close();
         }
 
         // Event: left month navigation
@@ -4677,6 +4534,9 @@ var DatePickerView = function(
         }
       }
     };
+
+    // Close date-picker if user clicks off the ui element
+    Utils.bindClickBeyondNode(datePickerRootNode, close); 
   };
 
   var setSelectedDate = function(selected_date) {
@@ -5390,6 +5250,152 @@ var DropDownView = function(
 
   this.bindClick = function(callback) {
     onClickCallbacks.push(callback);
+  };
+};
+
+var CenterPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'center-page-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'center-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var rootNode = null;
+
+  var currentPageView = null;
+
+  var newExperimentPageView = null;
+  var myExperimentsPageView = null;
+  var feedbackPageView = null;
+  var technicianPageView = null;
+
+  /**
+   * Dom nodes
+   */
+  var pageTitleNode = {
+    className: 'title-label',
+    node: null
+  };
+
+  var centerPanelPageContainerNode = {
+    className: 'page-container',
+    node: null
+  };
+
+  var adminButtonContainerNode = {
+    className: 'admin-btn-container',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+
+  var initNewExperimentPage = function() {
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    ); 
+    newExperimentPageView.init();
+  };
+
+  var initPages = function() {
+    initNewExperimentPage(); 
+  };
+
+  var bindNodes = function() {
+    // Bind page title node
+    pageTitleNode.node = Utils.bindNode(
+      rootNode,
+      pageTitleNode.className
+    ); 
+
+    // Bind container node for admin buttons
+    adminButtonContainerNode.node = Utils.bindNode(
+      rootNode,
+      adminButtonContainerNode.className
+    );
+    
+    // Bind node that contains the pages
+    centerPanelPageContainerNode.node = Utils.bindNode(
+      rootNode,
+      centerPanelPageContainerNode.className
+    );
+
+    // Initialize pages
+    initPages();
+  };
+
+  var initPageViews = function() {
+    // Init new experiment page view
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );     
+
+    newExperimentPageView.init();
+  };
+
+  var changePage = function(next_page_view) {
+    console.assert(next_page_view != null);
+
+    // Hide current page
+    if (currentPageView != null) {
+      currentPageView.hide();
+    }
+
+    // Show next page and update title
+    currentPageView = next_page_view;
+    pageTitleNode.node.innerHTML = currentPageView.getTitle();
+    currentPageView.show();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );
+
+    bindNodes();
+
+    return this;
+  };
+
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    changePage(newExperimentPageView);       
+  };
+
+  this.showMyExperimentsPage = function() {
+    changePage(myExperimentsPageView);       
+  };
+
+  this.showFeedbackPage = function() {
+    changePage(feedbackPageView);       
+  };
+
+  this.showTechnicianPage = function() {
+    changePage(technicianPageView);       
   };
 };
 
@@ -7185,132 +7191,6 @@ function SidePanelTab(
   };
 };
 
-function TechnicianPage(
-  template_store,
-  root_id,
-  is_displayed_initially
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = '#technician-page-template';
-
-  /**
-   * Ui attributes
-   */
-  var HIDDEN_ATTR = "hidden-technician-page";
-
-  /**
-   * Private state
-   */
-  // Dom nodes
-  var templateStore = template_store;
-  var isDisplayedInitially = is_displayed_initially;
-  var _this = this;
-
-  // Root node
-  var TechnicianPageRootNode = {
-    id: root_id,
-    node: null
-  };
-
-  // Class-bound nodes
-  var pageWrapperNode = {
-    className: 'technician-page-wrapper',
-    node: null 
-  };
-
-  /**
-   * Private functions
-   */
-  function fetchClassBoundDomNode(node_info) {
-    elements = TechnicianPageRootNode.node.getElementsByClassName(node_info.className);
-    console.assert(elements.length == 1);
-    node_info.node = elements[0];
-  };
-
-  /**
-   * synthesizeTechnicianPageTemplate()
-   * - copy technician-page template and insert into main dom tree
-   * @pre-condition: 'TechnicianPageRootNode' must be initialized
-   */
-  function synthesizeTechnicianPageTemplate() {
-    // Bind technician-page dom template
-    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
-    var page_clone = document.importNode(page_template.content, true);
-    TechnicianPageRootNode.node.appendChild(page_clone);
-  };
-
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = TechnicianPageRootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  /**
-   * bindInternalNodes()
-   * - bind class-bound nodes internal to this template
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(pageWrapperNode);     
-  };
-
-  /**
-   * initDisplay()
-   * - render initially ui
-   */
-  function initDisplay() {
-    if (isDisplayedInitially) {
-      _this.show();
-    } else {
-      _this.hide(); 
-    }
-  };
-
-  /**
-   * Privileged functions
-   */
-  /**
-   * init()
-   * - initialize technician page and put it in starting state
-   */
-  this.init = function() {
-    // Bind top-level technician-page node (we're going to copy the template into this!)
-    TechnicianPageRootNode.node = document.getElementById(TechnicianPageRootNode.id);
-
-    // Clone template and copy into wrapper
-    synthesizeTechnicianPageTemplate();
-
-    // Bind nodes internal to this template
-    bindInternalNodes();
-
-    // Initialize ui
-    initDisplay();
-  };
-
-  /**
-   * hide()
-   * - hide the technician-page
-   */
-  this.hide = function() {
-    TechnicianPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
-  };
-
-  /**
-   * show()
-   * - show the technician-page
-   */
-  this.show = function() {
-    TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
-  };
-
-};
-
 function TimePicker(
   template_store,
   parent_node,
@@ -7576,6 +7456,132 @@ function TimePicker(
     inputFieldNode.node.innerHTML = stringifyTimeForInputField(time);
     currentTime = time;
   };
+};
+
+function TechnicianPage(
+  template_store,
+  root_id,
+  is_displayed_initially
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = '#technician-page-template';
+
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_ATTR = "hidden-technician-page";
+
+  /**
+   * Private state
+   */
+  // Dom nodes
+  var templateStore = template_store;
+  var isDisplayedInitially = is_displayed_initially;
+  var _this = this;
+
+  // Root node
+  var TechnicianPageRootNode = {
+    id: root_id,
+    node: null
+  };
+
+  // Class-bound nodes
+  var pageWrapperNode = {
+    className: 'technician-page-wrapper',
+    node: null 
+  };
+
+  /**
+   * Private functions
+   */
+  function fetchClassBoundDomNode(node_info) {
+    elements = TechnicianPageRootNode.node.getElementsByClassName(node_info.className);
+    console.assert(elements.length == 1);
+    node_info.node = elements[0];
+  };
+
+  /**
+   * synthesizeTechnicianPageTemplate()
+   * - copy technician-page template and insert into main dom tree
+   * @pre-condition: 'TechnicianPageRootNode' must be initialized
+   */
+  function synthesizeTechnicianPageTemplate() {
+    // Bind technician-page dom template
+    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
+    var page_clone = document.importNode(page_template.content, true);
+    TechnicianPageRootNode.node.appendChild(page_clone);
+  };
+
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = TechnicianPageRootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  /**
+   * bindInternalNodes()
+   * - bind class-bound nodes internal to this template
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(pageWrapperNode);     
+  };
+
+  /**
+   * initDisplay()
+   * - render initially ui
+   */
+  function initDisplay() {
+    if (isDisplayedInitially) {
+      _this.show();
+    } else {
+      _this.hide(); 
+    }
+  };
+
+  /**
+   * Privileged functions
+   */
+  /**
+   * init()
+   * - initialize technician page and put it in starting state
+   */
+  this.init = function() {
+    // Bind top-level technician-page node (we're going to copy the template into this!)
+    TechnicianPageRootNode.node = document.getElementById(TechnicianPageRootNode.id);
+
+    // Clone template and copy into wrapper
+    synthesizeTechnicianPageTemplate();
+
+    // Bind nodes internal to this template
+    bindInternalNodes();
+
+    // Initialize ui
+    initDisplay();
+  };
+
+  /**
+   * hide()
+   * - hide the technician-page
+   */
+  this.hide = function() {
+    TechnicianPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+  };
+
+  /**
+   * show()
+   * - show the technician-page
+   */
+  this.show = function() {
+    TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  };
+
 };
 
 var NewExperimentPageView = function(

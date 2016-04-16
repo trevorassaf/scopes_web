@@ -186,6 +186,9 @@ var DatePickerView = function(
             var callback = dateSelectionCallbacks[j];   
             callback(_this, date_idx);
           }
+
+          // Close date-picker
+          close();
         }
 
         // Event: left month navigation
@@ -199,6 +202,9 @@ var DatePickerView = function(
         }
       }
     };
+
+    // Close date-picker if user clicks off the ui element
+    Utils.bindClickBeyondNode(datePickerRootNode, close); 
   };
 
   var setSelectedDate = function(selected_date) {

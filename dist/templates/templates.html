@@ -1,31 +1,3 @@
-<template id='center-page-template'>
-  <div class='center-page-wrapper'>
-
-    <!-- Upper-most row of center page. Container page title and admin btns -->
-    <div class='title-and-admin-btn-row'>
-      
-      <!-- Title for the center page -->
-      <div class='title-container'>
-        <span class='title-label'></span> 
-      </div> 
-
-      <!-- Admin icon buttons -->
-      <div class='admin-btn-container'>
-        <div class='user-profile-admin-btn-container'>
-          <iron-icon class='user-circle-icon' icon='account-circle'></iron-icon>
-        </div>
-        <div class='settings-admin-btn-container'>
-          <iron-icon class='settings-icon' icon='settings'></iron-icon>
-        </div>
-      </div>
-    </div>
-
-    <!-- Center panel container: contains all main pages -->
-    <div class='page-container'></div>
-
-  </div>
-</template>
-
 <template id='calendar-template'>
   <div class='calendar-wrapper'>
     <!-- Collapsed banner -->
@@ -128,6 +100,34 @@
 <template id='dropdown-item-template'>
   <div class='dropdown-item-wrapper'>
     <span class='item-label'></span>
+  </div>
+</template>
+
+<template id='center-page-template'>
+  <div class='center-page-wrapper'>
+
+    <!-- Upper-most row of center page. Container page title and admin btns -->
+    <div class='title-and-admin-btn-row'>
+      
+      <!-- Title for the center page -->
+      <div class='title-container'>
+        <span class='title-label'></span> 
+      </div> 
+
+      <!-- Admin icon buttons -->
+      <div class='admin-btn-container'>
+        <div class='user-profile-admin-btn-container'>
+          <iron-icon class='user-circle-icon' icon='account-circle'></iron-icon>
+        </div>
+        <div class='settings-admin-btn-container'>
+          <iron-icon class='settings-icon' icon='settings'></iron-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center panel container: contains all main pages -->
+    <div class='page-container'></div>
+
   </div>
 </template>
 
@@ -350,10 +350,6 @@
   </div>
 </template>
 
-<template id='technician-page-template'>
-  <div class='technician-page-wrapper'></div>
-</template>
-
 <template id='time-picker-template'>
   <div class='time-picker-wrapper'>
     <div class='input-field-wrapper'>
@@ -372,6 +368,10 @@
   <div class='time-picker-option'>
     <span class='time-label'></span>
   </div>
+</template>
+
+<template id='technician-page-template'>
+  <div class='technician-page-wrapper'></div>
 </template>
 
 <template id='confirm-order-form-template'>
