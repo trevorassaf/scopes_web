@@ -5,7 +5,7 @@ html, body {
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0px; /* remove space in inline-block elements */
-  overflow-x: scroll;
+  /* overflow-x: scroll; */
   min-width: 1000px;
 }
 

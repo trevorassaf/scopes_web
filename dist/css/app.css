@@ -78,7 +78,7 @@ html, body {
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 0px; /* remove space in inline-block elements */
-  overflow-x: scroll;
+  /* overflow-x: scroll; */
   min-width: 1000px;
 }
 
@@ -547,6 +547,7 @@ hidden {
   overflow-y: auto;
   width: 100%;
   top: 2px;
+  z-index: 100;
 }
 
 /**
@@ -1001,7 +1002,6 @@ hidden {
   margin-bottom: 15px;
 }
 
-
 .dash-nav-panel-btn {
   background: #FFFFFF;  
   padding: 10px;
@@ -1027,6 +1027,7 @@ hidden {
   color: rgb(41, 98, 255);
   color: #3385FF;
 }
+
 
 .time-picker-wrapper {
   cursor: pointer;

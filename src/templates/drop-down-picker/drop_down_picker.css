@@ -53,6 +53,7 @@
   overflow-y: auto;
   width: 100%;
   top: 2px;
+  z-index: 100;
 }
 
 /**

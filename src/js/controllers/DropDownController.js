@@ -34,4 +34,12 @@ var DropDownController = function() {
     dropDownModel = model;
     return this;
   };
+
+  this.getView = function() {
+    return dropDownView;
+  };
+
+  this.getModel = function() {
+    return dropDownModel;
+  };
 };

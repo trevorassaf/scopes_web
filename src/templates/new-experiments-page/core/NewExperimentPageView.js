@@ -47,14 +47,6 @@ var NewExperimentPageView = function(
     node: null
   };
 
-  /**
-   * Experiment time form node
-   */
-  var experimentTimeNode = {
-    className: 'experiment-time-form',
-    node: null
-  };
-
   var EXPERIMENT_DURATION_TITLE_LABEL = 'How long is your experiment?';
 
   var EXPERIMENT_DURATION_UNIT_LABELS = {
@@ -67,6 +59,24 @@ var NewExperimentPageView = function(
     max: 12,
     step: 1
   };
+  
+  /**
+   * Experiment time form node
+   */
+  var experimentTimeNode = {
+    className: 'experiment-time-form',
+    node: null
+  };
+
+  /**
+   * Short code picker input field
+   */
+  var shortCodePickerNode = {
+    className: 'short-code-form', 
+    node: null
+  };
+
+  var SHORT_CODE_TITLE_LABEL = 'Select a payment method';
 
   /**
    * Private state
@@ -78,6 +88,7 @@ var NewExperimentPageView = function(
   var scopesCountFormView = null;
   var experimentDurationFormView = null;
   var experimentTimeFormView = null;
+  var shortCodePickerFormView = null;
 
   /**
    * Private functions
@@ -132,6 +143,31 @@ var NewExperimentPageView = function(
     return form_view;
   };
 
+  var initShortCodePickerFormView = function() {
+    // Initialize form view
+    var form_view = new ShortCodeFormView(
+      templateStore,
+      shortCodePickerNode.node
+    );
+   
+    // Initialize drop-down model
+    var drop_down_model = new DropDownModel();
+    var drop_down_items = [
+      new DropDownItemModel("SHORT", "SHORT", {}),
+      new DropDownItemModel("CODE", "CODE", {}),
+      new DropDownItemModel("SHIT", "SHIT", {})
+    ];
+    drop_down_model.setDropDownItems(drop_down_items);
+
+    // Initialize drop-down model controller
+    var drop_down_controller = new DropDownController();
+    drop_down_controller.setModel(drop_down_model);
+
+    form_view.init(drop_down_controller);
+
+    return form_view;
+  };
+
   var bindNodes = function() {
     scopesCountNode.node = Utils.bindNode(
       rootNode,
@@ -146,6 +182,11 @@ var NewExperimentPageView = function(
     experimentTimeNode.node = Utils.bindNode(
       rootNode,
       experimentTimeNode.className
+    );
+
+    shortCodePickerNode.node = Utils.bindNode(
+      rootNode,
+      shortCodePickerNode.className
     );
   };
 
@@ -168,6 +209,7 @@ var NewExperimentPageView = function(
     scopesCountFormView = initScopeCountView(); 
     experimentDurationFormView = initExperimentDurationView();
     experimentTimeFormView = initExperimentTimeFormView();
+    shortCodePickerFormView = initShortCodePickerFormView();
   };
 
   this.getTitle = function() {
