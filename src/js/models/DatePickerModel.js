@@ -28,24 +28,24 @@ var DatePickerModel = function() {
 DatePickerModel.prototype.setSelectedDate = function(selected_date) {
   this.selectedDate = selected_date;
   this.selectedDateCallbacks.forEach(function(callback) {
-    callback(selectedDate);
-  });
+    callback(this.selectedDate);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setSelectedMonth = function(selected_month) {
   this.selectedMonth = selected_month;
   this.selectedMonthCallbacks.forEach(function(callback) {
-    callback(selectedMonth);
-  });
+    callback(this.selectedMonth);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setSelectedYear = function(selected_year) {
   this.selectedYear = selected_year;
   this.selectedYearCallbacks.forEach(function(callback) {
-    callback(selectedYear);
-  });
+    callback(this.selectedYear);
+  }, this);
   return this;
 };
 
@@ -53,56 +53,56 @@ DatePickerModel.prototype.setViewedMonthAndYear = function(viewed_month, viewed_
   this.viewedMonth = viewed_month;
   this.viewedYear = viewed_year;
   this.viewedMonthCallbacks.forEach(function(callback) {
-    callback(viewedMonth, viewedYear);
-  });
+    callback(this.viewedMonth, this.viewedYear);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setViewedMonth = function(viewed_month) {
   this.viewedMonth = viewed_month;
   this.viewedMonthCallbacks.forEach(function(callback) {
-    callback(viewedMonth, viewedYear);
-  });
+    callback(this.viewedMonth, this.viewedYear);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setViewedYear = function(viewed_year) {
   this.viewedYear = viewed_year;
   this.viewedMonthCallbacks.forEach(function(callback) {
-    callback(viewedMonth, viewedYear);
-  });
+    callback(this.viewedMonth, this.viewedYear);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setMinAdvanceDayCount = function(count) {
   this.minAdvanceDayCount = count;
   this.minAdvanceDayCountCallbacks.forEach(function(callback) {
-    callback(minAdvanceDayCount);
-  });
+    callback(this.minAdvanceDayCount);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setMaxAdvanceMonthCount = function(count) {
   this.maxAdvanceMonthCount = count;
   this.maxAdvanceMonthCountCallbacks.forEach(function(callback) {
-    callback(maxAdvanceMonthCount);
-  });
+    callback(this.maxAdvanceMonthCount);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setInvalidDaysOfTheWeek = function(invalid_days) {
   this.invalidDaysOfTheWeek = invalid_days;
   this.invalidDaysOfTheWeekCallbacks.forEach(function(callback) {
-    callback(invalidDaysOfTheWeek);
-  });
+    callback(this.invalidDaysOfTheWeek);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setInvalidDates = function(invalid_dates) {
   this.invalidDates = invalid_dates;
   this.invalidDatesCallbacks.forEach(function(callback) {
-    callback(invalidDates);
-  });
+    callback(this.invalidDates);
+  }, this);
   return this;
 };
 

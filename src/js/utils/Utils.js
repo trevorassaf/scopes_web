@@ -9,21 +9,26 @@ var Utils = (function() {
   var TIME_DELIMITER = ":";
   var DATE_TIME_SEPERATOR = " ";
 
-  this.hasClass = function(expected_class, node) {
-    if (!(CLASS_NAME_PROPERTY in node)) {
-      return false;
-    }
+  // this.hasClass = function(expected_class, node) {
+  //   if (!(CLASS_NAME_PROPERTY in node)) {
+  //     return false;
+  //   }
+  //
+  //   var node_class = node[CLASS_NAME_PROPERTY];
+  //   var class_idx = node_class.indexOf(expected_class);
+  //   
+  //   if (class_idx == -1) {
+  //     return false;
+  //   }
+  //
+  //   return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
+  //     && (expected_class.length + class_idx == node_class.length
+  //       || node_class.charAt(expected_class.length + class_idx) == ' ');
+  // };
 
-    var node_class = node[CLASS_NAME_PROPERTY];
-    var class_idx = node_class.indexOf(expected_class);
-    
-    if (class_idx == -1) {
-      return false;
-    }
-
-    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-      && (expected_class.length + class_idx == node_class.length
-        || node_class.charAt(expected_class.length + class_idx) == ' ');
+  this.hasClass = function(class_name, node) {
+    console.assert(node != null);
+    return 'classList' in node && node.classList.contains(class_name);
   };
   
   this.makePriceString = function(price) {
@@ -257,6 +262,14 @@ var Utils = (function() {
     return 0;
   };
 
+  var contains = function(needle, haystack) {
+    return haystack.indexOf(needle) != -1; 
+  };
+
+  var trimLast = function(str) {
+    return str.susbtring(0, str.length - 1);
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -272,7 +285,9 @@ var Utils = (function() {
     hideNode: hideNode,
     showNode: showNode,
     bindClickBeyondNode: bindClickBeyondNode,
-    compareDates: compareDates
+    compareDates: compareDates,
+    contains: contains,
+    trimLast : trimLast,
   };
 
 })();

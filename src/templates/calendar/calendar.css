@@ -125,6 +125,19 @@
   top: 3px;
 }
 
+.calendar-wrapper .month-nav-container > iron-icon {
+  --iron-icon-height: 20px;
+  --iron-icon-width: 20px;
+}
+
+.calendar-wrapper .month-nav-container[disabled-month-nav] > iron-icon {
+  color: #777;
+}
+
+.calendar-wrapper .month-nav-container:not([disabled-month-nav]) {
+  cursor: pointer;
+}
+
 .calendar-wrapper .decrement-month-container {
   float: left; 
   margin-left: 10px;
@@ -133,12 +146,6 @@
 .calendar-wrapper .increment-month-container {
   float: right; 
   margin-right: 6px;
-}
-
-.calendar-wrapper .month-nav-container iron-icon {
-  --iron-icon-height: 20px;
-  --iron-icon-width: 20px;
-  cursor: pointer;
 }
 
 .calendar-wrapper .weeks-container {

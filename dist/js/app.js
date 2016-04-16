@@ -66,6 +66,124 @@ window.onload = function() {
   // });
 };
 
+var DatePickerController = function() {
+
+  /**
+   * Private state
+   */
+  var currentDate = new Date();
+  var datePickerView = null;
+  var datePickerModel = null;
+
+  /**
+   * Private functions
+   */
+  var handleDateSelection = function(view, date) {
+    // Exit early if we're no longer using this view
+    if (view != datePickerView) {
+      return;
+    }
+
+    // Handle date selection
+    datePickerModel
+      .setSelectedDate(date)
+      .setSelectedMonth(datePickerModel.getViewedMonth())
+      .setSelectedYear(datePickerModel.getViewedYear());
+  };
+
+  var handleMonthNavigation = function(view, is_decrement) {
+    if (view != datePickerView) {
+      return; 
+    }
+
+    var month_displacement = is_decrement
+      ? -1
+      : 1;
+
+    // Check current date, fix date if necessary
+    var current_date = new Date();
+    if (current_date.getUTCFullYear() != currentDate.getUTCFullYear() ||
+        current_date.getMonth() != currentDate.getMonth() ||
+        current_date.getDate() != currentDate.getDate()) {
+      currentDate = current_date;    
+    }
+
+    // Adjust year and reset month if we extend beyond calendar bounds
+    var current_month = datePickerModel.getViewedMonth();
+    var current_year = datePickerModel.getViewedYear();
+
+    var next_month = current_month + month_displacement;
+    var next_year = current_year;
+
+    switch (next_month) {
+      case -1:
+        next_month = 11;
+        --next_year;
+        break;
+      case 12:
+        next_month = 0;
+        ++next_year;
+        break;
+    }
+
+    // Exit early if invalid month displacement
+    if (!isValidMonth(next_month, next_year)) {
+      return;
+    }
+
+    // Update viewed month/date in model
+    datePickerModel.setViewedMonthAndYear(next_month, next_year);
+    
+    // Check if previous month is illegal. If so, disable decrement month
+    // navigation arrow
+    var previous_month = new Date(next_year, next_month - 1);
+    datePickerView.toggleMonthDecrementNavButtonActiveState(
+      isValidMonth(previous_month.getMonth(), previous_month.getFullYear())    
+    );
+
+    // Check if next month is illegal. If so, disable increment month
+    // navigation arrow
+    var next_month = new Date(next_year, next_month + 1);
+    datePickerView.toggleMonthIncrementNavButtonActiveState(
+      isValidMonth(next_month.getMonth(), next_month.getFullYear())   
+    );
+
+    return this;
+  };
+
+  var isValidMonth = function(month, year) {
+    var start_date = new Date(); 
+    start_date.setDate(
+      start_date.getDate() + datePickerModel.getMinAdvanceDayCount()
+    );
+
+    // Calculate month-displacement between new-date and start-date
+    var month_displacement = 12 * (year - start_date.getFullYear()) + month - start_date.getMonth();
+
+    return month_displacement > 0 &&
+      month_displacement <= datePickerModel.getMaxAdvanceMonthCount();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.setView = function(view) {
+    // Cache view
+    datePickerView = view;
+
+    // Bind event listeners
+    datePickerView.bindDateSelection(handleDateSelection);
+    datePickerView.bindMonthNavigation(handleMonthNavigation);
+
+    return this;
+  };
+
+  this.setModel = function(model) {
+    datePickerModel = model;
+    return this;
+  };
+};
+
 var DropDownController = function() {
 
   /**
@@ -102,7 +220,6 @@ var DropDownController = function() {
     dropDownModel = model;
     return this;
   };
-
 };
 
 var MyExperimentController = function() {
@@ -653,24 +770,24 @@ var DatePickerModel = function() {
 DatePickerModel.prototype.setSelectedDate = function(selected_date) {
   this.selectedDate = selected_date;
   this.selectedDateCallbacks.forEach(function(callback) {
-    callback(selectedDate);
-  });
+    callback(this.selectedDate);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setSelectedMonth = function(selected_month) {
   this.selectedMonth = selected_month;
   this.selectedMonthCallbacks.forEach(function(callback) {
-    callback(selectedMonth);
-  });
+    callback(this.selectedMonth);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setSelectedYear = function(selected_year) {
   this.selectedYear = selected_year;
   this.selectedYearCallbacks.forEach(function(callback) {
-    callback(selectedYear);
-  });
+    callback(this.selectedYear);
+  }, this);
   return this;
 };
 
@@ -678,56 +795,56 @@ DatePickerModel.prototype.setViewedMonthAndYear = function(viewed_month, viewed_
   this.viewedMonth = viewed_month;
   this.viewedYear = viewed_year;
   this.viewedMonthCallbacks.forEach(function(callback) {
-    callback(viewedMonth, viewedYear);
-  });
+    callback(this.viewedMonth, this.viewedYear);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setViewedMonth = function(viewed_month) {
   this.viewedMonth = viewed_month;
   this.viewedMonthCallbacks.forEach(function(callback) {
-    callback(viewedMonth, viewedYear);
-  });
+    callback(this.viewedMonth, this.viewedYear);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setViewedYear = function(viewed_year) {
   this.viewedYear = viewed_year;
   this.viewedMonthCallbacks.forEach(function(callback) {
-    callback(viewedMonth, viewedYear);
-  });
+    callback(this.viewedMonth, this.viewedYear);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setMinAdvanceDayCount = function(count) {
   this.minAdvanceDayCount = count;
   this.minAdvanceDayCountCallbacks.forEach(function(callback) {
-    callback(minAdvanceDayCount);
-  });
+    callback(this.minAdvanceDayCount);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setMaxAdvanceMonthCount = function(count) {
   this.maxAdvanceMonthCount = count;
   this.maxAdvanceMonthCountCallbacks.forEach(function(callback) {
-    callback(maxAdvanceMonthCount);
-  });
+    callback(this.maxAdvanceMonthCount);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setInvalidDaysOfTheWeek = function(invalid_days) {
   this.invalidDaysOfTheWeek = invalid_days;
   this.invalidDaysOfTheWeekCallbacks.forEach(function(callback) {
-    callback(invalidDaysOfTheWeek);
-  });
+    callback(this.invalidDaysOfTheWeek);
+  }, this);
   return this;
 };
 
 DatePickerModel.prototype.setInvalidDates = function(invalid_dates) {
   this.invalidDates = invalid_dates;
   this.invalidDatesCallbacks.forEach(function(callback) {
-    callback(invalidDates);
-  });
+    callback(this.invalidDates);
+  }, this);
   return this;
 };
 
@@ -1452,21 +1569,26 @@ var Utils = (function() {
   var TIME_DELIMITER = ":";
   var DATE_TIME_SEPERATOR = " ";
 
-  this.hasClass = function(expected_class, node) {
-    if (!(CLASS_NAME_PROPERTY in node)) {
-      return false;
-    }
+  // this.hasClass = function(expected_class, node) {
+  //   if (!(CLASS_NAME_PROPERTY in node)) {
+  //     return false;
+  //   }
+  //
+  //   var node_class = node[CLASS_NAME_PROPERTY];
+  //   var class_idx = node_class.indexOf(expected_class);
+  //   
+  //   if (class_idx == -1) {
+  //     return false;
+  //   }
+  //
+  //   return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
+  //     && (expected_class.length + class_idx == node_class.length
+  //       || node_class.charAt(expected_class.length + class_idx) == ' ');
+  // };
 
-    var node_class = node[CLASS_NAME_PROPERTY];
-    var class_idx = node_class.indexOf(expected_class);
-    
-    if (class_idx == -1) {
-      return false;
-    }
-
-    return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-      && (expected_class.length + class_idx == node_class.length
-        || node_class.charAt(expected_class.length + class_idx) == ' ');
+  this.hasClass = function(class_name, node) {
+    console.assert(node != null);
+    return 'classList' in node && node.classList.contains(class_name);
   };
   
   this.makePriceString = function(price) {
@@ -1700,6 +1822,14 @@ var Utils = (function() {
     return 0;
   };
 
+  var contains = function(needle, haystack) {
+    return haystack.indexOf(needle) != -1; 
+  };
+
+  var trimLast = function(str) {
+    return str.susbtring(0, str.length - 1);
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -1715,7 +1845,9 @@ var Utils = (function() {
     hideNode: hideNode,
     showNode: showNode,
     bindClickBeyondNode: bindClickBeyondNode,
-    compareDates: compareDates
+    compareDates: compareDates,
+    contains: contains,
+    trimLast : trimLast,
   };
 
 })();
@@ -4215,6 +4347,7 @@ var DatePickerView = function(
    */
   var UNSELECTABLE_DATE_ATTR = 'unselectable-date';
   var CLOSED_DATE_PICKER_ATTR = 'closed-calendar';
+  var DISABLED_MONTH_NAV_ATTR = 'disabled-month-nav';
 
   /**
    * Month names
@@ -4248,7 +4381,16 @@ var DatePickerView = function(
   var parentNode = parent_node;
   var datePickerRootNode = null;
 
+  // Ui state
   var isDatePickerClosed = true;
+  var isActiveMonthDecrementNavButton = null;
+  var isActiveMonthIncrementNavButton = null;
+
+  var _this = this;
+
+  // Callbacks
+  var dateSelectionCallbacks = [];
+  var monthNavigationCallbacks = [];
 
   /**
    * Dom nodes
@@ -4320,15 +4462,6 @@ var DatePickerView = function(
   var bindNodes = function() {
     // Top banner nodes
     Utils.bindNodeInfo(parentNode, selectedDateDisplayContainerNodeInfo);
-
-    selectedDateDisplayContainerNodeInfo.node.onclick = function() {
-      if (isDatePickerClosed) {
-        open(); 
-      } else {
-        close(); 
-      }
-    };
-
     Utils.bindNodeInfo(parentNode, selectedMonthLabelNodeInfo);
     Utils.bindNodeInfo(parentNode, selectedDateLabelNodeInfo);
     Utils.bindNodeInfo(parentNode, selectedYearLabelNodeInfo);
@@ -4342,7 +4475,54 @@ var DatePickerView = function(
     // Selectable dates
     Utils.bindNodeInfo(parentNode, weeksContainerNodeInfo);
     Utils.bindNodeInfo(parentNode, calendarMainContainerNodeInfo);
+    
+    /**
+     * Bind event listeners
+     */
+    // Hide/close banner
+    selectedDateDisplayContainerNodeInfo.node.onclick = function() {
+      if (isDatePickerClosed) {
+        open(); 
+      } else {
+        close(); 
+      }
+    };
 
+    // On ui click
+    datePickerRootNode.onclick = function(event) {
+      // Crawl node hierarchy
+      for (var i = 0; i < event.path.length; ++i) {
+        var node = event.path[i]; 
+        
+        // Event: date selection click
+        // 1. Click has to be on date-wrapper
+        // 2. Date-wrapper can't be marked 'unselectable'
+        if (Utils.hasClass(DATE_WRAPPER_CLASS, node) && !node.hasAttribute(UNSELECTABLE_DATE_ATTR)) {
+          // Extract date idx 
+          var date_label_list = node.getElementsByClassName(DATE_LABEL_CLASS);
+          console.assert(date_label_list.length == 1);
+
+          var date_label = date_label_list[0];
+          var date_idx = date_label.innerHTML;
+
+          // Invok registered callbacks
+          for (var j = 0; j < dateSelectionCallbacks.length; ++j) {
+            var callback = dateSelectionCallbacks[j];   
+            callback(_this, date_idx);
+          }
+        }
+
+        // Event: left month navigation
+        if (node == decrementMonthNavNodeInfo.node) {
+          _this.decrementMonth(); 
+        }
+
+        // Event: right month navigation
+        if (node == incrementMonthNavNodeInfo.node) {
+          _this.incrementMonth();
+        }
+      }
+    };
   };
 
   var setSelectedDate = function(selected_date) {
@@ -4425,9 +4605,13 @@ var DatePickerView = function(
 
   var isInvalidDate = function(date) {
     // Check if this date's 'day of the week' is marked invalid
-    if (datePickerModel.getInvalidDaysOfTheWeek().includes(date.getDay())) {
+    if (Utils.contains(date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())) {
       return true;
     }
+
+    // if (datePickerModel.getInvalidDaysOfTheWeek().includes(date.getDay())) {
+    //   return true;
+    // }
 
     // Check if this date is one of the irregular dates marked invalid
     var invalid_dates = datePickerModel.getInvalidDates();
@@ -4517,7 +4701,72 @@ var DatePickerView = function(
 
     // Bind model and init ui
     bindModel(date_picker_model);
+
+    // Initialize month-nav arrow states
+    this.disableMonthDecrementNavButton(); 
+    this.enableMonthIncrementNavButton();
   };
+
+  this.bindDateSelection = function(callback) {
+    dateSelectionCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindMonthNavigation = function(callback) {
+    monthNavigationCallbacks.push(callback);
+    return this;
+  };
+
+  this.decrementMonth = function() {
+    monthNavigationCallbacks.forEach(function(callback) {
+      callback(this, true);
+    }, this);  
+  };
+
+  this.incrementMonth = function() {
+    monthNavigationCallbacks.forEach(function(callback) {
+      callback(this, false);
+    }, this);  
+  };
+  
+  this.disableMonthIncrementNavButton = function() {
+    this.toggleMonthIncrementNavButtonActiveState(false); 
+  };
+
+  this.enableMonthIncrementNavButton = function() {
+    this.toggleMonthIncrementNavButtonActiveState(true); 
+  };
+
+  this.toggleMonthIncrementNavButtonActiveState = function(is_active) {
+    isActiveMonthIncrementNavButton = is_active; 
+
+    // Update ui
+    if (is_active) {
+      incrementMonthNavNodeInfo.node.removeAttribute(DISABLED_MONTH_NAV_ATTR);
+    } else {
+      incrementMonthNavNodeInfo.node.setAttribute(DISABLED_MONTH_NAV_ATTR, '');
+    }
+  };
+
+  this.disableMonthDecrementNavButton = function() {
+    this.toggleMonthDecrementNavButtonActiveState(false); 
+  };
+
+  this.enableMonthDecrementNavButton = function() {
+    this.toggleMonthDecrementNavButtonActiveState(true); 
+  };
+
+  this.toggleMonthDecrementNavButtonActiveState = function(is_active) {
+    isActiveMonthDecrementNavButton = is_active; 
+
+    // Update ui
+    if (is_active) {
+      decrementMonthNavNodeInfo.node.removeAttribute(DISABLED_MONTH_NAV_ATTR);
+    } else {
+      decrementMonthNavNodeInfo.node.setAttribute(DISABLED_MONTH_NAV_ATTR, '');
+    }
+  };
+  
 };
 
 function StaticCalendar(
@@ -6928,132 +7177,6 @@ function SidePanelTab(
   };
 };
 
-function TechnicianPage(
-  template_store,
-  root_id,
-  is_displayed_initially
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = '#technician-page-template';
-
-  /**
-   * Ui attributes
-   */
-  var HIDDEN_ATTR = "hidden-technician-page";
-
-  /**
-   * Private state
-   */
-  // Dom nodes
-  var templateStore = template_store;
-  var isDisplayedInitially = is_displayed_initially;
-  var _this = this;
-
-  // Root node
-  var TechnicianPageRootNode = {
-    id: root_id,
-    node: null
-  };
-
-  // Class-bound nodes
-  var pageWrapperNode = {
-    className: 'technician-page-wrapper',
-    node: null 
-  };
-
-  /**
-   * Private functions
-   */
-  function fetchClassBoundDomNode(node_info) {
-    elements = TechnicianPageRootNode.node.getElementsByClassName(node_info.className);
-    console.assert(elements.length == 1);
-    node_info.node = elements[0];
-  };
-
-  /**
-   * synthesizeTechnicianPageTemplate()
-   * - copy technician-page template and insert into main dom tree
-   * @pre-condition: 'TechnicianPageRootNode' must be initialized
-   */
-  function synthesizeTechnicianPageTemplate() {
-    // Bind technician-page dom template
-    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
-    var page_clone = document.importNode(page_template.content, true);
-    TechnicianPageRootNode.node.appendChild(page_clone);
-  };
-
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = TechnicianPageRootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  /**
-   * bindInternalNodes()
-   * - bind class-bound nodes internal to this template
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(pageWrapperNode);     
-  };
-
-  /**
-   * initDisplay()
-   * - render initially ui
-   */
-  function initDisplay() {
-    if (isDisplayedInitially) {
-      _this.show();
-    } else {
-      _this.hide(); 
-    }
-  };
-
-  /**
-   * Privileged functions
-   */
-  /**
-   * init()
-   * - initialize technician page and put it in starting state
-   */
-  this.init = function() {
-    // Bind top-level technician-page node (we're going to copy the template into this!)
-    TechnicianPageRootNode.node = document.getElementById(TechnicianPageRootNode.id);
-
-    // Clone template and copy into wrapper
-    synthesizeTechnicianPageTemplate();
-
-    // Bind nodes internal to this template
-    bindInternalNodes();
-
-    // Initialize ui
-    initDisplay();
-  };
-
-  /**
-   * hide()
-   * - hide the technician-page
-   */
-  this.hide = function() {
-    TechnicianPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
-  };
-
-  /**
-   * show()
-   * - show the technician-page
-   */
-  this.show = function() {
-    TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
-  };
-
-};
-
 function TimePicker(
   template_store,
   parent_node,
@@ -7321,6 +7444,132 @@ function TimePicker(
   };
 };
 
+function TechnicianPage(
+  template_store,
+  root_id,
+  is_displayed_initially
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = '#technician-page-template';
+
+  /**
+   * Ui attributes
+   */
+  var HIDDEN_ATTR = "hidden-technician-page";
+
+  /**
+   * Private state
+   */
+  // Dom nodes
+  var templateStore = template_store;
+  var isDisplayedInitially = is_displayed_initially;
+  var _this = this;
+
+  // Root node
+  var TechnicianPageRootNode = {
+    id: root_id,
+    node: null
+  };
+
+  // Class-bound nodes
+  var pageWrapperNode = {
+    className: 'technician-page-wrapper',
+    node: null 
+  };
+
+  /**
+   * Private functions
+   */
+  function fetchClassBoundDomNode(node_info) {
+    elements = TechnicianPageRootNode.node.getElementsByClassName(node_info.className);
+    console.assert(elements.length == 1);
+    node_info.node = elements[0];
+  };
+
+  /**
+   * synthesizeTechnicianPageTemplate()
+   * - copy technician-page template and insert into main dom tree
+   * @pre-condition: 'TechnicianPageRootNode' must be initialized
+   */
+  function synthesizeTechnicianPageTemplate() {
+    // Bind technician-page dom template
+    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
+    var page_clone = document.importNode(page_template.content, true);
+    TechnicianPageRootNode.node.appendChild(page_clone);
+  };
+
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = TechnicianPageRootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  /**
+   * bindInternalNodes()
+   * - bind class-bound nodes internal to this template
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(pageWrapperNode);     
+  };
+
+  /**
+   * initDisplay()
+   * - render initially ui
+   */
+  function initDisplay() {
+    if (isDisplayedInitially) {
+      _this.show();
+    } else {
+      _this.hide(); 
+    }
+  };
+
+  /**
+   * Privileged functions
+   */
+  /**
+   * init()
+   * - initialize technician page and put it in starting state
+   */
+  this.init = function() {
+    // Bind top-level technician-page node (we're going to copy the template into this!)
+    TechnicianPageRootNode.node = document.getElementById(TechnicianPageRootNode.id);
+
+    // Clone template and copy into wrapper
+    synthesizeTechnicianPageTemplate();
+
+    // Bind nodes internal to this template
+    bindInternalNodes();
+
+    // Initialize ui
+    initDisplay();
+  };
+
+  /**
+   * hide()
+   * - hide the technician-page
+   */
+  this.hide = function() {
+    TechnicianPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+  };
+
+  /**
+   * show()
+   * - show the technician-page
+   */
+  this.show = function() {
+    TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+  };
+
+};
+
 var NewExperimentPageView = function(
   template_store,
   parent_node
@@ -7533,7 +7782,7 @@ var ExperimentTimeFormView = function(
   var experimentTimePickerModel = null;
   var experimentTimePickerController = null;
 
-  var experimentDatePickerView = null;
+  var experimentDatePickerController = null;
 
   /**
    * Dom nodes
@@ -7609,13 +7858,32 @@ var ExperimentTimeFormView = function(
       new Date(2016, 4, 5)
     ];
 
+    // Determine first open date
+    var starting_date = new Date();
+    starting_date.setDate(
+        starting_date.getDate() + min_advance_day_count
+    );
+
+    while (
+      Utils.contains(starting_date.getDay(), invalid_days_of_the_week) ||
+      Utils.contains(starting_date, invalid_dates)    
+    ) {
+      starting_date.setDate(starting_date.getDate() + 1); 
+      // TODO handle case in which NO legal starting dates exist!
+    }
+
+    
     // Create model
+
     var date_picker_model = new DatePickerModel();
     date_picker_model
-      .setSelectedDate(6)
-      .setSelectedMonth(3)
-      .setSelectedYear(2016)
-      .setViewedMonthAndYear(3, 2016)
+      .setSelectedDate(starting_date.getDate())
+      .setSelectedMonth(starting_date.getMonth())
+      .setSelectedYear(starting_date.getFullYear())
+      .setViewedMonthAndYear(
+        starting_date.getMonth(),
+        starting_date.getFullYear()
+      )
       .setMinAdvanceDayCount(min_advance_day_count)
       .setMaxAdvanceMonthCount(max_advance_month_count)
       .setInvalidDaysOfTheWeek(invalid_days_of_the_week)
@@ -7628,6 +7896,12 @@ var ExperimentTimeFormView = function(
     );
 
     date_picker_view.init(date_picker_model);
+
+    // Initialize controller
+    experimentDatePickerController = new DatePickerController();   
+    experimentDatePickerController
+      .setModel(date_picker_model)
+      .setView(date_picker_view);
   };
 
   var initFormElements = function() {

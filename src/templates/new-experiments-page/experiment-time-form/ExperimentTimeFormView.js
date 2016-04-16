@@ -25,7 +25,7 @@ var ExperimentTimeFormView = function(
   var experimentTimePickerModel = null;
   var experimentTimePickerController = null;
 
-  var experimentDatePickerView = null;
+  var experimentDatePickerController = null;
 
   /**
    * Dom nodes
@@ -101,13 +101,31 @@ var ExperimentTimeFormView = function(
       new Date(2016, 4, 5)
     ];
 
+    // Determine first open date
+    var starting_date = new Date();
+    starting_date.setDate(
+        starting_date.getDate() + min_advance_day_count
+    );
+
+    while (
+      Utils.contains(starting_date.getDay(), invalid_days_of_the_week) ||
+      Utils.contains(starting_date, invalid_dates)    
+    ) {
+      starting_date.setDate(starting_date.getDate() + 1); 
+      // TODO handle case in which NO legal starting dates exist!
+    }
+
+    
     // Create model
     var date_picker_model = new DatePickerModel();
     date_picker_model
-      .setSelectedDate(6)
-      .setSelectedMonth(3)
-      .setSelectedYear(2016)
-      .setViewedMonthAndYear(3, 2016)
+      .setSelectedDate(starting_date.getDate())
+      .setSelectedMonth(starting_date.getMonth())
+      .setSelectedYear(starting_date.getFullYear())
+      .setViewedMonthAndYear(
+        starting_date.getMonth(),
+        starting_date.getFullYear()
+      )
       .setMinAdvanceDayCount(min_advance_day_count)
       .setMaxAdvanceMonthCount(max_advance_month_count)
       .setInvalidDaysOfTheWeek(invalid_days_of_the_week)
@@ -120,6 +138,12 @@ var ExperimentTimeFormView = function(
     );
 
     date_picker_view.init(date_picker_model);
+
+    // Initialize controller
+    experimentDatePickerController = new DatePickerController();   
+    experimentDatePickerController
+      .setModel(date_picker_model)
+      .setView(date_picker_view);
   };
 
   var initFormElements = function() {

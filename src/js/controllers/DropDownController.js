@@ -34,5 +34,4 @@ var DropDownController = function() {
     dropDownModel = model;
     return this;
   };
-
 };

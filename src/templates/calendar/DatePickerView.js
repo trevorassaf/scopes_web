@@ -23,6 +23,7 @@ var DatePickerView = function(
    */
   var UNSELECTABLE_DATE_ATTR = 'unselectable-date';
   var CLOSED_DATE_PICKER_ATTR = 'closed-calendar';
+  var DISABLED_MONTH_NAV_ATTR = 'disabled-month-nav';
 
   /**
    * Month names
@@ -56,7 +57,16 @@ var DatePickerView = function(
   var parentNode = parent_node;
   var datePickerRootNode = null;
 
+  // Ui state
   var isDatePickerClosed = true;
+  var isActiveMonthDecrementNavButton = null;
+  var isActiveMonthIncrementNavButton = null;
+
+  var _this = this;
+
+  // Callbacks
+  var dateSelectionCallbacks = [];
+  var monthNavigationCallbacks = [];
 
   /**
    * Dom nodes
@@ -128,15 +138,6 @@ var DatePickerView = function(
   var bindNodes = function() {
     // Top banner nodes
     Utils.bindNodeInfo(parentNode, selectedDateDisplayContainerNodeInfo);
-
-    selectedDateDisplayContainerNodeInfo.node.onclick = function() {
-      if (isDatePickerClosed) {
-        open(); 
-      } else {
-        close(); 
-      }
-    };
-
     Utils.bindNodeInfo(parentNode, selectedMonthLabelNodeInfo);
     Utils.bindNodeInfo(parentNode, selectedDateLabelNodeInfo);
     Utils.bindNodeInfo(parentNode, selectedYearLabelNodeInfo);
@@ -150,7 +151,54 @@ var DatePickerView = function(
     // Selectable dates
     Utils.bindNodeInfo(parentNode, weeksContainerNodeInfo);
     Utils.bindNodeInfo(parentNode, calendarMainContainerNodeInfo);
+    
+    /**
+     * Bind event listeners
+     */
+    // Hide/close banner
+    selectedDateDisplayContainerNodeInfo.node.onclick = function() {
+      if (isDatePickerClosed) {
+        open(); 
+      } else {
+        close(); 
+      }
+    };
 
+    // On ui click
+    datePickerRootNode.onclick = function(event) {
+      // Crawl node hierarchy
+      for (var i = 0; i < event.path.length; ++i) {
+        var node = event.path[i]; 
+        
+        // Event: date selection click
+        // 1. Click has to be on date-wrapper
+        // 2. Date-wrapper can't be marked 'unselectable'
+        if (Utils.hasClass(DATE_WRAPPER_CLASS, node) && !node.hasAttribute(UNSELECTABLE_DATE_ATTR)) {
+          // Extract date idx 
+          var date_label_list = node.getElementsByClassName(DATE_LABEL_CLASS);
+          console.assert(date_label_list.length == 1);
+
+          var date_label = date_label_list[0];
+          var date_idx = date_label.innerHTML;
+
+          // Invok registered callbacks
+          for (var j = 0; j < dateSelectionCallbacks.length; ++j) {
+            var callback = dateSelectionCallbacks[j];   
+            callback(_this, date_idx);
+          }
+        }
+
+        // Event: left month navigation
+        if (node == decrementMonthNavNodeInfo.node) {
+          _this.decrementMonth(); 
+        }
+
+        // Event: right month navigation
+        if (node == incrementMonthNavNodeInfo.node) {
+          _this.incrementMonth();
+        }
+      }
+    };
   };
 
   var setSelectedDate = function(selected_date) {
@@ -233,9 +281,13 @@ var DatePickerView = function(
 
   var isInvalidDate = function(date) {
     // Check if this date's 'day of the week' is marked invalid
-    if (datePickerModel.getInvalidDaysOfTheWeek().includes(date.getDay())) {
+    if (Utils.contains(date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())) {
       return true;
     }
+
+    // if (datePickerModel.getInvalidDaysOfTheWeek().includes(date.getDay())) {
+    //   return true;
+    // }
 
     // Check if this date is one of the irregular dates marked invalid
     var invalid_dates = datePickerModel.getInvalidDates();
@@ -325,5 +377,70 @@ var DatePickerView = function(
 
     // Bind model and init ui
     bindModel(date_picker_model);
+
+    // Initialize month-nav arrow states
+    this.disableMonthDecrementNavButton(); 
+    this.enableMonthIncrementNavButton();
   };
+
+  this.bindDateSelection = function(callback) {
+    dateSelectionCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindMonthNavigation = function(callback) {
+    monthNavigationCallbacks.push(callback);
+    return this;
+  };
+
+  this.decrementMonth = function() {
+    monthNavigationCallbacks.forEach(function(callback) {
+      callback(this, true);
+    }, this);  
+  };
+
+  this.incrementMonth = function() {
+    monthNavigationCallbacks.forEach(function(callback) {
+      callback(this, false);
+    }, this);  
+  };
+  
+  this.disableMonthIncrementNavButton = function() {
+    this.toggleMonthIncrementNavButtonActiveState(false); 
+  };
+
+  this.enableMonthIncrementNavButton = function() {
+    this.toggleMonthIncrementNavButtonActiveState(true); 
+  };
+
+  this.toggleMonthIncrementNavButtonActiveState = function(is_active) {
+    isActiveMonthIncrementNavButton = is_active; 
+
+    // Update ui
+    if (is_active) {
+      incrementMonthNavNodeInfo.node.removeAttribute(DISABLED_MONTH_NAV_ATTR);
+    } else {
+      incrementMonthNavNodeInfo.node.setAttribute(DISABLED_MONTH_NAV_ATTR, '');
+    }
+  };
+
+  this.disableMonthDecrementNavButton = function() {
+    this.toggleMonthDecrementNavButtonActiveState(false); 
+  };
+
+  this.enableMonthDecrementNavButton = function() {
+    this.toggleMonthDecrementNavButtonActiveState(true); 
+  };
+
+  this.toggleMonthDecrementNavButtonActiveState = function(is_active) {
+    isActiveMonthDecrementNavButton = is_active; 
+
+    // Update ui
+    if (is_active) {
+      decrementMonthNavNodeInfo.node.removeAttribute(DISABLED_MONTH_NAV_ATTR);
+    } else {
+      decrementMonthNavNodeInfo.node.setAttribute(DISABLED_MONTH_NAV_ATTR, '');
+    }
+  };
+  
 };
