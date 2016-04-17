@@ -68,8 +68,8 @@ var MyExperimentView = function(
     node: null
   };
 
-  var headerNode = {
-    className: 'header-wrapper',
+  var titleHeaderNode = {
+    className: 'title-header-wrapper',
     node: null
   };
 
@@ -121,7 +121,7 @@ var MyExperimentView = function(
   var bindNodes = function() {
     // Bind nodes    
     Utils.bindNodeInfo(rootNode, titleLabelNode);
-    Utils.bindNodeInfo(rootNode, headerNode);
+    Utils.bindNodeInfo(rootNode, titleHeaderNode);
 
     Utils.bindNodeInfo(rootNode, frontPageNode);
     Utils.bindNodeInfo(rootNode, descriptionPageNode);
@@ -169,14 +169,14 @@ var MyExperimentView = function(
       }
     };
 
-    headerNode.node.onclick = function(event) {
+    titleHeaderNode.node.onclick = function(event) {
       // Put title in 'editing' state if we're not editing it already
       if (!isEditingTitle) {
         setEditingTitle();
       }
     };
 
-    Utils.bindClickBeyondNode(headerNode.node, function(event) {
+    Utils.bindClickBeyondNode(titleHeaderNode.node, function(event) {
       // Short circuit b/c we're not editing title anyhow
       if (!isEditingTitle) {
         return;
@@ -216,7 +216,7 @@ var MyExperimentView = function(
     console.assert(!isEditingTitle);
     
     // Update ui
-    Utils.markNode(headerNode.node, EDITING_TITLE_ATTR);
+    Utils.markNode(titleHeaderNode.node, EDITING_TITLE_ATTR);
 
     if (isUserDefinedTitle) {
       // Highligh title field text
@@ -233,7 +233,7 @@ var MyExperimentView = function(
     console.assert(isEditingTitle);
 
     // Update ui
-    Utils.unmarkNode(headerNode.node, EDITING_TITLE_ATTR);
+    Utils.unmarkNode(titleHeaderNode.node, EDITING_TITLE_ATTR);
 
     // Unselect title
     Utils.unselectTextRange(titleLabelNode.node);

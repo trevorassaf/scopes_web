@@ -1,6 +1,23 @@
-.my-experiment-wrapper .header-wrapper {
-  padding: 20px;
+.my-experiment-wrapper .header-wrapper > div {
+  display: inline-block;
+}
+
+.my-experiment-wrapper .settings-button-wrapper {
+  position: relative;
   cursor: pointer;
+}
+
+.my-experiment-wrapper .settings-button-wrapper:hover > iron-icon {
+  color: rgb(38, 108, 177);
+}
+
+.my-experiment-wrapper .title-header-wrapper {
+  padding-left: 20px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  width: calc(100% - 55px);
 }
 
 .my-experiment-wrapper .title-label {
@@ -13,7 +30,7 @@
   font-style: italic;
 }
 
-.my-experiment-wrapper .header-wrapper[editing-title] .title-label,
+.my-experiment-wrapper .title-header-wrapper[editing-title] .title-label,
 .my-experiment-wrapper .title-label[changed-title] {
   font-weight: bold;
   font-style: normal;
@@ -24,28 +41,23 @@
   cursor: text;
 }
 
-.my-experiment-wrapper .header-wrapper {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-}
-
 .my-experiment-wrapper .title-underline {
   margin-top: 14px;
   border-top: 1px solid rgb(228, 228, 228);
   margin-bottom: 1px;
 }
 
-.my-experiment-wrapper .header-wrapper:hover .title-underline {
+.my-experiment-wrapper .title-header-wrapper:hover .title-underline {
   border-color: rgb(38, 108, 177);
 }
 
-.my-experiment-wrapper .header-wrapper[editing-title] .title-underline {
+.my-experiment-wrapper .title-header-wrapper[editing-title] .title-underline {
   border-color: rgb(38, 108, 177);
   border-width: 2px;
   margin-bottom: 0px;
 }
 
-.my-experiments-page-wrapper .header-wrapper[editing-title] {
+.my-experiments-page-wrapper .title-header-wrapper[editing-title] {
   cursor: text;
 }
 

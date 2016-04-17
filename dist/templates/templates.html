@@ -159,11 +159,21 @@
     
     <!-- Wrapper for upper ui row -->
     <div class='header-wrapper'>
-      <!-- Editable title area -->
-      <div class='title-label' contenteditable='true' placeholder='Add title...'></div>
+      
+      <!-- Title field -->
+      <div class='title-header-wrapper'>
+        <!-- Editable title area -->
+        <div class='title-label' contenteditable='true' placeholder='Add title...'></div>
 
-      <!-- Title underline -->
-      <div class='title-underline'></div>
+        <!-- Title underline -->
+        <div class='title-underline'></div>
+      </div>
+
+      <!-- Settings button -->
+      <div class='settings-button-wrapper'>
+        <iron-icon icon='more-vert'></iron-icon>
+      </div>
+
     </div>
 
     <!-- Main display space -->
@@ -364,15 +374,6 @@
   </div>
 </template>
 
-<!-- specify icon type with 'icon' attribute in iron-icon element -->
-<!-- Add tab label in innerHTML of 'nav-btn-label '-->
-<template id='side-panel-tab-template'>
-  <div class='dash-nav-panel-btn'>
-    <iron-icon class='nav-btn-icon'></iron-icon>
-    <span class='nav-btn-label'></span>
-  </div>
-</template>
-
 <template id='side-panel-template'>
   <div class='side-panel-wrapper'>
     <!-- User name -->
@@ -397,6 +398,15 @@
 
     <!-- Page navigation buttons -->
     <div class='nav-btns-container'></div>
+  </div>
+</template>
+
+<!-- specify icon type with 'icon' attribute in iron-icon element -->
+<!-- Add tab label in innerHTML of 'nav-btn-label '-->
+<template id='side-panel-tab-template'>
+  <div class='dash-nav-panel-btn'>
+    <iron-icon class='nav-btn-icon'></iron-icon>
+    <span class='nav-btn-label'></span>
   </div>
 </template>
 
@@ -539,5 +549,11 @@
     <!--   <iron&#45;icon id='scopes&#45;count&#45;valid&#45;icon' class='valid&#45;input&#45;icon validation&#45;input&#45;icon' icon='check&#45;circle'></iron&#45;icon> -->
     <!--   <iron&#45;icon id='scopes&#45;count&#45;invalid&#45;icon' class='invalid&#45;input&#45;icon validation&#45;input&#45;icon' icon='cancel'></iron&#45;icon> -->
     <!-- </div> -->
+  </div>
+</template>
+
+<template id='my-experiment-front-page-template'>
+  <div class='my-experiment-front-page-wrapper'>
+    
   </div>
 </template>
