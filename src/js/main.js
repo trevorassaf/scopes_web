@@ -9,15 +9,9 @@ window.onload = function() {
   console.assert(template_store != null);
 
   /**
-   * Initialize models
+   * Initialize center page
    */
-  var new_experiment_page_model = new NewExperimentPageModel();
-  new_experiment_page_model.init();
-
-  /**
-   * Initialize pages
-   */
-  // Initialize center page
+  // Center page view
   var center_page_node = document.getElementById('center-panel');
 
   var center_page_view = new CenterPageView(
@@ -27,23 +21,20 @@ window.onload = function() {
   center_page_view.init();
   center_page_view.showNewExperimentPage();
 
-  // Initialize page controllers
-  var new_experiment_page_controller = new NewExperimentPageController();
-  new_experiment_page_controller.init(
-    new_experiment_page_model,
-    center_page_view.getNewExperimentPageView()
+  // Center page model
+  var center_page_model = new CenterPageModel();
+  center_page_model.init();
+
+  // Center page controller
+  var center_page_controller = new CenterPageController();
+  center_page_controller.init(
+    center_page_view,
+    center_page_model
   );
-
-  // New experiment page
-  // var new_experiment_parent_node = null;
-  // var new_experiment_page_view = new NewExperimentPageView(
-  //   template_store,
-  //   page_parent_node
-  // );
-  //
-  // new_experiment_page_view.init();
-
-  // Initialize side panel
+  
+  /**
+   * Initialize side panel
+   */
   var side_panel_parent_root = document.getElementById('side-panel');
 
   var side_panel_view = new SidePanelView(

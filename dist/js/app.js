@@ -9,15 +9,9 @@ window.onload = function() {
   console.assert(template_store != null);
 
   /**
-   * Initialize models
+   * Initialize center page
    */
-  var new_experiment_page_model = new NewExperimentPageModel();
-  new_experiment_page_model.init();
-
-  /**
-   * Initialize pages
-   */
-  // Initialize center page
+  // Center page view
   var center_page_node = document.getElementById('center-panel');
 
   var center_page_view = new CenterPageView(
@@ -27,21 +21,36 @@ window.onload = function() {
   center_page_view.init();
   center_page_view.showNewExperimentPage();
 
-  // Initialize page controllers
-  var new_experiment_page_controller = new NewExperimentPageController();
-  new_experiment_page_controller.init(
-    new_experiment_page_model,
-    center_page_view.getNewExperimentPageView()
-  );
+  // Center page model
+  var center_page_model = new CenterPageModel();
+  center_page_model.init();
 
-  // New experiment page
-  // var new_experiment_parent_node = null;
-  // var new_experiment_page_view = new NewExperimentPageView(
-  //   template_store,
-  //   page_parent_node
-  // );
+  // Center page controller
+  var center_page_controller = new CenterPageController();
+  center_page_controller.init(
+    center_page_view,
+    center_page_model
+  );
+  
+  /**
+   * Initialize new experiment page
+   */
+  // // Model
+  // var new_experiment_page_model = new NewExperimentPageModel();
+  // new_experiment_page_model.init();
   //
-  // new_experiment_page_view.init();
+  // // Controller
+  // var new_experiment_page_controller = new NewExperimentPageController();
+  // new_experiment_page_controller.init(
+  //   new_experiment_page_model,
+  //   center_page_view.getNewExperimentPageView()
+  // );
+
+  /**
+   * Initialize my experiments
+   */
+
+
 
   // Initialize side panel
   var side_panel_parent_root = document.getElementById('side-panel');
@@ -78,6 +87,40 @@ window.onload = function() {
   // NewExperimentUiController.registerOrderConfirmedListener(function() {
   //   MyExperimentsLogicController.refreshData();
   // });
+};
+
+var CenterPageController = function() {
+
+  /**
+   * Private state
+   */
+  // Child controllers
+  var newExperimentPageController = null;
+
+  var centerPageModel = null;
+  var centerPageView = null;
+
+  /**
+   * Private functions
+   */
+  var initNewExperimentPageController = function() {
+    newExperimentPageController = new NewExperimentPageController();
+    newExperimentPageController.init(
+      centerPageModel.getNewExperimentPageModel(),
+      centerPageView.getNewExperimentPageView()
+    );
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(view, model) {
+    centerPageView = view;
+    centerPageModel = model;
+
+    // Initialize child controllers
+    initNewExperimentPageController();
+  };
 };
 
 var ConfirmOrderController = function() {
@@ -921,6 +964,34 @@ var SliderController = function() {
 
   this.getView = function() {
     return sliderView;
+  };
+};
+
+var CenterPageModel = function() {
+
+  /**
+   * Private state
+   */
+  var newExperimentPageModel = null;
+
+  /**
+   * Private functions
+   */
+  var initNewExperimentPageModel = function() {
+    newExperimentPageModel = new NewExperimentPageModel();
+    newExperimentPageModel.init();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    initNewExperimentPageModel();
+  };
+
+  // Getters
+  this.getNewExperimentPageModel = function() {
+    return newExperimentPageModel;
   };
 };
 
