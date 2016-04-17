@@ -39,7 +39,7 @@ var ShortCodeFormView = function(
   /**
    * Private functions
    */
-  var initFormElements = function(drop_down_controller) {
+  var initFormElements = function() {
     // Bind short-code drop-down node
     Utils.bindNodeInfo(rootNode, shortCodePickerNode);  
 
@@ -49,19 +49,13 @@ var ShortCodeFormView = function(
       shortCodePickerNode.node
     );
 
-    shortCodePickerView.init(
-      drop_down_controller.getModel(),
-      ICON_NAME
-    );
-
-    drop_down_controller.setView(shortCodePickerView);
+    shortCodePickerView.init(ICON_NAME);
   };
-
 
   /**
    * Privileged functions
    */
-  this.init = function(drop_down_controller) {
+  this.init = function() {
     // Synthesize template into document
     rootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -71,7 +65,7 @@ var ShortCodeFormView = function(
     ); 
 
     // Initialize form elements
-    initFormElements(drop_down_controller);
+    initFormElements();
   };
 
   this.getDropDownView = function() {

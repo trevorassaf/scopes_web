@@ -80,35 +80,15 @@ var SliderFormView = function(
     };
   };
 
-  var setMinValue = function(min_value) {
-    sliderNode.node.setAttribute(PAPER_SLIDER_MIN_ATTR, min_value); 
-  };
-
-  var setMaxValue = function(max_value) {
-    sliderNode.node.setAttribute(PAPER_SLIDER_MAX_ATTR, max_value); 
-  };
-
-  var setStep = function(step) {
-    sliderNode.node.setAttribute(PAPER_SLIDER_STEP_ATTR, step); 
-  };
-
   var initUi = function() {
     // Initialize slider
     formTitleNode.node.innerHTML = titleLabel;
   };
 
-  var bindModel = function(slider_model) {
-    slider_model
-      .bindMinValue(setMinValue)
-      .bindMaxValue(setMaxValue)
-      .bindStep(setStep)
-      .bindCurrentValue(_this.setValue);
-  };
-
   /**
    * Privileged functions
    */
-  this.init = function(slider_model) {
+  this.init = function() {
     // Initialize root node
     rootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -119,9 +99,6 @@ var SliderFormView = function(
 
     // Initialize nodes and bind event listeners
     bindNodes();
-
-    // Bind model and init ui
-    bindModel(slider_model);
 
     // Init ui elements (e.g. form title)
     initUi();
@@ -138,6 +115,18 @@ var SliderFormView = function(
     unitDisplayNode.node.innerHTML = (value == 1)
       ? unitLabels.singular
       : unitLabels.plural;
+  };
+
+  this.setMinValue = function(min_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MIN_ATTR, min_value); 
+  };
+
+  this.setMaxValue = function(max_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MAX_ATTR, max_value); 
+  };
+
+  this.setStep = function(step) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_STEP_ATTR, step); 
   };
 
   this.bindValueChange = function(callback) {

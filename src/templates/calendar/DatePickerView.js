@@ -51,8 +51,6 @@ var DatePickerView = function(
   /**
    * Private state
    */
-  var datePickerModel = null;
-
   var templateStore = template_store;
   var parentNode = parent_node;
   var datePickerRootNode = null;
@@ -207,23 +205,13 @@ var DatePickerView = function(
     Utils.bindClickBeyondNode(datePickerRootNode, close); 
   };
 
-  var setSelectedDate = function(selected_date) {
-    selectedDateLabelNodeInfo.node.innerHTML = "" + selected_date + DATE_DELIMITER; 
-  };
-
-  var setSelectedMonth = function(selected_month) {
-    selectedMonthLabelNodeInfo.node.innerHTML = SHORT_MONTH_NAMES[selected_month];
-  };
-
-  var setSelectedYear = function(selected_year) {
-    selectedYearLabelNodeInfo.node.innerHTML = selected_year;
-  };
-
-  var setViewedMonth = function(month, year) {
-    refreshCalendar(month, year);
-  }
-
-  var refreshCalendar = function(month, year) {
+  this.refreshCalendar = function(
+    month,
+    year,
+    min_advance_day_count,
+    invalid_week_days,
+    invalid_dates
+  ) {
     // Remove previous date nodes
     Utils.removeDomChildren(weeksContainerNodeInfo.node); 
 
@@ -253,7 +241,7 @@ var DatePickerView = function(
     // Determine which date is the first selectable one
     var first_selectable_date = new Date();
     first_selectable_date.setDate(
-      first_selectable_date.getDate() + datePickerModel.getMinAdvanceDayCount()
+      first_selectable_date.getDate() + min_advance_day_count 
     );
 
     // Generate nodes for displaying selectable days
@@ -272,8 +260,10 @@ var DatePickerView = function(
       // 2. It falls too close to the current date 
       var validation_check_date = new Date(year, month, i);
 
-      if (Utils.compareDates(first_selectable_date, validation_check_date) > 0 ||
-          isInvalidDate(validation_check_date)) {
+      if (
+          Utils.compareDates(first_selectable_date, validation_check_date) > 0 ||
+          isInvalidDate(validation_check_date, invalid_week_days, invalid_dates)
+      ) {
         date.setAttribute(UNSELECTABLE_DATE_ATTR, '');     
       } 
       
@@ -285,18 +275,13 @@ var DatePickerView = function(
     }
   };
 
-  var isInvalidDate = function(date) {
+  var isInvalidDate = function(date, invalid_week_days, invalid_dates) {
     // Check if this date's 'day of the week' is marked invalid
-    if (Utils.contains(date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())) {
+    if (Utils.contains(date.getDay(), invalid_week_days)) {
       return true;
     }
 
-    // if (datePickerModel.getInvalidDaysOfTheWeek().includes(date.getDay())) {
-    //   return true;
-    // }
-
     // Check if this date is one of the irregular dates marked invalid
-    var invalid_dates = datePickerModel.getInvalidDates();
     for (var i = 0; i < invalid_dates.length; ++i) {
       var invalid_date = invalid_dates[i];
       if (Utils.compareDates(date, invalid_date) == 0) {
@@ -325,51 +310,10 @@ var DatePickerView = function(
     );
   };
 
-  var setMinAdvanceDayCount = function(count) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var setMaxAdvanceMonthCount = function(count) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var setInvalidDaysOfTheWeek = function(invalid_days) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var setInvalidDates = function(dates) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var bindModel = function(date_picker_model) {
-    datePickerModel = date_picker_model;
-    datePickerModel 
-      .bindSelectedDate(setSelectedDate)
-      .bindSelectedMonth(setSelectedMonth)
-      .bindSelectedYear(setSelectedYear)
-      .bindViewedMonth(setViewedMonth)
-      .bindMinAdvanceDayCount(setMinAdvanceDayCount)
-      .bindMaxAdvanceMonthCount(setMaxAdvanceMonthCount)
-      .bindInvalidDaysOfTheWeek(setInvalidDaysOfTheWeek)
-      .bindInvalidDates(setInvalidDates);
-  };
-
   /**
    * Privileged functions
    */
-  this.init = function(date_picker_model) {
+  this.init = function() {
     // Synthesize template into document
     datePickerRootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -380,9 +324,6 @@ var DatePickerView = function(
 
     // Bind nodes
     bindNodes();
-
-    // Bind model and init ui
-    bindModel(date_picker_model);
 
     // Initialize month-nav arrow states
     this.disableMonthDecrementNavButton(); 
@@ -449,4 +390,15 @@ var DatePickerView = function(
     }
   };
   
+  this.setSelectedDate = function(selected_date) {
+    selectedDateLabelNodeInfo.node.innerHTML = "" + selected_date + DATE_DELIMITER; 
+  };
+
+  this.setSelectedMonth = function(selected_month) {
+    selectedMonthLabelNodeInfo.node.innerHTML = SHORT_MONTH_NAMES[selected_month];
+  };
+
+  this.setSelectedYear = function(selected_year) {
+    selectedYearLabelNodeInfo.node.innerHTML = selected_year;
+  };
 };

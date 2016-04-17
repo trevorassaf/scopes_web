@@ -9,8 +9,15 @@ window.onload = function() {
   console.assert(template_store != null);
 
   /**
+   * Initialize models
+   */
+  var new_experiment_page_model = new NewExperimentPageModel();
+  new_experiment_page_model.init();
+
+  /**
    * Initialize pages
    */
+  // Initialize center page
   var center_page_node = document.getElementById('center-panel');
 
   var center_page_view = new CenterPageView(
@@ -19,6 +26,13 @@ window.onload = function() {
   );
   center_page_view.init();
   center_page_view.showNewExperimentPage();
+
+  // Initialize page controllers
+  var new_experiment_page_controller = new NewExperimentPageController();
+  new_experiment_page_controller.init(
+    new_experiment_page_model,
+    center_page_view.getNewExperimentPageView()
+  );
 
   // New experiment page
   // var new_experiment_parent_node = null;

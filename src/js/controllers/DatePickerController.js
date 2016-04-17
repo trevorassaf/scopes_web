@@ -96,22 +96,48 @@ var DatePickerController = function() {
       month_displacement <= datePickerModel.getMaxAdvanceMonthCount();
   };
 
+  // TODO these...
+  var handleMinAdvanceDayCountChange = function(min_advance_day_count) {
+  };
+
+  var handleMaxAdvanceMonthCountChange = function(max_advance_month_count) {
+  };
+
+  var handleInvalidWeekDaysChange = function(invalid_week_days) {};
+
+  var handleInvalidDatesChange = function(invalid_dates) {};
+
+  var handleCalendarRefresh = function() {
+    datePickerView.refreshCalendar(
+      datePickerModel.getViewedMonth(),
+      datePickerModel.getViewedYear(),
+      datePickerModel.getMinAdvanceDayCount(),
+      datePickerModel.getInvalidDaysOfTheWeek(),
+      datePickerModel.getInvalidDates()
+    ); 
+  };
+
   /**
    * Privileged functions
    */
-  this.setView = function(view) {
-    // Cache view
+  this.init = function(view, model) {
     datePickerView = view;
-
-    // Bind event listeners
-    datePickerView.bindDateSelection(handleDateSelection);
-    datePickerView.bindMonthNavigation(handleMonthNavigation);
-
-    return this;
-  };
-
-  this.setModel = function(model) {
     datePickerModel = model;
-    return this;
+
+    // Configure view --> model data pathway
+    datePickerView
+      .bindDateSelection(handleDateSelection)
+      .bindMonthNavigation(handleMonthNavigation);
+
+    // Configure model --> view data pathway
+    datePickerModel
+      .bindSelectedDate(datePickerView.setSelectedDate)
+      .bindSelectedMonth(datePickerView.setSelectedMonth)
+      .bindSelectedYear(datePickerView.setSelectedYear)
+      .bindViewedMonth(handleCalendarRefresh)
+      .bindMinAdvanceDayCount(handleCalendarRefresh)
+      .bindMaxAdvanceMonthCount(handleCalendarRefresh)
+      .bindInvalidDaysOfTheWeek(handleCalendarRefresh)
+      .bindInvalidDates(handleCalendarRefresh);
   };
 };

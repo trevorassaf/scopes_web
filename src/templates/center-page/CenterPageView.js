@@ -62,26 +62,11 @@ var CenterPageView = function(
   };
 
   var bindNodes = function() {
-    // Bind page title node
-    pageTitleNode.node = Utils.bindNode(
-      rootNode,
-      pageTitleNode.className
-    ); 
+    // Bind page nodes
+    Utils.bindNodeInfo(rootNode, pageTitleNode);
+    Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
+    Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
 
-    // Bind container node for admin buttons
-    adminButtonContainerNode.node = Utils.bindNode(
-      rootNode,
-      adminButtonContainerNode.className
-    );
-    
-    // Bind node that contains the pages
-    centerPanelPageContainerNode.node = Utils.bindNode(
-      rootNode,
-      centerPanelPageContainerNode.className
-    );
-
-    // Initialize pages
-    initPages();
   };
 
   var initPageViews = function() {
@@ -112,6 +97,8 @@ var CenterPageView = function(
    * Privileged functions
    */
   this.init = function() {
+    // Synthesize template into document and initialize
+    // root DOM element
     rootNode = Utils.synthesizeTemplate(
       templateStore,
       TEMPLATE_ID,
@@ -119,7 +106,11 @@ var CenterPageView = function(
       ROOT_NODE_CLASS
     );
 
+    // Bind ui elements and attach event listeners
     bindNodes();
+    
+    // Initialize pages
+    initPages();
 
     return this;
   };
@@ -141,5 +132,9 @@ var CenterPageView = function(
 
   this.showTechnicianPage = function() {
     changePage(technicianPageView);       
+  };
+
+  this.getNewExperimentPageView = function() {
+    return newExperimentPageView;
   };
 };

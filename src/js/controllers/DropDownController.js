@@ -22,6 +22,19 @@ var DropDownController = function() {
   /**
    * Privileged functions
    */
+  this.init = function(view, model) {
+    dropDownView = view;
+    dropDownModel = model;
+
+    // Configure model --> view data pathway
+    dropDownModel
+      .bindSelectedItem(dropDownView.setSelectedItem)
+      .bindDropDownItemModels(dropDownView.setDropDownItemModels);
+
+    // Configure view --> model data pathway
+    dropDownView.bindClick(handleClick);
+  };
+
   this.setView = function(view) {
     dropDownView = view;
 

@@ -112,13 +112,6 @@ var DropDownView = function(
     dropDownRootNode.setAttribute(REVEALED_DROPDOWN_ATTR, '');
   };
 
-  var bindModel = function(drop_down_model) {
-    // Bind to model state
-    drop_down_model
-      .bindSelectedItem(setSelectedItem)
-      .bindDropDownItemModels(setDropDownItemModels);
-  };
-
   var configureDropDownItems = function(drop_down_data) {
     for (var i = 0; i < drop_down_data.length; ++i) {
       var label = drop_down_data[i]; 
@@ -143,11 +136,36 @@ var DropDownView = function(
     dropDownIconNode.node.setAttribute(ICON_TYPE_ATTR, icon_type); 
   };
 
-  var setSelectedItem = function(drop_down_item) {
+  /**
+   * Privileged functions 
+   */
+  this.init = function(icon_type) {
+    // Synthesize template into document
+    dropDownRootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_WRAPPER_CLASS
+    );  
+
+    // Bind nodes
+    bindNodes();
+
+    // Configure icon
+    setIcon(icon_type);
+  };
+
+  this.bindClick = function(callback) {
+    onClickCallbacks.push(callback);
+  };
+
+  this.setSelectedItem = function(drop_down_item) {
     inputFieldLabelNode.node.innerHTML = drop_down_item.getLabel();
   };
 
-  var setDropDownItemModels = function(drop_down_item_models) {
+  // TODO maybe move this to controller
+  this.setDropDownItemModels = function(drop_down_item_models) {
+    // TODO clear list first?
     for (var i = 0; i < drop_down_item_models.length; ++i) {
       // Initialize drop down view
       var drop_down_item_view = new DropDownItemView(
@@ -162,34 +180,5 @@ var DropDownView = function(
 
       dropDownItemViews.push(drop_down_item_view);
     }
-  };
-
-  /**
-   * Privileged functions 
-   */
-  this.init = function(
-      drop_down_model,
-      icon_type
-  ) {
-    // Synthesize template into document
-    dropDownRootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_WRAPPER_CLASS
-    );  
-
-    // Bind nodes
-    bindNodes();
-
-    // Configure icon
-    setIcon(icon_type);
-
-    // Bind model
-    bindModel(drop_down_model);
-  };
-
-  this.bindClick = function(callback) {
-    onClickCallbacks.push(callback);
   };
 };

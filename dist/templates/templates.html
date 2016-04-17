@@ -73,34 +73,6 @@
   </div>
 </template>
 
-<template id='center-page-template'>
-  <div class='center-page-wrapper'>
-
-    <!-- Upper-most row of center page. Container page title and admin btns -->
-    <div class='title-and-admin-btn-row'>
-      
-      <!-- Title for the center page -->
-      <div class='title-container'>
-        <span class='title-label'></span> 
-      </div> 
-
-      <!-- Admin icon buttons -->
-      <div class='admin-btn-container'>
-        <div class='user-profile-admin-btn-container'>
-          <iron-icon class='user-circle-icon' icon='account-circle'></iron-icon>
-        </div>
-        <div class='settings-admin-btn-container'>
-          <iron-icon class='settings-icon' icon='settings'></iron-icon>
-        </div>
-      </div>
-    </div>
-
-    <!-- Center panel container: contains all main pages -->
-    <div class='page-container'></div>
-
-  </div>
-</template>
-
 <!-- Template for dropdown form -->
 <template id='dropdown-picker-template'>
   <div class='dropdown-picker-wrapper'>
@@ -128,6 +100,34 @@
 <template id='dropdown-item-template'>
   <div class='dropdown-item-wrapper'>
     <span class='item-label'></span>
+  </div>
+</template>
+
+<template id='center-page-template'>
+  <div class='center-page-wrapper'>
+
+    <!-- Upper-most row of center page. Container page title and admin btns -->
+    <div class='title-and-admin-btn-row'>
+      
+      <!-- Title for the center page -->
+      <div class='title-container'>
+        <span class='title-label'></span> 
+      </div> 
+
+      <!-- Admin icon buttons -->
+      <div class='admin-btn-container'>
+        <div class='user-profile-admin-btn-container'>
+          <iron-icon class='user-circle-icon' icon='account-circle'></iron-icon>
+        </div>
+        <div class='settings-admin-btn-container'>
+          <iron-icon class='settings-icon' icon='settings'></iron-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center panel container: contains all main pages -->
+    <div class='page-container'></div>
+
   </div>
 </template>
 
@@ -314,15 +314,6 @@
   </div>
 </template>
 
-<!-- specify icon type with 'icon' attribute in iron-icon element -->
-<!-- Add tab label in innerHTML of 'nav-btn-label '-->
-<template id='side-panel-tab-template'>
-  <div class='dash-nav-panel-btn'>
-    <iron-icon class='nav-btn-icon'></iron-icon>
-    <span class='nav-btn-label'></span>
-  </div>
-</template>
-
 <template id='side-panel-template'>
   <div class='side-panel-wrapper'>
     <!-- User name -->
@@ -347,6 +338,15 @@
 
     <!-- Page navigation buttons -->
     <div class='nav-btns-container'></div>
+  </div>
+</template>
+
+<!-- specify icon type with 'icon' attribute in iron-icon element -->
+<!-- Add tab label in innerHTML of 'nav-btn-label '-->
+<template id='side-panel-tab-template'>
+  <div class='dash-nav-panel-btn'>
+    <iron-icon class='nav-btn-icon'></iron-icon>
+    <span class='nav-btn-label'></span>
   </div>
 </template>
 

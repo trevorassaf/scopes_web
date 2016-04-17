@@ -9,8 +9,15 @@ window.onload = function() {
   console.assert(template_store != null);
 
   /**
+   * Initialize models
+   */
+  var new_experiment_page_model = new NewExperimentPageModel();
+  new_experiment_page_model.init();
+
+  /**
    * Initialize pages
    */
+  // Initialize center page
   var center_page_node = document.getElementById('center-panel');
 
   var center_page_view = new CenterPageView(
@@ -19,6 +26,13 @@ window.onload = function() {
   );
   center_page_view.init();
   center_page_view.showNewExperimentPage();
+
+  // Initialize page controllers
+  var new_experiment_page_controller = new NewExperimentPageController();
+  new_experiment_page_controller.init(
+    new_experiment_page_model,
+    center_page_view.getNewExperimentPageView()
+  );
 
   // New experiment page
   // var new_experiment_parent_node = null;
@@ -207,23 +221,49 @@ var DatePickerController = function() {
       month_displacement <= datePickerModel.getMaxAdvanceMonthCount();
   };
 
+  // TODO these...
+  var handleMinAdvanceDayCountChange = function(min_advance_day_count) {
+  };
+
+  var handleMaxAdvanceMonthCountChange = function(max_advance_month_count) {
+  };
+
+  var handleInvalidWeekDaysChange = function(invalid_week_days) {};
+
+  var handleInvalidDatesChange = function(invalid_dates) {};
+
+  var handleCalendarRefresh = function() {
+    datePickerView.refreshCalendar(
+      datePickerModel.getViewedMonth(),
+      datePickerModel.getViewedYear(),
+      datePickerModel.getMinAdvanceDayCount(),
+      datePickerModel.getInvalidDaysOfTheWeek(),
+      datePickerModel.getInvalidDates()
+    ); 
+  };
+
   /**
    * Privileged functions
    */
-  this.setView = function(view) {
-    // Cache view
+  this.init = function(view, model) {
     datePickerView = view;
-
-    // Bind event listeners
-    datePickerView.bindDateSelection(handleDateSelection);
-    datePickerView.bindMonthNavigation(handleMonthNavigation);
-
-    return this;
-  };
-
-  this.setModel = function(model) {
     datePickerModel = model;
-    return this;
+
+    // Configure view --> model data pathway
+    datePickerView
+      .bindDateSelection(handleDateSelection)
+      .bindMonthNavigation(handleMonthNavigation);
+
+    // Configure model --> view data pathway
+    datePickerModel
+      .bindSelectedDate(datePickerView.setSelectedDate)
+      .bindSelectedMonth(datePickerView.setSelectedMonth)
+      .bindSelectedYear(datePickerView.setSelectedYear)
+      .bindViewedMonth(handleCalendarRefresh)
+      .bindMinAdvanceDayCount(handleCalendarRefresh)
+      .bindMaxAdvanceMonthCount(handleCalendarRefresh)
+      .bindInvalidDaysOfTheWeek(handleCalendarRefresh)
+      .bindInvalidDates(handleCalendarRefresh);
   };
 };
 
@@ -251,6 +291,19 @@ var DropDownController = function() {
   /**
    * Privileged functions
    */
+  this.init = function(view, model) {
+    dropDownView = view;
+    dropDownModel = model;
+
+    // Configure model --> view data pathway
+    dropDownModel
+      .bindSelectedItem(dropDownView.setSelectedItem)
+      .bindDropDownItemModels(dropDownView.setDropDownItemModels);
+
+    // Configure view --> model data pathway
+    dropDownView.bindClick(handleClick);
+  };
+
   this.setView = function(view) {
     dropDownView = view;
 
@@ -529,6 +582,97 @@ var MyExperimentsPageController = function() {
   this.hide = function() {};
 };
 
+var NewExperimentPageController = function() {
+  
+  /**
+   * Private state
+   */
+  // Child controllers
+  var scopesCountController = null;
+  var experimentDurationController = null;
+  var experimentTimePickerController = null;
+  var experimentDatePickerController = null;
+  var shortCodePickerController = null;
+
+  // Model and view
+  var newExperimentPageModel = null;
+  var newExperimentPageView = null;
+
+  /**
+   * Privileged functions
+   */
+  var initScopesCountController = function() {
+    var scopes_count_view = newExperimentPageView.getScopesCountFormView(); 
+    var scopes_count_model = newExperimentPageModel.getScopesCountModel();
+
+    scopesCountController = new SliderController();
+    scopesCountController.init(
+      scopes_count_view,
+      scopes_count_model
+    );
+  };
+
+  var initExperimentDurationController = function() {
+    var experiment_duration_view = newExperimentPageView.getExperimentDurationFormView();
+    var experiment_duration_model = newExperimentPageModel.getExperimentDurationModel();
+
+    experimentDurationController = new SliderController();
+    experimentDurationController.init(
+      experiment_duration_view,
+      experiment_duration_model
+    );
+  };
+
+  var initExperimentTimePickerController = function() {
+    var experiment_time_form_view = newExperimentPageView.getExperimentTimeFormView();
+    var experiment_time_picker_model = newExperimentPageModel.getExperimentTimePickerModel();
+
+    experimentTimePickerController = new DropDownController();
+    experimentTimePickerController.init(
+      experiment_time_form_view.getTimePickerView(),
+      experiment_time_picker_model
+    );
+  };
+
+  var initExperimentDatePickerController = function() {
+    var experiment_time_form_view = newExperimentPageView.getExperimentTimeFormView();
+    var experiment_date_picker_model = newExperimentPageModel.getExperimentDatePickerModel();
+
+    experimentDatePickerController = new DatePickerController();
+    experimentDatePickerController.init(
+      experiment_time_form_view.getDatePickerView(),
+      experiment_date_picker_model
+    );
+  };
+
+  var initShortCodePickerController = function() {
+    var short_code_form_view = newExperimentPageView.getShortCodeFormView();
+    var short_code_picker_model = newExperimentPageModel.getShortCodePickerModel();
+
+    shortCodePickerController = new DropDownController();
+    shortCodePickerController.init(
+      short_code_form_view.getDropDownView(),
+      short_code_picker_model
+    );
+  };
+
+  /**
+   * Private functions
+   */
+  this.init = function(model, view) {
+    // TODO, handle case where init is called twice (model and view already bound)
+    newExperimentPageModel = model;
+    newExperimentPageView = view;
+
+    // Initialize child controllers
+    scopesCountController = initScopesCountController();
+    experimentDurationController = initExperimentDurationController();
+    experimentTimePickerController = initExperimentTimePickerController();
+    experimentDatePickerController = initExperimentDatePickerController();
+    shortCodePickerController = initShortCodePickerController();
+  };
+};
+
 var PageController = function(
   side_panel_view,
   new_experiment_view
@@ -624,6 +768,14 @@ var SliderController = function() {
    * Private functions
    */
   var configureCallbacks = function() {
+    // Configure model --> view data pathway
+    sliderModel
+      .bindMinValue(sliderView.setMinValue)
+      .bindMaxValue(sliderView.setMaxValue)
+      .bindStep(sliderView.setStep)
+      .bindCurrentValue(sliderView.setValue);
+
+    // Configure view --> model data pathway
     sliderView.bindValueChange(updateValue);
   };
 
@@ -1143,6 +1295,153 @@ var NewExperimentModel = function() {
   this.startTimePickerModel = null;
   this.startDatePickerModel = null;
   this.shortCodePickerModel = null;
+};
+
+var NewExperimentPageModel = function() {
+
+  /**
+   * Default starting state
+   */
+  var DEFAULT_SCOPES_COUNT_MODEL_PARAMETERS = {
+    min_value: 0,
+    max_value: 15,
+    step: 1,
+    value: 0
+  };
+
+  var DEFAULT_EXPERIMENT_DURATION_MODEL_PARAMETERS = {
+    min_value: 0,
+    max_value: 15,
+    step: 1,
+    value: 0
+  };
+
+  /**
+   * Private state
+   */
+  var scopesCountModel = null;
+  var experimentDurationModel = null;
+  var experimentTimePickerModel = null;
+  var experimentDatePickerModel = null;
+  var shortCodePickerModel = null;
+
+  /**
+   * Private functions
+   */
+  var initializeScopesCountModel = function() {
+    var slider_model = new SliderModel();
+    return slider_model
+      .setMinValue(DEFAULT_SCOPES_COUNT_MODEL_PARAMETERS.min_value)
+      .setMaxValue(DEFAULT_SCOPES_COUNT_MODEL_PARAMETERS.max_value)
+      .setStep(DEFAULT_SCOPES_COUNT_MODEL_PARAMETERS.step)
+      .setCurrentValue(DEFAULT_SCOPES_COUNT_MODEL_PARAMETERS.value);
+  };
+
+  var initializeExperimentDurationModel = function() {
+    var slider_model = new SliderModel();
+    return slider_model
+      .setMinValue(DEFAULT_EXPERIMENT_DURATION_MODEL_PARAMETERS.min_value)
+      .setMaxValue(DEFAULT_EXPERIMENT_DURATION_MODEL_PARAMETERS.max_value)
+      .setStep(DEFAULT_EXPERIMENT_DURATION_MODEL_PARAMETERS.step)
+      .setCurrentValue(DEFAULT_EXPERIMENT_DURATION_MODEL_PARAMETERS.value);
+  };
+
+  var initializeExperimentTimePickerModel = function() {
+    // Create drop down items 
+    var drop_down_items = [
+      new DropDownItemModel("10:00", "10:00", {}),
+      new DropDownItemModel("10:30", "10:30", {}),
+      new DropDownItemModel("11:00", "11:00", {})
+    ];
+    
+    experimentTimePickerModel = new DropDownModel();
+    return experimentTimePickerModel.setDropDownItems(drop_down_items);
+  };
+
+  var initializeExperimentDatePickerModel = function() {
+    // Create data model
+    var min_advance_day_count = 14;
+    var max_advance_month_count = 4;
+    var invalid_days_of_the_week = [0, 6];
+    var invalid_dates = [
+      new Date(2016, 4, 3),
+      new Date(2016, 4, 4),
+      new Date(2016, 4, 5)
+    ];
+
+    // Determine first open date
+    var starting_date = new Date();
+    starting_date.setDate(
+        starting_date.getDate() + min_advance_day_count
+    );
+
+    while (
+      Utils.contains(starting_date.getDay(), invalid_days_of_the_week) ||
+      Utils.contains(starting_date, invalid_dates)    
+    ) {
+      starting_date.setDate(starting_date.getDate() + 1); 
+      // TODO handle case in which NO legal starting dates exist!
+    }
+
+    
+    // Create model
+    var date_picker_model = new DatePickerModel();
+    return date_picker_model
+      .setSelectedDate(starting_date.getDate())
+      .setSelectedMonth(starting_date.getMonth())
+      .setSelectedYear(starting_date.getFullYear())
+      .setViewedMonthAndYear(
+        starting_date.getMonth(),
+        starting_date.getFullYear()
+      )
+      .setMinAdvanceDayCount(min_advance_day_count)
+      .setMaxAdvanceMonthCount(max_advance_month_count)
+      .setInvalidDaysOfTheWeek(invalid_days_of_the_week)
+      .setInvalidDates(invalid_dates);
+  };
+
+  var initializeShortCodePickerModel = function() {
+    var drop_down_items = [
+      new DropDownItemModel("SHORT", "SHORT", {}),
+      new DropDownItemModel("CODE", "CODE", {}),
+      new DropDownItemModel("SHIT", "SHIT", {})
+    ];
+    var drop_down_model = new DropDownModel();
+    return drop_down_model.setDropDownItems(drop_down_items);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize models
+    scopesCountModel = initializeScopesCountModel();
+    experimentDurationModel = initializeExperimentDurationModel();
+    experimentTimePickerModel = initializeExperimentTimePickerModel();
+    experimentDatePickerModel = initializeExperimentDatePickerModel();
+    shortCodePickerModel = initializeShortCodePickerModel();
+  };
+
+  // Getters
+  this.getScopesCountModel = function() {
+    return scopesCountModel;
+  };
+
+  this.getExperimentDurationModel = function() {
+    return experimentDurationModel;
+  };
+
+  this.getExperimentTimePickerModel = function() {
+    return experimentTimePickerModel;
+  };
+
+  this.getExperimentDatePickerModel = function() {
+    return experimentDatePickerModel;
+  };
+
+  this.getShortCodePickerModel = function() {
+    return shortCodePickerModel;
+  };
 };
 
 var OrderRequestModel = function() {
@@ -4465,8 +4764,6 @@ var DatePickerView = function(
   /**
    * Private state
    */
-  var datePickerModel = null;
-
   var templateStore = template_store;
   var parentNode = parent_node;
   var datePickerRootNode = null;
@@ -4621,23 +4918,13 @@ var DatePickerView = function(
     Utils.bindClickBeyondNode(datePickerRootNode, close); 
   };
 
-  var setSelectedDate = function(selected_date) {
-    selectedDateLabelNodeInfo.node.innerHTML = "" + selected_date + DATE_DELIMITER; 
-  };
-
-  var setSelectedMonth = function(selected_month) {
-    selectedMonthLabelNodeInfo.node.innerHTML = SHORT_MONTH_NAMES[selected_month];
-  };
-
-  var setSelectedYear = function(selected_year) {
-    selectedYearLabelNodeInfo.node.innerHTML = selected_year;
-  };
-
-  var setViewedMonth = function(month, year) {
-    refreshCalendar(month, year);
-  }
-
-  var refreshCalendar = function(month, year) {
+  this.refreshCalendar = function(
+    month,
+    year,
+    min_advance_day_count,
+    invalid_week_days,
+    invalid_dates
+  ) {
     // Remove previous date nodes
     Utils.removeDomChildren(weeksContainerNodeInfo.node); 
 
@@ -4667,7 +4954,7 @@ var DatePickerView = function(
     // Determine which date is the first selectable one
     var first_selectable_date = new Date();
     first_selectable_date.setDate(
-      first_selectable_date.getDate() + datePickerModel.getMinAdvanceDayCount()
+      first_selectable_date.getDate() + min_advance_day_count 
     );
 
     // Generate nodes for displaying selectable days
@@ -4686,8 +4973,10 @@ var DatePickerView = function(
       // 2. It falls too close to the current date 
       var validation_check_date = new Date(year, month, i);
 
-      if (Utils.compareDates(first_selectable_date, validation_check_date) > 0 ||
-          isInvalidDate(validation_check_date)) {
+      if (
+          Utils.compareDates(first_selectable_date, validation_check_date) > 0 ||
+          isInvalidDate(validation_check_date, invalid_week_days, invalid_dates)
+      ) {
         date.setAttribute(UNSELECTABLE_DATE_ATTR, '');     
       } 
       
@@ -4699,18 +4988,13 @@ var DatePickerView = function(
     }
   };
 
-  var isInvalidDate = function(date) {
+  var isInvalidDate = function(date, invalid_week_days, invalid_dates) {
     // Check if this date's 'day of the week' is marked invalid
-    if (Utils.contains(date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())) {
+    if (Utils.contains(date.getDay(), invalid_week_days)) {
       return true;
     }
 
-    // if (datePickerModel.getInvalidDaysOfTheWeek().includes(date.getDay())) {
-    //   return true;
-    // }
-
     // Check if this date is one of the irregular dates marked invalid
-    var invalid_dates = datePickerModel.getInvalidDates();
     for (var i = 0; i < invalid_dates.length; ++i) {
       var invalid_date = invalid_dates[i];
       if (Utils.compareDates(date, invalid_date) == 0) {
@@ -4739,51 +5023,10 @@ var DatePickerView = function(
     );
   };
 
-  var setMinAdvanceDayCount = function(count) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var setMaxAdvanceMonthCount = function(count) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var setInvalidDaysOfTheWeek = function(invalid_days) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var setInvalidDates = function(dates) {
-    refreshCalendar(
-      datePickerModel.getViewedMonth(),
-      datePickerModel.getViewedYear()
-    ); 
-  };
-
-  var bindModel = function(date_picker_model) {
-    datePickerModel = date_picker_model;
-    datePickerModel 
-      .bindSelectedDate(setSelectedDate)
-      .bindSelectedMonth(setSelectedMonth)
-      .bindSelectedYear(setSelectedYear)
-      .bindViewedMonth(setViewedMonth)
-      .bindMinAdvanceDayCount(setMinAdvanceDayCount)
-      .bindMaxAdvanceMonthCount(setMaxAdvanceMonthCount)
-      .bindInvalidDaysOfTheWeek(setInvalidDaysOfTheWeek)
-      .bindInvalidDates(setInvalidDates);
-  };
-
   /**
    * Privileged functions
    */
-  this.init = function(date_picker_model) {
+  this.init = function() {
     // Synthesize template into document
     datePickerRootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -4794,9 +5037,6 @@ var DatePickerView = function(
 
     // Bind nodes
     bindNodes();
-
-    // Bind model and init ui
-    bindModel(date_picker_model);
 
     // Initialize month-nav arrow states
     this.disableMonthDecrementNavButton(); 
@@ -4863,6 +5103,17 @@ var DatePickerView = function(
     }
   };
   
+  this.setSelectedDate = function(selected_date) {
+    selectedDateLabelNodeInfo.node.innerHTML = "" + selected_date + DATE_DELIMITER; 
+  };
+
+  this.setSelectedMonth = function(selected_month) {
+    selectedMonthLabelNodeInfo.node.innerHTML = SHORT_MONTH_NAMES[selected_month];
+  };
+
+  this.setSelectedYear = function(selected_year) {
+    selectedYearLabelNodeInfo.node.innerHTML = selected_year;
+  };
 };
 
 function StaticCalendar(
@@ -5043,152 +5294,6 @@ function StaticCalendar(
     synthesizeTemplate();
     bindInternalNodes();
     initUi();
-  };
-};
-
-var CenterPageView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'center-page-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'center-page-wrapper';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-  var rootNode = null;
-
-  var currentPageView = null;
-
-  var newExperimentPageView = null;
-  var myExperimentsPageView = null;
-  var feedbackPageView = null;
-  var technicianPageView = null;
-
-  /**
-   * Dom nodes
-   */
-  var pageTitleNode = {
-    className: 'title-label',
-    node: null
-  };
-
-  var centerPanelPageContainerNode = {
-    className: 'page-container',
-    node: null
-  };
-
-  var adminButtonContainerNode = {
-    className: 'admin-btn-container',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-
-  var initNewExperimentPage = function() {
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    ); 
-    newExperimentPageView.init();
-  };
-
-  var initPages = function() {
-    initNewExperimentPage(); 
-  };
-
-  var bindNodes = function() {
-    // Bind page title node
-    pageTitleNode.node = Utils.bindNode(
-      rootNode,
-      pageTitleNode.className
-    ); 
-
-    // Bind container node for admin buttons
-    adminButtonContainerNode.node = Utils.bindNode(
-      rootNode,
-      adminButtonContainerNode.className
-    );
-    
-    // Bind node that contains the pages
-    centerPanelPageContainerNode.node = Utils.bindNode(
-      rootNode,
-      centerPanelPageContainerNode.className
-    );
-
-    // Initialize pages
-    initPages();
-  };
-
-  var initPageViews = function() {
-    // Init new experiment page view
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );     
-
-    newExperimentPageView.init();
-  };
-
-  var changePage = function(next_page_view) {
-    console.assert(next_page_view != null);
-
-    // Hide current page
-    if (currentPageView != null) {
-      currentPageView.hide();
-    }
-
-    // Show next page and update title
-    currentPageView = next_page_view;
-    pageTitleNode.node.innerHTML = currentPageView.getTitle();
-    currentPageView.show();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );
-
-    bindNodes();
-
-    return this;
-  };
-
-  /**
-   * Functions for showing main pages
-   */
-  this.showNewExperimentPage = function() {
-    changePage(newExperimentPageView);       
-  };
-
-  this.showMyExperimentsPage = function() {
-    changePage(myExperimentsPageView);       
-  };
-
-  this.showFeedbackPage = function() {
-    changePage(feedbackPageView);       
-  };
-
-  this.showTechnicianPage = function() {
-    changePage(technicianPageView);       
   };
 };
 
@@ -5399,13 +5504,6 @@ var DropDownView = function(
     dropDownRootNode.setAttribute(REVEALED_DROPDOWN_ATTR, '');
   };
 
-  var bindModel = function(drop_down_model) {
-    // Bind to model state
-    drop_down_model
-      .bindSelectedItem(setSelectedItem)
-      .bindDropDownItemModels(setDropDownItemModels);
-  };
-
   var configureDropDownItems = function(drop_down_data) {
     for (var i = 0; i < drop_down_data.length; ++i) {
       var label = drop_down_data[i]; 
@@ -5430,11 +5528,36 @@ var DropDownView = function(
     dropDownIconNode.node.setAttribute(ICON_TYPE_ATTR, icon_type); 
   };
 
-  var setSelectedItem = function(drop_down_item) {
+  /**
+   * Privileged functions 
+   */
+  this.init = function(icon_type) {
+    // Synthesize template into document
+    dropDownRootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_WRAPPER_CLASS
+    );  
+
+    // Bind nodes
+    bindNodes();
+
+    // Configure icon
+    setIcon(icon_type);
+  };
+
+  this.bindClick = function(callback) {
+    onClickCallbacks.push(callback);
+  };
+
+  this.setSelectedItem = function(drop_down_item) {
     inputFieldLabelNode.node.innerHTML = drop_down_item.getLabel();
   };
 
-  var setDropDownItemModels = function(drop_down_item_models) {
+  // TODO maybe move this to controller
+  this.setDropDownItemModels = function(drop_down_item_models) {
+    // TODO clear list first?
     for (var i = 0; i < drop_down_item_models.length; ++i) {
       // Initialize drop down view
       var drop_down_item_view = new DropDownItemView(
@@ -5450,34 +5573,146 @@ var DropDownView = function(
       dropDownItemViews.push(drop_down_item_view);
     }
   };
+};
+
+var CenterPageView = function(
+  template_store,
+  parent_node
+) {
 
   /**
-   * Privileged functions 
+   * Template node id
    */
-  this.init = function(
-      drop_down_model,
-      icon_type
-  ) {
-    // Synthesize template into document
-    dropDownRootNode = Utils.synthesizeTemplate(
+  var TEMPLATE_ID = 'center-page-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'center-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var rootNode = null;
+
+  var currentPageView = null;
+
+  var newExperimentPageView = null;
+  var myExperimentsPageView = null;
+  var feedbackPageView = null;
+  var technicianPageView = null;
+
+  /**
+   * Dom nodes
+   */
+  var pageTitleNode = {
+    className: 'title-label',
+    node: null
+  };
+
+  var centerPanelPageContainerNode = {
+    className: 'page-container',
+    node: null
+  };
+
+  var adminButtonContainerNode = {
+    className: 'admin-btn-container',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+
+  var initNewExperimentPage = function() {
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    ); 
+    newExperimentPageView.init();
+  };
+
+  var initPages = function() {
+    initNewExperimentPage(); 
+  };
+
+  var bindNodes = function() {
+    // Bind page nodes
+    Utils.bindNodeInfo(rootNode, pageTitleNode);
+    Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
+    Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
+
+  };
+
+  var initPageViews = function() {
+    // Init new experiment page view
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );     
+
+    newExperimentPageView.init();
+  };
+
+  var changePage = function(next_page_view) {
+    console.assert(next_page_view != null);
+
+    // Hide current page
+    if (currentPageView != null) {
+      currentPageView.hide();
+    }
+
+    // Show next page and update title
+    currentPageView = next_page_view;
+    pageTitleNode.node.innerHTML = currentPageView.getTitle();
+    currentPageView.show();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize template into document and initialize
+    // root DOM element
+    rootNode = Utils.synthesizeTemplate(
       templateStore,
       TEMPLATE_ID,
       parentNode,
-      ROOT_WRAPPER_CLASS
-    );  
+      ROOT_NODE_CLASS
+    );
 
-    // Bind nodes
+    // Bind ui elements and attach event listeners
     bindNodes();
+    
+    // Initialize pages
+    initPages();
 
-    // Configure icon
-    setIcon(icon_type);
-
-    // Bind model
-    bindModel(drop_down_model);
+    return this;
   };
 
-  this.bindClick = function(callback) {
-    onClickCallbacks.push(callback);
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    changePage(newExperimentPageView);       
+  };
+
+  this.showMyExperimentsPage = function() {
+    changePage(myExperimentsPageView);       
+  };
+
+  this.showFeedbackPage = function() {
+    changePage(feedbackPageView);       
+  };
+
+  this.showTechnicianPage = function() {
+    changePage(technicianPageView);       
+  };
+
+  this.getNewExperimentPageView = function() {
+    return newExperimentPageView;
   };
 };
 
@@ -6936,128 +7171,6 @@ function ShortCodePicker(
   };
 };
 
-function SidePanelTab(
-  template_store,
-  parent_node,
-  button_title,
-  iron_icon_type
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
-
-  /**
-   * Ui attributes
-   */
-  var SELECTED_ATTR = "selected-side-panel-tab";
-  var IRON_ICON_TYPE_ATTR = "icon";
-
-  /**
-   * Private state
-   */
-  var _this = this;
-  var templateStore = template_store;
-  var buttonTitle = button_title;
-  var ironIconType = iron_icon_type;
-  var onClickListeners = [];
-
-  // Root dom node
-  var rootNode = {
-    className: 'dash-nav-panel-btn',
-    node: null
-  };
-
-  var ironIconNode = {
-    className: 'nav-btn-icon',
-    node: null
-  };
-
-  var buttonTitleNode = {
-    className: 'nav-btn-label',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = rootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  function synthesizeSidePanelTemplate() {
-    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
-    var tab_clone = document.importNode(tab_template.content, true);
-    parent_node.appendChild(tab_clone);
-
-    // Initialize root node and configure event listener
-    var tabs = parent_node.getElementsByClassName(rootNode.className);
-    rootNode.node = tabs[tabs.length - 1];
-
-    rootNode.node.onclick = function() {
-      for (var i = 0; i < onClickListeners.length; ++i) {
-        onClickListeners[i]();
-      }
-    };
-  };
-
-  /**
-   * bindInternalNodes()
-   * @pre-condition: 'rootNode' must already be bound
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(ironIconNode); 
-    bindClassBoundNode(buttonTitleNode);
-  };
-
-  /**
-   * initDisplay()
-   * - initializes text/graphics for this tab
-   * @pre-condition: all internal nodes bound
-   */
-  function initDisplay() {
-    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
-    buttonTitleNode.node.innerHTML = buttonTitle; 
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Initialize template and append to parent dom node
-    synthesizeSidePanelTemplate();
-
-    // Initialize pointers to internal nodes
-    bindInternalNodes();
-
-    // Initialize the ui
-    initDisplay();
-  }; 
-
-  this.select = function() {
-    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
-  };
-
-  this.deselect = function() {
-    rootNode.node.removeAttribute(SELECTED_ATTR);
-  };
-
-  /**
-   * registerOnClickListener()
-   * @param FuncPtr callback: function(_this) {...}
-   */
-  this.registerOnClickListener = function(callback) {
-    onClickListeners.push(callback); 
-  };
-};
-
 var SidePanelView = function(
   template_store,
   parent_node
@@ -7270,6 +7383,128 @@ var SidePanelView = function(
 
   this.selectTechnicianTab = function() {
     selectTab(technicianInfo.tab);
+  };
+};
+
+function SidePanelTab(
+  template_store,
+  parent_node,
+  button_title,
+  iron_icon_type
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+
+  /**
+   * Ui attributes
+   */
+  var SELECTED_ATTR = "selected-side-panel-tab";
+  var IRON_ICON_TYPE_ATTR = "icon";
+
+  /**
+   * Private state
+   */
+  var _this = this;
+  var templateStore = template_store;
+  var buttonTitle = button_title;
+  var ironIconType = iron_icon_type;
+  var onClickListeners = [];
+
+  // Root dom node
+  var rootNode = {
+    className: 'dash-nav-panel-btn',
+    node: null
+  };
+
+  var ironIconNode = {
+    className: 'nav-btn-icon',
+    node: null
+  };
+
+  var buttonTitleNode = {
+    className: 'nav-btn-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  function synthesizeSidePanelTemplate() {
+    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var tab_clone = document.importNode(tab_template.content, true);
+    parent_node.appendChild(tab_clone);
+
+    // Initialize root node and configure event listener
+    var tabs = parent_node.getElementsByClassName(rootNode.className);
+    rootNode.node = tabs[tabs.length - 1];
+
+    rootNode.node.onclick = function() {
+      for (var i = 0; i < onClickListeners.length; ++i) {
+        onClickListeners[i]();
+      }
+    };
+  };
+
+  /**
+   * bindInternalNodes()
+   * @pre-condition: 'rootNode' must already be bound
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(ironIconNode); 
+    bindClassBoundNode(buttonTitleNode);
+  };
+
+  /**
+   * initDisplay()
+   * - initializes text/graphics for this tab
+   * @pre-condition: all internal nodes bound
+   */
+  function initDisplay() {
+    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
+    buttonTitleNode.node.innerHTML = buttonTitle; 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize template and append to parent dom node
+    synthesizeSidePanelTemplate();
+
+    // Initialize pointers to internal nodes
+    bindInternalNodes();
+
+    // Initialize the ui
+    initDisplay();
+  }; 
+
+  this.select = function() {
+    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
+  };
+
+  this.deselect = function() {
+    rootNode.node.removeAttribute(SELECTED_ATTR);
+  };
+
+  /**
+   * registerOnClickListener()
+   * @param FuncPtr callback: function(_this) {...}
+   */
+  this.registerOnClickListener = function(callback) {
+    onClickListeners.push(callback); 
   };
 };
 
@@ -7910,14 +8145,6 @@ var NewExperimentPageView = function(
    * Private functions
    */
   var initScopeCountView = function() {
-    // Initialize and configure slider model
-    var slider_model = new SliderModel();
-    slider_model
-      .setMinValue(0)
-      .setMaxValue(15)
-      .setStep(1)
-      .setCurrentValue(0);
-
     var slider_form_view = new SliderFormView(
       templateStore,
       scopesCountNode.node,
@@ -7925,19 +8152,11 @@ var NewExperimentPageView = function(
       SCOPES_COUNT_UNIT_LABELS
     ); 
 
-    slider_form_view.init(slider_model);
+    slider_form_view.init();
     return slider_form_view;
   };
 
   var initExperimentDurationView = function() {
-    // Initialize and configure slider model
-    var slider_model = new SliderModel();
-    slider_model
-      .setMinValue(0)
-      .setMaxValue(15)
-      .setStep(1)
-      .setCurrentValue(0);
-
     var slider_form_view = new SliderFormView(
       templateStore,    
       experimentDurationNode.node,
@@ -7945,14 +8164,7 @@ var NewExperimentPageView = function(
       EXPERIMENT_DURATION_UNIT_LABELS
     );
 
-    slider_form_view.init(slider_model);
-
-    experimentDurationController = new SliderController();
-    experimentDurationController.init(
-      slider_form_view,
-      slider_model
-    );
-
+    slider_form_view.init();
     return slider_form_view;
   };
 
@@ -7972,21 +8184,22 @@ var NewExperimentPageView = function(
       templateStore,
       shortCodePickerNode.node
     );
+    form_view.init();
    
     // Initialize drop-down model
-    var drop_down_model = new DropDownModel();
-    var drop_down_items = [
-      new DropDownItemModel("SHORT", "SHORT", {}),
-      new DropDownItemModel("CODE", "CODE", {}),
-      new DropDownItemModel("SHIT", "SHIT", {})
-    ];
-    drop_down_model.setDropDownItems(drop_down_items);
-
-    // Initialize drop-down model controller
-    var drop_down_controller = new DropDownController();
-    drop_down_controller.setModel(drop_down_model);
-
-    form_view.init(drop_down_controller);
+    // var drop_down_model = new DropDownModel();
+    // var drop_down_items = [
+    //   new DropDownItemModel("SHORT", "SHORT", {}),
+    //   new DropDownItemModel("CODE", "CODE", {}),
+    //   new DropDownItemModel("SHIT", "SHIT", {})
+    // ];
+    // drop_down_model.setDropDownItems(drop_down_items);
+    //
+    // // Initialize drop-down model controller
+    // var drop_down_controller = new DropDownController();
+    // drop_down_controller.setModel(drop_down_model);
+    //
+    // form_view.init(drop_down_controller);
 
     return form_view;
   };
@@ -8001,11 +8214,11 @@ var NewExperimentPageView = function(
     form_view.init();
 
     // Initialize form controller
-    var form_controller = new ConfirmOrderFormController();
-    form_controller.init(
-      form_view,
-      experimentDurationController.getModel()
-    );
+    // var form_controller = new ConfirmOrderFormController();
+    // form_controller.init(
+    //   form_view,
+    //   experimentDurationController.getModel()
+    // );
     return form_view;
   };
 
@@ -8051,6 +8264,26 @@ var NewExperimentPageView = function(
   this.show = function() {
     Utils.showNode(rootNode);
   };
+
+  this.getScopesCountFormView = function() {
+    return scopesCountFormView;
+  };
+  
+  this.getExperimentDurationFormView = function() {
+    return experimentDurationFormView;
+  };
+
+  this.getExperimentTimeFormView = function() {
+    return experimentTimeFormView;   
+  };
+  
+  this.getShortCodeFormView = function() {
+    return shortCodePickerFormView;
+  };
+
+  this.getConfirmExperimentFormView = function() {
+    return confirmExperimentFormView;
+  };
 };
 
 var ExperimentTimeFormView = function(
@@ -8076,11 +8309,9 @@ var ExperimentTimeFormView = function(
 
   var rootNode = null;
 
-  var experimentTimePickerView = null;
-  var experimentTimePickerModel = null;
-  var experimentTimePickerController = null;
+  var timePickerView = null;
 
-  var experimentDatePickerController = null;
+  var datePickerView = null;
 
   /**
    * Dom nodes
@@ -8102,103 +8333,26 @@ var ExperimentTimeFormView = function(
     // Bind nodes
     Utils.bindNodeInfo(rootNode, experimentTimePickerNode);
 
-
-    // Create data model
-    var drop_down_items = [
-      new DropDownItemModel("10:00", "10:00", {}),
-      new DropDownItemModel("10:30", "10:30", {}),
-      new DropDownItemModel("11:00", "11:00", {})
-    ];
-
-    experimentTimePickerModel = new DropDownModel();
-    experimentTimePickerModel.setDropDownItems(drop_down_items);
-
     // Create view
-    experimentTimePickerView = new DropDownView(
+    timePickerView = new DropDownView(
       templateStore,
       experimentTimePickerNode.node
     );
 
-    experimentTimePickerView.init(
-      experimentTimePickerModel,
-      'device:access-time'
-    );
-
-    // Create controller
-    experimentTimePickerController = new DropDownController();
-    experimentTimePickerController
-      .setModel(experimentTimePickerModel)
-      .setView(experimentTimePickerView);
-
-    // Initialize view
-    // experimentTimePickerView = new TimePicker(
-    //   templateStore,
-    //   experimentTimePickerNode.node,
-    //   {minutes: 0, hours: 10},
-    //   {minutes: 0, hours: 19},
-    //   30
-    // ); 
-    //
-    // experimentTimePickerView.init();
+    timePickerView.init('device:access-time');
   };
 
   var initExperimentDatePickerView = function() {
     // Bind nodes
     Utils.bindNodeInfo(rootNode, experimentDatePickerNode);
 
-    // Create data model
-    var min_advance_day_count = 14;
-    var max_advance_month_count = 4;
-    var invalid_days_of_the_week = [0, 6];
-    var invalid_dates = [
-      new Date(2016, 4, 3),
-      new Date(2016, 4, 4),
-      new Date(2016, 4, 5)
-    ];
-
-    // Determine first open date
-    var starting_date = new Date();
-    starting_date.setDate(
-        starting_date.getDate() + min_advance_day_count
-    );
-
-    while (
-      Utils.contains(starting_date.getDay(), invalid_days_of_the_week) ||
-      Utils.contains(starting_date, invalid_dates)    
-    ) {
-      starting_date.setDate(starting_date.getDate() + 1); 
-      // TODO handle case in which NO legal starting dates exist!
-    }
-
-    
-    // Create model
-    var date_picker_model = new DatePickerModel();
-    date_picker_model
-      .setSelectedDate(starting_date.getDate())
-      .setSelectedMonth(starting_date.getMonth())
-      .setSelectedYear(starting_date.getFullYear())
-      .setViewedMonthAndYear(
-        starting_date.getMonth(),
-        starting_date.getFullYear()
-      )
-      .setMinAdvanceDayCount(min_advance_day_count)
-      .setMaxAdvanceMonthCount(max_advance_month_count)
-      .setInvalidDaysOfTheWeek(invalid_days_of_the_week)
-      .setInvalidDates(invalid_dates);
-
     // Create view
-    var date_picker_view = new DatePickerView(
+    datePickerView = new DatePickerView(
       templateStore,
       experimentDatePickerNode.node
     );
 
-    date_picker_view.init(date_picker_model);
-
-    // Initialize controller
-    experimentDatePickerController = new DatePickerController();   
-    experimentDatePickerController
-      .setModel(date_picker_model)
-      .setView(date_picker_view);
+    datePickerView.init();
   };
 
   var initFormElements = function() {
@@ -8220,6 +8374,14 @@ var ExperimentTimeFormView = function(
 
     // Initialize form elements 
     initFormElements();
+  };
+
+  this.getTimePickerView = function() {
+    return timePickerView;
+  };
+
+  this.getDatePickerView = function() {
+    return datePickerView;
   };
 };
 
@@ -8264,7 +8426,7 @@ var ShortCodeFormView = function(
   /**
    * Private functions
    */
-  var initFormElements = function(drop_down_controller) {
+  var initFormElements = function() {
     // Bind short-code drop-down node
     Utils.bindNodeInfo(rootNode, shortCodePickerNode);  
 
@@ -8274,19 +8436,13 @@ var ShortCodeFormView = function(
       shortCodePickerNode.node
     );
 
-    shortCodePickerView.init(
-      drop_down_controller.getModel(),
-      ICON_NAME
-    );
-
-    drop_down_controller.setView(shortCodePickerView);
+    shortCodePickerView.init(ICON_NAME);
   };
-
 
   /**
    * Privileged functions
    */
-  this.init = function(drop_down_controller) {
+  this.init = function() {
     // Synthesize template into document
     rootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -8296,7 +8452,7 @@ var ShortCodeFormView = function(
     ); 
 
     // Initialize form elements
-    initFormElements(drop_down_controller);
+    initFormElements();
   };
 
   this.getDropDownView = function() {
@@ -8387,35 +8543,15 @@ var SliderFormView = function(
     };
   };
 
-  var setMinValue = function(min_value) {
-    sliderNode.node.setAttribute(PAPER_SLIDER_MIN_ATTR, min_value); 
-  };
-
-  var setMaxValue = function(max_value) {
-    sliderNode.node.setAttribute(PAPER_SLIDER_MAX_ATTR, max_value); 
-  };
-
-  var setStep = function(step) {
-    sliderNode.node.setAttribute(PAPER_SLIDER_STEP_ATTR, step); 
-  };
-
   var initUi = function() {
     // Initialize slider
     formTitleNode.node.innerHTML = titleLabel;
   };
 
-  var bindModel = function(slider_model) {
-    slider_model
-      .bindMinValue(setMinValue)
-      .bindMaxValue(setMaxValue)
-      .bindStep(setStep)
-      .bindCurrentValue(_this.setValue);
-  };
-
   /**
    * Privileged functions
    */
-  this.init = function(slider_model) {
+  this.init = function() {
     // Initialize root node
     rootNode = Utils.synthesizeTemplate(
       templateStore,
@@ -8426,9 +8562,6 @@ var SliderFormView = function(
 
     // Initialize nodes and bind event listeners
     bindNodes();
-
-    // Bind model and init ui
-    bindModel(slider_model);
 
     // Init ui elements (e.g. form title)
     initUi();
@@ -8445,6 +8578,18 @@ var SliderFormView = function(
     unitDisplayNode.node.innerHTML = (value == 1)
       ? unitLabels.singular
       : unitLabels.plural;
+  };
+
+  this.setMinValue = function(min_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MIN_ATTR, min_value); 
+  };
+
+  this.setMaxValue = function(max_value) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_MAX_ATTR, max_value); 
+  };
+
+  this.setStep = function(step) {
+    sliderNode.node.setAttribute(PAPER_SLIDER_STEP_ATTR, step); 
   };
 
   this.bindValueChange = function(callback) {
