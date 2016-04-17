@@ -1,0 +1,51 @@
+.my-experiment-wrapper .header-wrapper {
+  padding: 20px;
+  cursor: pointer;
+}
+
+.my-experiment-wrapper .title-label {
+  display: inline-block;
+  font-size: 20px;
+  padding: 4px;
+  outline: 0px solid transparent;
+  color: #909090;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.my-experiment-wrapper .header-wrapper[editing-title] .title-label,
+.my-experiment-wrapper .title-label[changed-title] {
+  font-weight: bold;
+  font-style: normal;
+  color: #424242;
+}
+
+.my-experiment-wrapper .title-label:focus {
+  cursor: text;
+}
+
+.my-experiment-wrapper .header-wrapper {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.my-experiment-wrapper .title-underline {
+  margin-top: 14px;
+  border-top: 1px solid rgb(228, 228, 228);
+  margin-bottom: 1px;
+}
+
+.my-experiment-wrapper .header-wrapper:hover .title-underline {
+  border-color: rgb(38, 108, 177);
+}
+
+.my-experiment-wrapper .header-wrapper[editing-title] .title-underline {
+  border-color: rgb(38, 108, 177);
+  border-width: 2px;
+  margin-bottom: 0px;
+}
+
+.my-experiments-page-wrapper .header-wrapper[editing-title] {
+  cursor: text;
+}
+

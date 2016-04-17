@@ -33,8 +33,6 @@ var MyExperimentsPageController = function() {
       experiment_model.getId(),
       experiment_controller  
     );
-
-    experiment_view.init();
   };
 
   // TODO

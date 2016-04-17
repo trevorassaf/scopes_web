@@ -56,6 +56,8 @@ var MyExperimentsPageView = function(
       templateStore,
       rootNode
     ); 
+
+    my_experiment_view.init();
     return my_experiment_view;
   };
 

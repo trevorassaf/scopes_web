@@ -3,28 +3,15 @@ var Utils = (function() {
   var CLASS_NAME_PROPERTY = "className";
 
   var HIDDEN_ATTR = 'hidden';
+  var SELECTED_ATTR = 'selected';
 
   // Timestamp delimiters
   var DATE_DELIMITER = "-";
   var TIME_DELIMITER = ":";
   var DATE_TIME_SEPERATOR = " ";
 
-  // this.hasClass = function(expected_class, node) {
-  //   if (!(CLASS_NAME_PROPERTY in node)) {
-  //     return false;
-  //   }
-  //
-  //   var node_class = node[CLASS_NAME_PROPERTY];
-  //   var class_idx = node_class.indexOf(expected_class);
-  //   
-  //   if (class_idx == -1) {
-  //     return false;
-  //   }
-  //
-  //   return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-  //     && (expected_class.length + class_idx == node_class.length
-  //       || node_class.charAt(expected_class.length + class_idx) == ' ');
-  // };
+  // Key codes
+  var ENTER_KEY_CODE = 13;
 
   this.hasClass = function(class_name, node) {
     console.assert(node != null);
@@ -210,10 +197,27 @@ var Utils = (function() {
 
   this.hideNode = function(node) {
     node.setAttribute(HIDDEN_ATTR, ''); 
+    markNode(node, HIDDEN_ATTR);
   };
 
   this.showNode = function(node) {
-    node.removeAttribute(HIDDEN_ATTR);
+    unmarkNode(node, HIDDEN_ATTR);
+  };
+  
+  this.selectNode = function(node) {
+    markNode(node, SELECTED_ATTR); 
+  };
+
+  this.unselectNode = function(node) {
+    unmarkNode(node, SELECTED_ATTR);
+  };
+
+  this.markNode = function(node, attr) {
+    node.setAttribute(attr, '');
+  };
+
+  this.unmarkNode = function(node, attr) {
+    node.removeAttribute(attr); 
   };
 
   this.bindClickBeyondNode = function(node, callback) {
@@ -277,6 +281,29 @@ var Utils = (function() {
     }
   };
 
+  var selectTextRange = function(node) {
+    var range = document.createRange();
+    range.selectNodeContents(node);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+
+  var unselectTextRange = function(node) {
+    var selection = window.getSelection();
+    if (hasClass(node.className, selection.anchorNode.parentElement)) {
+      selection.removeAllRanges();
+    }
+  };
+
+  var isEnterKeyPressed = function(event) {
+    return 'charCode' in event && event.charCode == ENTER_KEY_CODE;
+  };
+
+  var isWhiteSpace = function(str) {
+    return str.trim().length == 0;
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -296,6 +323,14 @@ var Utils = (function() {
     contains: contains,
     trimLast : trimLast,
     removeElementFromArray : removeElementFromArray,
+    selectNode: selectNode,
+    unselectNode: unselectNode,
+    markNode: markNode,
+    unmarkNode: unmarkNode,
+    selectTextRange : selectTextRange,
+    unselectTextRange: unselectTextRange,
+    isEnterKeyPressed : isEnterKeyPressed,
+    isWhiteSpace: isWhiteSpace
   };
 
 })();

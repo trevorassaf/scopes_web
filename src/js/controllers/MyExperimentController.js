@@ -9,30 +9,54 @@ var MyExperimentController = function() {
   /**
    * Protected functions
    */
-  var changeTitle = function(title) {
-    // Update model
-    myExperimentModel.setTitle(title);
-
-    // TODO persist...
+  var handleModelTitleChange = function(title) {
+    if (title == null) {
+      myExperimentView.setTitlePlaceholder(); 
+    } else {
+      myExperimentView.setTitle(title);
+    }
   };
 
-  var changeDescription = function(description) {
-    // Update model
-    myExperimentModel.setDescription(description);
-
-    // TODO persist...
-  };
-
-  var deleteExperiment = function() {
-    isActive = false;
-
-    myExperimentView.remove();
-    
-    // TODO... persist
+  var handleViewTitleChange = function(new_title) {
+    if (new_title == null || Utils.isWhiteSpace(new_title)) {
+      // User removed title. Now, delete title in model and 
+      // update ui with default title
+      myExperimentModel.setTitle(null);
+    } else {
+      // Update model
+      myExperimentModel.setTitle(new_title.trim());
+    }
   };
 
   var configureCallbacks = function() {
-     
+    /**
+     * Model --> view data pathways
+     */
+    myExperimentModel
+      .bindTitle(handleModelTitleChange);
+
+    /**
+     * View --> model data pathways
+     */
+    // Attach title change listeners
+    myExperimentView.bindTitle(handleViewTitleChange);
+
+    // Attach page nav event listeners
+    myExperimentView.bindFrontPageNav(function() {
+      myExperimentView.showFrontPage();
+    });
+
+    myExperimentView.bindDescriptionNav(function() {
+      myExperimentView.showDescriptionPage();
+    });
+
+    myExperimentView.bindMonitorNav(function() {
+      myExperimentView.showMonitorPage();
+    });
+
+    myExperimentView.bindRecordingNav(function() {
+      myExperimentView.showRecordingPage();
+    });
   };
 
   /**

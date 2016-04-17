@@ -52,7 +52,7 @@ var CenterPageController = function() {
 
     var experiment_model = new MyExperimentModel(
       0,
-      'Title',
+      null,
       'Description',
       10,
       5,

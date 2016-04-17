@@ -133,7 +133,7 @@ var CenterPageController = function() {
 
     var experiment_model = new MyExperimentModel(
       0,
-      'Title',
+      null,
       'Description',
       10,
       5,
@@ -480,30 +480,54 @@ var MyExperimentController = function() {
   /**
    * Protected functions
    */
-  var changeTitle = function(title) {
-    // Update model
-    myExperimentModel.setTitle(title);
-
-    // TODO persist...
+  var handleModelTitleChange = function(title) {
+    if (title == null) {
+      myExperimentView.setTitlePlaceholder(); 
+    } else {
+      myExperimentView.setTitle(title);
+    }
   };
 
-  var changeDescription = function(description) {
-    // Update model
-    myExperimentModel.setDescription(description);
-
-    // TODO persist...
-  };
-
-  var deleteExperiment = function() {
-    isActive = false;
-
-    myExperimentView.remove();
-    
-    // TODO... persist
+  var handleViewTitleChange = function(new_title) {
+    if (new_title == null || Utils.isWhiteSpace(new_title)) {
+      // User removed title. Now, delete title in model and 
+      // update ui with default title
+      myExperimentModel.setTitle(null);
+    } else {
+      // Update model
+      myExperimentModel.setTitle(new_title.trim());
+    }
   };
 
   var configureCallbacks = function() {
-     
+    /**
+     * Model --> view data pathways
+     */
+    myExperimentModel
+      .bindTitle(handleModelTitleChange);
+
+    /**
+     * View --> model data pathways
+     */
+    // Attach title change listeners
+    myExperimentView.bindTitle(handleViewTitleChange);
+
+    // Attach page nav event listeners
+    myExperimentView.bindFrontPageNav(function() {
+      myExperimentView.showFrontPage();
+    });
+
+    myExperimentView.bindDescriptionNav(function() {
+      myExperimentView.showDescriptionPage();
+    });
+
+    myExperimentView.bindMonitorNav(function() {
+      myExperimentView.showMonitorPage();
+    });
+
+    myExperimentView.bindRecordingNav(function() {
+      myExperimentView.showRecordingPage();
+    });
   };
 
   /**
@@ -555,8 +579,6 @@ var MyExperimentsPageController = function() {
       experiment_model.getId(),
       experiment_controller  
     );
-
-    experiment_view.init();
   };
 
   // TODO
@@ -2507,28 +2529,15 @@ var Utils = (function() {
   var CLASS_NAME_PROPERTY = "className";
 
   var HIDDEN_ATTR = 'hidden';
+  var SELECTED_ATTR = 'selected';
 
   // Timestamp delimiters
   var DATE_DELIMITER = "-";
   var TIME_DELIMITER = ":";
   var DATE_TIME_SEPERATOR = " ";
 
-  // this.hasClass = function(expected_class, node) {
-  //   if (!(CLASS_NAME_PROPERTY in node)) {
-  //     return false;
-  //   }
-  //
-  //   var node_class = node[CLASS_NAME_PROPERTY];
-  //   var class_idx = node_class.indexOf(expected_class);
-  //   
-  //   if (class_idx == -1) {
-  //     return false;
-  //   }
-  //
-  //   return (class_idx == 0 || node_class.charAt(class_idx - 1) == ' ')
-  //     && (expected_class.length + class_idx == node_class.length
-  //       || node_class.charAt(expected_class.length + class_idx) == ' ');
-  // };
+  // Key codes
+  var ENTER_KEY_CODE = 13;
 
   this.hasClass = function(class_name, node) {
     console.assert(node != null);
@@ -2714,10 +2723,27 @@ var Utils = (function() {
 
   this.hideNode = function(node) {
     node.setAttribute(HIDDEN_ATTR, ''); 
+    markNode(node, HIDDEN_ATTR);
   };
 
   this.showNode = function(node) {
-    node.removeAttribute(HIDDEN_ATTR);
+    unmarkNode(node, HIDDEN_ATTR);
+  };
+  
+  this.selectNode = function(node) {
+    markNode(node, SELECTED_ATTR); 
+  };
+
+  this.unselectNode = function(node) {
+    unmarkNode(node, SELECTED_ATTR);
+  };
+
+  this.markNode = function(node, attr) {
+    node.setAttribute(attr, '');
+  };
+
+  this.unmarkNode = function(node, attr) {
+    node.removeAttribute(attr); 
   };
 
   this.bindClickBeyondNode = function(node, callback) {
@@ -2781,6 +2807,29 @@ var Utils = (function() {
     }
   };
 
+  var selectTextRange = function(node) {
+    var range = document.createRange();
+    range.selectNodeContents(node);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+
+  var unselectTextRange = function(node) {
+    var selection = window.getSelection();
+    if (hasClass(node.className, selection.anchorNode.parentElement)) {
+      selection.removeAllRanges();
+    }
+  };
+
+  var isEnterKeyPressed = function(event) {
+    return 'charCode' in event && event.charCode == ENTER_KEY_CODE;
+  };
+
+  var isWhiteSpace = function(str) {
+    return str.trim().length == 0;
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -2800,6 +2849,14 @@ var Utils = (function() {
     contains: contains,
     trimLast : trimLast,
     removeElementFromArray : removeElementFromArray,
+    selectNode: selectNode,
+    unselectNode: unselectNode,
+    markNode: markNode,
+    unmarkNode: unmarkNode,
+    selectTextRange : selectTextRange,
+    unselectTextRange: unselectTextRange,
+    isEnterKeyPressed : isEnterKeyPressed,
+    isWhiteSpace: isWhiteSpace
   };
 
 })();
@@ -6635,21 +6692,53 @@ var MyExperimentView = function(
   var ROOT_CLASS = 'my-experiment-wrapper';
 
   /**
+   * Ui text
+   */
+  var DEFAULT_TITLE = 'Add title...';
+
+  /**
+   * Ui attributes
+   */
+  var CHANGED_TITLE_ATTR = 'changed-title';
+  var EDITING_TITLE_ATTR = 'editing-title';
+
+  /**
    * Private state
    */
   var templateStore = template_store;
-  var parentNode = parent_node;
 
+  // Ui data
+  var cachedTitle = null;
+  var isUserDefinedTitle = false;
+  var isEditingTitle = false;
+ 
+  // Dom nodes
+  var parentNode = parent_node;
   var rootNode = null;
 
-  // Event listeners
+  // Page views
+  var frontPageView = null;
+  var descriptionPageView = null;
+  var monitorExperimentPageView = null;
+  var recordingPageView = null;
+
+  var selectedPageView = null;
+  var selectedPageButtonNode = null;
+
+  /**
+   * Event listeners
+   */
+  // Title change listeners
+  var titleChangeCallbacks = [];
+
+  // Page nav listeners
   var frontPageNavCallbacks = [];
   var descriptionNavCallbacks = [];
   var monitorNavCallbacks = [];
   var recordingNavCallbacks = [];
 
   /**
-   * Dom nodes
+   * Dom node infos
    */
   // Title
   var titleLabelNode = {
@@ -6657,8 +6746,8 @@ var MyExperimentView = function(
     node: null
   };
 
-  var titleUnderlineNode = {
-    className: 'title-underline',
+  var headerNode = {
+    className: 'header-wrapper',
     node: null
   };
 
@@ -6710,7 +6799,7 @@ var MyExperimentView = function(
   var bindNodes = function() {
     // Bind nodes    
     Utils.bindNodeInfo(rootNode, titleLabelNode);
-    Utils.bindNodeInfo(rootNode, titleUnderlineNode);
+    Utils.bindNodeInfo(rootNode, headerNode);
 
     Utils.bindNodeInfo(rootNode, frontPageNode);
     Utils.bindNodeInfo(rootNode, descriptionPageNode);
@@ -6722,7 +6811,10 @@ var MyExperimentView = function(
     Utils.bindNodeInfo(rootNode, monitorNavNode);
     Utils.bindNodeInfo(rootNode, recordingNavNode);
 
-    // TODO attach onclick listeners
+    /**
+     * Attach event listeners
+     */
+    // Page nav listeners
     frontPageNavNode.node.onclick = function() {
       frontPageNavCallbacks.forEach(function(callback) {
         callback();
@@ -6746,10 +6838,103 @@ var MyExperimentView = function(
         callback();
       }); 
     };
+
+    // Title event listeners
+    titleLabelNode.node.onkeypress = function(event) {
+      if (Utils.isEnterKeyPressed(event)) {
+        setFinishedEditingTitle();
+        return false;
+      }
+    };
+
+    headerNode.node.onclick = function(event) {
+      // Put title in 'editing' state if we're not editing it already
+      if (!isEditingTitle) {
+        setEditingTitle();
+      }
+    };
+
+    Utils.bindClickBeyondNode(headerNode.node, function(event) {
+      // Short circuit b/c we're not editing title anyhow
+      if (!isEditingTitle) {
+        return;
+      }
+
+      // Signal that we've finished editing the title
+      setFinishedEditingTitle();
+    });
+
   };
 
   var initPages = function() {
     // Initialize child pages
+  };
+  
+  var changeVisiblePage = function(
+    next_page_view,
+    next_page_button
+  ) {
+    // Unselect current page
+    selectedPageView.hide();
+    Utils.unselectNode(selectedPageButtonNode);
+  
+    selectPage(next_page_view, next_page_button);
+  };
+
+  var selectPage = function(page_view, page_button_node) {
+    // Update Ui
+    page_view.show();
+    Utils.selectNode(page_button_node);
+
+    selectedPageView = page_view;
+    selectedPageButtonNode = page_button_node; 
+  };
+
+  var setEditingTitle = function() {
+    console.assert(!isEditingTitle);
+    
+    // Update ui
+    Utils.markNode(headerNode.node, EDITING_TITLE_ATTR);
+
+    if (isUserDefinedTitle) {
+      // Highligh title field text
+      Utils.selectTextRange(titleLabelNode.node); 
+    } else {
+      // Remove placeholder title 
+      titleLabelNode.node.innerHTML = '';
+    }
+
+    isEditingTitle = true;
+  };
+
+  var setNotEditingTitle = function() {
+    console.assert(isEditingTitle);
+
+    // Update ui
+    Utils.unmarkNode(headerNode.node, EDITING_TITLE_ATTR);
+
+    // Unselect title
+    Utils.unselectTextRange(titleLabelNode.node);
+    titleLabelNode.node.blur();
+    window.getSelection().removeAllRanges();
+
+    isEditingTitle = false;
+  };
+
+  var setFinishedEditingTitle = function() {
+    // Notify listeners that the title has changed! 
+    var title = titleLabelNode.node.innerHTML;
+
+    // Short circuit if title hasn't changed
+    if (isUserDefinedTitle && title == cachedTitle) {
+      return;
+    }
+    titleChangeCallbacks.forEach(function(callback) {
+      callback(title); 
+    }); 
+
+    // Return title to non-editing state
+    setNotEditingTitle();
   };
 
   /**
@@ -6773,6 +6958,12 @@ var MyExperimentView = function(
     return this;
   };
 
+  // Callback registers
+  this.bindTitle = function(callback) {
+    titleChangeCallbacks.push(callback); 
+    return this;
+  };
+
   this.bindFrontPageNav = function(callback) {
     frontPageNavCallbacks.push(callback);
     return this;
@@ -6791,6 +6982,39 @@ var MyExperimentView = function(
   this.bindRecordingNav = function(callback) {
     recordingNavCallbacks.push(callback);
     return this;
+  };
+
+  // Show page functions
+  this.showFrontPage = function() {
+    changeVisiblePage(frontPageView);
+  };
+
+  this.showDescriptionPage = function() {
+    changeVisiblePage(descriptionPageView);
+  };
+
+  this.showMonitorExperimentPage = function() {
+    changeVisiblePage(monitorExperimentPageView);
+  };
+
+  this.showRecordingPage = function() {
+    changeVisiblePage(recordingPageView);
+  };
+ 
+  // Ui setters
+  this.setTitle = function(title) {
+    // Handle title change
+    titleLabelNode.node.innerHTML = title;
+    cachedTitle = title;
+    Utils.markNode(titleLabelNode.node, CHANGED_TITLE_ATTR);
+    isUserDefinedTitle = true;
+  };
+
+  this.setTitlePlaceholder = function() {
+    titleLabelNode.node.innerHTML = DEFAULT_TITLE;
+    cachedTitle = null;
+    Utils.unmarkNode(titleLabelNode.node, CHANGED_TITLE_ATTR);
+    isUserDefinedTitle = false;
   };
 };
 
@@ -6997,6 +7221,8 @@ var MyExperimentsPageView = function(
       templateStore,
       rootNode
     ); 
+
+    my_experiment_view.init();
     return my_experiment_view;
   };
 
@@ -7988,6 +8214,128 @@ function ShortCodePicker(
   };
 };
 
+function SidePanelTab(
+  template_store,
+  parent_node,
+  button_title,
+  iron_icon_type
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+
+  /**
+   * Ui attributes
+   */
+  var SELECTED_ATTR = "selected-side-panel-tab";
+  var IRON_ICON_TYPE_ATTR = "icon";
+
+  /**
+   * Private state
+   */
+  var _this = this;
+  var templateStore = template_store;
+  var buttonTitle = button_title;
+  var ironIconType = iron_icon_type;
+  var onClickListeners = [];
+
+  // Root dom node
+  var rootNode = {
+    className: 'dash-nav-panel-btn',
+    node: null
+  };
+
+  var ironIconNode = {
+    className: 'nav-btn-icon',
+    node: null
+  };
+
+  var buttonTitleNode = {
+    className: 'nav-btn-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  function synthesizeSidePanelTemplate() {
+    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var tab_clone = document.importNode(tab_template.content, true);
+    parent_node.appendChild(tab_clone);
+
+    // Initialize root node and configure event listener
+    var tabs = parent_node.getElementsByClassName(rootNode.className);
+    rootNode.node = tabs[tabs.length - 1];
+
+    rootNode.node.onclick = function() {
+      for (var i = 0; i < onClickListeners.length; ++i) {
+        onClickListeners[i]();
+      }
+    };
+  };
+
+  /**
+   * bindInternalNodes()
+   * @pre-condition: 'rootNode' must already be bound
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(ironIconNode); 
+    bindClassBoundNode(buttonTitleNode);
+  };
+
+  /**
+   * initDisplay()
+   * - initializes text/graphics for this tab
+   * @pre-condition: all internal nodes bound
+   */
+  function initDisplay() {
+    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
+    buttonTitleNode.node.innerHTML = buttonTitle; 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize template and append to parent dom node
+    synthesizeSidePanelTemplate();
+
+    // Initialize pointers to internal nodes
+    bindInternalNodes();
+
+    // Initialize the ui
+    initDisplay();
+  }; 
+
+  this.select = function() {
+    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
+  };
+
+  this.deselect = function() {
+    rootNode.node.removeAttribute(SELECTED_ATTR);
+  };
+
+  /**
+   * registerOnClickListener()
+   * @param FuncPtr callback: function(_this) {...}
+   */
+  this.registerOnClickListener = function(callback) {
+    onClickListeners.push(callback); 
+  };
+};
+
 var SidePanelView = function(
   template_store,
   parent_node
@@ -8200,128 +8548,6 @@ var SidePanelView = function(
 
   this.selectTechnicianTab = function() {
     selectTab(technicianInfo.tab);
-  };
-};
-
-function SidePanelTab(
-  template_store,
-  parent_node,
-  button_title,
-  iron_icon_type
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
-
-  /**
-   * Ui attributes
-   */
-  var SELECTED_ATTR = "selected-side-panel-tab";
-  var IRON_ICON_TYPE_ATTR = "icon";
-
-  /**
-   * Private state
-   */
-  var _this = this;
-  var templateStore = template_store;
-  var buttonTitle = button_title;
-  var ironIconType = iron_icon_type;
-  var onClickListeners = [];
-
-  // Root dom node
-  var rootNode = {
-    className: 'dash-nav-panel-btn',
-    node: null
-  };
-
-  var ironIconNode = {
-    className: 'nav-btn-icon',
-    node: null
-  };
-
-  var buttonTitleNode = {
-    className: 'nav-btn-label',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = rootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  function synthesizeSidePanelTemplate() {
-    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
-    var tab_clone = document.importNode(tab_template.content, true);
-    parent_node.appendChild(tab_clone);
-
-    // Initialize root node and configure event listener
-    var tabs = parent_node.getElementsByClassName(rootNode.className);
-    rootNode.node = tabs[tabs.length - 1];
-
-    rootNode.node.onclick = function() {
-      for (var i = 0; i < onClickListeners.length; ++i) {
-        onClickListeners[i]();
-      }
-    };
-  };
-
-  /**
-   * bindInternalNodes()
-   * @pre-condition: 'rootNode' must already be bound
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(ironIconNode); 
-    bindClassBoundNode(buttonTitleNode);
-  };
-
-  /**
-   * initDisplay()
-   * - initializes text/graphics for this tab
-   * @pre-condition: all internal nodes bound
-   */
-  function initDisplay() {
-    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
-    buttonTitleNode.node.innerHTML = buttonTitle; 
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Initialize template and append to parent dom node
-    synthesizeSidePanelTemplate();
-
-    // Initialize pointers to internal nodes
-    bindInternalNodes();
-
-    // Initialize the ui
-    initDisplay();
-  }; 
-
-  this.select = function() {
-    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
-  };
-
-  this.deselect = function() {
-    rootNode.node.removeAttribute(SELECTED_ATTR);
-  };
-
-  /**
-   * registerOnClickListener()
-   * @param FuncPtr callback: function(_this) {...}
-   */
-  this.registerOnClickListener = function(callback) {
-    onClickListeners.push(callback); 
   };
 };
 

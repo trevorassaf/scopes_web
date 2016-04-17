@@ -1,0 +1,33 @@
+.my-experiment-wrapper .footer-wrapper {
+  font-size: 0px;
+}
+
+.my-experiment-wrapper .footer-wrapper > div {
+  display: inline-block;
+  font-size: 0px;
+  width: 25%;
+  position: relative;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+}
+
+.my-experiment-wrapper .footer-wrapper > div[selected-btn] > iron-icon {
+  color: rgb(38, 108, 177);
+}
+
+.my-experiment-wrapper .footer-wrapper > div:hover {
+  background-color: #ECEFF1;
+}
+
+.my-experiment-wrapper .footer-wrapper > div:hover > iron-icon,
+.my-experiment-wrapper .footer-wrapper > div[selected] {
+  color: rgb(38, 108, 177);
+}
+
+.my-experiment-wrapper .footer-wrapper iron-icon {
+  position: relative;
+  margin-left: calc(50% - 12px);
+  width: 24px;
+  height: 24px;
+} 
