@@ -89,12 +89,31 @@ var ConfirmOrderController = function() {
   var experimentDurationModel = null;
   var pricePerHour = 20;
 
+  var cancelOrderCallbacks = [];
+  var confirmOrderCallbacks = [];
+
   /**
    * Private functions
    */
   var configureCallbacks = function() {
-    // Bind to experiment-duration change 
+    // Model --> view data pathway
     experimentDurationModel.bindCurrentValue(handleNewExperimentDuration);
+
+    // Register button click callbacks
+    confirmOrderView.bindCancelOrder(handleCancelOrderClick);
+    confirmOrderView.bindConfirmOrder(handleConfirmOrderClick);
+  };
+
+  var handleConfirmOrderClick = function() {
+    for (var i = 0; i < confirmOrderCallbacks.length; ++i) {
+      confirmOrderCallbacks[i]();
+    }
+  };
+
+  var handleCancelOrderClick = function() {
+    for (var i = 0; i < cancelOrderCallbacks.length; ++i) {
+      cancelOrderCallbacks[i]();
+    }
   };
 
   var handleNewExperimentDuration = function(experiment_duration) {
@@ -119,6 +138,18 @@ var ConfirmOrderController = function() {
 
     // Attach models to views
     configureCallbacks(); 
+
+    return this;
+  };
+
+  this.bindConfirmOrder = function(callback) {
+    confirmOrderCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindCancelOrder = function(callback) {
+    cancelOrderCallbacks.push(callback);
+    return this;
   };
 };
 
@@ -220,17 +251,6 @@ var DatePickerController = function() {
       month_displacement <= datePickerModel.getMaxAdvanceMonthCount();
   };
 
-  // TODO these...
-  var handleMinAdvanceDayCountChange = function(min_advance_day_count) {
-  };
-
-  var handleMaxAdvanceMonthCountChange = function(max_advance_month_count) {
-  };
-
-  var handleInvalidWeekDaysChange = function(invalid_week_days) {};
-
-  var handleInvalidDatesChange = function(invalid_dates) {};
-
   var handleCalendarRefresh = function() {
     datePickerView.refreshCalendar(
       datePickerModel.getViewedMonth(),
@@ -240,6 +260,7 @@ var DatePickerController = function() {
       datePickerModel.getInvalidDates()
     ); 
   };
+
 
   /**
    * Privileged functions
@@ -263,6 +284,46 @@ var DatePickerController = function() {
       .bindMaxAdvanceMonthCount(handleCalendarRefresh)
       .bindInvalidDaysOfTheWeek(handleCalendarRefresh)
       .bindInvalidDates(handleCalendarRefresh);
+    
+    // Initialize model/ui
+    this.renderDefaultUi();
+
+  };
+
+  this.renderDefaultUi = function() {
+    this.selectFirstAvailableDate();  
+  };
+
+  this.selectFirstAvailableDate = function() {
+    // Identify first available date
+    var starting_date = new Date();
+    starting_date.setDate(
+      starting_date.getDate() + datePickerModel.getMinAdvanceDayCount()    
+    );
+
+    var max_month = starting_date.getMonth() + datePickerModel.getMaxAdvanceMonthCount();
+
+    while (
+      (Utils.contains(starting_date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())
+        || Utils.contains(starting_date, datePickerModel.getInvalidDates()))
+      && starting_date.getMonth() < max_month
+    ) {
+      starting_date.setDate(starting_date.getDate() + 1);
+    }
+
+    if (starting_date.getMonth() == max_month) {
+      // TODO handle case in which NO legal starting dates exist!
+    }
+
+    // Set date on DatePickerModel
+    datePickerModel
+      .setSelectedDate(starting_date.getDate())
+      .setSelectedMonth(starting_date.getMonth())
+      .setSelectedYear(starting_date.getFullYear())
+      .setViewedMonthAndYear(
+        starting_date.getMonth(),
+        starting_date.getFullYear()
+      );
   };
 };
 
@@ -301,6 +362,10 @@ var DropDownController = function() {
 
     // Configure view --> model data pathway
     dropDownView.bindClick(handleClick);
+  };
+
+  this.renderDefaultUi = function() {
+    dropDownModel.setSelectedItemIdx(0); 
   };
 
   this.setView = function(view) {
@@ -598,6 +663,8 @@ var NewExperimentPageController = function() {
   var newExperimentPageModel = null;
   var newExperimentPageView = null;
 
+  var _this = this;
+
   /**
    * Privileged functions
    */
@@ -661,10 +728,24 @@ var NewExperimentPageController = function() {
     var experiment_duration_model = newExperimentPageModel.getExperimentDurationModel();
 
     confirmOrderController = new ConfirmOrderController();
-    confirmOrderController.init(
-      confirm_order_form_view,
-      experiment_duration_model
-    );
+    confirmOrderController
+      .bindConfirmOrder(handleConfirmOrder)
+      .bindCancelOrder(handleCancelOrder)
+      .init(
+        confirm_order_form_view,
+        experiment_duration_model
+      );
+  };
+
+  var handleConfirmOrder = function() {
+  };
+
+  var handleCancelOrder = function() {
+    scopesCountController.renderDefaultUi();
+    experimentDurationController.renderDefaultUi();
+    experimentTimePickerController.renderDefaultUi();
+    shortCodePickerController.renderDefaultUi();
+    experimentDatePickerController.renderDefaultUi();
   };
 
   /**
@@ -676,12 +757,36 @@ var NewExperimentPageController = function() {
     newExperimentPageView = view;
 
     // Initialize child controllers
-    scopesCountController = initScopesCountController();
-    experimentDurationController = initExperimentDurationController();
-    experimentTimePickerController = initExperimentTimePickerController();
-    experimentDatePickerController = initExperimentDatePickerController();
-    shortCodePickerController = initShortCodePickerController();
-    confirmOrderController = initConfirmOrderController();
+    initScopesCountController();
+    initExperimentDurationController();
+    initExperimentTimePickerController();
+    initExperimentDatePickerController();
+    initShortCodePickerController();
+    initConfirmOrderController();
+  };
+
+  this.getScopesCountController = function() {
+    return scopesCountController;
+  };
+
+  this.getExperimentDurationController = function() {
+    return experimentDurationController;
+  };
+
+  this.getExperimentTimePickerController = function() {
+    return experimentTimePickerController;
+  };
+
+  this.getExperimentDatePickerController = function() {
+    return experimentDatePickerController;
+  };
+
+  this.getShortCodePickerController = function() {
+    return shortCodePickerController;
+  };
+
+  this.getConfirmOrderController = function() {
+    return confirmOrderController;
   };
 };
 
@@ -804,6 +909,10 @@ var SliderController = function() {
 
     // Attach view to model
     configureCallbacks();
+  };
+
+  this.renderDefaultUi = function() {
+    updateValue(sliderModel.getMinValue()); 
   };
 
   this.getModel = function() {
@@ -1380,32 +1489,10 @@ var NewExperimentPageModel = function() {
       new Date(2016, 4, 4),
       new Date(2016, 4, 5)
     ];
-
-    // Determine first open date
-    var starting_date = new Date();
-    starting_date.setDate(
-        starting_date.getDate() + min_advance_day_count
-    );
-
-    while (
-      Utils.contains(starting_date.getDay(), invalid_days_of_the_week) ||
-      Utils.contains(starting_date, invalid_dates)    
-    ) {
-      starting_date.setDate(starting_date.getDate() + 1); 
-      // TODO handle case in which NO legal starting dates exist!
-    }
-
     
     // Create model
     var date_picker_model = new DatePickerModel();
     return date_picker_model
-      .setSelectedDate(starting_date.getDate())
-      .setSelectedMonth(starting_date.getMonth())
-      .setSelectedYear(starting_date.getFullYear())
-      .setViewedMonthAndYear(
-        starting_date.getMonth(),
-        starting_date.getFullYear()
-      )
       .setMinAdvanceDayCount(min_advance_day_count)
       .setMaxAdvanceMonthCount(max_advance_month_count)
       .setInvalidDaysOfTheWeek(invalid_days_of_the_week)

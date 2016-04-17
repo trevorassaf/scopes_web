@@ -7,11 +7,31 @@ var ConfirmOrderController = function() {
   var experimentDurationModel = null;
   var pricePerHour = 20;
 
+  var cancelOrderCallbacks = [];
+  var confirmOrderCallbacks = [];
+
   /**
    * Private functions
    */
   var configureCallbacks = function() {
+    // Model --> view data pathway
     experimentDurationModel.bindCurrentValue(handleNewExperimentDuration);
+
+    // Register button click callbacks
+    confirmOrderView.bindCancelOrder(handleCancelOrderClick);
+    confirmOrderView.bindConfirmOrder(handleConfirmOrderClick);
+  };
+
+  var handleConfirmOrderClick = function() {
+    for (var i = 0; i < confirmOrderCallbacks.length; ++i) {
+      confirmOrderCallbacks[i]();
+    }
+  };
+
+  var handleCancelOrderClick = function() {
+    for (var i = 0; i < cancelOrderCallbacks.length; ++i) {
+      cancelOrderCallbacks[i]();
+    }
   };
 
   var handleNewExperimentDuration = function(experiment_duration) {
@@ -36,5 +56,17 @@ var ConfirmOrderController = function() {
 
     // Attach models to views
     configureCallbacks(); 
+
+    return this;
+  };
+
+  this.bindConfirmOrder = function(callback) {
+    confirmOrderCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindCancelOrder = function(callback) {
+    cancelOrderCallbacks.push(callback);
+    return this;
   };
 };

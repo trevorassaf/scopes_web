@@ -36,6 +36,10 @@ var SliderController = function() {
     configureCallbacks();
   };
 
+  this.renderDefaultUi = function() {
+    updateValue(sliderModel.getMinValue()); 
+  };
+
   this.getModel = function() {
     return sliderModel;
   };

@@ -15,6 +15,8 @@ var NewExperimentPageController = function() {
   var newExperimentPageModel = null;
   var newExperimentPageView = null;
 
+  var _this = this;
+
   /**
    * Privileged functions
    */
@@ -78,10 +80,24 @@ var NewExperimentPageController = function() {
     var experiment_duration_model = newExperimentPageModel.getExperimentDurationModel();
 
     confirmOrderController = new ConfirmOrderController();
-    confirmOrderController.init(
-      confirm_order_form_view,
-      experiment_duration_model
-    );
+    confirmOrderController
+      .bindConfirmOrder(handleConfirmOrder)
+      .bindCancelOrder(handleCancelOrder)
+      .init(
+        confirm_order_form_view,
+        experiment_duration_model
+      );
+  };
+
+  var handleConfirmOrder = function() {
+  };
+
+  var handleCancelOrder = function() {
+    scopesCountController.renderDefaultUi();
+    experimentDurationController.renderDefaultUi();
+    experimentTimePickerController.renderDefaultUi();
+    shortCodePickerController.renderDefaultUi();
+    experimentDatePickerController.renderDefaultUi();
   };
 
   /**
@@ -93,11 +109,35 @@ var NewExperimentPageController = function() {
     newExperimentPageView = view;
 
     // Initialize child controllers
-    scopesCountController = initScopesCountController();
-    experimentDurationController = initExperimentDurationController();
-    experimentTimePickerController = initExperimentTimePickerController();
-    experimentDatePickerController = initExperimentDatePickerController();
-    shortCodePickerController = initShortCodePickerController();
-    confirmOrderController = initConfirmOrderController();
+    initScopesCountController();
+    initExperimentDurationController();
+    initExperimentTimePickerController();
+    initExperimentDatePickerController();
+    initShortCodePickerController();
+    initConfirmOrderController();
+  };
+
+  this.getScopesCountController = function() {
+    return scopesCountController;
+  };
+
+  this.getExperimentDurationController = function() {
+    return experimentDurationController;
+  };
+
+  this.getExperimentTimePickerController = function() {
+    return experimentTimePickerController;
+  };
+
+  this.getExperimentDatePickerController = function() {
+    return experimentDatePickerController;
+  };
+
+  this.getShortCodePickerController = function() {
+    return shortCodePickerController;
+  };
+
+  this.getConfirmOrderController = function() {
+    return confirmOrderController;
   };
 };

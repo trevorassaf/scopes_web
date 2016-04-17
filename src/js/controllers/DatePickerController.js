@@ -96,17 +96,6 @@ var DatePickerController = function() {
       month_displacement <= datePickerModel.getMaxAdvanceMonthCount();
   };
 
-  // TODO these...
-  var handleMinAdvanceDayCountChange = function(min_advance_day_count) {
-  };
-
-  var handleMaxAdvanceMonthCountChange = function(max_advance_month_count) {
-  };
-
-  var handleInvalidWeekDaysChange = function(invalid_week_days) {};
-
-  var handleInvalidDatesChange = function(invalid_dates) {};
-
   var handleCalendarRefresh = function() {
     datePickerView.refreshCalendar(
       datePickerModel.getViewedMonth(),
@@ -116,6 +105,7 @@ var DatePickerController = function() {
       datePickerModel.getInvalidDates()
     ); 
   };
+
 
   /**
    * Privileged functions
@@ -139,5 +129,45 @@ var DatePickerController = function() {
       .bindMaxAdvanceMonthCount(handleCalendarRefresh)
       .bindInvalidDaysOfTheWeek(handleCalendarRefresh)
       .bindInvalidDates(handleCalendarRefresh);
+    
+    // Initialize model/ui
+    this.renderDefaultUi();
+
+  };
+
+  this.renderDefaultUi = function() {
+    this.selectFirstAvailableDate();  
+  };
+
+  this.selectFirstAvailableDate = function() {
+    // Identify first available date
+    var starting_date = new Date();
+    starting_date.setDate(
+      starting_date.getDate() + datePickerModel.getMinAdvanceDayCount()    
+    );
+
+    var max_month = starting_date.getMonth() + datePickerModel.getMaxAdvanceMonthCount();
+
+    while (
+      (Utils.contains(starting_date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())
+        || Utils.contains(starting_date, datePickerModel.getInvalidDates()))
+      && starting_date.getMonth() < max_month
+    ) {
+      starting_date.setDate(starting_date.getDate() + 1);
+    }
+
+    if (starting_date.getMonth() == max_month) {
+      // TODO handle case in which NO legal starting dates exist!
+    }
+
+    // Set date on DatePickerModel
+    datePickerModel
+      .setSelectedDate(starting_date.getDate())
+      .setSelectedMonth(starting_date.getMonth())
+      .setSelectedYear(starting_date.getFullYear())
+      .setViewedMonthAndYear(
+        starting_date.getMonth(),
+        starting_date.getFullYear()
+      );
   };
 };

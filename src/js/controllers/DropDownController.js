@@ -35,6 +35,10 @@ var DropDownController = function() {
     dropDownView.bindClick(handleClick);
   };
 
+  this.renderDefaultUi = function() {
+    dropDownModel.setSelectedItemIdx(0); 
+  };
+
   this.setView = function(view) {
     dropDownView = view;
 
