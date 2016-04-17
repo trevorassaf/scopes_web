@@ -294,6 +294,56 @@
   </div>
 </template>
 
+<template id='my-experiment-skeleton-template'>
+  <div class='my-experiment-wrapper'>
+    
+    <!-- Wrapper for upper ui row -->
+    <div class='header-wrapper'>
+      <!-- Editable title area -->
+      <div class='title-label' contenteditable='true'></div>
+
+      <!-- Title underline -->
+      <div class='title-underline'></div>
+    </div>
+
+    <!-- Main display space -->
+    <div class='main-stage-wrapper'>
+      
+      <!-- Front page of my experiment element-->
+      <div class='front-page'></div>
+
+      <!-- Description page -->
+      <div class='description-page' contenteditable='true'></div>
+
+      <!-- Monitor experiment live page -->
+      <div class='monitor-page'></div>
+
+      <!-- Playback experiment recordings -->
+      <div class='recording-page'></div>
+    </div>
+
+    <!-- Wrapper for nav buttons -->
+    <div class='footer-wrapper'>
+      <div class='front-page-nav-wrapper'>
+        <iron-icon class='time-icon' icon='event'></iron-icon>
+      </div>
+      <div class='description-nav-wrapper'>
+        <iron-icon class='description-icon' icon='description'></iron-icon>
+      </div>
+      <div class='monitor-nav-wrapper'>
+        <iron-icon class='monitor-icon' icon='settings-overscan'></iron-icon>
+      </div>
+      <div class='recording-nav-wrapper'>
+        <iron-icon class='recording-icon' icon='av:video-library'></iron-icon>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<template id='my-experiment-title-page-template'></template>
+<template id='my-experiment-description-page-template'></template>
+
 <template id='short-code-picker-template'>
   <div class='short-code-picker-wrapper'>
     <div class='input-field-wrapper'>

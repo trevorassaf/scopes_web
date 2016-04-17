@@ -49,7 +49,7 @@ var CenterPageView = function(
    * Private functions
    */
 
-  var initNewExperimentPage = function() {
+  var initNewExperimentPageView = function() {
     newExperimentPageView = new NewExperimentPageView(
       templateStore,
       centerPanelPageContainerNode.node
@@ -57,8 +57,17 @@ var CenterPageView = function(
     newExperimentPageView.init();
   };
 
+  var initMyExperimentsPageView = function() {
+    myExperimentsPageView = new MyExperimentsPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    myExperimentsPageView.init();
+  };
+
   var initPages = function() {
-    initNewExperimentPage(); 
+    initNewExperimentPageView(); 
+    initMyExperimentsPageView();
   };
 
   var bindNodes = function() {
@@ -136,5 +145,9 @@ var CenterPageView = function(
 
   this.getNewExperimentPageView = function() {
     return newExperimentPageView;
+  };
+
+  this.getMyExperimentsPageView = function() {
+    return myExperimentsPageView;
   };
 };

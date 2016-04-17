@@ -270,6 +270,13 @@ var Utils = (function() {
     return str.susbtring(0, str.length - 1);
   };
 
+  var removeElementFromArray = function(needle, haystack) {
+    var index = haystack.indexOf(needle);
+    if (index != -1) {
+      haystack.splice(index, 1);
+    }
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -288,6 +295,7 @@ var Utils = (function() {
     compareDates: compareDates,
     contains: contains,
     trimLast : trimLast,
+    removeElementFromArray : removeElementFromArray,
   };
 
 })();

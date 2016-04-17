@@ -101,6 +101,14 @@ var CenterPageController = function() {
     );
   };
 
+  var initMyExperimentsPageController = function() {
+    myExperimentsPageController = new MyExperimentsPageController();
+    myExperimentsPageController.init(
+      centerPageView.getMyExperimentsPageView(),
+      centerPageModel.getMyExperimentsPageModel()
+    );
+  };
+
   /**
    * Privileged functions
    */
@@ -110,6 +118,7 @@ var CenterPageController = function() {
 
     // Initialize child controllers
     initNewExperimentPageController();
+    initMyExperimentsPageController();
   };
 
   /**
@@ -121,6 +130,24 @@ var CenterPageController = function() {
 
   this.showMyExperimentsPage = function() {
     centerPageView.showMyExperimentsPage();
+
+    var experiment_model = new MyExperimentModel(
+      0,
+      'Title',
+      'Description',
+      10,
+      5,
+      null,
+      null,
+      null,
+      0,
+      0,
+      null,
+      null
+    );
+
+    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    my_experiments_page_model.addExperiment(experiment_model);
   };
 
   this.showFeedbackPage = function() {
@@ -449,7 +476,6 @@ var MyExperimentController = function() {
    */
   var myExperimentView = null;
   var myExperimentModel = null; 
-  var isActive = false;
 
   /**
    * Protected functions
@@ -476,41 +502,87 @@ var MyExperimentController = function() {
     // TODO... persist
   };
 
-  /**
-   * Public functions
-   */
-  this.init = function(
-    template_store,
-    parent_node,
-    model
-  ) {
-    // Check: controller must be inactive to initialize!
-    console.assert(!isActive);
-    this.isActive = true;
-
-    // We need a reference to this model (we don't own!)
-    myExperimentModel = model;
-
-    // Create view and bind event listeners
-    myExperimentView = new MyExperimentView(
-      template_store,
-      parent_node
-    );
-
-    myExperimentView.registerChangedTitleListener(changeTitle);
-    myExperimentView.registerChangedDescriptionListener(changeDescription);
-
-
-    // Init ui and bind model
-    myExperimentView.init(model);
+  var configureCallbacks = function() {
+     
   };
 
-  this.getModel = function() {
-    return myExperimentModel;
+  /**
+   * Privileged functions
+   */
+  this.init = function(
+    view,
+    model
+  ) {
+    myExperimentView = view;
+    myExperimentModel = model;
+
+    configureCallbacks();
   };
 };
 
 var MyExperimentsPageController = function() {
+
+  /**
+   * Private state
+   */
+  var myExperimentsControllers = new Map(); // Map<int id, Obj MyExperimentController>
+  var getConfirmedOrdersApiWrapper = null;
+
+  var myExperimentsPageView = null;
+  var myExperimentsPageModel = null;
+
+  /**
+   * Private functions
+   */
+  var configureCallbacks = function() {
+    // Model --> view data pathway
+    myExperimentsPageModel.bindAddExperiment(handleNewExperiment);     
+    myExperimentsPageModel.bindRemoveExperiment(handleRemoveExperiment);
+    myExperimentsPageModel.bindSetExperiments(handleSetExperiments);
+  };
+
+  var handleNewExperiment = function(experiment_model) {
+    // Create new-experiment ui element and bind to controller
+    var experiment_view = myExperimentsPageView.spawnNewExperiment();
+    var experiment_controller = new MyExperimentController();
+    experiment_controller.init(
+      experiment_view,
+      experiment_model
+    );
+
+    // Cache controller
+    myExperimentsControllers.set(
+      experiment_model.getId(),
+      experiment_controller  
+    );
+
+    experiment_view.init();
+  };
+
+  // TODO
+  var handleRemoveExperiment = function(experiment_model) {};
+ 
+
+  var handleSetExperiments = function(experiments) {
+    // Delete all previous experiments in ui
+    myExperimentsPageView.removeExperiments(); 
+
+    // Render new experiments
+    experiments.forEach(handleNewExperiment);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(view, model) {
+    myExperimentsPageView = view; 
+    myExperimentsPageModel = model; 
+
+    configureCallbacks();
+  };
+};
+
+var MyExperimentsPageControllerBackup = function() {
 
   /**
    * Private state
@@ -1002,6 +1074,7 @@ var CenterPageModel = function() {
    * Private state
    */
   var newExperimentPageModel = null;
+  var myExperimentsPageModel = null;
 
   /**
    * Private functions
@@ -1011,16 +1084,25 @@ var CenterPageModel = function() {
     newExperimentPageModel.init();
   };
 
+  var initMyExperimentsPageModel = function() {
+    myExperimentsPageModel = new MyExperimentsPageModel();
+  };
+
   /**
    * Privileged functions
    */
   this.init = function() {
     initNewExperimentPageModel();
+    initMyExperimentsPageModel();
   };
 
   // Getters
   this.getNewExperimentPageModel = function() {
     return newExperimentPageModel;
+  };
+
+  this.getMyExperimentsPageModel = function() {
+    return myExperimentsPageModel;
   };
 };
 
@@ -1507,6 +1589,280 @@ DropDownModel.prototype.getSelectedItem = function() {
 
 DropDownModel.prototype.getDropDownItemModels = function() {
   return this.dropDownItemModels;
+};
+
+var MyExperimentModel = function(
+  id,    
+  title,
+  description,
+  scopes_count,
+  experiment_duration,
+  start_time,
+  start_date,
+  short_code,
+  experiment_status,
+  payment_status,
+  time_ordered,
+  date_ordered
+) {
+
+  /**
+   * Private state
+   */
+  this.id = id;
+  this.title = title;
+  this.description = description;
+  this.scopesCount = scopes_count;
+  this.experimentDuration = experiment_duration;
+  this.startTime = start_time;
+  this.startDate = start_date;
+  this.shortCode = short_code;
+  this.experimentStatus = experiment_status;
+  this.paymentStatus = payment_status;
+  this.timeOrdered = time_ordered;
+  this.dateOrdered = date_ordered;
+
+  // Callbacks
+  this.titleCallbacks = [];
+  this.descriptionCallbacks = [];
+  this.scopesCountCallbacks = [];
+  this.experimentDurationCallbacks = [];
+  this.startTimeCallbacks = [];
+  this.startDateCallbacks = [];
+  this.experimentStatusCallbacks = [];
+  this.paymentStatusCallbacks = [];
+};
+
+// Setters
+MyExperimentModel.prototype.setTitle = function(title) {
+  this.title = title;
+  this.titleCallbacks.forEach(function(callback) {
+    callback(this.title); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setDescription = function(description) {
+  this.description = description;
+  this.descriptionCallbacks.forEach(function(callback) {
+    callback(this.description); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setScopesCount = function(scopesCount) {
+  this.scopesCount = scopesCount;
+  this.scopesCountCallbacks.forEach(function(callback) {
+    callback(this.scopesCount); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setExperimentDuration = function(experimentDuration) {
+  this.experimentDuration = experimentDuration;
+  this.experimentDurationCallbacks.forEach(function(callback) {
+    callback(this.experimentDuration); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setStartTime = function(startTime) {
+  this.startTime = startTime;
+  this.startTimeCallbacks.forEach(function(callback) {
+    callback(this.startTime); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setStartDate = function(startDate) {
+  this.startDate = startDate;
+  this.startDateCallbacks.forEach(function(callback) {
+    callback(this.startDate); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setShortCode = function(shortCode) {
+  this.shortCode = shortCode;
+  this.shortCodeCallbacks.forEach(function(callback) {
+    callback(this.shortCode); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setShortCode = function(shortCode) {
+  this.shortCode = shortCode;
+  this.shortCodeCallbacks.forEach(function(callback) {
+    callback(this.shortCode); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setExperimentStatus = function(experimentStatus) {
+  this.experimentStatus = experimentStatus;
+  this.experimentStatusCallbacks.forEach(function(callback) {
+    callback(this.experimentStatus); 
+  }, this);
+  return this;
+};
+
+MyExperimentModel.prototype.setPaymentStatus = function(paymentStatus) {
+  this.paymentStatus = paymentStatus;
+  this.paymentStatusCallbacks.forEach(function(callback) {
+    callback(this.paymentStatus); 
+  }, this);
+  return this;
+};
+
+// Bind callbacks
+MyExperimentModel.prototype.bindTitle = function(callback) {
+  this.titleCallbacks.push(callback);
+  callback(this.title);
+  return this;
+};
+
+MyExperimentModel.prototype.bindDescription = function(callback) {
+  this.descriptionCallbacks.push(callback);
+  callback(this.description);
+  return this;
+};
+
+MyExperimentModel.prototype.bindScopesCount = function(callback) {
+  this.scopesCountCallbacks.push(callback);
+  callback(this.scopesCount);
+  return this;
+};
+
+MyExperimentModel.prototype.bindStartTime = function(callback) {
+  this.startTimeCallbacks.push(callback);
+  callback(this.startTime);
+  return this;
+};
+
+MyExperimentModel.prototype.bindStartDate = function(callback) {
+  this.startDateCallbacks.push(callback);
+  callback(this.startDate);
+  return this;
+};
+
+MyExperimentModel.prototype.bindShortCode = function(callback) {
+  this.shortCodeCallbacks.push(callback);
+  callback(this.shortCode);
+  return this;
+};
+
+MyExperimentModel.prototype.bindExperimentStatus = function(callback) {
+  this.experimentStatusCallbacks.push(callback);
+  callback(this.experimentStatus);
+  return this;
+};
+
+MyExperimentModel.prototype.bindPaymentStatus = function(callback) {
+  this.paymentStatusCallbacks.push(callback);
+  callback(this.paymentStatus);
+  return this;
+};
+
+// Getters
+MyExperimentModel.prototype.getId = function() {
+  return this.id;
+};
+
+MyExperimentModel.prototype.getDescription = function() {
+  return this.description;
+};
+
+MyExperimentModel.prototype.getScopesCount = function() {
+  return this.scopesCount;
+};
+
+MyExperimentModel.prototype.getExperimentDuration = function() {
+  return this.experimentDuration;
+};
+
+MyExperimentModel.prototype.getStartTime = function() {
+  return this.startTime;
+};
+
+MyExperimentModel.prototype.getShortCode = function() {
+  return this.shortCode;
+};
+
+MyExperimentModel.prototype.getExperimentStatus = function() {
+  return this.experimentStatus;
+};
+
+MyExperimentModel.prototype.getPaymentStatus = function() {
+  return this.paymentStatus;
+};
+
+MyExperimentModel.prototype.getTimeOrdered = function() {
+  return this.timeOrdered;
+};
+
+MyExperimentModel.prototype.getDateOrdered = function() {
+  return this.dateOrdered;
+};
+
+var MyExperimentsPageModel = function() {
+
+  /**
+   * Private vars
+   */
+  this.myExperiments = [];
+
+  /**
+   * Callbacks
+   */
+  this.newExperimentCallbacks = []; 
+  this.removeExperimentCallbacks = [];
+  this.setExperimentsCallbacks = [];
+};
+
+MyExperimentsPageModel.prototype.addExperiment = function(experiment) {
+  this.myExperiments.push(experiment);
+  this.newExperimentCallbacks.forEach(function(callback) {
+    callback(experiment);
+  });
+  return this;
+};
+
+MyExperimentsPageModel.prototype.removeExperiment = function(experiment) {
+  // TODO: Need to rethink this
+  Utils.removeElementFromArray(experiment, this.myExperiments);  
+  this.removeExperimentsCallbacks.forEach(function(callback) {
+    callback(experiment);
+  });
+  return this;
+};
+
+MyExperimentsPageModel.prototype.setExperiments = function(my_experiments) {
+  this.myExperiments = my_experiments;
+  this.setExperimentsCallbacks.forEach(function(callback) {
+    callback(my_experiments);
+  });
+  return this;
+};
+
+// Bind Callbacks
+MyExperimentsPageModel.prototype.bindAddExperiment = function(callback) {
+  this.newExperimentCallbacks.push(callback);
+  return this;
+};
+
+MyExperimentsPageModel.prototype.bindRemoveExperiment = function(callback) {
+  this.removeExperimentCallbacks.push(callback);
+  return this;
+};
+
+MyExperimentsPageModel.prototype.bindSetExperiments = function(callback) {
+  this.setExperimentsCallbacks.push(callback);
+  return this;
+};
+
+// Getters
+MyExperimentsPageModel.prototype.getExperiments = function() {
+  return this.myExperiments;
 };
 
 var NewExperimentModel = function() {
@@ -2418,6 +2774,13 @@ var Utils = (function() {
     return str.susbtring(0, str.length - 1);
   };
 
+  var removeElementFromArray = function(needle, haystack) {
+    var index = haystack.indexOf(needle);
+    if (index != -1) {
+      haystack.splice(index, 1);
+    }
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -2436,6 +2799,7 @@ var Utils = (function() {
     compareDates: compareDates,
     contains: contains,
     trimLast : trimLast,
+    removeElementFromArray : removeElementFromArray,
   };
 
 })();
@@ -5547,7 +5911,7 @@ var CenterPageView = function(
    * Private functions
    */
 
-  var initNewExperimentPage = function() {
+  var initNewExperimentPageView = function() {
     newExperimentPageView = new NewExperimentPageView(
       templateStore,
       centerPanelPageContainerNode.node
@@ -5555,8 +5919,17 @@ var CenterPageView = function(
     newExperimentPageView.init();
   };
 
+  var initMyExperimentsPageView = function() {
+    myExperimentsPageView = new MyExperimentsPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    myExperimentsPageView.init();
+  };
+
   var initPages = function() {
-    initNewExperimentPage(); 
+    initNewExperimentPageView(); 
+    initMyExperimentsPageView();
   };
 
   var bindNodes = function() {
@@ -5634,6 +6007,10 @@ var CenterPageView = function(
 
   this.getNewExperimentPageView = function() {
     return newExperimentPageView;
+  };
+
+  this.getMyExperimentsPageView = function() {
+    return myExperimentsPageView;
   };
 };
 
@@ -6242,7 +6619,182 @@ function FeedbackQuestion(
 
 };
 
-function MyExperimentsPageView(
+var MyExperimentView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'my-experiment-skeleton-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'my-experiment-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  // Event listeners
+  var frontPageNavCallbacks = [];
+  var descriptionNavCallbacks = [];
+  var monitorNavCallbacks = [];
+  var recordingNavCallbacks = [];
+
+  /**
+   * Dom nodes
+   */
+  // Title
+  var titleLabelNode = {
+    className: 'title-label',
+    node: null
+  };
+
+  var titleUnderlineNode = {
+    className: 'title-underline',
+    node: null
+  };
+
+  // Page wrappers
+  var frontPageNode = {
+    className: 'front-page',
+    node: null
+  };
+
+  var descriptionPageNode = {
+    className: 'description-page',
+    node: null
+  };
+
+  var monitorPageNode = {
+    className: 'monitor-page',
+    node: null
+  };
+
+  var recordingPageNode = {
+    className: 'recording-page',
+    node: null
+  };
+
+  // Navigation bar
+  var frontPageNavNode = {
+    className: 'front-page-nav-wrapper',
+    node: null
+  };
+
+  var descriptionNavNode = {
+    className: 'description-nav-wrapper',
+    node: null
+  };
+
+  var monitorNavNode = {
+    className: 'monitor-nav-wrapper',
+    node: null
+  };
+
+  var recordingNavNode = {
+    className: 'recording-nav-wrapper',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    // Bind nodes    
+    Utils.bindNodeInfo(rootNode, titleLabelNode);
+    Utils.bindNodeInfo(rootNode, titleUnderlineNode);
+
+    Utils.bindNodeInfo(rootNode, frontPageNode);
+    Utils.bindNodeInfo(rootNode, descriptionPageNode);
+    Utils.bindNodeInfo(rootNode, monitorPageNode);
+    Utils.bindNodeInfo(rootNode, recordingPageNode);
+
+    Utils.bindNodeInfo(rootNode, frontPageNavNode);
+    Utils.bindNodeInfo(rootNode, descriptionNavNode);
+    Utils.bindNodeInfo(rootNode, monitorNavNode);
+    Utils.bindNodeInfo(rootNode, recordingNavNode);
+
+    // TODO attach onclick listeners
+    frontPageNavNode.node.onclick = function() {
+      frontPageNavCallbacks.forEach(function(callback) {
+        callback();
+      }); 
+    };
+    
+    descriptionNavNode.node.onclick = function() {
+      descriptionNavCallbacks.forEach(function(callback) {
+        callback();
+      }); 
+    };
+    
+    monitorNavNode.node.onclick = function() {
+      monitorNavCallbacks.forEach(function(callback) {
+        callback();
+      }); 
+    };
+    
+    recordingNavNode.node.onclick = function() {
+      recordingNavCallbacks.forEach(function(callback) {
+        callback();
+      }); 
+    };
+  };
+
+  var initPages = function() {
+    // Initialize child pages
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+
+    // Bind all ui nodes and attach event listeners
+    bindNodes(); 
+
+    // Initialize child pages
+    initPages();
+
+    return this;
+  };
+
+  this.bindFrontPageNav = function(callback) {
+    frontPageNavCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindDescriptionNav = function(callback) {
+    descriptionNavCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindMonitorNav = function(callback) {
+    monitorNavCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindRecordingNav = function(callback) {
+    recordingNavCallbacks.push(callback);
+    return this;
+  };
+};
+
+function MyExperimentsPageViewBackup(
   template_store,
   root_id,
   is_displayed_initially
@@ -6384,6 +6936,72 @@ function MyExperimentsPageView(
   this.clearPendingOrders = function() {
     pendingExperimentViews = [];
     Utils.removeDomChildren(pageWrapperNode.node);
+  };
+};
+
+var MyExperimentsPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Page title
+   */
+  var PAGE_TITLE = 'My Experiments';
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'my-experiments-page-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'my-experiments-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize my-experiments page 
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+  };
+
+  this.hide = function() {
+    Utils.hideNode(rootNode);
+  };
+
+  this.show = function() {
+    Utils.showNode(rootNode);
+  };
+
+  this.getTitle = function() {
+    return PAGE_TITLE;
+  };
+
+  this.spawnNewExperiment = function() {
+    var my_experiment_view = new MyExperimentView(
+      templateStore,
+      rootNode
+    ); 
+    return my_experiment_view;
+  };
+
+  this.removeExperiments = function() {
+    Utils.removeDomChildren(rootNode);
   };
 };
 

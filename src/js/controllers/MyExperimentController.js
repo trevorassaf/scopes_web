@@ -5,7 +5,6 @@ var MyExperimentController = function() {
    */
   var myExperimentView = null;
   var myExperimentModel = null; 
-  var isActive = false;
 
   /**
    * Protected functions
@@ -32,36 +31,20 @@ var MyExperimentController = function() {
     // TODO... persist
   };
 
-  /**
-   * Public functions
-   */
-  this.init = function(
-    template_store,
-    parent_node,
-    model
-  ) {
-    // Check: controller must be inactive to initialize!
-    console.assert(!isActive);
-    this.isActive = true;
-
-    // We need a reference to this model (we don't own!)
-    myExperimentModel = model;
-
-    // Create view and bind event listeners
-    myExperimentView = new MyExperimentView(
-      template_store,
-      parent_node
-    );
-
-    myExperimentView.registerChangedTitleListener(changeTitle);
-    myExperimentView.registerChangedDescriptionListener(changeDescription);
-
-
-    // Init ui and bind model
-    myExperimentView.init(model);
+  var configureCallbacks = function() {
+     
   };
 
-  this.getModel = function() {
-    return myExperimentModel;
+  /**
+   * Privileged functions
+   */
+  this.init = function(
+    view,
+    model
+  ) {
+    myExperimentView = view;
+    myExperimentModel = model;
+
+    configureCallbacks();
   };
 };
