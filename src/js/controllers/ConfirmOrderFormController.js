@@ -1,4 +1,4 @@
-var ConfirmOrderFormController = function() {
+var ConfirmOrderController = function() {
 
   /**
    * Private state
@@ -11,7 +11,6 @@ var ConfirmOrderFormController = function() {
    * Private functions
    */
   var configureCallbacks = function() {
-    // Bind to experiment-duration change 
     experimentDurationModel.bindCurrentValue(handleNewExperimentDuration);
   };
 
@@ -24,7 +23,6 @@ var ConfirmOrderFormController = function() {
       total_price
     );
   };
-
 
   /**
    * Privileged functions

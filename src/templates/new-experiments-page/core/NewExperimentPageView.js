@@ -145,22 +145,6 @@ var NewExperimentPageView = function(
       shortCodePickerNode.node
     );
     form_view.init();
-   
-    // Initialize drop-down model
-    // var drop_down_model = new DropDownModel();
-    // var drop_down_items = [
-    //   new DropDownItemModel("SHORT", "SHORT", {}),
-    //   new DropDownItemModel("CODE", "CODE", {}),
-    //   new DropDownItemModel("SHIT", "SHIT", {})
-    // ];
-    // drop_down_model.setDropDownItems(drop_down_items);
-    //
-    // // Initialize drop-down model controller
-    // var drop_down_controller = new DropDownController();
-    // drop_down_controller.setModel(drop_down_model);
-    //
-    // form_view.init(drop_down_controller);
-
     return form_view;
   };
 
@@ -172,13 +156,6 @@ var NewExperimentPageView = function(
     );
 
     form_view.init();
-
-    // Initialize form controller
-    // var form_controller = new ConfirmOrderFormController();
-    // form_controller.init(
-    //   form_view,
-    //   experimentDurationController.getModel()
-    // );
     return form_view;
   };
 

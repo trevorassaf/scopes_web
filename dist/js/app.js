@@ -80,7 +80,7 @@ window.onload = function() {
   // });
 };
 
-var ConfirmOrderFormController = function() {
+var ConfirmOrderController = function() {
 
   /**
    * Private state
@@ -106,7 +106,6 @@ var ConfirmOrderFormController = function() {
       total_price
     );
   };
-
 
   /**
    * Privileged functions
@@ -593,6 +592,7 @@ var NewExperimentPageController = function() {
   var experimentTimePickerController = null;
   var experimentDatePickerController = null;
   var shortCodePickerController = null;
+  var confirmOrderController = null;
 
   // Model and view
   var newExperimentPageModel = null;
@@ -656,6 +656,17 @@ var NewExperimentPageController = function() {
     );
   };
 
+  var initConfirmOrderController = function() {
+    var confirm_order_form_view = newExperimentPageView.getConfirmExperimentFormView();
+    var experiment_duration_model = newExperimentPageModel.getExperimentDurationModel();
+
+    confirmOrderController = new ConfirmOrderController();
+    confirmOrderController.init(
+      confirm_order_form_view,
+      experiment_duration_model
+    );
+  };
+
   /**
    * Private functions
    */
@@ -670,6 +681,7 @@ var NewExperimentPageController = function() {
     experimentTimePickerController = initExperimentTimePickerController();
     experimentDatePickerController = initExperimentDatePickerController();
     shortCodePickerController = initShortCodePickerController();
+    confirmOrderController = initConfirmOrderController();
   };
 };
 
@@ -5297,6 +5309,147 @@ function StaticCalendar(
   };
 };
 
+var CenterPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'center-page-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'center-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var rootNode = null;
+
+  var currentPageView = null;
+
+  var newExperimentPageView = null;
+  var myExperimentsPageView = null;
+  var feedbackPageView = null;
+  var technicianPageView = null;
+
+  /**
+   * Dom nodes
+   */
+  var pageTitleNode = {
+    className: 'title-label',
+    node: null
+  };
+
+  var centerPanelPageContainerNode = {
+    className: 'page-container',
+    node: null
+  };
+
+  var adminButtonContainerNode = {
+    className: 'admin-btn-container',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+
+  var initNewExperimentPage = function() {
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    ); 
+    newExperimentPageView.init();
+  };
+
+  var initPages = function() {
+    initNewExperimentPage(); 
+  };
+
+  var bindNodes = function() {
+    // Bind page nodes
+    Utils.bindNodeInfo(rootNode, pageTitleNode);
+    Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
+    Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
+
+  };
+
+  var initPageViews = function() {
+    // Init new experiment page view
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );     
+
+    newExperimentPageView.init();
+  };
+
+  var changePage = function(next_page_view) {
+    console.assert(next_page_view != null);
+
+    // Hide current page
+    if (currentPageView != null) {
+      currentPageView.hide();
+    }
+
+    // Show next page and update title
+    currentPageView = next_page_view;
+    pageTitleNode.node.innerHTML = currentPageView.getTitle();
+    currentPageView.show();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize template into document and initialize
+    // root DOM element
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );
+
+    // Bind ui elements and attach event listeners
+    bindNodes();
+    
+    // Initialize pages
+    initPages();
+
+    return this;
+  };
+
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    changePage(newExperimentPageView);       
+  };
+
+  this.showMyExperimentsPage = function() {
+    changePage(myExperimentsPageView);       
+  };
+
+  this.showFeedbackPage = function() {
+    changePage(feedbackPageView);       
+  };
+
+  this.showTechnicianPage = function() {
+    changePage(technicianPageView);       
+  };
+
+  this.getNewExperimentPageView = function() {
+    return newExperimentPageView;
+  };
+};
+
 var DropDownItemView = function(
   template_store,
   parent_node
@@ -5572,147 +5725,6 @@ var DropDownView = function(
 
       dropDownItemViews.push(drop_down_item_view);
     }
-  };
-};
-
-var CenterPageView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'center-page-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'center-page-wrapper';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-  var rootNode = null;
-
-  var currentPageView = null;
-
-  var newExperimentPageView = null;
-  var myExperimentsPageView = null;
-  var feedbackPageView = null;
-  var technicianPageView = null;
-
-  /**
-   * Dom nodes
-   */
-  var pageTitleNode = {
-    className: 'title-label',
-    node: null
-  };
-
-  var centerPanelPageContainerNode = {
-    className: 'page-container',
-    node: null
-  };
-
-  var adminButtonContainerNode = {
-    className: 'admin-btn-container',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-
-  var initNewExperimentPage = function() {
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    ); 
-    newExperimentPageView.init();
-  };
-
-  var initPages = function() {
-    initNewExperimentPage(); 
-  };
-
-  var bindNodes = function() {
-    // Bind page nodes
-    Utils.bindNodeInfo(rootNode, pageTitleNode);
-    Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
-    Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
-
-  };
-
-  var initPageViews = function() {
-    // Init new experiment page view
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );     
-
-    newExperimentPageView.init();
-  };
-
-  var changePage = function(next_page_view) {
-    console.assert(next_page_view != null);
-
-    // Hide current page
-    if (currentPageView != null) {
-      currentPageView.hide();
-    }
-
-    // Show next page and update title
-    currentPageView = next_page_view;
-    pageTitleNode.node.innerHTML = currentPageView.getTitle();
-    currentPageView.show();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Synthesize template into document and initialize
-    // root DOM element
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );
-
-    // Bind ui elements and attach event listeners
-    bindNodes();
-    
-    // Initialize pages
-    initPages();
-
-    return this;
-  };
-
-  /**
-   * Functions for showing main pages
-   */
-  this.showNewExperimentPage = function() {
-    changePage(newExperimentPageView);       
-  };
-
-  this.showMyExperimentsPage = function() {
-    changePage(myExperimentsPageView);       
-  };
-
-  this.showFeedbackPage = function() {
-    changePage(feedbackPageView);       
-  };
-
-  this.showTechnicianPage = function() {
-    changePage(technicianPageView);       
-  };
-
-  this.getNewExperimentPageView = function() {
-    return newExperimentPageView;
   };
 };
 
@@ -8185,22 +8197,6 @@ var NewExperimentPageView = function(
       shortCodePickerNode.node
     );
     form_view.init();
-   
-    // Initialize drop-down model
-    // var drop_down_model = new DropDownModel();
-    // var drop_down_items = [
-    //   new DropDownItemModel("SHORT", "SHORT", {}),
-    //   new DropDownItemModel("CODE", "CODE", {}),
-    //   new DropDownItemModel("SHIT", "SHIT", {})
-    // ];
-    // drop_down_model.setDropDownItems(drop_down_items);
-    //
-    // // Initialize drop-down model controller
-    // var drop_down_controller = new DropDownController();
-    // drop_down_controller.setModel(drop_down_model);
-    //
-    // form_view.init(drop_down_controller);
-
     return form_view;
   };
 
@@ -8212,13 +8208,6 @@ var NewExperimentPageView = function(
     );
 
     form_view.init();
-
-    // Initialize form controller
-    // var form_controller = new ConfirmOrderFormController();
-    // form_controller.init(
-    //   form_view,
-    //   experimentDurationController.getModel()
-    // );
     return form_view;
   };
 
@@ -8310,7 +8299,6 @@ var ExperimentTimeFormView = function(
   var rootNode = null;
 
   var timePickerView = null;
-
   var datePickerView = null;
 
   /**

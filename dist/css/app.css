@@ -1030,6 +1030,7 @@ hidden {
   color: #3385FF;
 }
 
+
 .time-picker-wrapper {
   cursor: pointer;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -1109,7 +1110,6 @@ hidden {
 .time-picker-wrapper .time-picker-option:hover {
   background-color: #EEEEEE;
 }
-
 
 .confirm-order-form-wrapper .confirm-payment-container {
   margin-top: 20px;

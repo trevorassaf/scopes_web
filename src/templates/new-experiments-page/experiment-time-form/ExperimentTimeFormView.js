@@ -22,7 +22,6 @@ var ExperimentTimeFormView = function(
   var rootNode = null;
 
   var timePickerView = null;
-
   var datePickerView = null;
 
   /**

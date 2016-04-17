@@ -9,6 +9,7 @@ var NewExperimentPageController = function() {
   var experimentTimePickerController = null;
   var experimentDatePickerController = null;
   var shortCodePickerController = null;
+  var confirmOrderController = null;
 
   // Model and view
   var newExperimentPageModel = null;
@@ -72,6 +73,17 @@ var NewExperimentPageController = function() {
     );
   };
 
+  var initConfirmOrderController = function() {
+    var confirm_order_form_view = newExperimentPageView.getConfirmExperimentFormView();
+    var experiment_duration_model = newExperimentPageModel.getExperimentDurationModel();
+
+    confirmOrderController = new ConfirmOrderController();
+    confirmOrderController.init(
+      confirm_order_form_view,
+      experiment_duration_model
+    );
+  };
+
   /**
    * Private functions
    */
@@ -86,5 +98,6 @@ var NewExperimentPageController = function() {
     experimentTimePickerController = initExperimentTimePickerController();
     experimentDatePickerController = initExperimentDatePickerController();
     shortCodePickerController = initShortCodePickerController();
+    confirmOrderController = initConfirmOrderController();
   };
 };
