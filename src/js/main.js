@@ -35,6 +35,7 @@ window.onload = function() {
   /**
    * Initialize side panel
    */
+  // Side panel view
   var side_panel_parent_root = document.getElementById('side-panel');
 
   var side_panel_view = new SidePanelView(
@@ -43,6 +44,13 @@ window.onload = function() {
   );
   side_panel_view.init();
   side_panel_view.selectNewExperimentTab();
+
+  // Side panel controller
+  var side_panel_controller = new SidePanelController();
+  side_panel_controller.init(
+    side_panel_view,
+    center_page_controller
+  );
 
   // Initialize page controller
   // var page_controller = new PageController(

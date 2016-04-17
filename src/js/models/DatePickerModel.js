@@ -1,6 +1,6 @@
 var DatePickerModel = function() {
 
-  // Privat state
+  // Private state
   this.selectedDate = null;
   this.selectedMonth = null;
   this.selectedYear = null;

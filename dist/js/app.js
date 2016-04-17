@@ -33,26 +33,9 @@ window.onload = function() {
   );
   
   /**
-   * Initialize new experiment page
+   * Initialize side panel
    */
-  // // Model
-  // var new_experiment_page_model = new NewExperimentPageModel();
-  // new_experiment_page_model.init();
-  //
-  // // Controller
-  // var new_experiment_page_controller = new NewExperimentPageController();
-  // new_experiment_page_controller.init(
-  //   new_experiment_page_model,
-  //   center_page_view.getNewExperimentPageView()
-  // );
-
-  /**
-   * Initialize my experiments
-   */
-
-
-
-  // Initialize side panel
+  // Side panel view
   var side_panel_parent_root = document.getElementById('side-panel');
 
   var side_panel_view = new SidePanelView(
@@ -61,6 +44,13 @@ window.onload = function() {
   );
   side_panel_view.init();
   side_panel_view.selectNewExperimentTab();
+
+  // Side panel controller
+  var side_panel_controller = new SidePanelController();
+  side_panel_controller.init(
+    side_panel_view,
+    center_page_controller
+  );
 
   // Initialize page controller
   // var page_controller = new PageController(
@@ -120,6 +110,25 @@ var CenterPageController = function() {
 
     // Initialize child controllers
     initNewExperimentPageController();
+  };
+
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    centerPageView.showNewExperimentPage();
+  };
+
+  this.showMyExperimentsPage = function() {
+    centerPageView.showMyExperimentsPage();
+  };
+
+  this.showFeedbackPage = function() {
+    centerPageView.showFeedbackPage();
+  };
+
+  this.showTechnicianPage = function() {
+    centerPageView.showTechnicianPage();
   };
 };
 
@@ -885,34 +894,54 @@ var PageController = function(
   };
 };
 
-var SidePanelController = function(
-    template_store,
-    new_experiment_page_controller,
-    my_experiments_page_controller,
-    feedback_page_controller,
-    technician_page_controller
-) {
+var SidePanelController = function() {
 
   /**
    * Private state
    */
   var sidePanelView = null;
-  var templateStore = template_store;
+  var centerPageController = null;
 
-  var newExperimentPageController = new_experiment_page_controller;
-  var myExperimentsPageController = my_experiments_page_controller;
-  var feedbackPageController = feedback_page_controller;
-  var technicianPageController = technician_page_controller;
+  /**
+   * Private functions
+   */
+  var configureCallbacks = function() {
+    // Model --> view data pathways
+  
+    // Register tab-selection callbacks
+    sidePanelView.bindNewExperimentTabClick(handleNewExperimentTabClick);
+    sidePanelView.bindMyExperimentsTabClick(handleMyExperimentsTabClick);
+    sidePanelView.bindFeedbackTabClick(handleFeedbackTabClick);
+    sidePanelView.bindTechnicianTabClick(handleTechnicianTabClick);
+  };
+
+  var handleNewExperimentTabClick = function() {
+    centerPageController.showNewExperimentPage();
+  };
+
+  var handleMyExperimentsTabClick = function() {
+    centerPageController.showMyExperimentsPage();
+  };
+
+  var handleFeedbackTabClick = function() {
+    centerPageController.showFeedbackPage();
+  };
+
+  var handleTechnicianTabClick = function() {
+    centerPageController.showTechnicianPage();
+  };
 
   /**
    * Privileged functions
    */
-  this.init = function() {
-    /**
-     * Initialize the tab views
-     */
-    sidePanelView = new SidePanelView(templateStore);
-    sidePanelView.init();
+  this.init = function(
+    side_panel_view,
+    center_page_controller
+  ) {
+    sidePanelView = side_panel_view;
+    centerPageController = center_page_controller;
+
+    configureCallbacks();
   };
 };
 
@@ -1176,7 +1205,7 @@ ConfirmedOrderModel.prototype.bindShortCode = function(callback) {
 
 var DatePickerModel = function() {
 
-  // Privat state
+  // Private state
   this.selectedDate = null;
   this.selectedMonth = null;
   this.selectedYear = null;
@@ -7373,7 +7402,7 @@ var SidePanelView = function(
   
   var currentlySelectedTab = null;
   var tabParentNode = null;
-  
+
   /**
    * Tab infos
    */
@@ -7524,15 +7553,15 @@ var SidePanelView = function(
     newExperimentInfo.callback_listeners.push(callback); 
   };
 
-  this.bindMyExperimentsTabClick = function() {
+  this.bindMyExperimentsTabClick = function(callback) {
     myExperimentsInfo.callback_listeners.push(callback); 
   };
 
-  this.bindFeedbackTabClick = function() {
+  this.bindFeedbackTabClick = function(callback) {
     feedbackInfo.callback_listeners.push(callback); 
   };
 
-  this.bindTechnicianTabClick = function() {
+  this.bindTechnicianTabClick = function(callback) {
     technicianInfo.callback_listeners.push(callback); 
   };
 

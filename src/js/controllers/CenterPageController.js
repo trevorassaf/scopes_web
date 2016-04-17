@@ -30,4 +30,23 @@ var CenterPageController = function() {
     // Initialize child controllers
     initNewExperimentPageController();
   };
+
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    centerPageView.showNewExperimentPage();
+  };
+
+  this.showMyExperimentsPage = function() {
+    centerPageView.showMyExperimentsPage();
+  };
+
+  this.showFeedbackPage = function() {
+    centerPageView.showFeedbackPage();
+  };
+
+  this.showTechnicianPage = function() {
+    centerPageView.showTechnicianPage();
+  };
 };

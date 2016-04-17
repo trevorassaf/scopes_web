@@ -30,7 +30,7 @@ var SidePanelView = function(
   
   var currentlySelectedTab = null;
   var tabParentNode = null;
-  
+
   /**
    * Tab infos
    */
@@ -181,15 +181,15 @@ var SidePanelView = function(
     newExperimentInfo.callback_listeners.push(callback); 
   };
 
-  this.bindMyExperimentsTabClick = function() {
+  this.bindMyExperimentsTabClick = function(callback) {
     myExperimentsInfo.callback_listeners.push(callback); 
   };
 
-  this.bindFeedbackTabClick = function() {
+  this.bindFeedbackTabClick = function(callback) {
     feedbackInfo.callback_listeners.push(callback); 
   };
 
-  this.bindTechnicianTabClick = function() {
+  this.bindTechnicianTabClick = function(callback) {
     technicianInfo.callback_listeners.push(callback); 
   };
 

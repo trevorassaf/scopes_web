@@ -1,30 +1,50 @@
-var SidePanelController = function(
-    template_store,
-    new_experiment_page_controller,
-    my_experiments_page_controller,
-    feedback_page_controller,
-    technician_page_controller
-) {
+var SidePanelController = function() {
 
   /**
    * Private state
    */
   var sidePanelView = null;
-  var templateStore = template_store;
+  var centerPageController = null;
 
-  var newExperimentPageController = new_experiment_page_controller;
-  var myExperimentsPageController = my_experiments_page_controller;
-  var feedbackPageController = feedback_page_controller;
-  var technicianPageController = technician_page_controller;
+  /**
+   * Private functions
+   */
+  var configureCallbacks = function() {
+    // Model --> view data pathways
+  
+    // Register tab-selection callbacks
+    sidePanelView.bindNewExperimentTabClick(handleNewExperimentTabClick);
+    sidePanelView.bindMyExperimentsTabClick(handleMyExperimentsTabClick);
+    sidePanelView.bindFeedbackTabClick(handleFeedbackTabClick);
+    sidePanelView.bindTechnicianTabClick(handleTechnicianTabClick);
+  };
+
+  var handleNewExperimentTabClick = function() {
+    centerPageController.showNewExperimentPage();
+  };
+
+  var handleMyExperimentsTabClick = function() {
+    centerPageController.showMyExperimentsPage();
+  };
+
+  var handleFeedbackTabClick = function() {
+    centerPageController.showFeedbackPage();
+  };
+
+  var handleTechnicianTabClick = function() {
+    centerPageController.showTechnicianPage();
+  };
 
   /**
    * Privileged functions
    */
-  this.init = function() {
-    /**
-     * Initialize the tab views
-     */
-    sidePanelView = new SidePanelView(templateStore);
-    sidePanelView.init();
+  this.init = function(
+    side_panel_view,
+    center_page_controller
+  ) {
+    sidePanelView = side_panel_view;
+    centerPageController = center_page_controller;
+
+    configureCallbacks();
   };
 };
