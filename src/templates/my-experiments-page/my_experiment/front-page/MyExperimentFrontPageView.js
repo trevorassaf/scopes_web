@@ -118,6 +118,10 @@ var MyExperimentFrontPageView = function(
 
   this.setScopesCount = function(count) {
     scopesCountValueNode.node.innerHTML = count;
+
+
+    var price = count * 20;
+    experimentPriceValueNode.node.innerHTML = "$" + Utils.makePriceString(price);
   };
 
   this.setPaymentStatus = function(payment_status) {
