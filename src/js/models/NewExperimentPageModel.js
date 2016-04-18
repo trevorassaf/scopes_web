@@ -50,35 +50,35 @@ var NewExperimentPageModel = function() {
   var initializeExperimentTimePickerModel = function() {
     // Create drop down items 
     var drop_down_items = [
-      new DropDownItemModel("10:00", "10:00", {
+      new DropDownItemModel("10:00 am", "10:00 am", {
         hour: 10,
         minute: 0
       }),
-      new DropDownItemModel("10:30", "10:30", {
+      new DropDownItemModel("10:30 am", "10:30 am", {
         hour: 10,
         minute: 30
       }),
-      new DropDownItemModel("11:00", "11:00", {
+      new DropDownItemModel("11:00 am", "11:00 am", {
         hour: 11,
         minute: 00
       }),
-      new DropDownItemModel("11:30", "11:30", {
+      new DropDownItemModel("11:30 am", "11:30 am", {
         hour: 11,
         minute: 30
       }),
-      new DropDownItemModel("12:00", "12:00", {
+      new DropDownItemModel("12:00 pm", "12:00 pm", {
         hour: 12,
         minute: 00
       }),
-      new DropDownItemModel("12:30", "12:30", {
+      new DropDownItemModel("12:30 pm", "12:30 pm", {
         hour: 12,
         minute: 30
       }),
-      new DropDownItemModel("1:00", "1:00", {
+      new DropDownItemModel("1:00 pm", "1:00 pm", {
         hour: 1,
         minute: 00
       }),
-      new DropDownItemModel("1:30", "1:30", {
+      new DropDownItemModel("1:30 pm", "1:30 pm", {
         hour: 1,
         minute: 30
       })

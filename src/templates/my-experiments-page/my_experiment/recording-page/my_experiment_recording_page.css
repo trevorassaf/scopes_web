@@ -1,4 +1,12 @@
 .my-experiment-recording-page-wrapper .experiment-recording {
   height: 300px;
   width: calc(100% - 60px);
+  position: relative;
+}
+
+.my-experiment-recording-page-wrapper .absent-video-message {
+  margin: auto;
+  color: #424242;
+  position: relative;
+  top: 120px;
 }

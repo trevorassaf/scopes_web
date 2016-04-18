@@ -1238,6 +1238,10 @@ hidden {
   background-image: -webkit-linear-gradient(top, #FF3B45, #FF0E1A);
 }
 
+.experiment-time-form-wrapper .input-container > div {
+  vertical-align: top; 
+}
+
 .new-experiment-page-wrapper[hidden-page] {
   display: none; 
 }
@@ -1272,10 +1276,6 @@ hidden {
   /* position: relative; */
   /* top: -10px; */
   margin-right: 40px;
-}
-
-.experiment-time-form-wrapper .input-container > div {
-  vertical-align: top; 
 }
 
 .slider-input-form-wrapper .slider-input {
@@ -1316,4 +1316,12 @@ hidden {
 .my-experiment-recording-page-wrapper .experiment-recording {
   height: 300px;
   width: calc(100% - 60px);
+  position: relative;
+}
+
+.my-experiment-recording-page-wrapper .absent-video-message {
+  margin: auto;
+  color: #424242;
+  position: relative;
+  top: 120px;
 }
