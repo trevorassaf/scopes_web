@@ -13,6 +13,25 @@ var Utils = (function() {
   // Key codes
   var ENTER_KEY_CODE = 13;
 
+  // Month names
+  var POST_MERIDIAN = 'pm';
+  var ANTE_MERIDIAN = 'am';
+
+  var SHORT_MONTH_NAMES = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
   this.hasClass = function(class_name, node) {
     console.assert(node != null);
     return 'classList' in node && node.classList.contains(class_name);
@@ -304,6 +323,41 @@ var Utils = (function() {
     return str.trim().length == 0;
   };
 
+  var getShortMonthName = function(month_idx) {
+    console.assert(month_idx < 12);
+    return SHORT_MONTH_NAMES[month_idx];
+  };
+
+  var toCivilianHour = function(military_hour) {
+    var civilian_hour = (military_hour > 12)
+      ? military_hour - 12
+      : military_hour;
+
+    var meridian_designation = (military_hour > 11 && military_hour != 24)
+      ? POST_MERIDIAN
+      : ANTE_MERIDIAN;
+
+    return civilian_hour.toString() + " " + meridian_designation; 
+  };
+
+  var toHoursAndMinutesString = function(start_time) {
+    var military_hour = start_time.getHours();
+    var time_str = (military_hour > 12)
+      ? military_hour - 12
+      : military_hour;
+
+    time_str += TIME_DELIMITER + stringifyNumberWithEnforcedDigitCount(
+      start_time.getMinutes(),
+      2
+    );
+
+    var meridian_designation = (military_hour > 11 && military_hour != 24)
+      ? POST_MERIDIAN
+      : ANTE_MERIDIAN;
+
+    return time_str + " " + meridian_designation;
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -330,7 +384,9 @@ var Utils = (function() {
     selectTextRange : selectTextRange,
     unselectTextRange: unselectTextRange,
     isEnterKeyPressed : isEnterKeyPressed,
-    isWhiteSpace: isWhiteSpace
+    isWhiteSpace: isWhiteSpace,
+    getShortMonthName: getShortMonthName,
+    toCivilianHour: toCivilianHour,
+    toHoursAndMinutesString : toHoursAndMinutesString
   };
-
 })();

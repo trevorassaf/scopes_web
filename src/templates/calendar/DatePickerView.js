@@ -29,18 +29,18 @@ var DatePickerView = function(
    * Month names
    */
   var SHORT_MONTH_NAMES = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
+    'Jan.',
+    'Feb.',
+    'Mar.',
+    'Apr.',
     'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
+    'Jun.',
+    'Jul.',
+    'Aug.',
+    'Sep.',
+    'Oct.',
+    'Nov.',
+    'Dec.'
   ];
 
   /**

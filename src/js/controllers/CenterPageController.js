@@ -52,17 +52,14 @@ var CenterPageController = function() {
 
     var experiment_model = new MyExperimentModel(
       0,
-      null,
+      'Experiment #1',
       'Description',
       10,
       5,
-      null,
-      null,
-      null,
-      0,
-      0,
-      null,
-      null
+      new Date(),
+      "SHORT",
+      "Pending",
+      "Pending"
     );
 
     var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();

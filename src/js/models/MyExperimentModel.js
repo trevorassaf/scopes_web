@@ -5,12 +5,9 @@ var MyExperimentModel = function(
   scopes_count,
   experiment_duration,
   start_time,
-  start_date,
   short_code,
   experiment_status,
-  payment_status,
-  time_ordered,
-  date_ordered
+  payment_status
 ) {
 
   /**
@@ -22,12 +19,9 @@ var MyExperimentModel = function(
   this.scopesCount = scopes_count;
   this.experimentDuration = experiment_duration;
   this.startTime = start_time;
-  this.startDate = start_date;
   this.shortCode = short_code;
   this.experimentStatus = experiment_status;
   this.paymentStatus = payment_status;
-  this.timeOrdered = time_ordered;
-  this.dateOrdered = date_ordered;
 
   // Callbacks
   this.titleCallbacks = [];
@@ -35,9 +29,9 @@ var MyExperimentModel = function(
   this.scopesCountCallbacks = [];
   this.experimentDurationCallbacks = [];
   this.startTimeCallbacks = [];
-  this.startDateCallbacks = [];
   this.experimentStatusCallbacks = [];
   this.paymentStatusCallbacks = [];
+  this.shortCodeCallbacks = [];
 };
 
 // Setters
@@ -81,22 +75,6 @@ MyExperimentModel.prototype.setStartTime = function(startTime) {
   return this;
 };
 
-MyExperimentModel.prototype.setStartDate = function(startDate) {
-  this.startDate = startDate;
-  this.startDateCallbacks.forEach(function(callback) {
-    callback(this.startDate); 
-  }, this);
-  return this;
-};
-
-MyExperimentModel.prototype.setShortCode = function(shortCode) {
-  this.shortCode = shortCode;
-  this.shortCodeCallbacks.forEach(function(callback) {
-    callback(this.shortCode); 
-  }, this);
-  return this;
-};
-
 MyExperimentModel.prototype.setShortCode = function(shortCode) {
   this.shortCode = shortCode;
   this.shortCodeCallbacks.forEach(function(callback) {
@@ -134,6 +112,12 @@ MyExperimentModel.prototype.bindDescription = function(callback) {
   return this;
 };
 
+MyExperimentModel.prototype.bindExperimentDuration = function(callback) {
+  this.experimentDurationCallbacks.push(callback);
+  callback(this.experimentDuration);
+  return this;
+};
+
 MyExperimentModel.prototype.bindScopesCount = function(callback) {
   this.scopesCountCallbacks.push(callback);
   callback(this.scopesCount);
@@ -143,12 +127,6 @@ MyExperimentModel.prototype.bindScopesCount = function(callback) {
 MyExperimentModel.prototype.bindStartTime = function(callback) {
   this.startTimeCallbacks.push(callback);
   callback(this.startTime);
-  return this;
-};
-
-MyExperimentModel.prototype.bindStartDate = function(callback) {
-  this.startDateCallbacks.push(callback);
-  callback(this.startDate);
   return this;
 };
 
@@ -201,12 +179,4 @@ MyExperimentModel.prototype.getExperimentStatus = function() {
 
 MyExperimentModel.prototype.getPaymentStatus = function() {
   return this.paymentStatus;
-};
-
-MyExperimentModel.prototype.getTimeOrdered = function() {
-  return this.timeOrdered;
-};
-
-MyExperimentModel.prototype.getDateOrdered = function() {
-  return this.dateOrdered;
 };

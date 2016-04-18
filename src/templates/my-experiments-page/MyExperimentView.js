@@ -190,9 +190,20 @@ var MyExperimentView = function(
 
   var initPages = function() {
     // Initialize child pages
+    frontPageView = new MyExperimentFrontPageView(
+      templateStore,
+      frontPageNode.node
+    );
+    frontPageView.init();
+
+    descriptionPageView = new MyExperimentDescriptionPageView(
+      templateStore,
+      descriptionPageNode.node
+    );
+    descriptionPageView.init();
   };
   
-  var changeVisiblePage = function(
+  var changePage = function(
     next_page_view,
     next_page_button
   ) {
@@ -259,6 +270,11 @@ var MyExperimentView = function(
     setNotEditingTitle();
   };
 
+  var initUi = function() {
+    // Select front page first
+    selectPage(frontPageView, frontPageNavNode.node); 
+  };
+
   /**
    * Privileged functions
    */
@@ -276,6 +292,9 @@ var MyExperimentView = function(
 
     // Initialize child pages
     initPages();
+
+    // Initialize ui
+    initUi();
 
     return this;
   };
@@ -308,19 +327,19 @@ var MyExperimentView = function(
 
   // Show page functions
   this.showFrontPage = function() {
-    changeVisiblePage(frontPageView);
+    changePage(frontPageView, frontPageNavNode.node);
   };
 
   this.showDescriptionPage = function() {
-    changeVisiblePage(descriptionPageView);
+    changePage(descriptionPageView, descriptionNavNode.node);
   };
 
   this.showMonitorExperimentPage = function() {
-    changeVisiblePage(monitorExperimentPageView);
+    changePage(monitorExperimentPageView, monitorExperimentNavNode.node);
   };
 
   this.showRecordingPage = function() {
-    changeVisiblePage(recordingPageView);
+    changePage(recordingPageView, recordingNavNode.node);
   };
  
   // Ui setters
@@ -337,5 +356,22 @@ var MyExperimentView = function(
     cachedTitle = null;
     Utils.unmarkNode(titleLabelNode.node, CHANGED_TITLE_ATTR);
     isUserDefinedTitle = false;
+  };
+
+  // Getters
+  this.getFrontPageView = function() {
+    return frontPageView;
+  };
+
+  this.getDescriptionPageView = function() {
+    return descriptionPageView;
+  };
+
+  this.getMonitorPageView = function() {
+    return monitorPageView;
+  };
+
+  this.getRecordingPageView = function() {
+    return recordingPageView;
   };
 };

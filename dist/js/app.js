@@ -133,17 +133,14 @@ var CenterPageController = function() {
 
     var experiment_model = new MyExperimentModel(
       0,
-      null,
+      'Experiment #1',
       'Description',
       10,
       5,
-      null,
-      null,
-      null,
-      0,
-      0,
-      null,
-      null
+      new Date(),
+      "SHORT",
+      "Pending",
+      "Pending"
     );
 
     var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
@@ -477,6 +474,9 @@ var MyExperimentController = function() {
   var myExperimentView = null;
   var myExperimentModel = null; 
 
+  // Page controllers
+  var frontPageController = null;
+
   /**
    * Protected functions
    */
@@ -530,6 +530,14 @@ var MyExperimentController = function() {
     });
   };
 
+  var initPageControllers = function() {
+    frontPageController = new MyExperimentFrontPageController();
+    frontPageController.init(
+      myExperimentView.getFrontPageView(),
+      myExperimentModel
+    );
+  };
+
   /**
    * Privileged functions
    */
@@ -539,6 +547,50 @@ var MyExperimentController = function() {
   ) {
     myExperimentView = view;
     myExperimentModel = model;
+
+    // Initialize controllers for pages, e.g. front, description
+    initPageControllers();
+
+    // Set up data pathways
+    configureCallbacks();
+  };
+};
+
+var MyExperimentFrontPageController = function() {
+
+  /**
+   * Private state
+   */
+  var frontPageView = null;
+  var myExperimentModel = null;
+
+  /**
+   * Private functions
+   */
+  var handleStartTimeChange = function(start_time) {
+    frontPageView.setStartTime(start_time) 
+  };
+
+  var configureCallbacks = function() {
+    // Model --> view data pathway
+    myExperimentModel
+      .bindScopesCount(frontPageView.setScopesCount)
+      .bindExperimentDuration(frontPageView.setExperimentDuration)
+      .bindStartTime(handleStartTimeChange)
+      .bindShortCode(frontPageView.setShortCode)
+      .bindExperimentStatus(frontPageView.setExperimentStatus)
+      .bindPaymentStatus(frontPageView.setPaymentStatus);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(
+    front_page_view,
+    my_experiment_model
+  ) {
+    frontPageView = front_page_view;
+    myExperimentModel = my_experiment_model;
 
     configureCallbacks();
   };
@@ -1620,12 +1672,9 @@ var MyExperimentModel = function(
   scopes_count,
   experiment_duration,
   start_time,
-  start_date,
   short_code,
   experiment_status,
-  payment_status,
-  time_ordered,
-  date_ordered
+  payment_status
 ) {
 
   /**
@@ -1637,12 +1686,9 @@ var MyExperimentModel = function(
   this.scopesCount = scopes_count;
   this.experimentDuration = experiment_duration;
   this.startTime = start_time;
-  this.startDate = start_date;
   this.shortCode = short_code;
   this.experimentStatus = experiment_status;
   this.paymentStatus = payment_status;
-  this.timeOrdered = time_ordered;
-  this.dateOrdered = date_ordered;
 
   // Callbacks
   this.titleCallbacks = [];
@@ -1650,9 +1696,9 @@ var MyExperimentModel = function(
   this.scopesCountCallbacks = [];
   this.experimentDurationCallbacks = [];
   this.startTimeCallbacks = [];
-  this.startDateCallbacks = [];
   this.experimentStatusCallbacks = [];
   this.paymentStatusCallbacks = [];
+  this.shortCodeCallbacks = [];
 };
 
 // Setters
@@ -1696,22 +1742,6 @@ MyExperimentModel.prototype.setStartTime = function(startTime) {
   return this;
 };
 
-MyExperimentModel.prototype.setStartDate = function(startDate) {
-  this.startDate = startDate;
-  this.startDateCallbacks.forEach(function(callback) {
-    callback(this.startDate); 
-  }, this);
-  return this;
-};
-
-MyExperimentModel.prototype.setShortCode = function(shortCode) {
-  this.shortCode = shortCode;
-  this.shortCodeCallbacks.forEach(function(callback) {
-    callback(this.shortCode); 
-  }, this);
-  return this;
-};
-
 MyExperimentModel.prototype.setShortCode = function(shortCode) {
   this.shortCode = shortCode;
   this.shortCodeCallbacks.forEach(function(callback) {
@@ -1749,6 +1779,12 @@ MyExperimentModel.prototype.bindDescription = function(callback) {
   return this;
 };
 
+MyExperimentModel.prototype.bindExperimentDuration = function(callback) {
+  this.experimentDurationCallbacks.push(callback);
+  callback(this.experimentDuration);
+  return this;
+};
+
 MyExperimentModel.prototype.bindScopesCount = function(callback) {
   this.scopesCountCallbacks.push(callback);
   callback(this.scopesCount);
@@ -1758,12 +1794,6 @@ MyExperimentModel.prototype.bindScopesCount = function(callback) {
 MyExperimentModel.prototype.bindStartTime = function(callback) {
   this.startTimeCallbacks.push(callback);
   callback(this.startTime);
-  return this;
-};
-
-MyExperimentModel.prototype.bindStartDate = function(callback) {
-  this.startDateCallbacks.push(callback);
-  callback(this.startDate);
   return this;
 };
 
@@ -1816,14 +1846,6 @@ MyExperimentModel.prototype.getExperimentStatus = function() {
 
 MyExperimentModel.prototype.getPaymentStatus = function() {
   return this.paymentStatus;
-};
-
-MyExperimentModel.prototype.getTimeOrdered = function() {
-  return this.timeOrdered;
-};
-
-MyExperimentModel.prototype.getDateOrdered = function() {
-  return this.dateOrdered;
 };
 
 var MyExperimentsPageModel = function() {
@@ -2539,6 +2561,25 @@ var Utils = (function() {
   // Key codes
   var ENTER_KEY_CODE = 13;
 
+  // Month names
+  var POST_MERIDIAN = 'pm';
+  var ANTE_MERIDIAN = 'am';
+
+  var SHORT_MONTH_NAMES = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
   this.hasClass = function(class_name, node) {
     console.assert(node != null);
     return 'classList' in node && node.classList.contains(class_name);
@@ -2830,6 +2871,41 @@ var Utils = (function() {
     return str.trim().length == 0;
   };
 
+  var getShortMonthName = function(month_idx) {
+    console.assert(month_idx < 12);
+    return SHORT_MONTH_NAMES[month_idx];
+  };
+
+  var toCivilianHour = function(military_hour) {
+    var civilian_hour = (military_hour > 12)
+      ? military_hour - 12
+      : military_hour;
+
+    var meridian_designation = (military_hour > 11 && military_hour != 24)
+      ? POST_MERIDIAN
+      : ANTE_MERIDIAN;
+
+    return civilian_hour.toString() + " " + meridian_designation; 
+  };
+
+  var toHoursAndMinutesString = function(start_time) {
+    var military_hour = start_time.getHours();
+    var time_str = (military_hour > 12)
+      ? military_hour - 12
+      : military_hour;
+
+    time_str += TIME_DELIMITER + stringifyNumberWithEnforcedDigitCount(
+      start_time.getMinutes(),
+      2
+    );
+
+    var meridian_designation = (military_hour > 11 && military_hour != 24)
+      ? POST_MERIDIAN
+      : ANTE_MERIDIAN;
+
+    return time_str + " " + meridian_designation;
+  };
+
   return {
     hasClass: hasClass,
     makePriceString: makePriceString,
@@ -2856,9 +2932,11 @@ var Utils = (function() {
     selectTextRange : selectTextRange,
     unselectTextRange: unselectTextRange,
     isEnterKeyPressed : isEnterKeyPressed,
-    isWhiteSpace: isWhiteSpace
+    isWhiteSpace: isWhiteSpace,
+    getShortMonthName: getShortMonthName,
+    toCivilianHour: toCivilianHour,
+    toHoursAndMinutesString : toHoursAndMinutesString
   };
-
 })();
 
 function ApiControllerWrapper(api_object) {
@@ -4633,10 +4711,63 @@ var MyExperimentFrontPageView = function(
   var parentNode = parent_node;
 
   /**
+   * Dom node info
+   */
+  var experimentStatusValueNode = {
+    className: 'experiment-status-value',
+    node: null
+  };
+
+  var startTimeValueNode = {
+    className: 'start-time-value',
+    node: null
+  };
+
+  var experimentDurationValueNode = {
+    className: 'experiment-duration-value',
+    node: null
+  };
+
+  var scopesCountValueNode = {
+    className: 'scopes-count-value',
+    node: null
+  };
+
+  var paymentStatusValueNode = {
+    className: 'payment-status-value',
+    node: null
+  };
+
+  var experimentPriceValueNode = {
+    className: 'experiment-price-value',
+    node: null
+  };
+
+  var shortCodeValueNode = {
+    className: 'short-code-value',
+    node: null
+  };
+
+  /**
    * Private functions
    */
+  var createExperimentStartTimeString = function(start_time) {
+    var start_time_str = Utils.getShortMonthName(start_time.getMonth());
+    start_time_str += " " + start_time.getDate();
+    start_time_str += ", " + start_time.getFullYear();
+    start_time_str += " @ " + Utils.toHoursAndMinutesString(start_time);
+    return start_time_str;
+  };
+
   var bindNodes = function() {
-    
+    // Bind dom node info    
+    Utils.bindNodeInfo(rootNode, experimentStatusValueNode); 
+    Utils.bindNodeInfo(rootNode, startTimeValueNode); 
+    Utils.bindNodeInfo(rootNode, experimentDurationValueNode); 
+    Utils.bindNodeInfo(rootNode, scopesCountValueNode); 
+    Utils.bindNodeInfo(rootNode, paymentStatusValueNode); 
+    Utils.bindNodeInfo(rootNode, experimentPriceValueNode); 
+    Utils.bindNodeInfo(rootNode, shortCodeValueNode); 
   };
 
   /**
@@ -4653,6 +4784,98 @@ var MyExperimentFrontPageView = function(
 
     // Bind all ui nodes and attach event listeners
     bindNodes(); 
+  };
+
+  this.hide = function() {
+    Utils.hideNode(parentNode);
+  };
+
+  this.show = function() {
+    Utils.showNode(parentNode);
+  };
+
+  // Setters
+  this.setExperimentStatus = function(experiment_status) {
+    experimentStatusValueNode.node.innerHTML = experiment_status;
+  };
+
+  this.setStartTime = function(start_time) {
+    startTimeValueNode.node.innerHTML = createExperimentStartTimeString(start_time);
+  };
+
+  this.setExperimentDuration = function(duration) {
+    experimentDurationValueNode.node.innerHTML = duration.toString() + " hr";
+  };
+
+  this.setScopesCount = function(count) {
+    scopesCountValueNode.node.innerHTML = count;
+  };
+
+  this.setPaymentStatus = function(payment_status) {
+    paymentStatusValueNode.node.innerHTML = payment_status;
+  };
+
+  this.setExperimentPrice = function(price) {
+    experimentPriceValueNode.node.innerHTML = price;
+  };
+
+  this.setShortCode = function(short_code) {
+    shortCodeValueNode.node.innerHTML = short_code;
+  };
+};
+
+var MyExperimentDescriptionPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'my-experiment-description-template'; 
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'my-experiment-description-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    // Attach event listeners
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+
+    // Bind all ui nodes and attach event listeners
+    bindNodes(); 
+  };
+
+  this.hide = function() {
+    Utils.hideNode(parentNode);
+  };
+
+  this.show = function() {
+    Utils.showNode(parentNode);
   };
 };
 
@@ -5407,18 +5630,18 @@ var DatePickerView = function(
    * Month names
    */
   var SHORT_MONTH_NAMES = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
+    'Jan.',
+    'Feb.',
+    'Mar.',
+    'Apr.',
     'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
+    'Jun.',
+    'Jul.',
+    'Aug.',
+    'Sep.',
+    'Oct.',
+    'Nov.',
+    'Dec.'
   ];
 
   /**
@@ -6913,9 +7136,20 @@ var MyExperimentView = function(
 
   var initPages = function() {
     // Initialize child pages
+    frontPageView = new MyExperimentFrontPageView(
+      templateStore,
+      frontPageNode.node
+    );
+    frontPageView.init();
+
+    descriptionPageView = new MyExperimentDescriptionPageView(
+      templateStore,
+      descriptionPageNode.node
+    );
+    descriptionPageView.init();
   };
   
-  var changeVisiblePage = function(
+  var changePage = function(
     next_page_view,
     next_page_button
   ) {
@@ -6982,6 +7216,11 @@ var MyExperimentView = function(
     setNotEditingTitle();
   };
 
+  var initUi = function() {
+    // Select front page first
+    selectPage(frontPageView, frontPageNavNode.node); 
+  };
+
   /**
    * Privileged functions
    */
@@ -6999,6 +7238,9 @@ var MyExperimentView = function(
 
     // Initialize child pages
     initPages();
+
+    // Initialize ui
+    initUi();
 
     return this;
   };
@@ -7031,19 +7273,19 @@ var MyExperimentView = function(
 
   // Show page functions
   this.showFrontPage = function() {
-    changeVisiblePage(frontPageView);
+    changePage(frontPageView, frontPageNavNode.node);
   };
 
   this.showDescriptionPage = function() {
-    changeVisiblePage(descriptionPageView);
+    changePage(descriptionPageView, descriptionNavNode.node);
   };
 
   this.showMonitorExperimentPage = function() {
-    changeVisiblePage(monitorExperimentPageView);
+    changePage(monitorExperimentPageView, monitorExperimentNavNode.node);
   };
 
   this.showRecordingPage = function() {
-    changeVisiblePage(recordingPageView);
+    changePage(recordingPageView, recordingNavNode.node);
   };
  
   // Ui setters
@@ -7060,6 +7302,23 @@ var MyExperimentView = function(
     cachedTitle = null;
     Utils.unmarkNode(titleLabelNode.node, CHANGED_TITLE_ATTR);
     isUserDefinedTitle = false;
+  };
+
+  // Getters
+  this.getFrontPageView = function() {
+    return frontPageView;
+  };
+
+  this.getDescriptionPageView = function() {
+    return descriptionPageView;
+  };
+
+  this.getMonitorPageView = function() {
+    return monitorPageView;
+  };
+
+  this.getRecordingPageView = function() {
+    return recordingPageView;
   };
 };
 

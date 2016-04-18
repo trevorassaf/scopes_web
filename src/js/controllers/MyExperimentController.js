@@ -6,6 +6,9 @@ var MyExperimentController = function() {
   var myExperimentView = null;
   var myExperimentModel = null; 
 
+  // Page controllers
+  var frontPageController = null;
+
   /**
    * Protected functions
    */
@@ -59,6 +62,14 @@ var MyExperimentController = function() {
     });
   };
 
+  var initPageControllers = function() {
+    frontPageController = new MyExperimentFrontPageController();
+    frontPageController.init(
+      myExperimentView.getFrontPageView(),
+      myExperimentModel
+    );
+  };
+
   /**
    * Privileged functions
    */
@@ -69,6 +80,10 @@ var MyExperimentController = function() {
     myExperimentView = view;
     myExperimentModel = model;
 
+    // Initialize controllers for pages, e.g. front, description
+    initPageControllers();
+
+    // Set up data pathways
     configureCallbacks();
   };
 };

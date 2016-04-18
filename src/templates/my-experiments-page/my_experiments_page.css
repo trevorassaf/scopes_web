@@ -22,9 +22,9 @@
   display: none;
 }
 
-.my-experiment-wrapper .main-stage-wrapper > div:not([selected-page]) {
-  display: none;
-}
+/* .my-experiment-wrapper .main-stage-wrapper > div:not([selected-page]) { */
+/*   display: none; */
+/* } */
 
 .my-experiment-wrapper .main-stage-wrapper {
   height: 320px;
