@@ -99,6 +99,45 @@ var CenterPageController = function() {
       centerPageModel.getNewExperimentPageModel(),
       centerPageView.getNewExperimentPageView()
     );
+
+    newExperimentPageController.bindConfirmOrder(handleConfirmOrder);
+  };
+
+  var handleConfirmOrder = function() {
+    var new_experiment_model = newExperimentPageController.getModel();  
+    
+    // Time input
+    var start_date_model = new_experiment_model.getExperimentDatePickerModel();
+    var start_time_model = new_experiment_model.getExperimentTimePickerModel();
+    var selected_time_model = start_time_model.getSelectedItem();
+    
+    var start_time = new Date(
+      start_date_model.getSelectedYear(),
+      start_date_model.getSelectedMonth(),
+      start_date_model.getSelectedDate(),
+      selected_time_model.getData().hour,
+      selected_time_model.getData().minute
+    );
+
+
+    // Short code
+    var short_code_model = new_experiment_model.getShortCodePickerModel(); 
+    var selected_short_code_model = short_code_model.getSelectedItem();
+    
+    var experiment_model = new MyExperimentModel(
+      0,
+      null,
+      null,
+      new_experiment_model.getScopesCountModel().getCurrentValue(),
+      new_experiment_model.getExperimentDurationModel().getCurrentValue(),
+      start_time,
+      selected_short_code_model.getLabel(),
+      "Pending",
+      "Pending"
+    );
+
+    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    my_experiments_page_model.addExperiment(experiment_model);
   };
 
   var initMyExperimentsPageController = function() {
@@ -143,8 +182,8 @@ var CenterPageController = function() {
       "Pending"
     );
 
-    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
-    my_experiments_page_model.addExperiment(experiment_model);
+    // var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    // my_experiments_page_model.addExperiment(experiment_model);
   };
 
   this.showFeedbackPage = function() {
@@ -849,6 +888,8 @@ var NewExperimentPageController = function() {
   /**
    * Private state
    */
+  var _this = this;
+  
   // Child controllers
   var scopesCountController = null;
   var experimentDurationController = null;
@@ -861,7 +902,8 @@ var NewExperimentPageController = function() {
   var newExperimentPageModel = null;
   var newExperimentPageView = null;
 
-  var _this = this;
+  // Callbacks
+  var confirmOrderCallbacks = [];
 
   /**
    * Privileged functions
@@ -936,6 +978,9 @@ var NewExperimentPageController = function() {
   };
 
   var handleConfirmOrder = function() {
+    confirmOrderCallbacks.forEach(function(callback) {
+      callback();
+    });
   };
 
   var handleCancelOrder = function() {
@@ -985,6 +1030,15 @@ var NewExperimentPageController = function() {
 
   this.getConfirmOrderController = function() {
     return confirmOrderController;
+  };
+
+  this.getModel = function() {
+    return newExperimentPageModel;
+  };
+
+  this.bindConfirmOrder = function(callback) {
+    confirmOrderCallbacks.push(callback);
+    return this;
   };
 };
 
@@ -1970,9 +2024,38 @@ var NewExperimentPageModel = function() {
   var initializeExperimentTimePickerModel = function() {
     // Create drop down items 
     var drop_down_items = [
-      new DropDownItemModel("10:00", "10:00", {}),
-      new DropDownItemModel("10:30", "10:30", {}),
-      new DropDownItemModel("11:00", "11:00", {})
+      new DropDownItemModel("10:00", "10:00", {
+        hour: 10,
+        minute: 0
+      }),
+      new DropDownItemModel("10:30", "10:30", {
+        hour: 10,
+        minute: 30
+      }),
+      new DropDownItemModel("11:00", "11:00", {
+        hour: 11,
+        minute: 00
+      }),
+      new DropDownItemModel("11:30", "11:30", {
+        hour: 11,
+        minute: 30
+      }),
+      new DropDownItemModel("12:00", "12:00", {
+        hour: 12,
+        minute: 00
+      }),
+      new DropDownItemModel("12:30", "12:30", {
+        hour: 12,
+        minute: 30
+      }),
+      new DropDownItemModel("1:00", "1:00", {
+        hour: 1,
+        minute: 00
+      }),
+      new DropDownItemModel("1:30", "1:30", {
+        hour: 1,
+        minute: 30
+      })
     ];
     
     experimentTimePickerModel = new DropDownModel();
@@ -4689,6 +4772,61 @@ var ScopesNetwork = (function() {
   }
 }());
 
+var MyExperimentDescriptionPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'my-experiment-description-template'; 
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'my-experiment-description-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    // Attach event listeners
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+
+    // Bind all ui nodes and attach event listeners
+    bindNodes(); 
+  };
+
+  this.hide = function() {
+    Utils.hideNode(parentNode);
+  };
+
+  this.show = function() {
+    Utils.showNode(parentNode);
+  };
+};
+
 var MyExperimentFrontPageView = function(
   template_store,
   parent_node
@@ -4821,61 +4959,6 @@ var MyExperimentFrontPageView = function(
 
   this.setShortCode = function(short_code) {
     shortCodeValueNode.node.innerHTML = short_code;
-  };
-};
-
-var MyExperimentDescriptionPageView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID = 'my-experiment-description-template'; 
-
-  /**
-   * Root class
-   */
-  var ROOT_CLASS = 'my-experiment-description-wrapper';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-
-  var rootNode = null;
-
-  /**
-   * Private functions
-   */
-  var bindNodes = function() {
-    // Attach event listeners
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Initialize new-experiment ui
-    rootNode = Utils.synthesizeTemplateIntoList(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_CLASS 
-    );
-
-    // Bind all ui nodes and attach event listeners
-    bindNodes(); 
-  };
-
-  this.hide = function() {
-    Utils.hideNode(parentNode);
-  };
-
-  this.show = function() {
-    Utils.showNode(parentNode);
   };
 };
 
@@ -6944,6 +7027,22 @@ function FeedbackQuestion(
 
 };
 
+var ScopesCountFormView = function(template_store) {
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(parent_node) {
+    parentNode = parent_node;
+  };
+};
+
 var MyExperimentView = function(
   template_store,
   parent_node
@@ -8145,22 +8244,6 @@ function PendingExperimentView(
    */
   this.registerChangedDescriptionListener = function(callback) {
     changedDescriptionListeners.push(callback);
-  };
-};
-
-var ScopesCountFormView = function(template_store) {
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-
-  /**
-   * Privileged functions
-   */
-  this.init = function(parent_node) {
-    parentNode = parent_node;
   };
 };
 

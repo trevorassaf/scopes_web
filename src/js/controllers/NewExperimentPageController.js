@@ -3,6 +3,8 @@ var NewExperimentPageController = function() {
   /**
    * Private state
    */
+  var _this = this;
+  
   // Child controllers
   var scopesCountController = null;
   var experimentDurationController = null;
@@ -15,7 +17,8 @@ var NewExperimentPageController = function() {
   var newExperimentPageModel = null;
   var newExperimentPageView = null;
 
-  var _this = this;
+  // Callbacks
+  var confirmOrderCallbacks = [];
 
   /**
    * Privileged functions
@@ -90,6 +93,9 @@ var NewExperimentPageController = function() {
   };
 
   var handleConfirmOrder = function() {
+    confirmOrderCallbacks.forEach(function(callback) {
+      callback();
+    });
   };
 
   var handleCancelOrder = function() {
@@ -139,5 +145,14 @@ var NewExperimentPageController = function() {
 
   this.getConfirmOrderController = function() {
     return confirmOrderController;
+  };
+
+  this.getModel = function() {
+    return newExperimentPageModel;
+  };
+
+  this.bindConfirmOrder = function(callback) {
+    confirmOrderCallbacks.push(callback);
+    return this;
   };
 };
