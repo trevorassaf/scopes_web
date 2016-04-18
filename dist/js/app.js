@@ -169,21 +169,6 @@ var CenterPageController = function() {
 
   this.showMyExperimentsPage = function() {
     centerPageView.showMyExperimentsPage();
-
-    var experiment_model = new MyExperimentModel(
-      0,
-      'Experiment #1',
-      'Description',
-      10,
-      5,
-      new Date(),
-      "SHORT",
-      "Pending",
-      "Pending"
-    );
-
-    // var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
-    // my_experiments_page_model.addExperiment(experiment_model);
   };
 
   this.showFeedbackPage = function() {
@@ -7027,22 +7012,6 @@ function FeedbackQuestion(
 
 };
 
-var ScopesCountFormView = function(template_store) {
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-
-  /**
-   * Privileged functions
-   */
-  this.init = function(parent_node) {
-    parentNode = parent_node;
-  };
-};
-
 var MyExperimentView = function(
   template_store,
   parent_node
@@ -8244,6 +8213,22 @@ function PendingExperimentView(
    */
   this.registerChangedDescriptionListener = function(callback) {
     changedDescriptionListeners.push(callback);
+  };
+};
+
+var ScopesCountFormView = function(template_store) {
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(parent_node) {
+    parentNode = parent_node;
   };
 };
 
