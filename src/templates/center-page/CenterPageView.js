@@ -65,9 +65,18 @@ var CenterPageView = function(
     myExperimentsPageView.init();
   };
 
+  var initFeedbackPageView = function() {
+    feedbackPageView = new FeedbackPage(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    feedbackPageView.init();
+  };
+
   var initPages = function() {
     initNewExperimentPageView(); 
     initMyExperimentsPageView();
+    initFeedbackPageView();
   };
 
   var bindNodes = function() {

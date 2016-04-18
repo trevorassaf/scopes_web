@@ -6324,9 +6324,18 @@ var CenterPageView = function(
     myExperimentsPageView.init();
   };
 
+  var initFeedbackPageView = function() {
+    feedbackPageView = new FeedbackPage(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    feedbackPageView.init();
+  };
+
   var initPages = function() {
     initNewExperimentPageView(); 
     initMyExperimentsPageView();
+    initFeedbackPageView();
   };
 
   var bindNodes = function() {
@@ -6691,14 +6700,15 @@ var DropDownView = function(
 
 function FeedbackPage(
   template_store,
-  root_id,
-  is_displayed_initially
+  parent_node
 ) {
 
   /**
    * Template id
    */
-  var TEMPLATE_ID_SELECTOR = '#feedback-page-template';
+  var TEMPLATE_ID = 'feedback-page-template';
+
+  var ROOT_CLASS = 'feedback-page-wrapper';
 
   /**
    * Ui attributes
@@ -6709,7 +6719,8 @@ function FeedbackPage(
    * Private state
    */
   var templateStore = template_store;
-  var isDisplayedInitially = is_displayed_initially;
+  var parentNode = parent_node;
+
   var _this = this;
   var feedbackQuestionList = [];
 
@@ -6718,16 +6729,10 @@ function FeedbackPage(
    */
   // Root node
   var feedbackPageRootNode = {
-    id: root_id,
     node: null
   };
 
   // Class-bound nodes
-  var pageWrapperNode = {
-    className: 'feedback-page-wrapper',
-    node: null 
-  };
-
   var questionListNode = {
     className: 'questions-wrapper',
     node: null
@@ -6752,12 +6757,12 @@ function FeedbackPage(
    * - copy feedback-page template and insert into main dom tree
    * @pre-condition: 'feedbackPageRootNode' must be initialized
    */
-  function synthesizeFeedbackPageTemplate() {
-    // Bind feedback-page dom template
-    var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
-    var page_clone = document.importNode(page_template.content, true);
-    feedbackPageRootNode.node.appendChild(page_clone);
-  };
+  // function synthesizeFeedbackPageTemplate() {
+  //   // Bind feedback-page dom template
+  //   var page_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR);
+  //   var page_clone = document.importNode(page_template.content, true);
+  //   feedbackPageRootNode.node.appendChild(page_clone);
+  // };
 
   /**
    * bindClassBoundNode()
@@ -6774,7 +6779,6 @@ function FeedbackPage(
    * - bind class-bound nodes internal to this template
    */
   function bindInternalNodes() {
-    bindClassBoundNode(pageWrapperNode);     
     bindClassBoundNode(questionListNode);     
     bindClassBoundNode(submitBtnNode);     
 
@@ -6790,12 +6794,6 @@ function FeedbackPage(
    * - render initially ui
    */
   function initDisplay() {
-    if (isDisplayedInitially) {
-      _this.show();
-    } else {
-      _this.hide(); 
-    }
-
     // Initialize feedback questions
     feedbackQuestionList = [];
     Utils.removeDomChildren(questionListNode.node);
@@ -6839,10 +6837,15 @@ function FeedbackPage(
    */
   this.init = function() {
     // Bind top-level feedback-page node (we're going to copy the template into this!)
-    feedbackPageRootNode.node = document.getElementById(feedbackPageRootNode.id);
+    feedbackPageRootNode.node = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS
+    );
 
-    // Clone template and copy into wrapper
-    synthesizeFeedbackPageTemplate();
+    // // Clone template and copy into wrapper
+    // synthesizeFeedbackPageTemplate();
 
     // Bind nodes internal to this template
     bindInternalNodes();
@@ -6856,7 +6859,8 @@ function FeedbackPage(
    * - hide the feedback-page
    */
   this.hide = function() {
-    feedbackPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
+    Utils.hideNode(feedbackPageRootNode.node);
+    // feedbackPageRootNode.node.setAttribute(HIDDEN_ATTR, '');
   };
 
   /**
@@ -6864,9 +6868,13 @@ function FeedbackPage(
    * - show the feedback-page
    */
   this.show = function() {
-    feedbackPageRootNode.node.removeAttribute(HIDDEN_ATTR);
+    Utils.showNode(feedbackPageRootNode.node);
+    // feedbackPageRootNode.node.removeAttribute(HIDDEN_ATTR);
   };
 
+  this.getTitle = function() {
+    return "Feedback";
+  };
 };
 
 function FeedbackQuestion(
