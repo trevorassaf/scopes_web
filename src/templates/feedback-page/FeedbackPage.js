@@ -151,7 +151,7 @@ function FeedbackPage(
     bindInternalNodes();
 
     // Initialize ui
-    initDisplay();
+    // initDisplay();
   };
 
   /**
@@ -174,5 +174,20 @@ function FeedbackPage(
 
   this.getTitle = function() {
     return "Feedback";
+  };
+
+  this.addQuestion = function(question_text) {
+    var question_view = new FeedbackQuestion(
+      templateStore,
+      questionListNode.node,
+      question_text
+    );
+    question_view.init();
+    feedbackQuestionList.push(question_view);
+  };
+
+  this.removeQuestion = function(question_idx) {
+    feedbackQuestionList[question_idx].remove();
+    feedbackQuestionList.splice(question_idx, 1); 
   };
 };

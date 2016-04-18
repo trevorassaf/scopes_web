@@ -1,3 +1,25 @@
 <template id='technician-page-template'>
-  <div class='technician-page-wrapper'></div>
+  <div hidden class='technician-page-wrapper'>
+    <div class='existing-questions'></div> 
+    <div class='add-new-question-wrapper'>
+
+      <div class='add-question-text-field-wrapper'>
+        <div class='add-question-text-field' contenteditable='true'></div>
+        <div class='add-question-underline'></div>
+      </div>
+
+      <div class='add-question-button'>
+        <iron-icon icon='add-box'></iron-icon>
+      </div>
+    </div> 
+  </div>
+</template>
+
+<template id='technician-feedback-question-template'>
+  <div class='technician-feedback-question-wrapper'>
+    <div class='question-text'></div>
+    <div class='delete-question-button'>
+      <iron-icon icon='cancel'></iron-icon>
+    </div>
+  </div>
 </template>

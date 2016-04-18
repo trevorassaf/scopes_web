@@ -143,4 +143,8 @@ function FeedbackQuestion(
     initUi();
   };
 
+  this.remove = function() {
+    rootNode.node.parentNode.removeChild(rootNode.node);    
+  };
+
 };

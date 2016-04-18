@@ -132,7 +132,7 @@
 </template>
 
 <template id='feedback-page-template'>
-  <div class='feedback-page-wrapper'>
+  <div hidden class='feedback-page-wrapper'>
     <div class='questions-wrapper'></div>
     <div class='buttons-wrapper'>
       <div class='submit-btn'>Submit</div>
@@ -151,7 +151,7 @@
 </template>
 
 <template id='my-experiments-page-template'>
-  <div class='my-experiments-page-wrapper'></div>
+  <div hidden class='my-experiments-page-wrapper'></div>
 </template>
 
 <template id='my-experiment-skeleton-template'>
@@ -410,7 +410,29 @@
 </template>
 
 <template id='technician-page-template'>
-  <div class='technician-page-wrapper'></div>
+  <div hidden class='technician-page-wrapper'>
+    <div class='existing-questions'></div> 
+    <div class='add-new-question-wrapper'>
+
+      <div class='add-question-text-field-wrapper'>
+        <div class='add-question-text-field' contenteditable='true'></div>
+        <div class='add-question-underline'></div>
+      </div>
+
+      <div class='add-question-button'>
+        <iron-icon icon='add-box'></iron-icon>
+      </div>
+    </div> 
+  </div>
+</template>
+
+<template id='technician-feedback-question-template'>
+  <div class='technician-feedback-question-wrapper'>
+    <div class='question-text'></div>
+    <div class='delete-question-button'>
+      <iron-icon icon='cancel'></iron-icon>
+    </div>
+  </div>
 </template>
 
 <template id='time-picker-template'>

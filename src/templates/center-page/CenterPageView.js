@@ -73,10 +73,19 @@ var CenterPageView = function(
     feedbackPageView.init();
   };
 
+  var initTechnicianPageView = function() {
+    technicianPageView = new TechnicianPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    technicianPageView.init();
+  };
+
   var initPages = function() {
     initNewExperimentPageView(); 
     initMyExperimentsPageView();
     initFeedbackPageView();
+    initTechnicianPageView();
   };
 
   var bindNodes = function() {
@@ -85,16 +94,6 @@ var CenterPageView = function(
     Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
     Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
 
-  };
-
-  var initPageViews = function() {
-    // Init new experiment page view
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );     
-
-    newExperimentPageView.init();
   };
 
   var changePage = function(next_page_view) {
@@ -158,5 +157,13 @@ var CenterPageView = function(
 
   this.getMyExperimentsPageView = function() {
     return myExperimentsPageView;
+  };
+
+  this.getTechnicianPageView = function() {
+    return technicianPageView;
+  };
+
+  this.getFeedbackPageView = function() {
+    return feedbackPageView;
   };
 };

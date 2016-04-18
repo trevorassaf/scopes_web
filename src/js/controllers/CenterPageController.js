@@ -5,6 +5,7 @@ var CenterPageController = function() {
    */
   // Child controllers
   var newExperimentPageController = null;
+  var technicianPageController = null;
 
   var centerPageModel = null;
   var centerPageView = null;
@@ -20,6 +21,14 @@ var CenterPageController = function() {
     );
 
     newExperimentPageController.bindConfirmOrder(handleConfirmOrder);
+  };
+
+  var initTechnicianPageController = function() {
+    technicianPageController = new TechnicianPageController();
+    technicianPageController.init(
+      centerPageView.getTechnicianPageView(),
+      centerPageView.getFeedbackPageView()
+    );
   };
 
   var handleConfirmOrder = function() {
@@ -77,6 +86,7 @@ var CenterPageController = function() {
     // Initialize child controllers
     initNewExperimentPageController();
     initMyExperimentsPageController();
+    initTechnicianPageController();
   };
 
   /**

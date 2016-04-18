@@ -86,6 +86,7 @@ var CenterPageController = function() {
    */
   // Child controllers
   var newExperimentPageController = null;
+  var technicianPageController = null;
 
   var centerPageModel = null;
   var centerPageView = null;
@@ -101,6 +102,14 @@ var CenterPageController = function() {
     );
 
     newExperimentPageController.bindConfirmOrder(handleConfirmOrder);
+  };
+
+  var initTechnicianPageController = function() {
+    technicianPageController = new TechnicianPageController();
+    technicianPageController.init(
+      centerPageView.getTechnicianPageView(),
+      centerPageView.getFeedbackPageView()
+    );
   };
 
   var handleConfirmOrder = function() {
@@ -158,6 +167,7 @@ var CenterPageController = function() {
     // Initialize child controllers
     initNewExperimentPageController();
     initMyExperimentsPageController();
+    initTechnicianPageController();
   };
 
   /**
@@ -1178,6 +1188,68 @@ var SliderController = function() {
 
   this.getView = function() {
     return sliderView;
+  };
+};
+
+var TechnicianPageController = function() {
+
+  /**
+   * Private vars
+   */
+  var technicianPageView = null;
+  var feedbackPageView = null;
+  var questionIndex = 0;
+
+  /**
+   * Private functions
+   */
+  var handleNewQuestion = function() {
+    var question = technicianPageView.getNewQuestionText();
+    addNewQuestion(question);
+  };
+
+  var handleCancel = function(question_view) {
+    var index = question_view.getIndex();
+    question_view.remove();
+    feedbackPageView.removeQuestion(index);
+  };
+
+  var addNewQuestion = function(question_text) {
+    // Update technician ui
+    var new_question = technicianPageView.spawnNewQuestion();
+    new_question.setText(question_text);
+    new_question.setIndex(questionIndex++);
+    new_question.bindCancel(handleCancel);
+
+    technicianPageView.clearNewQuestionText();
+    
+    // Update feedback page ui
+    feedbackPageView.addQuestion(question_text);
+  };
+
+  var configureCallbacks = function() {
+    technicianPageView.bindNewQuestion(handleNewQuestion);
+  };
+
+  var initUi = function() {
+    addNewQuestion("What was one thing MVS did especially well? Why?");  
+    addNewQuestion("What is one thing that you would like MVS to change going forward? Why?");  
+    addNewQuestion("Any other comments/suggestions?");  
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function(
+    technician_page_view,
+    feedback_page_view     
+  ) {
+    technicianPageView = technician_page_view;
+    feedbackPageView = feedback_page_view;
+
+    configureCallbacks();
+    
+    initUi();
   };
 };
 
@@ -6332,10 +6404,19 @@ var CenterPageView = function(
     feedbackPageView.init();
   };
 
+  var initTechnicianPageView = function() {
+    technicianPageView = new TechnicianPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    technicianPageView.init();
+  };
+
   var initPages = function() {
     initNewExperimentPageView(); 
     initMyExperimentsPageView();
     initFeedbackPageView();
+    initTechnicianPageView();
   };
 
   var bindNodes = function() {
@@ -6344,16 +6425,6 @@ var CenterPageView = function(
     Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
     Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
 
-  };
-
-  var initPageViews = function() {
-    // Init new experiment page view
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );     
-
-    newExperimentPageView.init();
   };
 
   var changePage = function(next_page_view) {
@@ -6417,6 +6488,14 @@ var CenterPageView = function(
 
   this.getMyExperimentsPageView = function() {
     return myExperimentsPageView;
+  };
+
+  this.getTechnicianPageView = function() {
+    return technicianPageView;
+  };
+
+  this.getFeedbackPageView = function() {
+    return feedbackPageView;
   };
 };
 
@@ -6851,7 +6930,7 @@ function FeedbackPage(
     bindInternalNodes();
 
     // Initialize ui
-    initDisplay();
+    // initDisplay();
   };
 
   /**
@@ -6874,6 +6953,21 @@ function FeedbackPage(
 
   this.getTitle = function() {
     return "Feedback";
+  };
+
+  this.addQuestion = function(question_text) {
+    var question_view = new FeedbackQuestion(
+      templateStore,
+      questionListNode.node,
+      question_text
+    );
+    question_view.init();
+    feedbackQuestionList.push(question_view);
+  };
+
+  this.removeQuestion = function(question_idx) {
+    feedbackQuestionList[question_idx].remove();
+    feedbackQuestionList.splice(question_idx, 1); 
   };
 };
 
@@ -7020,6 +7114,10 @@ function FeedbackQuestion(
     synthesizeTemplate();
     bindInternalNodes();
     initUi();
+  };
+
+  this.remove = function() {
+    rootNode.node.parentNode.removeChild(rootNode.node);    
   };
 
 };
@@ -9059,6 +9157,222 @@ function TechnicianPage(
     TechnicianPageRootNode.node.removeAttribute(HIDDEN_ATTR);
   };
 
+};
+
+var TechnicianPageFeedbackQuestionView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'technician-feedback-question-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'technician-feedback-question-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+  var questionIndex = null;
+
+  var cancelCallbacks = [];
+
+  var _this = this;
+
+  /**
+   * Dom nodes
+   */
+  var cancelButtonNode = {
+    className: 'delete-question-button',
+    node: null
+  };
+
+  var textNode = {
+    className: 'question-text',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    Utils.bindNodeInfo(rootNode, cancelButtonNode);
+    Utils.bindNodeInfo(rootNode, textNode);
+
+    cancelButtonNode.node.onclick = function(event) {
+      cancelCallbacks.forEach(function(callback) {
+        callback(this);
+      }, _this);
+    };
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+
+    // Bind all ui dom nodes
+    bindNodes();
+  };
+
+  this.setText = function(text) {
+    textNode.node.innerHTML = text;
+  };
+
+  this.bindCancel = function(callback) {
+    cancelCallbacks.push(callback);
+  };
+
+  this.remove = function() {
+    rootNode.parentNode.removeChild(rootNode);
+  };
+
+  this.setIndex = function(index) {
+    questionIndex = index;
+  };
+
+  this.getIndex = function() {
+    return questionIndex;
+  };
+};
+
+var TechnicianPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Page title
+   */
+  var PAGE_TITLE = 'Technician';
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'technician-page-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'technician-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  var addQuestionCallbacks = [];
+
+  /**
+   * Dom nodes
+   */
+  var existingQuestionsNode = {
+    className: 'existing-questions',
+    node: null
+  };
+
+  var addQuestionTextNode = {
+    className: 'add-question-text-field',
+    node: null
+  };
+
+  var addQuestionWrapperNode = {
+    className: 'add-new-question-wrapper',
+    node: null
+  };
+
+  var addQuestionButtonNode = {
+    className: 'add-question-button',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    Utils.bindNodeInfo(rootNode, existingQuestionsNode);
+    Utils.bindNodeInfo(rootNode, addQuestionTextNode);
+    Utils.bindNodeInfo(rootNode, addQuestionWrapperNode);
+    Utils.bindNodeInfo(rootNode, addQuestionButtonNode);
+
+    addQuestionButtonNode.node.onclick = function() {
+      addQuestionCallbacks.forEach(function(callback) {
+        callback();
+      });      
+    };
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+
+    // Bind all ui dom nodes
+    bindNodes();
+  };
+
+  this.hide = function() {
+    Utils.hideNode(rootNode);
+  };
+
+  this.show = function() {
+    Utils.showNode(rootNode);
+  };
+
+  this.getTitle = function() {
+    return PAGE_TITLE;
+  };
+
+  this.clearNewQuestionText = function() {
+    addQuestionTextNode.node.innerHTML = ''; 
+  };
+
+  this.getNewQuestionText = function() {
+    return addQuestionTextNode.node.innerHTML;
+  };
+
+  this.bindNewQuestion = function(callback) {
+    addQuestionCallbacks.push(callback);
+  };
+
+  this.addQuestion = function(question) {
+    feedback_question.setText(question);
+  };
+
+  this.spawnNewQuestion = function() {
+    var feedback_question = new TechnicianPageFeedbackQuestionView(
+      templateStore,
+      existingQuestionsNode.node
+    );
+
+    feedback_question.init();
+    return feedback_question;
+  };
 };
 
 function TimePicker(
