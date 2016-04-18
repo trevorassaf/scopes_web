@@ -112,7 +112,7 @@ var NewExperimentPageModel = function() {
     var drop_down_items = [
       new DropDownItemModel("SHORT", "SHORT", {}),
       new DropDownItemModel("CODE", "CODE", {}),
-      new DropDownItemModel("SHIT", "SHIT", {})
+      new DropDownItemModel("DEMO", "DEMO", {})
     ];
     var drop_down_model = new DropDownModel();
     return drop_down_model.setDropDownItems(drop_down_items);

@@ -353,26 +353,6 @@
   </div>
 </template>
 
-<template id='short-code-picker-template'>
-  <div class='short-code-picker-wrapper'>
-    <div class='input-field-wrapper'>
-      <div class='input-field'><span class='input-field-label'></span></div>
-      <div class='icon-wrapper'>
-        <iron-icon icon='payment'></iron-icon>
-      </div>
-    </div>
-    <div class='short-code-dropdown-wrapper'>
-      <div class='short-code-dropdown'></div>
-    </div>
-  </div>
-</template>
-
-<template id='short-code-picker-option-template'>
-  <div class='short-code-picker-option' local-idx='' tooltip=''>
-    <span class='short-code-label'></span>
-  </div>
-</template>
-
 <template id='side-panel-template'>
   <div class='side-panel-wrapper'>
     <!-- User name -->
@@ -400,6 +380,26 @@
   </div>
 </template>
 
+<template id='short-code-picker-template'>
+  <div class='short-code-picker-wrapper'>
+    <div class='input-field-wrapper'>
+      <div class='input-field'><span class='input-field-label'></span></div>
+      <div class='icon-wrapper'>
+        <iron-icon icon='payment'></iron-icon>
+      </div>
+    </div>
+    <div class='short-code-dropdown-wrapper'>
+      <div class='short-code-dropdown'></div>
+    </div>
+  </div>
+</template>
+
+<template id='short-code-picker-option-template'>
+  <div class='short-code-picker-option' local-idx='' tooltip=''>
+    <span class='short-code-label'></span>
+  </div>
+</template>
+
 <!-- specify icon type with 'icon' attribute in iron-icon element -->
 <!-- Add tab label in innerHTML of 'nav-btn-label '-->
 <template id='side-panel-tab-template'>
@@ -416,7 +416,7 @@
 
       <div class='add-question-text-field-wrapper'>
         <div class='add-question-text-field' contenteditable='true'></div>
-        <div class='add-question-underline'></div>
+        <!-- <input class='add&#45;question&#45;text&#45;field' type='text' placeholder='Add new question...'></input> -->
       </div>
 
       <div class='add-question-button'>
@@ -619,4 +619,21 @@
       </div>
     </div>
   </div>
+</template>
+
+<template id='my-experiment-monitor-page-template'>
+  <div class='my-experiment-monitor-page-wrapper'>
+    Experiment monitoring unavailable at this time!
+  </div>
+</template>
+
+<template id='my-experiment-recording-page-template'>
+  <div class='my-experiment-recording-page-wrapper'>
+    <video hidden controls src='angio_video.mp4' class='experiment-recording'></video>
+    
+    <div hidden class='absent-video-message'>
+      Your video hasn't been uploaded yet!
+    </div>
+  </div>
+
 </template>

@@ -16,12 +16,25 @@
   cursor: pointer;
 }
 
+.technician-page-wrapper .add-question-button {
+  position: relative;
+  left: 20px;
+}
+
 .technician-page-wrapper .add-new-question-wrapper > div {
   display: inline-block;
+  vertical-align: top;
 }
 
 .technician-page-wrapper .add-question-text-field-wrapper {
   width: calc(100% - 50px);
+}
+
+.technician-page-wrapper .add-question-text-field {
+  padding: 5px;
+  width: 100%;
+  font-size: 20px;
+  color: #424242;
 }
 
 .technician-page-wrapper .add-question-button {
@@ -34,7 +47,7 @@
   margin-bottom: 30px;
   font-family: Roboto, Noto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 20px;
-  color: #A0A0A0;
+  color: #424242;
   -webkit-font-smoothing: antialiased;
   position: relative;
   padding: 10px;
@@ -42,14 +55,18 @@
 
 .technician-feedback-question-wrapper > div {
   display: inline-block; 
+  vertical-align: top;
 }
 
 .technician-feedback-question-wrapper .question-text {
   width: calc(100% - 50px);
+  color: #424242;
 }
 
 .technician-feedback-question-wrapper .delete-question-button {
   width: 30px;
+  position: relative;
+  left: 20px;
 }
 
 .technician-feedback-question-wrapper .delete-question-button:hover > iron-icon {

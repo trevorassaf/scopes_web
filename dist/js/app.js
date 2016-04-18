@@ -86,6 +86,7 @@ var CenterPageController = function() {
    */
   // Child controllers
   var newExperimentPageController = null;
+  var myExperimentsPageController = null;
   var technicianPageController = null;
 
   var centerPageModel = null;
@@ -155,6 +156,23 @@ var CenterPageController = function() {
       centerPageView.getMyExperimentsPageView(),
       centerPageModel.getMyExperimentsPageModel()
     );
+
+    var start_time = new Date(2016, 2, 29, 10);
+
+    var preloaded_experiment_model = new MyExperimentModel(
+      1,
+      "Angiogenesis Exp. #5",
+      null,
+      4,
+      3,
+      start_time,
+      "SHORT",
+      "Complete",
+      "Complete"
+    );
+    
+    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    my_experiments_page_model.addExperiment(preloaded_experiment_model);
   };
 
   /**
@@ -533,12 +551,19 @@ var MyExperimentController = function() {
     }
   };
 
+  var handleExperimentStatusForVideo = function(experiment_status) {
+    if (experiment_status == 'Complete') {
+      myExperimentView.showVideo();
+    }
+  };
+
   var configureCallbacks = function() {
     /**
      * Model --> view data pathways
      */
     myExperimentModel
-      .bindTitle(handleModelTitleChange);
+      .bindTitle(handleModelTitleChange)
+      .bindExperimentStatus(handleExperimentStatusForVideo);
 
     /**
      * View --> model data pathways
@@ -2143,7 +2168,7 @@ var NewExperimentPageModel = function() {
     var drop_down_items = [
       new DropDownItemModel("SHORT", "SHORT", {}),
       new DropDownItemModel("CODE", "CODE", {}),
-      new DropDownItemModel("SHIT", "SHIT", {})
+      new DropDownItemModel("DEMO", "DEMO", {})
     ];
     var drop_down_model = new DropDownModel();
     return drop_down_model.setDropDownItems(drop_down_items);
@@ -3366,110 +3391,6 @@ UpdateConfirmedOrderRequest.prototype.getDescription = function() {
   return this.description;
 };
 
-var MyExperimentsLogicController = (function() {
-
-  /**
-   * Private state
-   */
-  var myExperiments = [];
-  var getConfirmedOrdersApiWrapper = null;
-  var myExperimentsView = null;
-
-  /**
-   * Private functions
-   */
-  var initApi = function() {
-    console.assert(getConfirmedOrdersApiWrapper === null); 
-
-    // Initialize get-confirmed-order api
-    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
-    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
-
-    // Bind event listeners to get-confirmed-orders api
-    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
-      clearConfirmedOrders();
-      var orders = json_response[response_keys.orders];
-      var order_response_keys = response_keys.confirmed_order;
-      var short_code_response_keys = response_keys.short_code;
-      
-      for (var i = 0; i < orders.length; ++i) {
-        var order = orders[i];
-        var short_code = order[order_response_keys.short_code];
-
-        var short_code = new ShortCode(
-          short_code[short_code_response_keys.id],
-          short_code[short_code_response_keys.code],
-          short_code[short_code_response_keys.alias]
-        );
-
-        var confirmed_order = new ConfirmedOrder(
-          order[order_response_keys.id],
-          order[order_response_keys.scopes_count],
-          order[order_response_keys.start_time],
-          order[order_response_keys.end_time],
-          order[order_response_keys.title],
-          order[order_response_keys.description],
-          order[order_response_keys.time_ordered],
-          order[order_response_keys.price],
-          short_code
-        );
-
-        addConfirmedOrder(confirmed_order); 
-      }
-    });
-
-    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders'); 
-    });
-
-    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders due to network error'); 
-    });
-  };
-
-  var addConfirmedOrder = function(confirm_order) {
-    // Store in local cache
-    myExperiments.push(confirm_order);  
-
-    // Update MyExperiments view
-    myExperimentsView.pushPendingOrder(confirm_order);
-  };
-
-  var clearConfirmedOrders = function() {
-    // Clear local cache
-    myExperiments = [];
-
-    // Clear MyExperiments view
-    // TODO...   
-  };
-
-  var init = function(my_experiments_view) {
-    myExperimentsView = my_experiments_view;
-
-    // Initialize api module
-    initApi();
-
-    refreshData(); 
-  };
-
-  var refreshData = function() {
-    myExperimentsView.clearPendingOrders();
-    getConfirmedOrdersApiWrapper.fetch(); 
-  };
-
-  var getMyExperiments = function() {
-    return myExperiments;
-  };
-
-  return {
-    init: init,
-    refreshData: refreshData,
-    getMyExperiments: getMyExperiments
-  };
-})();
-
 var ConfirmOrderUiController = (function() {
   
   /**
@@ -4456,6 +4377,110 @@ var SidePanelUiController = (function() {
   };
 })();
 
+var MyExperimentsLogicController = (function() {
+
+  /**
+   * Private state
+   */
+  var myExperiments = [];
+  var getConfirmedOrdersApiWrapper = null;
+  var myExperimentsView = null;
+
+  /**
+   * Private functions
+   */
+  var initApi = function() {
+    console.assert(getConfirmedOrdersApiWrapper === null); 
+
+    // Initialize get-confirmed-order api
+    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
+    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
+
+    // Bind event listeners to get-confirmed-orders api
+    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
+      clearConfirmedOrders();
+      var orders = json_response[response_keys.orders];
+      var order_response_keys = response_keys.confirmed_order;
+      var short_code_response_keys = response_keys.short_code;
+      
+      for (var i = 0; i < orders.length; ++i) {
+        var order = orders[i];
+        var short_code = order[order_response_keys.short_code];
+
+        var short_code = new ShortCode(
+          short_code[short_code_response_keys.id],
+          short_code[short_code_response_keys.code],
+          short_code[short_code_response_keys.alias]
+        );
+
+        var confirmed_order = new ConfirmedOrder(
+          order[order_response_keys.id],
+          order[order_response_keys.scopes_count],
+          order[order_response_keys.start_time],
+          order[order_response_keys.end_time],
+          order[order_response_keys.title],
+          order[order_response_keys.description],
+          order[order_response_keys.time_ordered],
+          order[order_response_keys.price],
+          short_code
+        );
+
+        addConfirmedOrder(confirmed_order); 
+      }
+    });
+
+    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders'); 
+    });
+
+    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders due to network error'); 
+    });
+  };
+
+  var addConfirmedOrder = function(confirm_order) {
+    // Store in local cache
+    myExperiments.push(confirm_order);  
+
+    // Update MyExperiments view
+    myExperimentsView.pushPendingOrder(confirm_order);
+  };
+
+  var clearConfirmedOrders = function() {
+    // Clear local cache
+    myExperiments = [];
+
+    // Clear MyExperiments view
+    // TODO...   
+  };
+
+  var init = function(my_experiments_view) {
+    myExperimentsView = my_experiments_view;
+
+    // Initialize api module
+    initApi();
+
+    refreshData(); 
+  };
+
+  var refreshData = function() {
+    myExperimentsView.clearPendingOrders();
+    getConfirmedOrdersApiWrapper.fetch(); 
+  };
+
+  var getMyExperiments = function() {
+    return myExperiments;
+  };
+
+  return {
+    init: init,
+    refreshData: refreshData,
+    getMyExperiments: getMyExperiments
+  };
+})();
+
 ConfirmOrderApi.prototype = new ScopesApi();
 ConfirmOrderApi.prototype.constructor = ConfirmOrderApi;
 
@@ -5020,6 +5045,128 @@ var MyExperimentFrontPageView = function(
 
   this.setShortCode = function(short_code) {
     shortCodeValueNode.node.innerHTML = short_code;
+  };
+};
+
+var MyExperimentMonitoringPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'my-experiment-monitor-page-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'my-experiment-monitor-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+  };
+
+  this.hide = function() {
+    Utils.hideNode(parentNode);
+  };
+
+  this.show = function() {
+    Utils.showNode(parentNode);
+  };
+};
+
+var MyExperimentRecordingPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'my-experiment-recording-page-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'my-experiment-recording-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  /**
+   * Dom info
+   */
+  var videoNode = {
+    className: 'experiment-recording',
+    node: null
+  };
+
+  var absentVideoMessageNode = {
+    className: 'absent-video-message',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var bindNodes = function() {
+    Utils.bindNodeInfo(rootNode, videoNode);
+    Utils.bindNodeInfo(rootNode, absentVideoMessageNode);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize new-experiment ui
+    rootNode = Utils.synthesizeTemplateIntoList(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS 
+    );
+
+    // Bind all ui nodes and attach event listeners
+    bindNodes(); 
+  };
+
+  this.show = function() {
+    Utils.showNode(parentNode);
+  };
+  
+  this.hide = function() {
+    Utils.hideNode(parentNode);
+  };
+
+  this.showVideo = function() {
+    Utils.hideNode(absentVideoMessageNode.node);
+    Utils.showNode(videoNode.node);
+  };
+
+  this.showAbsentVideoMessage = function() {
+    Utils.hideNode(videoNode.node);
+    Utils.showNode(absentVideoMessageNode.node);
   };
 };
 
@@ -7325,6 +7472,18 @@ var MyExperimentView = function(
       descriptionPageNode.node
     );
     descriptionPageView.init();
+
+    monitorExperimentPageView = new MyExperimentMonitoringPageView(
+      templateStore,
+      monitorPageNode.node
+    );
+    monitorExperimentPageView.init();
+
+    recordingPageView = new MyExperimentRecordingPageView(
+      templateStore,
+      recordingPageNode.node
+    );
+    recordingPageView.init();
   };
   
   var changePage = function(
@@ -7397,6 +7556,8 @@ var MyExperimentView = function(
   var initUi = function() {
     // Select front page first
     selectPage(frontPageView, frontPageNavNode.node); 
+
+    recordingPageView.showAbsentVideoMessage();
   };
 
   /**
@@ -7458,8 +7619,8 @@ var MyExperimentView = function(
     changePage(descriptionPageView, descriptionNavNode.node);
   };
 
-  this.showMonitorExperimentPage = function() {
-    changePage(monitorExperimentPageView, monitorExperimentNavNode.node);
+  this.showMonitorPage = function() {
+    changePage(monitorExperimentPageView, monitorNavNode.node);
   };
 
   this.showRecordingPage = function() {
@@ -7492,11 +7653,15 @@ var MyExperimentView = function(
   };
 
   this.getMonitorPageView = function() {
-    return monitorPageView;
+    return monitorExperimentPageView;
   };
 
   this.getRecordingPageView = function() {
     return recordingPageView;
+  };
+
+  this.showVideo = function() {
+    recordingPageView.showVideo(); 
   };
 };
 
@@ -8342,6 +8507,221 @@ var ScopesCountFormView = function(template_store) {
   };
 };
 
+var SidePanelView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'side-panel-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'side-panel-wrapper';
+  
+  /**
+   * Ui attributes
+   */
+  var START_HIDDEN_ATTR = "start-hidden";
+  
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var currentlySelectedTabAndPageInfo = null;
+  var centerPageTitleLabel = null;
+  var centerPanelPageContainer = null;
+  
+  var currentlySelectedTab = null;
+  var tabParentNode = null;
+
+  /**
+   * Tab infos
+   */
+  var tabContainerRootInfo = {
+    className: 'nav-btns-container',
+    node: null
+  };
+
+  var homeButtonNode = {
+    className: 'home-nav-container',
+    node: null
+  };
+
+  var userNameNode = {
+    className: 'side-panel-user-label',
+    node: null
+  };
+
+  var newExperimentInfo = {
+    button_title: 'Add Experiment',
+    icon_type: 'add-circle-outline',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var myExperimentsInfo = {
+    button_title: 'My Experiments',
+    icon_type: 'group-work',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var feedbackInfo = {
+    button_title: 'Feedback',
+    icon_type: 'question-answer',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var technicianInfo = {
+    button_title: 'Technician',
+    icon_type: 'build',
+    tab: null,
+    callback_listeners: []
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * initTabInfo()
+   * - initialize SidePanelTab view
+   * - bind event listeners
+   * @param TabInfo (see above)
+   */
+  var initTabInfo = function(tab_info) {
+    // Initialize tab view 
+    tab_info.tab = new SidePanelTab(
+      templateStore,
+      tabContainerRootInfo.node,
+      tab_info.button_title,
+      tab_info.icon_type
+    );    
+
+    // Register 'onclick' callback
+    tab_info.tab.registerOnClickListener(function() {
+      // Unselect previous tab
+      currentlySelectedTab.deselect();
+
+      // Select new tab
+      currentlySelectedTab = tab_info.tab;
+      currentlySelectedTab.select();
+
+      // Invoke callback listeners
+      for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
+        tab_info.callback_listeners[i]();
+      }
+    });
+
+    // Initialize tab ui
+    tab_info.tab.init();
+  };
+
+  /**
+   * initTabInfos()
+   * - initialize all tabs (bind nodes and event listeners)
+   */
+  var initTabInfos = function() {
+    // Initialize tab parent node
+    tabContainerRootInfo.node = Utils.bindNode(
+      rootNode,
+      tabContainerRootInfo.className
+    ); 
+
+    // Initialize tab views
+    initTabInfo(newExperimentInfo);
+    initTabInfo(myExperimentsInfo);
+    initTabInfo(technicianInfo);
+    initTabInfo(feedbackInfo);
+  };
+
+  var selectTab = function(tab) {
+    if (currentlySelectedTab != null) {
+      currentlySelectedTab.deselect();
+    }
+    tab.select();
+    currentlySelectedTab = tab;
+  };
+
+  var bindNodes = function() {
+    // Initialize user-name ui node
+    userNameNode.node = Utils.bindNode(
+      rootNode,
+      userNameNode.className
+    );
+
+    // Initialize home burron ui node
+    homeButtonNode.node = Utils.bindNode(
+      rootNode,
+      homeButtonNode.className
+    );
+
+    // Initialize tabs
+    initTabInfos();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize html template and insert into main document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );    
+
+    bindNodes();
+  
+    return this;
+  };
+
+  /**
+   * Onclick event listeners for tabs
+   */
+  this.bindNewExperimentTabClick = function(callback) {
+    newExperimentInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindMyExperimentsTabClick = function(callback) {
+    myExperimentsInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindFeedbackTabClick = function(callback) {
+    feedbackInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindTechnicianTabClick = function(callback) {
+    technicianInfo.callback_listeners.push(callback); 
+  };
+
+  /**
+   * Select tab
+   */
+  this.selectNewExperimentTab = function() {
+    selectTab(newExperimentInfo.tab);
+  };
+
+  this.selectMyExperimentsTab = function() {
+    selectTab(myExperimentsInfo.tab);
+  };
+
+  this.selectFeedbackTab = function() {
+    selectTab(feedbackInfo.tab);
+  };
+
+  this.selectTechnicianTab = function() {
+    selectTab(technicianInfo.tab);
+  };
+};
+
 function ShortCodePicker(
   template_store,
   id,
@@ -8693,221 +9073,6 @@ function ShortCodePicker(
 
   this.setInitialState = function() {
     setInitialStateInternal();
-  };
-};
-
-var SidePanelView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'side-panel-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'side-panel-wrapper';
-  
-  /**
-   * Ui attributes
-   */
-  var START_HIDDEN_ATTR = "start-hidden";
-  
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-
-  var currentlySelectedTabAndPageInfo = null;
-  var centerPageTitleLabel = null;
-  var centerPanelPageContainer = null;
-  
-  var currentlySelectedTab = null;
-  var tabParentNode = null;
-
-  /**
-   * Tab infos
-   */
-  var tabContainerRootInfo = {
-    className: 'nav-btns-container',
-    node: null
-  };
-
-  var homeButtonNode = {
-    className: 'home-nav-container',
-    node: null
-  };
-
-  var userNameNode = {
-    className: 'side-panel-user-label',
-    node: null
-  };
-
-  var newExperimentInfo = {
-    button_title: 'Add Experiment',
-    icon_type: 'add-circle-outline',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var myExperimentsInfo = {
-    button_title: 'My Experiments',
-    icon_type: 'group-work',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var feedbackInfo = {
-    button_title: 'Feedback',
-    icon_type: 'question-answer',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var technicianInfo = {
-    button_title: 'Technician',
-    icon_type: 'build',
-    tab: null,
-    callback_listeners: []
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * initTabInfo()
-   * - initialize SidePanelTab view
-   * - bind event listeners
-   * @param TabInfo (see above)
-   */
-  var initTabInfo = function(tab_info) {
-    // Initialize tab view 
-    tab_info.tab = new SidePanelTab(
-      templateStore,
-      tabContainerRootInfo.node,
-      tab_info.button_title,
-      tab_info.icon_type
-    );    
-
-    // Register 'onclick' callback
-    tab_info.tab.registerOnClickListener(function() {
-      // Unselect previous tab
-      currentlySelectedTab.deselect();
-
-      // Select new tab
-      currentlySelectedTab = tab_info.tab;
-      currentlySelectedTab.select();
-
-      // Invoke callback listeners
-      for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
-        tab_info.callback_listeners[i]();
-      }
-    });
-
-    // Initialize tab ui
-    tab_info.tab.init();
-  };
-
-  /**
-   * initTabInfos()
-   * - initialize all tabs (bind nodes and event listeners)
-   */
-  var initTabInfos = function() {
-    // Initialize tab parent node
-    tabContainerRootInfo.node = Utils.bindNode(
-      rootNode,
-      tabContainerRootInfo.className
-    ); 
-
-    // Initialize tab views
-    initTabInfo(newExperimentInfo);
-    initTabInfo(myExperimentsInfo);
-    initTabInfo(technicianInfo);
-    initTabInfo(feedbackInfo);
-  };
-
-  var selectTab = function(tab) {
-    if (currentlySelectedTab != null) {
-      currentlySelectedTab.deselect();
-    }
-    tab.select();
-    currentlySelectedTab = tab;
-  };
-
-  var bindNodes = function() {
-    // Initialize user-name ui node
-    userNameNode.node = Utils.bindNode(
-      rootNode,
-      userNameNode.className
-    );
-
-    // Initialize home burron ui node
-    homeButtonNode.node = Utils.bindNode(
-      rootNode,
-      homeButtonNode.className
-    );
-
-    // Initialize tabs
-    initTabInfos();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Synthesize html template and insert into main document
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );    
-
-    bindNodes();
-  
-    return this;
-  };
-
-  /**
-   * Onclick event listeners for tabs
-   */
-  this.bindNewExperimentTabClick = function(callback) {
-    newExperimentInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindMyExperimentsTabClick = function(callback) {
-    myExperimentsInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindFeedbackTabClick = function(callback) {
-    feedbackInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindTechnicianTabClick = function(callback) {
-    technicianInfo.callback_listeners.push(callback); 
-  };
-
-  /**
-   * Select tab
-   */
-  this.selectNewExperimentTab = function() {
-    selectTab(newExperimentInfo.tab);
-  };
-
-  this.selectMyExperimentsTab = function() {
-    selectTab(myExperimentsInfo.tab);
-  };
-
-  this.selectFeedbackTab = function() {
-    selectTab(feedbackInfo.tab);
-  };
-
-  this.selectTechnicianTab = function() {
-    selectTab(technicianInfo.tab);
   };
 };
 

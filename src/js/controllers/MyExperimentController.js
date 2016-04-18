@@ -31,12 +31,19 @@ var MyExperimentController = function() {
     }
   };
 
+  var handleExperimentStatusForVideo = function(experiment_status) {
+    if (experiment_status == 'Complete') {
+      myExperimentView.showVideo();
+    }
+  };
+
   var configureCallbacks = function() {
     /**
      * Model --> view data pathways
      */
     myExperimentModel
-      .bindTitle(handleModelTitleChange);
+      .bindTitle(handleModelTitleChange)
+      .bindExperimentStatus(handleExperimentStatusForVideo);
 
     /**
      * View --> model data pathways

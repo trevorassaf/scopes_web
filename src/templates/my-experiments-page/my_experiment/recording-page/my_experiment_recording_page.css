@@ -1,0 +1,4 @@
+.my-experiment-recording-page-wrapper .experiment-recording {
+  height: 300px;
+  width: calc(100% - 60px);
+}

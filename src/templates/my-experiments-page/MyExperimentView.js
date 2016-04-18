@@ -201,6 +201,18 @@ var MyExperimentView = function(
       descriptionPageNode.node
     );
     descriptionPageView.init();
+
+    monitorExperimentPageView = new MyExperimentMonitoringPageView(
+      templateStore,
+      monitorPageNode.node
+    );
+    monitorExperimentPageView.init();
+
+    recordingPageView = new MyExperimentRecordingPageView(
+      templateStore,
+      recordingPageNode.node
+    );
+    recordingPageView.init();
   };
   
   var changePage = function(
@@ -273,6 +285,8 @@ var MyExperimentView = function(
   var initUi = function() {
     // Select front page first
     selectPage(frontPageView, frontPageNavNode.node); 
+
+    recordingPageView.showAbsentVideoMessage();
   };
 
   /**
@@ -334,8 +348,8 @@ var MyExperimentView = function(
     changePage(descriptionPageView, descriptionNavNode.node);
   };
 
-  this.showMonitorExperimentPage = function() {
-    changePage(monitorExperimentPageView, monitorExperimentNavNode.node);
+  this.showMonitorPage = function() {
+    changePage(monitorExperimentPageView, monitorNavNode.node);
   };
 
   this.showRecordingPage = function() {
@@ -368,10 +382,14 @@ var MyExperimentView = function(
   };
 
   this.getMonitorPageView = function() {
-    return monitorPageView;
+    return monitorExperimentPageView;
   };
 
   this.getRecordingPageView = function() {
     return recordingPageView;
+  };
+
+  this.showVideo = function() {
+    recordingPageView.showVideo(); 
   };
 };
