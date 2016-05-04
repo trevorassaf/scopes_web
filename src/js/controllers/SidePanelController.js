@@ -3,6 +3,8 @@ var SidePanelController = function() {
   /**
    * Private state
    */
+  var _this = this;
+
   var sidePanelView = null;
   var centerPageController = null;
 
@@ -10,29 +12,11 @@ var SidePanelController = function() {
    * Private functions
    */
   var configureCallbacks = function() {
-    // Model --> view data pathways
-  
     // Register tab-selection callbacks
-    sidePanelView.bindNewExperimentTabClick(handleNewExperimentTabClick);
-    sidePanelView.bindMyExperimentsTabClick(handleMyExperimentsTabClick);
-    sidePanelView.bindFeedbackTabClick(handleFeedbackTabClick);
-    sidePanelView.bindTechnicianTabClick(handleTechnicianTabClick);
-  };
-
-  var handleNewExperimentTabClick = function() {
-    centerPageController.showNewExperimentPage();
-  };
-
-  var handleMyExperimentsTabClick = function() {
-    centerPageController.showMyExperimentsPage();
-  };
-
-  var handleFeedbackTabClick = function() {
-    centerPageController.showFeedbackPage();
-  };
-
-  var handleTechnicianTabClick = function() {
-    centerPageController.showTechnicianPage();
+    sidePanelView.bindNewExperimentTabClick(_this.selectNewExperimentTab);
+    sidePanelView.bindMyExperimentsTabClick(_this.selectMyExperimentsTab);
+    sidePanelView.bindFeedbackTabClick(_this.selectFeedbackTab);
+    sidePanelView.bindTechnicianTabClick(_this.selectTechnicianTab);
   };
 
   /**
@@ -46,5 +30,30 @@ var SidePanelController = function() {
     centerPageController = center_page_controller;
 
     configureCallbacks();
+  };
+
+
+  this.selectNewExperimentTab = function() {
+    sidePanelView.selectNewExperimentTab();
+    centerPageController.showNewExperimentPage();
+    return this;
+  };
+  
+  this.selectMyExperimentsTab = function() {
+    sidePanelView.selectMyExperimentsTab();
+    centerPageController.showMyExperimentsPage();
+    return this;
+  };
+
+  this.selectFeedbackTab = function() {
+    sidePanelView.selectFeedbackTab();
+    centerPageController.showFeedbackPage();
+    return this;
+  };
+
+  this.selectTechnicianTab = function() {
+    sidePanelView.selectTechnicianTab();
+    centerPageController.showTechnicianPage();
+    return this;
   };
 };

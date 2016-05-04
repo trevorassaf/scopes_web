@@ -48,7 +48,6 @@ var CenterPageController = function() {
       selected_time_model.getData().minute
     );
 
-
     // Short code
     var short_code_model = new_experiment_model.getShortCodePickerModel(); 
     var selected_short_code_model = short_code_model.getSelectedItem();

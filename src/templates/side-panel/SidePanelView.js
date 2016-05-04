@@ -97,12 +97,12 @@ var SidePanelView = function(
 
     // Register 'onclick' callback
     tab_info.tab.registerOnClickListener(function() {
-      // Unselect previous tab
-      currentlySelectedTab.deselect();
-
-      // Select new tab
-      currentlySelectedTab = tab_info.tab;
-      currentlySelectedTab.select();
+      // // Unselect previous tab
+      // currentlySelectedTab.deselect();
+      //
+      // // Select new tab
+      // currentlySelectedTab = tab_info.tab;
+      // currentlySelectedTab.select();
 
       // Invoke callback listeners
       for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
