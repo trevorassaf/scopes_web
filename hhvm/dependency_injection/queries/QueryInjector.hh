@@ -174,6 +174,10 @@ class QueryInjector {
   private ?InsertQuery<Gen0OrderPricePolicy> $insertGen0OrderPricePolicyQuery;
   private ?InsertGen0OrderPricePolicyQuery $concreteInsertGen0OrderPricePolicyQuery;
 
+  // Order configurations/policies
+  private ?FetchQuery<OrderConfiguration> $fetchOrderConfigurationQuery;
+  private ?FetchOrderConfigurationQuery $concreteFetchOrderConfigurationQuery;
+
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
     private LazyLoader<ConstraintMapToConjunctiveWhereClauseTranslator> $constraintMapToConjunctiveWhereClauseTranslatorLazyLoader,
@@ -237,7 +241,9 @@ class QueryInjector {
     private LazyLoader<ConfirmedOrderScopeMappingsTable> $confirmedOrderScopeMappingsTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<ConfirmedOrderScopeMapping>> $confirmedOrderScopeMappingModelFactoryLazyLoader,
     private LazyLoader<Gen0OrderPricePoliciesTable> $gen0OrderPricePoliciesTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<Gen0OrderPricePolicy>> $gen0OrderPricePolicyModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<Gen0OrderPricePolicy>> $gen0OrderPricePolicyModelFactoryLazyLoader,
+    private LazyLoader<OrderConfigurationTable> $orderConfigurationTableLazyLoader,
+    private LazyLoader<ModelFactory<OrderConfiguration>> $orderConfigurationModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -1744,6 +1750,28 @@ class QueryInjector {
       ); 
     }
     return $this->concreteInsertGen0OrderPricePolicyQuery;
+  }
+
+  public function getFetchOrderConfigurationQuery(): FetchQuery<OrderConfiguration> {
+    if ($this->fetchOrderConfigurationQuery === null) {
+      $this->fetchOrderConfigurationQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->orderConfigurationModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->fetchOrderConfigurationQuery;
+  }
+
+  public function getConcreteFetchOrderConfigurationQuery(): FetchOrderConfigurationQuery {
+    if ($this->concreteFetchOrderConfigurationQuery === null) {
+      $this->concreteFetchOrderConfigurationQuery = new FetchOrderConfigurationQuery(
+        $this->getFetchOrderConfigurationQuery(),
+        $this->orderConfigurationTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load() 
+      );
+    }
+    return $this->concreteFetchOrderConfigurationQuery;
   }
 
   public function getCompositeVideosTable(): CompositeVideoTable {

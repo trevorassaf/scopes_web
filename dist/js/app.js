@@ -18,21 +18,13 @@ window.onload = function() {
   app_controller.init();
 };
 
-var ApiController = function(network_module) {
+var ApiController = function() {
 
   /**
    * Private state
    */
-  // Api dependencies
-  var networkModule = network_module;
-
   // Apis
-  var confirmOrderApi = null;
-  var getAllUsersApi = null;
-  var getConfirmedOrdersApi = null;
-  var getOrderPricePolicyApi = null;
-  var getStartupDataApi = null;
-  var updateConfirmedOrderApi = null;
+  var getStartupDataApiController = null;
 
   // Event listeners
   var lostConnectionListeners = [];
@@ -42,50 +34,24 @@ var ApiController = function(network_module) {
    * Private functions
    */
   // Bind generic event listeners
-  var initApi = function(api) {};
+  var initApiController = function(api) {};
+
+  var configureGetStartupDataApi = function() {
+    // Initialize api controller and bind generic handler logic
+    getStartupDataApiController = new GetStartupDataApiController();
+    initApiController(getStartupDataApiController);
+  };
+
+  var configureApis = function() {
+    configureGetStartupDataApi(); 
+  };
 
   /**
    * Public functions
    */
-  // Lazy loader api getters
-  this.getConfirmOrderApi = function() {
-    if (confirmOrderApi == null) {
-      confirmOrderApi = new ConfirmOrderApi(networkModule);
-      initApi(confirmOrderApi);
-    }
-    return confirmOrderApi;
-  };
-
-  this.getStartupDataApi = function() {
-    if (getStartupDataApi == null) {
-      getStartupDataApi = new GetStartupDataApi(networkModule);
-      initApi(getStartupDataApi);
-    }
-    return getStartupDataApi;
-  };
-
-  this.getAllUsersApi = function() {
-    if (getAllUsersApi == null) {
-      getAllUsersApi = new GetAllUsersApi(networkModule);
-      initApi(getAllUsersApi);
-    }
-    return getAllUsersApi;
-  };
-  
-  this.getOrderPricePolicyApi = function() {
-    if (getOrderPricePolicyApi == null) {
-      getOrderPricePolicyApi = new GetOrderPricePolicyApi(networkModule);
-      initApi(getOrderPricePolicyApi);
-    }
-    return getOrderPricePolicyApi;
-  };
-
-  this.updateConfirmedOrderApi = function() {
-    if (updateConfirmedOrderApi == null) {
-      updateConfirmedOrderApi = new UpdateConfirmedOrderApi(networkModule);
-      initApi(updateConfirmedOrderApi);
-    }
-    return updateConfirmedOrderApi;
+  // Lazy loader api controllers
+  this.getGetStartupDataApiController = function() {
+    return getStartupDataApiController;
   };
 
   // Register event listeners
@@ -98,6 +64,10 @@ var ApiController = function(network_module) {
     badRequestListeners.push(callback);
     return this;
   };
+
+  this.init = function() {
+    configureApis();
+  };
 };
 
 var ApplicationController = function(template_store) {
@@ -107,11 +77,13 @@ var ApplicationController = function(template_store) {
    */
   var templateStore = template_store;
 
-  var _this = this;
-
+  // Controllers
   var centerPageController = null;
   var sidePanelController = null;
   var apiController = null;
+
+  // Models
+  var applicationModel = null;
 
   /**
    * Private functions
@@ -126,15 +98,11 @@ var ApplicationController = function(template_store) {
     );
     center_page_view.init();
 
-    // Init center page model
-    var center_page_model = new CenterPageModel();
-    center_page_model.init();
-
     // Init center page controller
     centerPageController = new CenterPageController();
     centerPageController.init(
       center_page_view,
-      center_page_model
+      applicationModel.getCenterPageModel() 
     );
   };
 
@@ -152,30 +120,42 @@ var ApplicationController = function(template_store) {
     sidePanelController = new SidePanelController();
     sidePanelController.init(
       side_panel_view,
-     centerPageController 
+      centerPageController,
+      applicationModel.getUserModel(),
+      apiController
     );
   };
 
   var initApiController = function() {
-    apiController = new ApiController(ScopesNetwork);
+    apiController = new ApiController();
+    apiController.init();
   };
 
   var initControllers = function() {
+    initApiController();
     initCenterPageController();
     initSidePanelController();
-    initApiController();
   };
 
   var initUi = function() {
     sidePanelController.selectNewExperimentTab();
   };
 
+  var initModels = function() {
+    applicationModel = new ApplicationModel();
+    applicationModel.init();
+  };
+
   /**
    * Public functions
    */
   this.init = function(template_store) {
+    initModels();
     initControllers();     
     initUi();
+
+    // Fetch startup data
+    apiController.getGetStartupDataApiController().fetch();
   };
 };
 
@@ -1220,13 +1200,48 @@ var SidePanelController = function() {
    */
   var _this = this;
 
+  // Views
   var sidePanelView = null;
+
+  // Controllers
   var centerPageController = null;
+  var apiController = null;
+
+  // Models
+  var userModel = null;
 
   /**
    * Private functions
    */
+  var configureGetStartupDataApi = function() {
+    // Bind custom handler logic
+    var get_startup_data_api_controller = apiController.getGetStartupDataApiController();
+
+    // Update user model startup data response
+    get_startup_data_api_controller.bindSuccess(function(json_response, api_keys) {
+
+// Debug
+console.log(json_response);
+console.log(api_keys);
+
+      // Update first and last name
+      userModel.setName(
+        json_response[api_keys.first_name],
+        json_response[api_keys.last_name]
+      );
+
+      // Update email
+      userModel.setEmail(json_response[api_keys.email]);
+    });
+  };
+
   var configureCallbacks = function() {
+    // Register model callbacks
+    userModel.bindSetName(sidePanelView.setUserName);
+
+    // Register network callbacks
+    configureGetStartupDataApi();
+
     // Register tab-selection callbacks
     sidePanelView.bindNewExperimentTabClick(_this.selectNewExperimentTab);
     sidePanelView.bindMyExperimentsTabClick(_this.selectMyExperimentsTab);
@@ -1239,11 +1254,16 @@ var SidePanelController = function() {
    */
   this.init = function(
     side_panel_view,
-    center_page_controller
+    center_page_controller,
+    user_model,
+    api_controller
   ) {
     sidePanelView = side_panel_view;
     centerPageController = center_page_controller;
+    userModel = user_model;
+    apiController = api_controller;
 
+    // Bind event listeners
     configureCallbacks();
   };
 
@@ -1383,6 +1403,44 @@ var TechnicianPageController = function() {
     configureCallbacks();
     
     initUi();
+  };
+};
+
+var ApplicationModel = function() {
+  
+  /**
+   * Private state
+   */
+  var userModel = null;
+  var centerPageModel = null;
+
+  /**
+   * Private functions
+   */
+  var initUserModel = function() {
+    userModel = new UserModel(); 
+  };
+
+  var initCenterPageModel = function() {
+    centerPageModel = new CenterPageModel();
+    centerPageModel.init();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    initUserModel();
+    initCenterPageModel();
+  };
+
+  // Getters
+  this.getUserModel = function() {
+    return userModel;
+  };
+
+  this.getCenterPageModel = function() {
+    return centerPageModel;
   };
 };
 
@@ -2485,9 +2543,12 @@ var UserModel = function() {
   this.lastName = null;
   this.email = null;
 
+  // State set event listeners
+  this.nameSetListeners = [];
+  this.emailSetListeners = [];
+
   // State change event listeners
-  this.firstNameChangeListeners = [];
-  this.lastNameChangeListeners = [];
+  this.nameChangeListeners = [];
   this.emailChangeListeners = [];
 };
 
@@ -2518,21 +2579,12 @@ UserModel.prototype.setId = function(id) {
   return this;
 };
 
-UserModel.prototype.setFirstName = function(first_name) {
+UserModel.prototype.setName = function(first_name, last_name) {
   this.firstName = first_name;
-
-  for (var i = 0; i < this.firstNameChangeListeners.length; ++i) {
-    this.firstNameChangeListeners[i](firstName);
-  }
-
-  return this;
-};
-
-UserModel.prototype.setLastName = function(last_name) {
   this.lastName = last_name;
 
-  for (var i = 0; i < this.lastNameChangeListeners.length; ++i) {
-    this.lastNameChangeListeners[i](lastName);
+  for (var i = 0; i < this.nameSetListeners.length; ++i) {
+    this.nameSetListeners[i](this.firstName, this.lastName);
   }
 
   return this;
@@ -2541,27 +2593,71 @@ UserModel.prototype.setLastName = function(last_name) {
 UserModel.prototype.setEmail = function(email) {
   this.email = email;
 
-  for (var i = 0; i < this.emailChangeListeners.length; ++i) {
-    this.emailChangeListeners[i](email);
+  for (var i = 0; i < this.emailSetListeners.length; ++i) {
+    this.emailSetListeners[i](this.email);
   }
 
   return this;
 };
 
 /**
- * Register event listeners 
+ * Bind "field set" event listeners 
  */
-UserModel.prototype.bindFirstName = function(callback) {
-  this.firstNameChangeListeners.push(callback); 
+UserModel.prototype.bindSetName = function(callback) {
+  this.nameSetListeners.push(callback); 
   return this;
 };
 
-UserModel.prototype.bindLastName = function(callback) {
-  this.lastNameChangeListeners.push(callback); 
+UserModel.prototype.bindSetEmail = function(callback) {
+  this.emailSetListeners.push(callback); 
   return this;
 };
 
-UserModel.prototype.bindEmail = function(callback) {
+/**
+ * "Field change" functions
+ */
+UserModel.prototype.changeName = function(first_name, last_name) {
+  this.firstName = first_name;
+  this.lastName = last_name;
+  
+  // Notify 'set listeners'
+  for (var i = 0; i < this.nameSetListeners.length; ++i) {
+    this.nameSetListeners[i](this.firstName, this.lastName);
+  }
+
+  // Notify 'change listeners'
+  for (var i = 0; i < this.nameChangeListeners.length; ++i) {
+    this.nameChangeListeners[i](this.firstName, this.lastName);
+  }
+  
+  return this;
+};
+
+UserModel.prototype.changeEmail = function(email) {
+  this.email = email;
+  
+  // Notify 'set' listeners
+  for (var i = 0; i < this.emailSetListeners.length; ++i) {
+    this.emailSetListeners[i](this.email);
+  }
+
+  // Notify 'change' listeners
+  for (var i = 0; i < this.emailChangeListeners.length; ++i) {
+    this.emailChangeListeners[i](this.email);
+  }
+
+  return this;
+};
+
+/**
+ * Bind "field change" event listeners 
+ */
+UserModel.prototype.bindChangeName = function(callback) {
+  this.nameChangeListeners.push(callback); 
+  return this;
+};
+
+UserModel.prototype.bindChangeEmail = function(callback) {
   this.emailChangeListeners.push(callback); 
   return this;
 };
@@ -3285,21 +3381,21 @@ function ApiControllerWrapper(api_object) {
   };
 };
 
-var GetStartupDataApiController = (function() {
+var GetStartupDataApiController = function() {
 
   /**
    * Private state
    */
   var getStartupDataApi = null;
-  var successfulApiCallbackListeners = [];
-  var failedLogicalApiCallbackListeners = [];
-  var failedNonLogicalApiCallbackListeners = [];
+  var successListeners = [];
+  var logicalFailureListeners = [];
+  var nonLogicalFailureListeners = [];
 
   /**
    * fetch()
    * - fetches startup data
    */
-  var fetch = function() {
+  this.fetch = function() {
     // Initialize api and bind event listeners
     if (getStartupDataApi === null) {
       getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
@@ -3315,8 +3411,8 @@ var GetStartupDataApiController = (function() {
   };
 
   var successfulApiCallback = function(api_response) {
-    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
-      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    for (var i = 0; i < successListeners.length; ++i) {
+      successListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
   
@@ -3325,7 +3421,7 @@ var GetStartupDataApiController = (function() {
     console.log(api_response); 
     
     for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
-      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+      logicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
 
@@ -3334,7 +3430,7 @@ var GetStartupDataApiController = (function() {
     console.nonLog(api_response); 
     
     for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
-      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+      nonLogicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
 
@@ -3343,8 +3439,8 @@ var GetStartupDataApiController = (function() {
    * - add callback for successful api call
    * @param FuncPtr callback: function(json_response, api_keys) {...}
    */
-  var registerSuccessfulApiCallback = function(callback) {
-    successfulApiCallbackListeners.push(callback);
+  this.bindSuccess = function(callback) {
+    successListeners.push(callback);
     return this;
   };
 
@@ -3353,8 +3449,8 @@ var GetStartupDataApiController = (function() {
    * - add callback for logical failed api call (i.e. api error error rather than network error)
    * @param FuncPtr callback: function(json_response, api_keys) {...}
    */
-  var registerLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
+  this.bindLogicalFailure = function(callback) {
+    logicalFailureListeners.push(callback);
     return this;
   };
 
@@ -3363,18 +3459,11 @@ var GetStartupDataApiController = (function() {
    * - add callback for non-logical failed api call (i.e. network error rather than api error)
    * @param FuncPtr callback: function(xhttp_response) {...}
    */
-  var registerNonLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
+  this.bindNonLogicalFailure = function(callback) {
+    nonLogicalFailureListeners.push(callback);
     return this;
   };
-
-  return {
-    fetch: fetch,
-    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
-    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
-    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
-  };
-})();
+};
 
 var UpdateConfirmedOrderApiController = (function() {
 
@@ -3498,6 +3587,110 @@ UpdateConfirmedOrderRequest.prototype.isDescriptionRemoved = function() {
 UpdateConfirmedOrderRequest.prototype.getDescription = function() {
   return this.description;
 };
+
+var MyExperimentsLogicController = (function() {
+
+  /**
+   * Private state
+   */
+  var myExperiments = [];
+  var getConfirmedOrdersApiWrapper = null;
+  var myExperimentsView = null;
+
+  /**
+   * Private functions
+   */
+  var initApi = function() {
+    console.assert(getConfirmedOrdersApiWrapper === null); 
+
+    // Initialize get-confirmed-order api
+    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
+    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
+
+    // Bind event listeners to get-confirmed-orders api
+    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
+      clearConfirmedOrders();
+      var orders = json_response[response_keys.orders];
+      var order_response_keys = response_keys.confirmed_order;
+      var short_code_response_keys = response_keys.short_code;
+      
+      for (var i = 0; i < orders.length; ++i) {
+        var order = orders[i];
+        var short_code = order[order_response_keys.short_code];
+
+        var short_code = new ShortCode(
+          short_code[short_code_response_keys.id],
+          short_code[short_code_response_keys.code],
+          short_code[short_code_response_keys.alias]
+        );
+
+        var confirmed_order = new ConfirmedOrder(
+          order[order_response_keys.id],
+          order[order_response_keys.scopes_count],
+          order[order_response_keys.start_time],
+          order[order_response_keys.end_time],
+          order[order_response_keys.title],
+          order[order_response_keys.description],
+          order[order_response_keys.time_ordered],
+          order[order_response_keys.price],
+          short_code
+        );
+
+        addConfirmedOrder(confirmed_order); 
+      }
+    });
+
+    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders'); 
+    });
+
+    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders due to network error'); 
+    });
+  };
+
+  var addConfirmedOrder = function(confirm_order) {
+    // Store in local cache
+    myExperiments.push(confirm_order);  
+
+    // Update MyExperiments view
+    myExperimentsView.pushPendingOrder(confirm_order);
+  };
+
+  var clearConfirmedOrders = function() {
+    // Clear local cache
+    myExperiments = [];
+
+    // Clear MyExperiments view
+    // TODO...   
+  };
+
+  var init = function(my_experiments_view) {
+    myExperimentsView = my_experiments_view;
+
+    // Initialize api module
+    initApi();
+
+    refreshData(); 
+  };
+
+  var refreshData = function() {
+    myExperimentsView.clearPendingOrders();
+    getConfirmedOrdersApiWrapper.fetch(); 
+  };
+
+  var getMyExperiments = function() {
+    return myExperiments;
+  };
+
+  return {
+    init: init,
+    refreshData: refreshData,
+    getMyExperiments: getMyExperiments
+  };
+})();
 
 var ConfirmOrderUiController = (function() {
   
@@ -4482,110 +4675,6 @@ var SidePanelUiController = (function() {
   return {
     init: init,
     getMyExperimentsView: getMyExperimentsView
-  };
-})();
-
-var MyExperimentsLogicController = (function() {
-
-  /**
-   * Private state
-   */
-  var myExperiments = [];
-  var getConfirmedOrdersApiWrapper = null;
-  var myExperimentsView = null;
-
-  /**
-   * Private functions
-   */
-  var initApi = function() {
-    console.assert(getConfirmedOrdersApiWrapper === null); 
-
-    // Initialize get-confirmed-order api
-    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
-    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
-
-    // Bind event listeners to get-confirmed-orders api
-    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
-      clearConfirmedOrders();
-      var orders = json_response[response_keys.orders];
-      var order_response_keys = response_keys.confirmed_order;
-      var short_code_response_keys = response_keys.short_code;
-      
-      for (var i = 0; i < orders.length; ++i) {
-        var order = orders[i];
-        var short_code = order[order_response_keys.short_code];
-
-        var short_code = new ShortCode(
-          short_code[short_code_response_keys.id],
-          short_code[short_code_response_keys.code],
-          short_code[short_code_response_keys.alias]
-        );
-
-        var confirmed_order = new ConfirmedOrder(
-          order[order_response_keys.id],
-          order[order_response_keys.scopes_count],
-          order[order_response_keys.start_time],
-          order[order_response_keys.end_time],
-          order[order_response_keys.title],
-          order[order_response_keys.description],
-          order[order_response_keys.time_ordered],
-          order[order_response_keys.price],
-          short_code
-        );
-
-        addConfirmedOrder(confirmed_order); 
-      }
-    });
-
-    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders'); 
-    });
-
-    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders due to network error'); 
-    });
-  };
-
-  var addConfirmedOrder = function(confirm_order) {
-    // Store in local cache
-    myExperiments.push(confirm_order);  
-
-    // Update MyExperiments view
-    myExperimentsView.pushPendingOrder(confirm_order);
-  };
-
-  var clearConfirmedOrders = function() {
-    // Clear local cache
-    myExperiments = [];
-
-    // Clear MyExperiments view
-    // TODO...   
-  };
-
-  var init = function(my_experiments_view) {
-    myExperimentsView = my_experiments_view;
-
-    // Initialize api module
-    initApi();
-
-    refreshData(); 
-  };
-
-  var refreshData = function() {
-    myExperimentsView.clearPendingOrders();
-    getConfirmedOrdersApiWrapper.fetch(); 
-  };
-
-  var getMyExperiments = function() {
-    return myExperiments;
-  };
-
-  return {
-    init: init,
-    refreshData: refreshData,
-    getMyExperiments: getMyExperiments
   };
 })();
 
@@ -9181,6 +9270,13 @@ var SidePanelView = function(
 
   this.selectTechnicianTab = function() {
     selectTab(technicianInfo.tab);
+  };
+
+  this.setUserName = function(first_name, last_name) {
+    var name = first_name + ' ' + last_name;
+    userNameNode.node.innerHTML = name;
+    // TODO check the length and curtail name if char count exceeds max
+    return this;
   };
 };
 

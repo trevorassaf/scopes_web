@@ -1,18 +1,18 @@
-var GetStartupDataApiController = (function() {
+var GetStartupDataApiController = function() {
 
   /**
    * Private state
    */
   var getStartupDataApi = null;
-  var successfulApiCallbackListeners = [];
-  var failedLogicalApiCallbackListeners = [];
-  var failedNonLogicalApiCallbackListeners = [];
+  var successListeners = [];
+  var logicalFailureListeners = [];
+  var nonLogicalFailureListeners = [];
 
   /**
    * fetch()
    * - fetches startup data
    */
-  var fetch = function() {
+  this.fetch = function() {
     // Initialize api and bind event listeners
     if (getStartupDataApi === null) {
       getStartupDataApi = new GetStartupDataApi(ScopesNetwork);
@@ -28,8 +28,8 @@ var GetStartupDataApiController = (function() {
   };
 
   var successfulApiCallback = function(api_response) {
-    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
-      successfulApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+    for (var i = 0; i < successListeners.length; ++i) {
+      successListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
   
@@ -38,7 +38,7 @@ var GetStartupDataApiController = (function() {
     console.log(api_response); 
     
     for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
-      logicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+      logicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
 
@@ -47,7 +47,7 @@ var GetStartupDataApiController = (function() {
     console.nonLog(api_response); 
     
     for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
-      nonLogicallyFailedApiCallbackListeners[i](api_response, getStartupDataApi.getApiKeys());
+      nonLogicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
 
@@ -56,8 +56,8 @@ var GetStartupDataApiController = (function() {
    * - add callback for successful api call
    * @param FuncPtr callback: function(json_response, api_keys) {...}
    */
-  var registerSuccessfulApiCallback = function(callback) {
-    successfulApiCallbackListeners.push(callback);
+  this.bindSuccess = function(callback) {
+    successListeners.push(callback);
     return this;
   };
 
@@ -66,8 +66,8 @@ var GetStartupDataApiController = (function() {
    * - add callback for logical failed api call (i.e. api error error rather than network error)
    * @param FuncPtr callback: function(json_response, api_keys) {...}
    */
-  var registerLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
+  this.bindLogicalFailure = function(callback) {
+    logicalFailureListeners.push(callback);
     return this;
   };
 
@@ -76,15 +76,8 @@ var GetStartupDataApiController = (function() {
    * - add callback for non-logical failed api call (i.e. network error rather than api error)
    * @param FuncPtr callback: function(xhttp_response) {...}
    */
-  var registerNonLogicalFailedApiCallback = function(callback) {
-    logicallyFailedApiCallbackListeners.push(callback);
+  this.bindNonLogicalFailure = function(callback) {
+    nonLogicalFailureListeners.push(callback);
     return this;
   };
-
-  return {
-    fetch: fetch,
-    registerSuccessfulApiCallback: registerSuccessfulApiCallback,
-    registerLogicalFailedApiCallback: registerLogicalFailedApiCallback,
-    registerNonLogicalFailedApiCallback: registerNonLogicalFailedApiCallback
-  };
-})();
+};

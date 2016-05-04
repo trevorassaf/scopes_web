@@ -5,9 +5,13 @@ var ApplicationController = function(template_store) {
    */
   var templateStore = template_store;
 
+  // Controllers
   var centerPageController = null;
   var sidePanelController = null;
   var apiController = null;
+
+  // Models
+  var applicationModel = null;
 
   /**
    * Private functions
@@ -22,15 +26,11 @@ var ApplicationController = function(template_store) {
     );
     center_page_view.init();
 
-    // Init center page model
-    var center_page_model = new CenterPageModel();
-    center_page_model.init();
-
     // Init center page controller
     centerPageController = new CenterPageController();
     centerPageController.init(
       center_page_view,
-      center_page_model
+      applicationModel.getCenterPageModel() 
     );
   };
 
@@ -48,29 +48,41 @@ var ApplicationController = function(template_store) {
     sidePanelController = new SidePanelController();
     sidePanelController.init(
       side_panel_view,
-     centerPageController 
+      centerPageController,
+      applicationModel.getUserModel(),
+      apiController
     );
   };
 
   var initApiController = function() {
-    apiController = new ApiController(ScopesNetwork);
+    apiController = new ApiController();
+    apiController.init();
   };
 
   var initControllers = function() {
+    initApiController();
     initCenterPageController();
     initSidePanelController();
-    initApiController();
   };
 
   var initUi = function() {
     sidePanelController.selectNewExperimentTab();
   };
 
+  var initModels = function() {
+    applicationModel = new ApplicationModel();
+    applicationModel.init();
+  };
+
   /**
    * Public functions
    */
   this.init = function(template_store) {
+    initModels();
     initControllers();     
     initUi();
+
+    // Fetch startup data
+    apiController.getGetStartupDataApiController().fetch();
   };
 };

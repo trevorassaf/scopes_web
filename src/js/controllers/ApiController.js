@@ -1,18 +1,10 @@
-var ApiController = function(network_module) {
+var ApiController = function() {
 
   /**
    * Private state
    */
-  // Api dependencies
-  var networkModule = network_module;
-
   // Apis
-  var confirmOrderApi = null;
-  var getAllUsersApi = null;
-  var getConfirmedOrdersApi = null;
-  var getOrderPricePolicyApi = null;
-  var getStartupDataApi = null;
-  var updateConfirmedOrderApi = null;
+  var getStartupDataApiController = null;
 
   // Event listeners
   var lostConnectionListeners = [];
@@ -22,50 +14,24 @@ var ApiController = function(network_module) {
    * Private functions
    */
   // Bind generic event listeners
-  var initApi = function(api) {};
+  var initApiController = function(api) {};
+
+  var configureGetStartupDataApi = function() {
+    // Initialize api controller and bind generic handler logic
+    getStartupDataApiController = new GetStartupDataApiController();
+    initApiController(getStartupDataApiController);
+  };
+
+  var configureApis = function() {
+    configureGetStartupDataApi(); 
+  };
 
   /**
    * Public functions
    */
-  // Lazy loader api getters
-  this.getConfirmOrderApi = function() {
-    if (confirmOrderApi == null) {
-      confirmOrderApi = new ConfirmOrderApi(networkModule);
-      initApi(confirmOrderApi);
-    }
-    return confirmOrderApi;
-  };
-
-  this.getStartupDataApi = function() {
-    if (getStartupDataApi == null) {
-      getStartupDataApi = new GetStartupDataApi(networkModule);
-      initApi(getStartupDataApi);
-    }
-    return getStartupDataApi;
-  };
-
-  this.getAllUsersApi = function() {
-    if (getAllUsersApi == null) {
-      getAllUsersApi = new GetAllUsersApi(networkModule);
-      initApi(getAllUsersApi);
-    }
-    return getAllUsersApi;
-  };
-  
-  this.getOrderPricePolicyApi = function() {
-    if (getOrderPricePolicyApi == null) {
-      getOrderPricePolicyApi = new GetOrderPricePolicyApi(networkModule);
-      initApi(getOrderPricePolicyApi);
-    }
-    return getOrderPricePolicyApi;
-  };
-
-  this.updateConfirmedOrderApi = function() {
-    if (updateConfirmedOrderApi == null) {
-      updateConfirmedOrderApi = new UpdateConfirmedOrderApi(networkModule);
-      initApi(updateConfirmedOrderApi);
-    }
-    return updateConfirmedOrderApi;
+  // Lazy loader api controllers
+  this.getGetStartupDataApiController = function() {
+    return getStartupDataApiController;
   };
 
   // Register event listeners
@@ -77,5 +43,9 @@ var ApiController = function(network_module) {
   this.bindBadRequest = function(callback) {
     badRequestListeners.push(callback);
     return this;
+  };
+
+  this.init = function() {
+    configureApis();
   };
 };

@@ -1,6 +1,6 @@
 <?hh // strict
 
-class OrderConfigurationFactory implements ModelFactory<OrderConfiguration> {
+class OrderConfigurationModelFactory implements ModelFactory<OrderConfiguration> {
   
   public function __construct(
     private OrderConfigurationTable $orderConfigurationsTable,

@@ -211,4 +211,11 @@ var SidePanelView = function(
   this.selectTechnicianTab = function() {
     selectTab(technicianInfo.tab);
   };
+
+  this.setUserName = function(first_name, last_name) {
+    var name = first_name + ' ' + last_name;
+    userNameNode.node.innerHTML = name;
+    // TODO check the length and curtail name if char count exceeds max
+    return this;
+  };
 };

@@ -45,6 +45,7 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
     $reserved_order_scope_mappings_table_loader = new ReservedOrderScopeMappingsTableLazyLoader();
     $confirmed_order_scope_mappings_table_loader = new ConfirmedOrderScopeMappingsTableLazyLoader();
     $gen0_order_price_policies_table_loader = new Gen0OrderPricePoliciesTableLazyLoader();
+    $order_configuration_table_loader = new OrderConfigurationTableLazyLoader();
 
     return new QueryInjector(
       new AsyncMysqlConnectionLazyLoader(
@@ -181,6 +182,11 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $gen0_order_price_policies_table_loader,
       new Gen0OrderPricePolicyModelFactoryLazyLoader(
         $gen0_order_price_policies_table_loader,
+        $timestamp_serializer_loader
+      ),
+      $order_configuration_table_loader,
+      new OrderConfigurationModelFactoryLazyLoader(
+        $order_configuration_table_loader,
         $timestamp_serializer_loader
       )
     );
