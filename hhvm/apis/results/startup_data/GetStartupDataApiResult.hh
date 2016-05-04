@@ -7,13 +7,17 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
   const string EMAIL_KEY = "email";
   const string HOURLY_PRICE_KEY = "hourly_price";
   const string USER_SHORT_CODES_KEY = "short_codes";
+  const string MAX_NUM_SCOPES = 'max_scopes';
+  const string MAX_EXPERIMENT_DURATION = 'max_hours';
 
   public function __construct(
     private string $firstName,
     private string $lastName,
     private Email $email,
     private UnsignedFloat $hourlyPrice,
-    private ImmVector<ShortCodeApiObject> $shortCodes
+    private ImmVector<ShortCodeApiObject> $shortCodes,
+    private UnsignedInt $maxScopes,
+    private UnsignedInt $maxHours
   ) {
     parent::__construct(ApiType::GET_STARTUP_DATA);
   }

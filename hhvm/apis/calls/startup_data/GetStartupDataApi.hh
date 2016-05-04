@@ -6,6 +6,7 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
     RequestFactory<GetStartupDataApiRequest> $request_factory,
     private GetGen0OrderPricePolicyByTimeMethod $getGen0OrderPricePolicyByTimeMethod,
     private GetUsersShortCodesMethod $getUsersShortCodesMethod,
+    private GetOrderConfigurationMethod $getOrderConfigurationMethod,
     private Logger $logger
   ) {
     parent::__construct(
@@ -30,6 +31,9 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
       $user->getId()
     );
 
+    // Fetch order configuration
+    $order_configuration = $this->getOrderConfigurationMethod->fetch();
+
     // Prepare short codes for transport
     $short_code_api_object_list = Vector{};
     foreach ($short_code_list as $short_code) {
@@ -45,7 +49,9 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
       $user->getLastName(),
       $user->getEmail(),
       $order_price_policy->getPrice(),
-      $short_code_api_object_list->toImmVector()
+      $short_code_api_object_list->toImmVector(),
+      $order_configuration->getScopesCount(),
+      $order_configuration->getMaxExperimentDuration() 
     );
   }
 
