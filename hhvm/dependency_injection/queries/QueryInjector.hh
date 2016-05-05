@@ -1794,7 +1794,8 @@ class QueryInjector {
       $this->concreteInsertOrderConfigurationQuery = new InsertOrderConfigurationQuery(
         $this->getInsertOrderConfigurationQuery(),
         $this->orderConfigurationTableLazyLoader->load(),
-        $this->timestampSerializerLazyLoader->load() 
+        $this->timestampSerializerLazyLoader->load(),
+        $this->timeSerializerLazyLoader->load()
       ); 
     }
     return $this->concreteInsertOrderConfigurationQuery;

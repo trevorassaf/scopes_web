@@ -56,9 +56,26 @@ function initOrderConfiguration(MethodInjector $method_injector): void {
   $max_scopes_count = new UnsignedInt(16);
   $max_experiment_duration = new UnsignedInt(16);
 
+  $time_builder = new TimeBuilder();
+  $start_time = $time_builder
+    ->setHour(new Hour(new UnsignedInt(10)))
+    ->build();
+  $end_time = $time_builder
+    ->setHour(new Hour(new UnsignedInt(11)))
+    ->build();
+
+  $start_time_interval = new UnsignedInt(30);
+  $min_days_in_advance = new UnsignedInt(14);
+  $max_months_in_advance = new UnsignedInt(3);
+
   $create_order_configuration_method->create(
     $max_scopes_count,
-    $max_experiment_duration 
+    $max_experiment_duration,
+    $start_time,
+    $end_time,
+    $start_time_interval,
+    $min_days_in_advance,
+    $max_months_in_advance
   );
 }
 

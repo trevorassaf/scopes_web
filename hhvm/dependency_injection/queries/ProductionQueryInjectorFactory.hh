@@ -187,7 +187,8 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
       $order_configuration_table_loader,
       new OrderConfigurationModelFactoryLazyLoader(
         $order_configuration_table_loader,
-        $timestamp_serializer_loader
+        $timestamp_serializer_loader,
+        $time_serializer_loader
       )
     );
   }
