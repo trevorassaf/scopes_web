@@ -12,6 +12,13 @@ GetStartupDataApi.prototype.getApiKeys = function() {
     last_name: 'last_name',
     email: 'email',
     hourly_price: 'hourly_price',
-    short_codes: 'short_codes'
+    short_codes: 'short_codes',
+    max_scopes: 'max_scopes',
+    max_hours: 'max_hours',
+    short_code_fields: {
+      alias: 'alias',
+      code: 'code',
+      id: 'id'
+    } 
   };
 };

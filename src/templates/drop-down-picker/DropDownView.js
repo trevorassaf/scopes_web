@@ -160,7 +160,9 @@ var DropDownView = function(
   };
 
   this.setSelectedItem = function(drop_down_item) {
-    inputFieldLabelNode.node.innerHTML = drop_down_item.getLabel();
+    if (drop_down_item != null) {
+      inputFieldLabelNode.node.innerHTML = drop_down_item.getLabel();
+    }
   };
 
   // TODO maybe move this to controller

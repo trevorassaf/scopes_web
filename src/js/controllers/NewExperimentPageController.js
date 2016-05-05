@@ -12,9 +12,12 @@ var NewExperimentPageController = function() {
   var experimentDatePickerController = null;
   var shortCodePickerController = null;
   var confirmOrderController = null;
+  var apiController = null;
 
-  // Model and view
+  // Models
   var newExperimentPageModel = null;
+
+  // Views
   var newExperimentPageView = null;
 
   // Callbacks
@@ -106,13 +109,66 @@ var NewExperimentPageController = function() {
     experimentDatePickerController.renderDefaultUi();
   };
 
+  var configureStartupDataApi = function() {
+    var startup_data_api = apiController.getGetStartupDataApiController();
+
+    startup_data_api.bindSuccess(function(json_response, api_keys) {
+      // Set max scopes
+      var scopes_count_model = scopesCountController.getModel();
+      scopes_count_model.setMaxValue(json_response[api_keys.max_scopes]);
+
+      // Set max experiment duration
+      var experiment_duration_model = experimentDurationController.getModel();
+      experiment_duration_model.setMaxValue(json_response[api_keys.max_hours]);
+
+      // Set short codes
+      var short_codes_model = shortCodePickerController.getModel();
+
+      var short_codes = json_response[api_keys.short_codes];
+      var drop_down_item_models = [];
+
+      for (var i = 0; i < short_codes.length; ++i) {
+        var json_short_code = short_codes[i];
+        var short_code = new ShortCode(
+          json_short_code[api_keys.short_code_fields.id],
+          json_short_code[api_keys.short_code_fields.code],
+          json_short_code[api_keys.short_code_fields.alias]
+        );
+
+        var drop_down_item_model = new DropDownItemModel(
+          short_code.getAlias(),
+          short_code.getCode(),
+          short_code
+        );
+
+        drop_down_item_models.push(drop_down_item_model);
+      }
+
+      short_codes_model.setDropDownItems(drop_down_item_models);
+      
+      
+      // Set invalid dates
+      
+      // Set starting/ending time and time interval
+    });
+  };
+
+  var configureApiCalls = function() {
+    configureStartupDataApi(); 
+  };
+
   /**
    * Private functions
    */
-  this.init = function(model, view) {
+  this.init = function(
+      new_experiment_view,
+      new_experiment_model,
+      api_controller
+    ) {
     // TODO, handle case where init is called twice (model and view already bound)
-    newExperimentPageModel = model;
-    newExperimentPageView = view;
+    newExperimentPageView = new_experiment_view;
+    newExperimentPageModel = new_experiment_model;
+    apiController = api_controller;
 
     // Initialize child controllers
     initScopesCountController();
@@ -121,6 +177,9 @@ var NewExperimentPageController = function() {
     initExperimentDatePickerController();
     initShortCodePickerController();
     initConfirmOrderController();
+
+    // Attach controllers to api calls
+    configureApiCalls();
   };
 
   this.getScopesCountController = function() {

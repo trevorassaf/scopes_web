@@ -7,8 +7,12 @@ var CenterPageController = function() {
   var newExperimentPageController = null;
   var myExperimentsPageController = null;
   var technicianPageController = null;
+  var apiController = null;
 
+  // Models
   var centerPageModel = null;
+
+  // Views
   var centerPageView = null;
 
   /**
@@ -17,8 +21,9 @@ var CenterPageController = function() {
   var initNewExperimentPageController = function() {
     newExperimentPageController = new NewExperimentPageController();
     newExperimentPageController.init(
+      centerPageView.getNewExperimentPageView(),
       centerPageModel.getNewExperimentPageModel(),
-      centerPageView.getNewExperimentPageView()
+      apiController
     );
 
     newExperimentPageController.bindConfirmOrder(handleConfirmOrder);
@@ -96,9 +101,14 @@ var CenterPageController = function() {
   /**
    * Privileged functions
    */
-  this.init = function(view, model) {
-    centerPageView = view;
-    centerPageModel = model;
+  this.init = function(
+      center_page_view,
+      center_page_model,
+      api_controller
+    ) {
+    centerPageView = center_page_view;
+    centerPageModel = center_page_model;
+    apiController = api_controller;
 
     // Initialize child controllers
     initNewExperimentPageController();

@@ -30,7 +30,8 @@ var ApplicationController = function(template_store) {
     centerPageController = new CenterPageController();
     centerPageController.init(
       center_page_view,
-      applicationModel.getCenterPageModel() 
+      applicationModel.getCenterPageModel(),
+      apiController
     );
   };
 

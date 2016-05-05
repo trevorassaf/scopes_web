@@ -38,8 +38,10 @@ DropDownModel.prototype.setSelectedItemIdx = function(index) {
 DropDownModel.prototype.setDropDownItems = function(drop_down_item_models) {
   this.dropDownItemModels = drop_down_item_models;
   this.dropDownItemModelsChangeCallbacks.forEach(function(callback) {
-    callback(dropDownItemModels);
-  });
+    callback(this.dropDownItemModels);
+  }, this);
+
+  this.setSelectedItemIdx(0);
   return this;
 };
 

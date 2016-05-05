@@ -102,7 +102,8 @@ var ApplicationController = function(template_store) {
     centerPageController = new CenterPageController();
     centerPageController.init(
       center_page_view,
-      applicationModel.getCenterPageModel() 
+      applicationModel.getCenterPageModel(),
+      apiController
     );
   };
 
@@ -168,8 +169,12 @@ var CenterPageController = function() {
   var newExperimentPageController = null;
   var myExperimentsPageController = null;
   var technicianPageController = null;
+  var apiController = null;
 
+  // Models
   var centerPageModel = null;
+
+  // Views
   var centerPageView = null;
 
   /**
@@ -178,8 +183,9 @@ var CenterPageController = function() {
   var initNewExperimentPageController = function() {
     newExperimentPageController = new NewExperimentPageController();
     newExperimentPageController.init(
+      centerPageView.getNewExperimentPageView(),
       centerPageModel.getNewExperimentPageModel(),
-      centerPageView.getNewExperimentPageView()
+      apiController
     );
 
     newExperimentPageController.bindConfirmOrder(handleConfirmOrder);
@@ -257,9 +263,14 @@ var CenterPageController = function() {
   /**
    * Privileged functions
    */
-  this.init = function(view, model) {
-    centerPageView = view;
-    centerPageModel = model;
+  this.init = function(
+      center_page_view,
+      center_page_model,
+      api_controller
+    ) {
+    centerPageView = center_page_view;
+    centerPageModel = center_page_model;
+    apiController = api_controller;
 
     // Initialize child controllers
     initNewExperimentPageController();
@@ -996,9 +1007,12 @@ var NewExperimentPageController = function() {
   var experimentDatePickerController = null;
   var shortCodePickerController = null;
   var confirmOrderController = null;
+  var apiController = null;
 
-  // Model and view
+  // Models
   var newExperimentPageModel = null;
+
+  // Views
   var newExperimentPageView = null;
 
   // Callbacks
@@ -1090,13 +1104,66 @@ var NewExperimentPageController = function() {
     experimentDatePickerController.renderDefaultUi();
   };
 
+  var configureStartupDataApi = function() {
+    var startup_data_api = apiController.getGetStartupDataApiController();
+
+    startup_data_api.bindSuccess(function(json_response, api_keys) {
+      // Set max scopes
+      var scopes_count_model = scopesCountController.getModel();
+      scopes_count_model.setMaxValue(json_response[api_keys.max_scopes]);
+
+      // Set max experiment duration
+      var experiment_duration_model = experimentDurationController.getModel();
+      experiment_duration_model.setMaxValue(json_response[api_keys.max_hours]);
+
+      // Set short codes
+      var short_codes_model = shortCodePickerController.getModel();
+
+      var short_codes = json_response[api_keys.short_codes];
+      var drop_down_item_models = [];
+
+      for (var i = 0; i < short_codes.length; ++i) {
+        var json_short_code = short_codes[i];
+        var short_code = new ShortCode(
+          json_short_code[api_keys.short_code_fields.id],
+          json_short_code[api_keys.short_code_fields.code],
+          json_short_code[api_keys.short_code_fields.alias]
+        );
+
+        var drop_down_item_model = new DropDownItemModel(
+          short_code.getAlias(),
+          short_code.getCode(),
+          short_code
+        );
+
+        drop_down_item_models.push(drop_down_item_model);
+      }
+
+      short_codes_model.setDropDownItems(drop_down_item_models);
+      
+      
+      // Set invalid dates
+      
+      // Set starting/ending time and time interval
+    });
+  };
+
+  var configureApiCalls = function() {
+    configureStartupDataApi(); 
+  };
+
   /**
    * Private functions
    */
-  this.init = function(model, view) {
+  this.init = function(
+      new_experiment_view,
+      new_experiment_model,
+      api_controller
+    ) {
     // TODO, handle case where init is called twice (model and view already bound)
-    newExperimentPageModel = model;
-    newExperimentPageView = view;
+    newExperimentPageView = new_experiment_view;
+    newExperimentPageModel = new_experiment_model;
+    apiController = api_controller;
 
     // Initialize child controllers
     initScopesCountController();
@@ -1105,6 +1172,9 @@ var NewExperimentPageController = function() {
     initExperimentDatePickerController();
     initShortCodePickerController();
     initConfirmOrderController();
+
+    // Attach controllers to api calls
+    configureApiCalls();
   };
 
   this.getScopesCountController = function() {
@@ -1404,259 +1474,6 @@ var TechnicianPageController = function() {
     
     initUi();
   };
-};
-
-function ConfirmedOrder(
-  id,
-  num_scopes,
-  start_timestamp,
-  end_timestamp,
-  title,
-  description,
-  time_ordered,
-  price,
-  short_code
-) {
-  this.id = id;
-  this.scopesCount = num_scopes;
-  this.startTimestamp = start_timestamp;
-  this.endTimestamp = end_timestamp;
-  this.title = title;
-  this.description = description;
-  this.timeOrdered = time_ordered;
-  this.price = price;
-  this.shortCode = short_code;
-};
-
-ConfirmedOrder.prototype.getId = function() {
-  return this.id;
-};
-
-ConfirmedOrder.prototype.getScopesCount = function() {
-  return this.scopesCount;
-};
-
-ConfirmedOrder.prototype.getStartTimestamp = function() {
-  return this.startTimestamp;
-};
-
-ConfirmedOrder.prototype.getEndTimestamp = function() {
-  return this.endTimestamp;
-};
-
-ConfirmedOrder.prototype.getTitle = function() {
-  return this.title;
-};
-
-ConfirmedOrder.prototype.getDescription = function() {
-  return this.description;
-};
-
-ConfirmedOrder.prototype.getTimeOrdered = function() {
-  return this.timeOrdered;
-};
-
-ConfirmedOrder.prototype.getPrice = function() {
-  return this.price;
-};
-
-ConfirmedOrder.prototype.getShortCode = function() {
-  return this.shortCode;
-};
-
-var DateOperator = (function() {
-
-  // Date constants
-  var HOURS_IN_MICROSECONDS = 3.6e6;
-
-  /**
-   * Privileged methods
-   */
-
-  this.getDifferenceInHours = function(
-    date_a,
-    date_b
-  ) {
-    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
-  };
-
-  return {
-    getDifferenceInHours: getDifferenceInHours
-  };
-
-})();
-
-function SerializeableDate(
-  year,
-  month,
-  date
-) {
-
-  // Ui constants
-  this.DATE_DELIMITER = ',';
-
-  this.SHORT_MONTH_NAMES = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
-
-  /**
-   * getShortMonthName()
-   * @param uint month: 0 < month < 11
-   */
-  this.getShortMonthName = function(month) {
-    return this.SHORT_MONTH_NAMES[month];
-  };
-
-  // Private state
-  this.year = year;
-
-  console.assert(month >= 0 && month < 12);
-  this.month = month;
-
-  console.assert(date >= 0 && date < 31);
-  this.date = date;
-};
-
-SerializeableDate.prototype.serialize = function() {
-  return this.getShortMonthName(this.month) + ' ' + this.date
-    + this.DATE_DELIMITER + ' ' + this.year;
-};
-
-function SerializeableTime(
-  hours,    // military time
-  minutes,
-  seconds
-) {
-
-  this.TIME_DELIMITER = ':';
-  this.AM_TOKEN = 'am';
-  this.PM_TOKEN = 'pm';
-
-  this.convertHourToNonMilitaryTime = function(military_hours) {
-    return (military_hours > 12)
-      ? military_hours - 12
-      : military_hours;
-  };
-
-  this.getMeridianToken = function(military_hours) {
-    return (military_hours >= 12 && military_hours !== 24)
-      ? this.PM_TOKEN
-      : this.AM_TOKEN;
-  };
-
-  this.hours = hours;
-  this.minutes = minutes;
-  this.seconds = seconds;
-};
-
-SerializeableTime.prototype.serialize = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
-};
-
-SerializeableTime.prototype.serializeWithoutSeconds = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
-    " " + meridian_token;
-};
-
-function ShortCode(
-  id,
-  code,
-  alias
-) {
-  this.id = id;
-  this.code = code;
-  this.alias = alias;
-};
-
-ShortCode.prototype.getId = function() {
-  return this.id;
-};
-
-ShortCode.prototype.getCode = function() {
-  return this.code;
-};
-
-ShortCode.prototype.getAlias = function() {
-  return this.alias;
-};
-
-var UpdateConfirmedOrderRequestBuilder = function() {
-
-  this.orderId = null;
-  this.title = null;
-  this.removeTitle = false;
-  this.description = null;
-  this.removeDescription = false;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
-  this.orderId = id;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
-  this.title = title;
-  this.removeTitle = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
-  this.title = null;
-  this.removeTitle = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
-  this.description = description;
-  this.removeDescription = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
-  this.description = null;
-  this.removeDescription = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
-  // Check: id must be set!
-  console.assert(this.orderId != null);
-
-  // Check: at least one other field must be set 
-  console.assert(
-      this.title != null ||
-      this.isTitleRemoved != null ||
-      this.description != null ||
-      this.isDescriptionRemoved != null
-  );
-
-  return new UpdateConfirmedOrderRequest(
-    this.orderId,
-    this.title,
-    this.isTitleRemoved,
-    this.description,
-    this.isDescriptionRemoved
-  );
 };
 
 var ApplicationModel = function() {
@@ -2206,8 +2023,10 @@ DropDownModel.prototype.setSelectedItemIdx = function(index) {
 DropDownModel.prototype.setDropDownItems = function(drop_down_item_models) {
   this.dropDownItemModels = drop_down_item_models;
   this.dropDownItemModelsChangeCallbacks.forEach(function(callback) {
-    callback(dropDownItemModels);
-  });
+    callback(this.dropDownItemModels);
+  }, this);
+
+  this.setSelectedItemIdx(0);
   return this;
 };
 
@@ -2584,13 +2403,14 @@ var NewExperimentPageModel = function() {
   };
 
   var initializeShortCodePickerModel = function() {
-    var drop_down_items = [
-      new DropDownItemModel("SHORT", "SHORT", {}),
-      new DropDownItemModel("CODE", "CODE", {}),
-      new DropDownItemModel("DEMO", "DEMO", {})
-    ];
-    var drop_down_model = new DropDownModel();
-    return drop_down_model.setDropDownItems(drop_down_items);
+    // var drop_down_items = [
+    //   new DropDownItemModel("SHORT", "SHORT", {}),
+    //   new DropDownItemModel("CODE", "CODE", {}),
+    //   new DropDownItemModel("DEMO", "DEMO", {})
+    // ];
+    // var drop_down_model = new DropDownModel();
+    // return drop_down_model.setDropDownItems(drop_down_items);
+    return new DropDownModel();
   };
 
   /**
@@ -2913,6 +2733,259 @@ UserModel.prototype.bindChangeName = function(callback) {
 UserModel.prototype.bindChangeEmail = function(callback) {
   this.emailChangeListeners.push(callback); 
   return this;
+};
+
+function ConfirmedOrder(
+  id,
+  num_scopes,
+  start_timestamp,
+  end_timestamp,
+  title,
+  description,
+  time_ordered,
+  price,
+  short_code
+) {
+  this.id = id;
+  this.scopesCount = num_scopes;
+  this.startTimestamp = start_timestamp;
+  this.endTimestamp = end_timestamp;
+  this.title = title;
+  this.description = description;
+  this.timeOrdered = time_ordered;
+  this.price = price;
+  this.shortCode = short_code;
+};
+
+ConfirmedOrder.prototype.getId = function() {
+  return this.id;
+};
+
+ConfirmedOrder.prototype.getScopesCount = function() {
+  return this.scopesCount;
+};
+
+ConfirmedOrder.prototype.getStartTimestamp = function() {
+  return this.startTimestamp;
+};
+
+ConfirmedOrder.prototype.getEndTimestamp = function() {
+  return this.endTimestamp;
+};
+
+ConfirmedOrder.prototype.getTitle = function() {
+  return this.title;
+};
+
+ConfirmedOrder.prototype.getDescription = function() {
+  return this.description;
+};
+
+ConfirmedOrder.prototype.getTimeOrdered = function() {
+  return this.timeOrdered;
+};
+
+ConfirmedOrder.prototype.getPrice = function() {
+  return this.price;
+};
+
+ConfirmedOrder.prototype.getShortCode = function() {
+  return this.shortCode;
+};
+
+var DateOperator = (function() {
+
+  // Date constants
+  var HOURS_IN_MICROSECONDS = 3.6e6;
+
+  /**
+   * Privileged methods
+   */
+
+  this.getDifferenceInHours = function(
+    date_a,
+    date_b
+  ) {
+    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
+  };
+
+  return {
+    getDifferenceInHours: getDifferenceInHours
+  };
+
+})();
+
+function SerializeableDate(
+  year,
+  month,
+  date
+) {
+
+  // Ui constants
+  this.DATE_DELIMITER = ',';
+
+  this.SHORT_MONTH_NAMES = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  /**
+   * getShortMonthName()
+   * @param uint month: 0 < month < 11
+   */
+  this.getShortMonthName = function(month) {
+    return this.SHORT_MONTH_NAMES[month];
+  };
+
+  // Private state
+  this.year = year;
+
+  console.assert(month >= 0 && month < 12);
+  this.month = month;
+
+  console.assert(date >= 0 && date < 31);
+  this.date = date;
+};
+
+SerializeableDate.prototype.serialize = function() {
+  return this.getShortMonthName(this.month) + ' ' + this.date
+    + this.DATE_DELIMITER + ' ' + this.year;
+};
+
+function SerializeableTime(
+  hours,    // military time
+  minutes,
+  seconds
+) {
+
+  this.TIME_DELIMITER = ':';
+  this.AM_TOKEN = 'am';
+  this.PM_TOKEN = 'pm';
+
+  this.convertHourToNonMilitaryTime = function(military_hours) {
+    return (military_hours > 12)
+      ? military_hours - 12
+      : military_hours;
+  };
+
+  this.getMeridianToken = function(military_hours) {
+    return (military_hours >= 12 && military_hours !== 24)
+      ? this.PM_TOKEN
+      : this.AM_TOKEN;
+  };
+
+  this.hours = hours;
+  this.minutes = minutes;
+  this.seconds = seconds;
+};
+
+SerializeableTime.prototype.serialize = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
+};
+
+SerializeableTime.prototype.serializeWithoutSeconds = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
+    " " + meridian_token;
+};
+
+function ShortCode(
+  id,
+  code,
+  alias
+) {
+  this.id = id;
+  this.code = code;
+  this.alias = alias;
+};
+
+ShortCode.prototype.getId = function() {
+  return this.id;
+};
+
+ShortCode.prototype.getCode = function() {
+  return this.code;
+};
+
+ShortCode.prototype.getAlias = function() {
+  return this.alias;
+};
+
+var UpdateConfirmedOrderRequestBuilder = function() {
+
+  this.orderId = null;
+  this.title = null;
+  this.removeTitle = false;
+  this.description = null;
+  this.removeDescription = false;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
+  this.orderId = id;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
+  this.title = title;
+  this.removeTitle = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
+  this.title = null;
+  this.removeTitle = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
+  this.description = description;
+  this.removeDescription = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
+  this.description = null;
+  this.removeDescription = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
+  // Check: id must be set!
+  console.assert(this.orderId != null);
+
+  // Check: at least one other field must be set 
+  console.assert(
+      this.title != null ||
+      this.isTitleRemoved != null ||
+      this.description != null ||
+      this.isDescriptionRemoved != null
+  );
+
+  return new UpdateConfirmedOrderRequest(
+    this.orderId,
+    this.title,
+    this.isTitleRemoved,
+    this.description,
+    this.isDescriptionRemoved
+  );
 };
 
 var Utils = (function() {
@@ -4784,7 +4857,14 @@ GetStartupDataApi.prototype.getApiKeys = function() {
     last_name: 'last_name',
     email: 'email',
     hourly_price: 'hourly_price',
-    short_codes: 'short_codes'
+    short_codes: 'short_codes',
+    max_scopes: 'max_scopes',
+    max_hours: 'max_hours',
+    short_code_fields: {
+      alias: 'alias',
+      code: 'code',
+      id: 'id'
+    } 
   };
 };
 
@@ -7098,7 +7178,9 @@ var DropDownView = function(
   };
 
   this.setSelectedItem = function(drop_down_item) {
-    inputFieldLabelNode.node.innerHTML = drop_down_item.getLabel();
+    if (drop_down_item != null) {
+      inputFieldLabelNode.node.innerHTML = drop_down_item.getLabel();
+    }
   };
 
   // TODO maybe move this to controller
