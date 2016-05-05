@@ -146,10 +146,57 @@ var NewExperimentPageController = function() {
 
       short_codes_model.setDropDownItems(drop_down_item_models);
       
-      
       // Set invalid dates
       
       // Set starting/ending time and time interval
+      var experiment_time_picker_model = experimentTimePickerController.getModel(); 
+      
+      var json_start_time = json_response[api_keys.start_time]; 
+      var json_end_time = json_response[api_keys.end_time]; 
+      var start_time_interval = json_response[api_keys.start_time_interval];
+
+      // Deserialize time objects
+      var start_time = new Time(
+        json_start_time[api_keys.time.hours],
+        json_start_time[api_keys.time.minutes],
+        json_start_time[api_keys.time.seconds]
+      );
+      var end_time = new Time(
+        json_end_time[api_keys.time.hours],
+        json_end_time[api_keys.time.minutes],
+        json_end_time[api_keys.time.seconds]
+      );
+
+      // Generate list of valid time intervals
+      var current_date_time = start_time.toDate();
+      var stopping_date_time = end_time.toDate();
+
+      var drop_down_items = [];
+
+      while (current_date_time.getTime() <= stopping_date_time.getTime()) {
+        // Create new time model and add it to drop-down list model
+        var time_data = new Time(
+          current_date_time.getHours(),
+          current_date_time.getMinutes(),
+          current_date_time.getSeconds()
+        );
+
+        var time_string = Utils.toHoursAndMinutesString(current_date_time);
+
+        drop_down_items.push(new DropDownItemModel(
+          time_string,
+          time_string,
+          time_data
+        ));
+
+        // Advance by perscribed time interval (minutes)
+        current_date_time.setMinutes(
+          current_date_time.getMinutes() + start_time_interval
+        );
+      }
+
+      experiment_time_picker_model.setDropDownItems(drop_down_items);
+
     });
   };
 

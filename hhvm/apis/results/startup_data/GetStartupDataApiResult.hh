@@ -23,12 +23,11 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
     private ImmVector<ShortCodeApiObject> $shortCodes,
     private UnsignedInt $maxScopes,
     private UnsignedInt $maxHours,
-    private Time $startTime,
-    private Time $endTime,
+    private TimeApiObject $startTime,
+    private TimeApiObject $endTime,
     private UnsignedInt $startTimeInterval,
     private UnsignedInt $minDaysInAdvance,
-    private UnsignedInt $maxMonthsInAdvance,
-    private TimeSerializer $timeSerializer
+    private UnsignedInt $maxMonthsInAdvance
   ) {
     parent::__construct(ApiType::GET_STARTUP_DATA);
   }
@@ -48,8 +47,8 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
       self::USER_SHORT_CODES_KEY => $short_code_data->toImmVector(),
       self::MAX_NUM_SCOPES => $this->maxScopes->getNumber(),
       self::MAX_EXPERIMENT_DURATION => $this->maxHours->getNumber(),
-      self::START_TIME_KEY => $this->timeSerializer->serialize($this->startTime),
-      self::END_TIME_KEY => $this->timeSerializer->serialize($this->endTime),
+      self::START_TIME_KEY => $this->startTime->getResultFields(),
+      self::END_TIME_KEY => $this->endTime->getResultFields(),
       self::START_TIME_INTERVAL_KEY => $this->startTimeInterval->getNumber(),
       self::MIN_DAYS_IN_ADVANCE_KEY => $this->minDaysInAdvance->getNumber(),
       self::MAX_MONTHS_IN_ADVANCE_KEY => $this->maxMonthsInAdvance->getNumber(),

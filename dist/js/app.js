@@ -1141,10 +1141,57 @@ var NewExperimentPageController = function() {
 
       short_codes_model.setDropDownItems(drop_down_item_models);
       
-      
       // Set invalid dates
       
       // Set starting/ending time and time interval
+      var experiment_time_picker_model = experimentTimePickerController.getModel(); 
+      
+      var json_start_time = json_response[api_keys.start_time]; 
+      var json_end_time = json_response[api_keys.end_time]; 
+      var start_time_interval = json_response[api_keys.start_time_interval];
+
+      // Deserialize time objects
+      var start_time = new Time(
+        json_start_time[api_keys.time.hours],
+        json_start_time[api_keys.time.minutes],
+        json_start_time[api_keys.time.seconds]
+      );
+      var end_time = new Time(
+        json_end_time[api_keys.time.hours],
+        json_end_time[api_keys.time.minutes],
+        json_end_time[api_keys.time.seconds]
+      );
+
+      // Generate list of valid time intervals
+      var current_date_time = start_time.toDate();
+      var stopping_date_time = end_time.toDate();
+
+      var drop_down_items = [];
+
+      while (current_date_time.getTime() <= stopping_date_time.getTime()) {
+        // Create new time model and add it to drop-down list model
+        var time_data = new Time(
+          current_date_time.getHours(),
+          current_date_time.getMinutes(),
+          current_date_time.getSeconds()
+        );
+
+        var time_string = Utils.toHoursAndMinutesString(current_date_time);
+
+        drop_down_items.push(new DropDownItemModel(
+          time_string,
+          time_string,
+          time_data
+        ));
+
+        // Advance by perscribed time interval (minutes)
+        current_date_time.setMinutes(
+          current_date_time.getMinutes() + start_time_interval
+        );
+      }
+
+      experiment_time_picker_model.setDropDownItems(drop_down_items);
+
     });
   };
 
@@ -2342,44 +2389,7 @@ var NewExperimentPageModel = function() {
   };
 
   var initializeExperimentTimePickerModel = function() {
-    // Create drop down items 
-    var drop_down_items = [
-      new DropDownItemModel("10:00 am", "10:00 am", {
-        hour: 10,
-        minute: 0
-      }),
-      new DropDownItemModel("10:30 am", "10:30 am", {
-        hour: 10,
-        minute: 30
-      }),
-      new DropDownItemModel("11:00 am", "11:00 am", {
-        hour: 11,
-        minute: 00
-      }),
-      new DropDownItemModel("11:30 am", "11:30 am", {
-        hour: 11,
-        minute: 30
-      }),
-      new DropDownItemModel("12:00 pm", "12:00 pm", {
-        hour: 12,
-        minute: 00
-      }),
-      new DropDownItemModel("12:30 pm", "12:30 pm", {
-        hour: 12,
-        minute: 30
-      }),
-      new DropDownItemModel("1:00 pm", "1:00 pm", {
-        hour: 1,
-        minute: 00
-      }),
-      new DropDownItemModel("1:30 pm", "1:30 pm", {
-        hour: 1,
-        minute: 30
-      })
-    ];
-    
-    experimentTimePickerModel = new DropDownModel();
-    return experimentTimePickerModel.setDropDownItems(drop_down_items);
+    return new DropDownModel();
   };
 
   var initializeExperimentDatePickerModel = function() {
@@ -2927,6 +2937,48 @@ ShortCode.prototype.getCode = function() {
 
 ShortCode.prototype.getAlias = function() {
   return this.alias;
+};
+
+var Time = function(
+  _hours,
+  _minutes,
+  _seconds
+) {
+ 
+  /**
+   * Private vars
+   */
+  var hours = (_hours == null) ? 0 : _hours;
+  var minutes = (_minutes == null) ? 0 : _minutes;
+  var seconds = (_seconds == null) ? 0 : _seconds;
+
+  // Validate input
+  console.assert(hours >= 0 && hours < 24);
+  console.assert(minutes >= 0 && minutes < 60);
+  console.assert(seconds >= 0 && seconds < 60);
+
+  /**
+   * Public functions
+   */
+  this.getHours = function() {
+    return hours;
+  };
+
+  this.getMinutes = function() {
+    return minutes;
+  };
+
+  this.getSeconds = function() {
+    return seconds;
+  };
+
+  this.toDate = function() {
+    var current_time = new Date(0, 0, 0);
+    current_time.setHours(hours);
+    current_time.setMinutes(minutes);
+    current_time.setSeconds(seconds);
+    return current_time;
+  };
 };
 
 var UpdateConfirmedOrderRequestBuilder = function() {
@@ -3660,110 +3712,6 @@ UpdateConfirmedOrderRequest.prototype.isDescriptionRemoved = function() {
 UpdateConfirmedOrderRequest.prototype.getDescription = function() {
   return this.description;
 };
-
-var MyExperimentsLogicController = (function() {
-
-  /**
-   * Private state
-   */
-  var myExperiments = [];
-  var getConfirmedOrdersApiWrapper = null;
-  var myExperimentsView = null;
-
-  /**
-   * Private functions
-   */
-  var initApi = function() {
-    console.assert(getConfirmedOrdersApiWrapper === null); 
-
-    // Initialize get-confirmed-order api
-    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
-    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
-
-    // Bind event listeners to get-confirmed-orders api
-    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
-      clearConfirmedOrders();
-      var orders = json_response[response_keys.orders];
-      var order_response_keys = response_keys.confirmed_order;
-      var short_code_response_keys = response_keys.short_code;
-      
-      for (var i = 0; i < orders.length; ++i) {
-        var order = orders[i];
-        var short_code = order[order_response_keys.short_code];
-
-        var short_code = new ShortCode(
-          short_code[short_code_response_keys.id],
-          short_code[short_code_response_keys.code],
-          short_code[short_code_response_keys.alias]
-        );
-
-        var confirmed_order = new ConfirmedOrder(
-          order[order_response_keys.id],
-          order[order_response_keys.scopes_count],
-          order[order_response_keys.start_time],
-          order[order_response_keys.end_time],
-          order[order_response_keys.title],
-          order[order_response_keys.description],
-          order[order_response_keys.time_ordered],
-          order[order_response_keys.price],
-          short_code
-        );
-
-        addConfirmedOrder(confirmed_order); 
-      }
-    });
-
-    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders'); 
-    });
-
-    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders due to network error'); 
-    });
-  };
-
-  var addConfirmedOrder = function(confirm_order) {
-    // Store in local cache
-    myExperiments.push(confirm_order);  
-
-    // Update MyExperiments view
-    myExperimentsView.pushPendingOrder(confirm_order);
-  };
-
-  var clearConfirmedOrders = function() {
-    // Clear local cache
-    myExperiments = [];
-
-    // Clear MyExperiments view
-    // TODO...   
-  };
-
-  var init = function(my_experiments_view) {
-    myExperimentsView = my_experiments_view;
-
-    // Initialize api module
-    initApi();
-
-    refreshData(); 
-  };
-
-  var refreshData = function() {
-    myExperimentsView.clearPendingOrders();
-    getConfirmedOrdersApiWrapper.fetch(); 
-  };
-
-  var getMyExperiments = function() {
-    return myExperiments;
-  };
-
-  return {
-    init: init,
-    refreshData: refreshData,
-    getMyExperiments: getMyExperiments
-  };
-})();
 
 var ConfirmOrderUiController = (function() {
   
@@ -4751,6 +4699,110 @@ var SidePanelUiController = (function() {
   };
 })();
 
+var MyExperimentsLogicController = (function() {
+
+  /**
+   * Private state
+   */
+  var myExperiments = [];
+  var getConfirmedOrdersApiWrapper = null;
+  var myExperimentsView = null;
+
+  /**
+   * Private functions
+   */
+  var initApi = function() {
+    console.assert(getConfirmedOrdersApiWrapper === null); 
+
+    // Initialize get-confirmed-order api
+    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
+    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
+
+    // Bind event listeners to get-confirmed-orders api
+    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
+      clearConfirmedOrders();
+      var orders = json_response[response_keys.orders];
+      var order_response_keys = response_keys.confirmed_order;
+      var short_code_response_keys = response_keys.short_code;
+      
+      for (var i = 0; i < orders.length; ++i) {
+        var order = orders[i];
+        var short_code = order[order_response_keys.short_code];
+
+        var short_code = new ShortCode(
+          short_code[short_code_response_keys.id],
+          short_code[short_code_response_keys.code],
+          short_code[short_code_response_keys.alias]
+        );
+
+        var confirmed_order = new ConfirmedOrder(
+          order[order_response_keys.id],
+          order[order_response_keys.scopes_count],
+          order[order_response_keys.start_time],
+          order[order_response_keys.end_time],
+          order[order_response_keys.title],
+          order[order_response_keys.description],
+          order[order_response_keys.time_ordered],
+          order[order_response_keys.price],
+          short_code
+        );
+
+        addConfirmedOrder(confirmed_order); 
+      }
+    });
+
+    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders'); 
+    });
+
+    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
+      console.log(response);
+      console.log('ERROR: failed to get confirmed orders due to network error'); 
+    });
+  };
+
+  var addConfirmedOrder = function(confirm_order) {
+    // Store in local cache
+    myExperiments.push(confirm_order);  
+
+    // Update MyExperiments view
+    myExperimentsView.pushPendingOrder(confirm_order);
+  };
+
+  var clearConfirmedOrders = function() {
+    // Clear local cache
+    myExperiments = [];
+
+    // Clear MyExperiments view
+    // TODO...   
+  };
+
+  var init = function(my_experiments_view) {
+    myExperimentsView = my_experiments_view;
+
+    // Initialize api module
+    initApi();
+
+    refreshData(); 
+  };
+
+  var refreshData = function() {
+    myExperimentsView.clearPendingOrders();
+    getConfirmedOrdersApiWrapper.fetch(); 
+  };
+
+  var getMyExperiments = function() {
+    return myExperiments;
+  };
+
+  return {
+    init: init,
+    refreshData: refreshData,
+    getMyExperiments: getMyExperiments
+  };
+})();
+
 ConfirmOrderApi.prototype = new ScopesApi();
 ConfirmOrderApi.prototype.constructor = ConfirmOrderApi;
 
@@ -4864,7 +4916,17 @@ GetStartupDataApi.prototype.getApiKeys = function() {
       alias: 'alias',
       code: 'code',
       id: 'id'
-    } 
+    },
+    start_time: 'start-time',
+    end_time: 'end-time',
+    time: {
+      hours: 'hours',
+      minutes: 'minutes',
+      seconds: 'seconds'
+    },
+    start_time_interval: 'start-time-interval',
+    min_days_in_advance: 'min-days-in-advance',
+    max_months_in_advance: 'max-months-in-advance'
   };
 };
 
@@ -9140,6 +9202,128 @@ function ShortCodePicker(
   };
 };
 
+function SidePanelTab(
+  template_store,
+  parent_node,
+  button_title,
+  iron_icon_type
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
+
+  /**
+   * Ui attributes
+   */
+  var SELECTED_ATTR = "selected-side-panel-tab";
+  var IRON_ICON_TYPE_ATTR = "icon";
+
+  /**
+   * Private state
+   */
+  var _this = this;
+  var templateStore = template_store;
+  var buttonTitle = button_title;
+  var ironIconType = iron_icon_type;
+  var onClickListeners = [];
+
+  // Root dom node
+  var rootNode = {
+    className: 'dash-nav-panel-btn',
+    node: null
+  };
+
+  var ironIconNode = {
+    className: 'nav-btn-icon',
+    node: null
+  };
+
+  var buttonTitleNode = {
+    className: 'nav-btn-label',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * bindClassBoundNode()
+   * - initialize pointer to specified dom node
+   */
+  function bindClassBoundNode(internal_node) {
+    elements = rootNode.node.getElementsByClassName(internal_node.className);
+    console.assert(elements.length === 1);
+    internal_node.node = elements[0];
+  };
+
+  function synthesizeSidePanelTemplate() {
+    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
+    var tab_clone = document.importNode(tab_template.content, true);
+    parent_node.appendChild(tab_clone);
+
+    // Initialize root node and configure event listener
+    var tabs = parent_node.getElementsByClassName(rootNode.className);
+    rootNode.node = tabs[tabs.length - 1];
+
+    rootNode.node.onclick = function() {
+      for (var i = 0; i < onClickListeners.length; ++i) {
+        onClickListeners[i]();
+      }
+    };
+  };
+
+  /**
+   * bindInternalNodes()
+   * @pre-condition: 'rootNode' must already be bound
+   */
+  function bindInternalNodes() {
+    bindClassBoundNode(ironIconNode); 
+    bindClassBoundNode(buttonTitleNode);
+  };
+
+  /**
+   * initDisplay()
+   * - initializes text/graphics for this tab
+   * @pre-condition: all internal nodes bound
+   */
+  function initDisplay() {
+    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
+    buttonTitleNode.node.innerHTML = buttonTitle; 
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Initialize template and append to parent dom node
+    synthesizeSidePanelTemplate();
+
+    // Initialize pointers to internal nodes
+    bindInternalNodes();
+
+    // Initialize the ui
+    initDisplay();
+  }; 
+
+  this.select = function() {
+    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
+  };
+
+  this.deselect = function() {
+    rootNode.node.removeAttribute(SELECTED_ATTR);
+  };
+
+  /**
+   * registerOnClickListener()
+   * @param FuncPtr callback: function(_this) {...}
+   */
+  this.registerOnClickListener = function(callback) {
+    onClickListeners.push(callback); 
+  };
+};
+
 var SidePanelView = function(
   template_store,
   parent_node
@@ -9359,128 +9543,6 @@ var SidePanelView = function(
     userNameNode.node.innerHTML = name;
     // TODO check the length and curtail name if char count exceeds max
     return this;
-  };
-};
-
-function SidePanelTab(
-  template_store,
-  parent_node,
-  button_title,
-  iron_icon_type
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID_SELECTOR = "#side-panel-tab-template";
-
-  /**
-   * Ui attributes
-   */
-  var SELECTED_ATTR = "selected-side-panel-tab";
-  var IRON_ICON_TYPE_ATTR = "icon";
-
-  /**
-   * Private state
-   */
-  var _this = this;
-  var templateStore = template_store;
-  var buttonTitle = button_title;
-  var ironIconType = iron_icon_type;
-  var onClickListeners = [];
-
-  // Root dom node
-  var rootNode = {
-    className: 'dash-nav-panel-btn',
-    node: null
-  };
-
-  var ironIconNode = {
-    className: 'nav-btn-icon',
-    node: null
-  };
-
-  var buttonTitleNode = {
-    className: 'nav-btn-label',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * bindClassBoundNode()
-   * - initialize pointer to specified dom node
-   */
-  function bindClassBoundNode(internal_node) {
-    elements = rootNode.node.getElementsByClassName(internal_node.className);
-    console.assert(elements.length === 1);
-    internal_node.node = elements[0];
-  };
-
-  function synthesizeSidePanelTemplate() {
-    var tab_template = templateStore.import.querySelector(TEMPLATE_ID_SELECTOR); 
-    var tab_clone = document.importNode(tab_template.content, true);
-    parent_node.appendChild(tab_clone);
-
-    // Initialize root node and configure event listener
-    var tabs = parent_node.getElementsByClassName(rootNode.className);
-    rootNode.node = tabs[tabs.length - 1];
-
-    rootNode.node.onclick = function() {
-      for (var i = 0; i < onClickListeners.length; ++i) {
-        onClickListeners[i]();
-      }
-    };
-  };
-
-  /**
-   * bindInternalNodes()
-   * @pre-condition: 'rootNode' must already be bound
-   */
-  function bindInternalNodes() {
-    bindClassBoundNode(ironIconNode); 
-    bindClassBoundNode(buttonTitleNode);
-  };
-
-  /**
-   * initDisplay()
-   * - initializes text/graphics for this tab
-   * @pre-condition: all internal nodes bound
-   */
-  function initDisplay() {
-    ironIconNode.node.setAttribute(IRON_ICON_TYPE_ATTR, ironIconType);
-    buttonTitleNode.node.innerHTML = buttonTitle; 
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Initialize template and append to parent dom node
-    synthesizeSidePanelTemplate();
-
-    // Initialize pointers to internal nodes
-    bindInternalNodes();
-
-    // Initialize the ui
-    initDisplay();
-  }; 
-
-  this.select = function() {
-    rootNode.node.setAttribute(SELECTED_ATTR, ''); 
-  };
-
-  this.deselect = function() {
-    rootNode.node.removeAttribute(SELECTED_ATTR);
-  };
-
-  /**
-   * registerOnClickListener()
-   * @param FuncPtr callback: function(_this) {...}
-   */
-  this.registerOnClickListener = function(callback) {
-    onClickListeners.push(callback); 
   };
 };
 

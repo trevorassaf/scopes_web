@@ -592,6 +592,7 @@ return array(
     'SuccessfulApiResult' => $baseDir . '/apis/results/SuccessfulApiResult.hh',
     'Table' => $baseDir . '/access_layer/tables/Table.hh',
     'Time' => $baseDir . '/utils/data_types/chronos/time/objects/Time.hh',
+    'TimeApiObject' => $baseDir . '/apis/results/objects/TimeApiObject.hh',
     'TimeBuilder' => $baseDir . '/utils/data_types/chronos/time/objects/TimeBuilder.hh',
     'TimeFieldConverter' => $baseDir . '/requests/fields/converters/TimeFieldConverter.hh',
     'TimeRequestFieldFactoryBuilder' => $baseDir . '/requests/fields/factories/TimeRequestFieldFactoryBuilder.hh',

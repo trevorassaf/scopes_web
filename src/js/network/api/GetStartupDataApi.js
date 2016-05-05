@@ -19,6 +19,16 @@ GetStartupDataApi.prototype.getApiKeys = function() {
       alias: 'alias',
       code: 'code',
       id: 'id'
-    } 
+    },
+    start_time: 'start-time',
+    end_time: 'end-time',
+    time: {
+      hours: 'hours',
+      minutes: 'minutes',
+      seconds: 'seconds'
+    },
+    start_time_interval: 'start-time-interval',
+    min_days_in_advance: 'min-days-in-advance',
+    max_months_in_advance: 'max-months-in-advance'
   };
 };

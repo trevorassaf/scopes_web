@@ -47,47 +47,6 @@ var NewExperimentPageModel = function() {
       .setCurrentValue(DEFAULT_EXPERIMENT_DURATION_MODEL_PARAMETERS.value);
   };
 
-  var initializeExperimentTimePickerModel = function() {
-    // Create drop down items 
-    var drop_down_items = [
-      new DropDownItemModel("10:00 am", "10:00 am", {
-        hour: 10,
-        minute: 0
-      }),
-      new DropDownItemModel("10:30 am", "10:30 am", {
-        hour: 10,
-        minute: 30
-      }),
-      new DropDownItemModel("11:00 am", "11:00 am", {
-        hour: 11,
-        minute: 00
-      }),
-      new DropDownItemModel("11:30 am", "11:30 am", {
-        hour: 11,
-        minute: 30
-      }),
-      new DropDownItemModel("12:00 pm", "12:00 pm", {
-        hour: 12,
-        minute: 00
-      }),
-      new DropDownItemModel("12:30 pm", "12:30 pm", {
-        hour: 12,
-        minute: 30
-      }),
-      new DropDownItemModel("1:00 pm", "1:00 pm", {
-        hour: 1,
-        minute: 00
-      }),
-      new DropDownItemModel("1:30 pm", "1:30 pm", {
-        hour: 1,
-        minute: 30
-      })
-    ];
-    
-    experimentTimePickerModel = new DropDownModel();
-    return experimentTimePickerModel.setDropDownItems(drop_down_items);
-  };
-
   var initializeExperimentDatePickerModel = function() {
     // Create data model
     var min_advance_day_count = 14;
@@ -108,17 +67,6 @@ var NewExperimentPageModel = function() {
       .setInvalidDates(invalid_dates);
   };
 
-  var initializeShortCodePickerModel = function() {
-    // var drop_down_items = [
-    //   new DropDownItemModel("SHORT", "SHORT", {}),
-    //   new DropDownItemModel("CODE", "CODE", {}),
-    //   new DropDownItemModel("DEMO", "DEMO", {})
-    // ];
-    // var drop_down_model = new DropDownModel();
-    // return drop_down_model.setDropDownItems(drop_down_items);
-    return new DropDownModel();
-  };
-
   /**
    * Privileged functions
    */
@@ -126,9 +74,9 @@ var NewExperimentPageModel = function() {
     // Initialize models
     scopesCountModel = initializeScopesCountModel();
     experimentDurationModel = initializeExperimentDurationModel();
-    experimentTimePickerModel = initializeExperimentTimePickerModel();
     experimentDatePickerModel = initializeExperimentDatePickerModel();
-    shortCodePickerModel = initializeShortCodePickerModel();
+    experimentTimePickerModel = new DropDownModel();
+    shortCodePickerModel = new DropDownModel();
   };
 
   // Getters
