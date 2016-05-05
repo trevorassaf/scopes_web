@@ -12,7 +12,6 @@ class OrderConfigurationModelFactory extends ConcreteModelFactory<OrderConfigura
     UnsignedInt $id,
     ImmMap<string, mixed> $params
   ): OrderConfiguration {
-    DLogger::log('', $params);
     return new OrderConfiguration(
       $id,
       new UnsignedInt((int)$params[$this->orderConfigurationsTable->getScopesCountKey()]),

@@ -707,4 +707,8 @@ class MethodInjector {
     }
     return $this->createOrderConfigurationMethod;
   }
+
+  public function getTimeSerializer(): TimeSerializer {
+    return $this->timeSerializerLoader->load();
+  }
 }

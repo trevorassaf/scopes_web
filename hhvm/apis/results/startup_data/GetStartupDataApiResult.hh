@@ -9,6 +9,11 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
   const string USER_SHORT_CODES_KEY = "short_codes";
   const string MAX_NUM_SCOPES = 'max_scopes';
   const string MAX_EXPERIMENT_DURATION = 'max_hours';
+  const string START_TIME_KEY = 'start-time';
+  const string END_TIME_KEY = 'end-time';
+  const string START_TIME_INTERVAL_KEY = 'start-time-interval';
+  const string MIN_DAYS_IN_ADVANCE_KEY = 'min-days-in-advance';
+  const string MAX_MONTHS_IN_ADVANCE_KEY = 'max-months-in-advance';
 
   public function __construct(
     private string $firstName,
@@ -17,7 +22,13 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
     private UnsignedFloat $hourlyPrice,
     private ImmVector<ShortCodeApiObject> $shortCodes,
     private UnsignedInt $maxScopes,
-    private UnsignedInt $maxHours
+    private UnsignedInt $maxHours,
+    private Time $startTime,
+    private Time $endTime,
+    private UnsignedInt $startTimeInterval,
+    private UnsignedInt $minDaysInAdvance,
+    private UnsignedInt $maxMonthsInAdvance,
+    private TimeSerializer $timeSerializer
   ) {
     parent::__construct(ApiType::GET_STARTUP_DATA);
   }
@@ -37,6 +48,11 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
       self::USER_SHORT_CODES_KEY => $short_code_data->toImmVector(),
       self::MAX_NUM_SCOPES => $this->maxScopes->getNumber(),
       self::MAX_EXPERIMENT_DURATION => $this->maxHours->getNumber(),
+      self::START_TIME_KEY => $this->timeSerializer->serialize($this->startTime),
+      self::END_TIME_KEY => $this->timeSerializer->serialize($this->endTime),
+      self::START_TIME_INTERVAL_KEY => $this->startTimeInterval->getNumber(),
+      self::MIN_DAYS_IN_ADVANCE_KEY => $this->minDaysInAdvance->getNumber(),
+      self::MAX_MONTHS_IN_ADVANCE_KEY => $this->maxMonthsInAdvance->getNumber(),
     };
   }
 }

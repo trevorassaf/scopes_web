@@ -309,6 +309,7 @@ class ApiInjector {
         $this->methodInjector->getGetGen0OrderPricePolicyMethod(),
         $this->methodInjector->getGetUsersShortCodesMethod(),
         $this->methodInjector->getGetOrderConfigurationMethod(),
+        $this->methodInjector->getTimeSerializer(),
         $this->logger 
       );
     }

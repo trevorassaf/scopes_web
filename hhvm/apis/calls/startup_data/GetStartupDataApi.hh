@@ -7,6 +7,7 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
     private GetGen0OrderPricePolicyByTimeMethod $getGen0OrderPricePolicyByTimeMethod,
     private GetUsersShortCodesMethod $getUsersShortCodesMethod,
     private GetOrderConfigurationMethod $getOrderConfigurationMethod,
+    private TimeSerializer $timeSerializer,
     private Logger $logger
   ) {
     parent::__construct(
@@ -51,7 +52,13 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
       $order_price_policy->getPrice(),
       $short_code_api_object_list->toImmVector(),
       $order_configuration->getScopesCount(),
-      $order_configuration->getMaxExperimentDuration() 
+      $order_configuration->getMaxExperimentDuration(),
+      $order_configuration->getStartTime(),
+      $order_configuration->getEndTime(),
+      $order_configuration->getStartTimeInterval(),
+      $order_configuration->getMinDaysInAdvance(),
+      $order_configuration->getMaxMonthsInAdvance(),
+      $this->timeSerializer
     );
   }
 
