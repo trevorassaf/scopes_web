@@ -25,6 +25,7 @@ var NewExperimentPageModel = function() {
   var experimentTimePickerModel = null;
   var experimentDatePickerModel = null;
   var shortCodePickerModel = null;
+  var pricingModel = null;
 
   /**
    * Private functions
@@ -77,6 +78,7 @@ var NewExperimentPageModel = function() {
     experimentDatePickerModel = initializeExperimentDatePickerModel();
     experimentTimePickerModel = new DropDownModel();
     shortCodePickerModel = new DropDownModel();
+    pricingModel = new PricingModel();
   };
 
   // Getters
@@ -98,5 +100,9 @@ var NewExperimentPageModel = function() {
 
   this.getShortCodePickerModel = function() {
     return shortCodePickerModel;
+  };
+
+  this.getPricingModel = function() {
+    return pricingModel;
   };
 };

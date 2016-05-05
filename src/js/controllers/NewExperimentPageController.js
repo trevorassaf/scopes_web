@@ -82,16 +82,15 @@ var NewExperimentPageController = function() {
   };
 
   var initConfirmOrderController = function() {
-    var confirm_order_form_view = newExperimentPageView.getConfirmExperimentFormView();
-    var experiment_duration_model = newExperimentPageModel.getExperimentDurationModel();
-
     confirmOrderController = new ConfirmOrderController();
+
     confirmOrderController
       .bindConfirmOrder(handleConfirmOrder)
       .bindCancelOrder(handleCancelOrder)
       .init(
-        confirm_order_form_view,
-        experiment_duration_model
+        newExperimentPageView.getConfirmExperimentFormView(),
+        newExperimentPageModel.getExperimentDurationModel(),
+        newExperimentPageModel.getPricingModel() 
       );
   };
 
@@ -205,23 +204,28 @@ var NewExperimentPageController = function() {
     calendar_model.setMaxAdvanceMonthCount(max_months_in_advance);
   };
 
+  var routePricingInfoApiFields = function(price_per_hour) {
+    var pricing_model = confirmOrderController.getPricingModel();
+    pricing_model.setPricePerHour(price_per_hour);
+  };
+
   var configureStartupDataApi = function() {
     var startup_data_api = apiController.getGetStartupDataApiController();
 
     startup_data_api.bindSuccess(function(json_response, api_keys) {
-      // Set max scopes
+      // Configure max scopes
       routeMaxScopesApiField(json_response[api_keys.max_scopes]);
 
-      // Set max experiment duration
+      // Configure max experiment duration
       routeMaxExperimentDurationApiField(json_response[api_keys.max_hours]);
 
-      // Set short codes
+      // Configure short codes
       routeShortCodeApiField(
         json_response[api_keys.short_codes],
         api_keys.short_code_fields
       );
       
-      // Set starting/ending time and time interval
+      // Configure starting/ending time and time interval
       routeExperimentStartingTimesApiField(
         json_response[api_keys.start_time],
         json_response[api_keys.end_time],
@@ -234,6 +238,9 @@ var NewExperimentPageController = function() {
         json_response[api_keys.min_days_in_advance],
         json_response[api_keys.max_months_in_advance]
       ); 
+
+      // Configure pricing
+      routePricingInfoApiFields(json_response[api_keys.hourly_price]);
     });
   };
 

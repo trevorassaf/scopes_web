@@ -303,10 +303,12 @@ var ConfirmOrderController = function() {
   /**
    * Private state
    */
+  // Model
   var confirmOrderView = null;
   var experimentDurationModel = null;
-  var pricePerHour = 20;
+  var pricingModel = null;
 
+  // Event listeners
   var cancelOrderCallbacks = [];
   var confirmOrderCallbacks = [];
 
@@ -315,11 +317,24 @@ var ConfirmOrderController = function() {
    */
   var configureCallbacks = function() {
     // Model --> view data pathway
-    experimentDurationModel.bindCurrentValue(handleNewExperimentDuration);
+    experimentDurationModel.bindCurrentValue(refreshPriceDisplay);
+    pricingModel.bindPricePerHour(refreshPriceDisplay);
 
     // Register button click callbacks
     confirmOrderView.bindCancelOrder(handleCancelOrderClick);
     confirmOrderView.bindConfirmOrder(handleConfirmOrderClick);
+  };
+
+  var refreshPriceDisplay = function() {
+    var hours = experimentDurationModel.getCurrentValue();
+    var hourly_price = pricingModel.getPricePerHour();
+    var total_cost = hours * hourly_price
+
+    confirmOrderView.setPricingInformation(
+      hours,
+      hourly_price,
+      total_cost
+    );
   };
 
   var handleConfirmOrderClick = function() {
@@ -334,25 +349,17 @@ var ConfirmOrderController = function() {
     }
   };
 
-  var handleNewExperimentDuration = function(experiment_duration) {
-    // Calculate price
-    var total_price = pricePerHour * experiment_duration;
-    confirmOrderView.setPricingInformation(
-      experiment_duration,
-      pricePerHour,
-      total_price
-    );
-  };
-
   /**
    * Privileged functions
    */
   this.init = function(
     confirm_order_view,
-    experiment_duration_model
+    experiment_duration_model,
+    pricing_model
   ) {
     confirmOrderView = confirm_order_view;
     experimentDurationModel = experiment_duration_model;
+    pricingModel = pricing_model;
 
     // Attach models to views
     configureCallbacks(); 
@@ -368,6 +375,10 @@ var ConfirmOrderController = function() {
   this.bindCancelOrder = function(callback) {
     cancelOrderCallbacks.push(callback);
     return this;
+  };
+
+  this.getPricingModel = function() {
+    return pricingModel;
   };
 };
 
@@ -1085,16 +1096,15 @@ var NewExperimentPageController = function() {
   };
 
   var initConfirmOrderController = function() {
-    var confirm_order_form_view = newExperimentPageView.getConfirmExperimentFormView();
-    var experiment_duration_model = newExperimentPageModel.getExperimentDurationModel();
-
     confirmOrderController = new ConfirmOrderController();
+
     confirmOrderController
       .bindConfirmOrder(handleConfirmOrder)
       .bindCancelOrder(handleCancelOrder)
       .init(
-        confirm_order_form_view,
-        experiment_duration_model
+        newExperimentPageView.getConfirmExperimentFormView(),
+        newExperimentPageModel.getExperimentDurationModel(),
+        newExperimentPageModel.getPricingModel() 
       );
   };
 
@@ -1208,23 +1218,28 @@ var NewExperimentPageController = function() {
     calendar_model.setMaxAdvanceMonthCount(max_months_in_advance);
   };
 
+  var routePricingInfoApiFields = function(price_per_hour) {
+    var pricing_model = confirmOrderController.getPricingModel();
+    pricing_model.setPricePerHour(price_per_hour);
+  };
+
   var configureStartupDataApi = function() {
     var startup_data_api = apiController.getGetStartupDataApiController();
 
     startup_data_api.bindSuccess(function(json_response, api_keys) {
-      // Set max scopes
+      // Configure max scopes
       routeMaxScopesApiField(json_response[api_keys.max_scopes]);
 
-      // Set max experiment duration
+      // Configure max experiment duration
       routeMaxExperimentDurationApiField(json_response[api_keys.max_hours]);
 
-      // Set short codes
+      // Configure short codes
       routeShortCodeApiField(
         json_response[api_keys.short_codes],
         api_keys.short_code_fields
       );
       
-      // Set starting/ending time and time interval
+      // Configure starting/ending time and time interval
       routeExperimentStartingTimesApiField(
         json_response[api_keys.start_time],
         json_response[api_keys.end_time],
@@ -1237,6 +1252,9 @@ var NewExperimentPageController = function() {
         json_response[api_keys.min_days_in_advance],
         json_response[api_keys.max_months_in_advance]
       ); 
+
+      // Configure pricing
+      routePricingInfoApiFields(json_response[api_keys.hourly_price]);
     });
   };
 
@@ -2411,6 +2429,7 @@ var NewExperimentPageModel = function() {
   var experimentTimePickerModel = null;
   var experimentDatePickerModel = null;
   var shortCodePickerModel = null;
+  var pricingModel = null;
 
   /**
    * Private functions
@@ -2463,6 +2482,7 @@ var NewExperimentPageModel = function() {
     experimentDatePickerModel = initializeExperimentDatePickerModel();
     experimentTimePickerModel = new DropDownModel();
     shortCodePickerModel = new DropDownModel();
+    pricingModel = new PricingModel();
   };
 
   // Getters
@@ -2484,6 +2504,10 @@ var NewExperimentPageModel = function() {
 
   this.getShortCodePickerModel = function() {
     return shortCodePickerModel;
+  };
+
+  this.getPricingModel = function() {
+    return pricingModel;
   };
 };
 
@@ -2556,6 +2580,43 @@ OrderRequestModel.prototype.bindStartDate = function(callback) {
 
 OrderRequestModel.prototype.bindShortCode = function(callback) {
   this.shortCodeChangeListeners.push(callback);
+  return this;
+};
+
+var PricingModel = function() {
+  
+  // Private state
+  this.pricePerHour = 0;
+
+  // Field listeners
+  this.pricePerHourListeners = [];
+};
+
+/**
+ * PricingModel state getters
+ */
+PricingModel.prototype.getPricePerHour = function() {
+  return this.pricePerHour;
+};
+
+/**
+ * Setters w/callbacks
+ */
+PricingModel.prototype.setPricePerHour = function(price) {
+  this.pricePerHour = price;
+
+  this.pricePerHourListeners.forEach(function(callback) {
+    callback(this.pricePerHour);
+  }, this); 
+  return this;
+};
+
+/**
+ * Register listeners
+ */
+PricingModel.prototype.bindPricePerHour = function(callback) {
+  this.pricePerHourListeners.push(callback);
+  callback(this.pricePerHour);
   return this;
 };
 
