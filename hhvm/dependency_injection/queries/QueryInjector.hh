@@ -177,6 +177,8 @@ class QueryInjector {
   // Order configurations/policies
   private ?FetchQuery<OrderConfiguration> $fetchOrderConfigurationQuery;
   private ?FetchOrderConfigurationQuery $concreteFetchOrderConfigurationQuery;
+  private ?InsertQuery<OrderConfiguration> $insertOrderConfigurationQuery;
+  private ?InsertOrderConfigurationQuery $concreteInsertOrderConfigurationQuery;
 
   public function __construct(
     private LazyLoader<AsyncMysqlConnection> $asyncMysqlConnectionLazyLoader,
@@ -243,7 +245,7 @@ class QueryInjector {
     private LazyLoader<Gen0OrderPricePoliciesTable> $gen0OrderPricePoliciesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<Gen0OrderPricePolicy>> $gen0OrderPricePolicyModelFactoryLazyLoader,
     private LazyLoader<OrderConfigurationTable> $orderConfigurationTableLazyLoader,
-    private LazyLoader<ModelFactory<OrderConfiguration>> $orderConfigurationModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<OrderConfiguration>> $orderConfigurationModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -1773,6 +1775,31 @@ class QueryInjector {
     }
     return $this->concreteFetchOrderConfigurationQuery;
   }
+
+  public function getInsertOrderConfigurationQuery(): InsertQuery<OrderConfiguration> {
+    if ($this->insertOrderConfigurationQuery === null) {
+      $this->insertOrderConfigurationQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->orderConfigurationTableLazyLoader->load(),
+        $this->orderConfigurationModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertOrderConfigurationQuery;
+  }
+
+  public function getConcreteInsertOrderConfigurationQuery(): InsertOrderConfigurationQuery {
+    if ($this->concreteInsertOrderConfigurationQuery === null) {
+      $this->concreteInsertOrderConfigurationQuery = new InsertOrderConfigurationQuery(
+        $this->getInsertOrderConfigurationQuery(),
+        $this->orderConfigurationTableLazyLoader->load(),
+        $this->timestampSerializerLazyLoader->load() 
+      ); 
+    }
+    return $this->concreteInsertOrderConfigurationQuery;
+  }
+  
 
   public function getCompositeVideosTable(): CompositeVideoTable {
     return $this->compositeVideoTableLazyLoader->load();

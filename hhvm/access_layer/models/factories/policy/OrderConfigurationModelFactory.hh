@@ -1,13 +1,14 @@
 <?hh // strict
 
-class OrderConfigurationModelFactory implements ModelFactory<OrderConfiguration> {
+class OrderConfigurationModelFactory extends ConcreteModelFactory<OrderConfiguration> {
   
   public function __construct(
     private OrderConfigurationTable $orderConfigurationsTable,
     private HRTimestampSerializer $timestampSerializer
   ) {}
 
-  public function extrude(
+  public function extrudeWithId(
+    UnsignedInt $id,
     ImmMap<string, mixed> $params
   ): OrderConfiguration {
     return new OrderConfiguration(
