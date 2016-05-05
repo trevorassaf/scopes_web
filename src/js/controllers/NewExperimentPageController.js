@@ -109,94 +109,131 @@ var NewExperimentPageController = function() {
     experimentDatePickerController.renderDefaultUi();
   };
 
+  var routeMaxScopesApiField = function(max_scopes) {
+    var scopes_count_model = scopesCountController.getModel();
+    scopes_count_model.setMaxValue(max_scopes);
+  };
+
+  var routeMaxExperimentDurationApiField = function(max_hours) {
+    var experiment_duration_model = experimentDurationController.getModel();
+    experiment_duration_model.setMaxValue(max_hours);
+  };
+
+  var routeShortCodeApiField = function(short_codes, api_keys) {
+    var short_codes_model = shortCodePickerController.getModel();
+
+    var drop_down_item_models = [];
+
+    for (var i = 0; i < short_codes.length; ++i) {
+      var json_short_code = short_codes[i];
+      var short_code = new ShortCode(
+        json_short_code[api_keys.id],
+        json_short_code[api_keys.code],
+        json_short_code[api_keys.alias]
+      );
+
+      var drop_down_item_model = new DropDownItemModel(
+        short_code.getAlias(),
+        short_code.getCode(),
+        short_code
+      );
+
+      drop_down_item_models.push(drop_down_item_model);
+    }
+
+    short_codes_model.setDropDownItems(drop_down_item_models);
+  };
+
+  var routeExperimentStartingTimesApiField = function(
+    json_start_time,
+    json_end_time,
+    start_time_interval,
+    time_keys
+  ) {
+    var experiment_time_picker_model = experimentTimePickerController.getModel(); 
+
+    // Deserialize time objects
+    var start_time = new Time(
+      json_start_time[time_keys.hours],
+      json_start_time[time_keys.minutes],
+      json_start_time[time_keys.seconds]
+    );
+    var end_time = new Time(
+      json_end_time[time_keys.hours],
+      json_end_time[time_keys.minutes],
+      json_end_time[time_keys.seconds]
+    );
+
+    // Generate list of valid time intervals
+    var current_date_time = start_time.toDate();
+    var stopping_date_time = end_time.toDate();
+
+    var drop_down_items = [];
+
+    while (current_date_time.getTime() <= stopping_date_time.getTime()) {
+      // Create new time model and add it to drop-down list model
+      var time_data = new Time(
+        current_date_time.getHours(),
+        current_date_time.getMinutes(),
+        current_date_time.getSeconds()
+      );
+
+      var time_string = Utils.toHoursAndMinutesString(current_date_time);
+
+      drop_down_items.push(new DropDownItemModel(
+        time_string,
+        time_string,
+        time_data
+      ));
+
+      // Advance by perscribed time interval (minutes)
+      current_date_time.setMinutes(
+        current_date_time.getMinutes() + start_time_interval
+      );
+    }
+
+    experiment_time_picker_model.setDropDownItems(drop_down_items);
+
+  };
+
+  var routeCalendarApiFields = function(
+    min_days_in_advance,
+    max_months_in_advance
+  ) {
+    var calendar_model = experimentDatePickerController.getModel();
+    calendar_model.setMinAdvanceDayCount(min_days_in_advance);
+    calendar_model.setMaxAdvanceMonthCount(max_months_in_advance);
+  };
+
   var configureStartupDataApi = function() {
     var startup_data_api = apiController.getGetStartupDataApiController();
 
     startup_data_api.bindSuccess(function(json_response, api_keys) {
       // Set max scopes
-      var scopes_count_model = scopesCountController.getModel();
-      scopes_count_model.setMaxValue(json_response[api_keys.max_scopes]);
+      routeMaxScopesApiField(json_response[api_keys.max_scopes]);
 
       // Set max experiment duration
-      var experiment_duration_model = experimentDurationController.getModel();
-      experiment_duration_model.setMaxValue(json_response[api_keys.max_hours]);
+      routeMaxExperimentDurationApiField(json_response[api_keys.max_hours]);
 
       // Set short codes
-      var short_codes_model = shortCodePickerController.getModel();
-
-      var short_codes = json_response[api_keys.short_codes];
-      var drop_down_item_models = [];
-
-      for (var i = 0; i < short_codes.length; ++i) {
-        var json_short_code = short_codes[i];
-        var short_code = new ShortCode(
-          json_short_code[api_keys.short_code_fields.id],
-          json_short_code[api_keys.short_code_fields.code],
-          json_short_code[api_keys.short_code_fields.alias]
-        );
-
-        var drop_down_item_model = new DropDownItemModel(
-          short_code.getAlias(),
-          short_code.getCode(),
-          short_code
-        );
-
-        drop_down_item_models.push(drop_down_item_model);
-      }
-
-      short_codes_model.setDropDownItems(drop_down_item_models);
-      
-      // Set invalid dates
+      routeShortCodeApiField(
+        json_response[api_keys.short_codes],
+        api_keys.short_code_fields
+      );
       
       // Set starting/ending time and time interval
-      var experiment_time_picker_model = experimentTimePickerController.getModel(); 
+      routeExperimentStartingTimesApiField(
+        json_response[api_keys.start_time],
+        json_response[api_keys.end_time],
+        json_response[api_keys.start_time_interval],
+        api_keys.time
+      );
       
-      var json_start_time = json_response[api_keys.start_time]; 
-      var json_end_time = json_response[api_keys.end_time]; 
-      var start_time_interval = json_response[api_keys.start_time_interval];
-
-      // Deserialize time objects
-      var start_time = new Time(
-        json_start_time[api_keys.time.hours],
-        json_start_time[api_keys.time.minutes],
-        json_start_time[api_keys.time.seconds]
-      );
-      var end_time = new Time(
-        json_end_time[api_keys.time.hours],
-        json_end_time[api_keys.time.minutes],
-        json_end_time[api_keys.time.seconds]
-      );
-
-      // Generate list of valid time intervals
-      var current_date_time = start_time.toDate();
-      var stopping_date_time = end_time.toDate();
-
-      var drop_down_items = [];
-
-      while (current_date_time.getTime() <= stopping_date_time.getTime()) {
-        // Create new time model and add it to drop-down list model
-        var time_data = new Time(
-          current_date_time.getHours(),
-          current_date_time.getMinutes(),
-          current_date_time.getSeconds()
-        );
-
-        var time_string = Utils.toHoursAndMinutesString(current_date_time);
-
-        drop_down_items.push(new DropDownItemModel(
-          time_string,
-          time_string,
-          time_data
-        ));
-
-        // Advance by perscribed time interval (minutes)
-        current_date_time.setMinutes(
-          current_date_time.getMinutes() + start_time_interval
-        );
-      }
-
-      experiment_time_picker_model.setDropDownItems(drop_down_items);
-
+      // Configure calendar 
+      routeCalendarApiFields(
+        json_response[api_keys.min_days_in_advance],
+        json_response[api_keys.max_months_in_advance]
+      ); 
     });
   };
 

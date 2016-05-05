@@ -92,7 +92,7 @@ var DatePickerController = function() {
     // Calculate month-displacement between new-date and start-date
     var month_displacement = 12 * (year - start_date.getFullYear()) + month - start_date.getMonth();
 
-    return month_displacement > 0 &&
+    return month_displacement >= 0 &&
       month_displacement <= datePickerModel.getMaxAdvanceMonthCount();
   };
 
@@ -149,8 +149,11 @@ var DatePickerController = function() {
     var max_month = starting_date.getMonth() + datePickerModel.getMaxAdvanceMonthCount();
 
     while (
-      (Utils.contains(starting_date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())
-        || Utils.contains(starting_date, datePickerModel.getInvalidDates()))
+      (
+        Utils.contains(starting_date.getDay(), datePickerModel.getInvalidDaysOfTheWeek())
+        ||
+        Utils.contains(starting_date, datePickerModel.getInvalidDates())
+      )
       && starting_date.getMonth() < max_month
     ) {
       starting_date.setDate(starting_date.getDate() + 1);
@@ -158,6 +161,7 @@ var DatePickerController = function() {
 
     if (starting_date.getMonth() == max_month) {
       // TODO handle case in which NO legal starting dates exist!
+      console.assert(false, 'Unhandled case!');
     }
 
     // Set date on DatePickerModel
@@ -169,5 +173,9 @@ var DatePickerController = function() {
         starting_date.getMonth(),
         starting_date.getFullYear()
       );
+  };
+
+  this.getModel = function() {
+    return datePickerModel;
   };
 };
