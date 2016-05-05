@@ -35,6 +35,8 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
       self::EMAIL_KEY => $this->email->toString(),
       self::HOURLY_PRICE_KEY => $this->hourlyPrice->getNumber(),
       self::USER_SHORT_CODES_KEY => $short_code_data->toImmVector(),
+      self::MAX_NUM_SCOPES => $this->maxScopes->getNumber(),
+      self::MAX_EXPERIMENT_DURATION => $this->maxHours->getNumber(),
     };
   }
 }
