@@ -12,6 +12,7 @@ class OrderConfigurationModelFactory extends ConcreteModelFactory<OrderConfigura
     ImmMap<string, mixed> $params
   ): OrderConfiguration {
     return new OrderConfiguration(
+      $id,
       new UnsignedInt((int)$params[$this->orderConfigurationsTable->getScopesCountKey()]),
       new UnsignedInt((int)$params[$this->orderConfigurationsTable->getMaxExperimentDurationKey()]),
       $this->timestampSerializer->deserialize((string)$params[$this->orderConfigurationsTable->getTimeEnactedKey()])

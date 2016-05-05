@@ -58,6 +58,7 @@ class MethodInjector {
   private ?CreateReservedOrderPolicyMethod $createReservedOrderPolicyMethod;
   private ?MakeVideoUploadPolicyMethod $makeVideoUploadPolicyMethod;
   private ?GetOrderConfigurationMethod $getOrderConfigurationMethod;
+  private ?CreateOrderConfigurationMethod $createOrderConfigurationMethod;
 
   // Transaction methods
   private ?ExecuteTransactionsForTimeIntervalMethod $executeTransactionsForTimeIntervalMethod;
@@ -695,5 +696,15 @@ class MethodInjector {
       );
     }
     return $this->getOrderConfigurationMethod;
+  }
+
+  public function getCreateOrderConfigurationMethod(): CreateOrderConfigurationMethod {
+    if ($this->createOrderConfigurationMethod === null) {
+      $this->createOrderConfigurationMethod = new CreateOrderConfigurationMethod(
+        $this->queryInjector->getConcreteInsertOrderConfigurationQuery(),
+        $this->timestampBuilderLoader->load()
+      ); 
+    }
+    return $this->createOrderConfigurationMethod;
   }
 }

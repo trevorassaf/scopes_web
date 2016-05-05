@@ -38,6 +38,7 @@ function initDbMain($argv, $argc): void {
   $method_injector = $production_method_injector_factory->get();
 
   // Init policies
+  initOrderConfiguration($method_injector);
   initGen0OrderPricePolicy($method_injector);
   initRsvdOrderPolicy($method_injector);
   initVideoUploadPolicy($method_injector, $project_root_dir);
@@ -49,7 +50,19 @@ function initDbMain($argv, $argc): void {
   initRegularWeekDaysAndTimes($method_injector);
 }
 
-function initVideoMimeTypes($method_injector): void {
+function initOrderConfiguration(MethodInjector $method_injector): void {
+  $create_order_configuration_method = $method_injector->getCreateOrderConfigurationMethod();
+
+  $max_scopes_count = new UnsignedInt(16);
+  $max_experiment_duration = new UnsignedInt(16);
+
+  $create_order_configuration_method->create(
+    $max_scopes_count,
+    $max_experiment_duration 
+  );
+}
+
+function initVideoMimeTypes(MethodInjector $method_injector): void {
   $create_video_mime_method = $method_injector->getCreateVideoMimeTypeMethod();
 
   $create_video_mime_method->create("mp4", "video/mp4");

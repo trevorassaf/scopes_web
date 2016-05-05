@@ -37,16 +37,16 @@ var GetStartupDataApiController = function() {
     console.log("WARNING: Logically failed api response!");
     console.log(api_response); 
     
-    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
+    for (var i = 0; i < logicalFailureListeners.length; ++i) {
       logicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
 
   var nonLogicallyFailedApiCallback = function(api_response) {
-    console.nonLog("WARNING: Logically failed api response!");
-    console.nonLog(api_response); 
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
     
-    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
+    for (var i = 0; i < nonLogicalFailureListeners.length; ++i) {
       nonLogicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };

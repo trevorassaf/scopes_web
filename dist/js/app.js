@@ -1406,6 +1406,259 @@ var TechnicianPageController = function() {
   };
 };
 
+function ConfirmedOrder(
+  id,
+  num_scopes,
+  start_timestamp,
+  end_timestamp,
+  title,
+  description,
+  time_ordered,
+  price,
+  short_code
+) {
+  this.id = id;
+  this.scopesCount = num_scopes;
+  this.startTimestamp = start_timestamp;
+  this.endTimestamp = end_timestamp;
+  this.title = title;
+  this.description = description;
+  this.timeOrdered = time_ordered;
+  this.price = price;
+  this.shortCode = short_code;
+};
+
+ConfirmedOrder.prototype.getId = function() {
+  return this.id;
+};
+
+ConfirmedOrder.prototype.getScopesCount = function() {
+  return this.scopesCount;
+};
+
+ConfirmedOrder.prototype.getStartTimestamp = function() {
+  return this.startTimestamp;
+};
+
+ConfirmedOrder.prototype.getEndTimestamp = function() {
+  return this.endTimestamp;
+};
+
+ConfirmedOrder.prototype.getTitle = function() {
+  return this.title;
+};
+
+ConfirmedOrder.prototype.getDescription = function() {
+  return this.description;
+};
+
+ConfirmedOrder.prototype.getTimeOrdered = function() {
+  return this.timeOrdered;
+};
+
+ConfirmedOrder.prototype.getPrice = function() {
+  return this.price;
+};
+
+ConfirmedOrder.prototype.getShortCode = function() {
+  return this.shortCode;
+};
+
+var DateOperator = (function() {
+
+  // Date constants
+  var HOURS_IN_MICROSECONDS = 3.6e6;
+
+  /**
+   * Privileged methods
+   */
+
+  this.getDifferenceInHours = function(
+    date_a,
+    date_b
+  ) {
+    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
+  };
+
+  return {
+    getDifferenceInHours: getDifferenceInHours
+  };
+
+})();
+
+function SerializeableDate(
+  year,
+  month,
+  date
+) {
+
+  // Ui constants
+  this.DATE_DELIMITER = ',';
+
+  this.SHORT_MONTH_NAMES = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  /**
+   * getShortMonthName()
+   * @param uint month: 0 < month < 11
+   */
+  this.getShortMonthName = function(month) {
+    return this.SHORT_MONTH_NAMES[month];
+  };
+
+  // Private state
+  this.year = year;
+
+  console.assert(month >= 0 && month < 12);
+  this.month = month;
+
+  console.assert(date >= 0 && date < 31);
+  this.date = date;
+};
+
+SerializeableDate.prototype.serialize = function() {
+  return this.getShortMonthName(this.month) + ' ' + this.date
+    + this.DATE_DELIMITER + ' ' + this.year;
+};
+
+function SerializeableTime(
+  hours,    // military time
+  minutes,
+  seconds
+) {
+
+  this.TIME_DELIMITER = ':';
+  this.AM_TOKEN = 'am';
+  this.PM_TOKEN = 'pm';
+
+  this.convertHourToNonMilitaryTime = function(military_hours) {
+    return (military_hours > 12)
+      ? military_hours - 12
+      : military_hours;
+  };
+
+  this.getMeridianToken = function(military_hours) {
+    return (military_hours >= 12 && military_hours !== 24)
+      ? this.PM_TOKEN
+      : this.AM_TOKEN;
+  };
+
+  this.hours = hours;
+  this.minutes = minutes;
+  this.seconds = seconds;
+};
+
+SerializeableTime.prototype.serialize = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
+};
+
+SerializeableTime.prototype.serializeWithoutSeconds = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
+    " " + meridian_token;
+};
+
+function ShortCode(
+  id,
+  code,
+  alias
+) {
+  this.id = id;
+  this.code = code;
+  this.alias = alias;
+};
+
+ShortCode.prototype.getId = function() {
+  return this.id;
+};
+
+ShortCode.prototype.getCode = function() {
+  return this.code;
+};
+
+ShortCode.prototype.getAlias = function() {
+  return this.alias;
+};
+
+var UpdateConfirmedOrderRequestBuilder = function() {
+
+  this.orderId = null;
+  this.title = null;
+  this.removeTitle = false;
+  this.description = null;
+  this.removeDescription = false;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
+  this.orderId = id;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
+  this.title = title;
+  this.removeTitle = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
+  this.title = null;
+  this.removeTitle = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
+  this.description = description;
+  this.removeDescription = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
+  this.description = null;
+  this.removeDescription = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
+  // Check: id must be set!
+  console.assert(this.orderId != null);
+
+  // Check: at least one other field must be set 
+  console.assert(
+      this.title != null ||
+      this.isTitleRemoved != null ||
+      this.description != null ||
+      this.isDescriptionRemoved != null
+  );
+
+  return new UpdateConfirmedOrderRequest(
+    this.orderId,
+    this.title,
+    this.isTitleRemoved,
+    this.description,
+    this.isDescriptionRemoved
+  );
+};
+
 var ApplicationModel = function() {
   
   /**
@@ -2662,259 +2915,6 @@ UserModel.prototype.bindChangeEmail = function(callback) {
   return this;
 };
 
-function ConfirmedOrder(
-  id,
-  num_scopes,
-  start_timestamp,
-  end_timestamp,
-  title,
-  description,
-  time_ordered,
-  price,
-  short_code
-) {
-  this.id = id;
-  this.scopesCount = num_scopes;
-  this.startTimestamp = start_timestamp;
-  this.endTimestamp = end_timestamp;
-  this.title = title;
-  this.description = description;
-  this.timeOrdered = time_ordered;
-  this.price = price;
-  this.shortCode = short_code;
-};
-
-ConfirmedOrder.prototype.getId = function() {
-  return this.id;
-};
-
-ConfirmedOrder.prototype.getScopesCount = function() {
-  return this.scopesCount;
-};
-
-ConfirmedOrder.prototype.getStartTimestamp = function() {
-  return this.startTimestamp;
-};
-
-ConfirmedOrder.prototype.getEndTimestamp = function() {
-  return this.endTimestamp;
-};
-
-ConfirmedOrder.prototype.getTitle = function() {
-  return this.title;
-};
-
-ConfirmedOrder.prototype.getDescription = function() {
-  return this.description;
-};
-
-ConfirmedOrder.prototype.getTimeOrdered = function() {
-  return this.timeOrdered;
-};
-
-ConfirmedOrder.prototype.getPrice = function() {
-  return this.price;
-};
-
-ConfirmedOrder.prototype.getShortCode = function() {
-  return this.shortCode;
-};
-
-var DateOperator = (function() {
-
-  // Date constants
-  var HOURS_IN_MICROSECONDS = 3.6e6;
-
-  /**
-   * Privileged methods
-   */
-
-  this.getDifferenceInHours = function(
-    date_a,
-    date_b
-  ) {
-    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
-  };
-
-  return {
-    getDifferenceInHours: getDifferenceInHours
-  };
-
-})();
-
-function SerializeableDate(
-  year,
-  month,
-  date
-) {
-
-  // Ui constants
-  this.DATE_DELIMITER = ',';
-
-  this.SHORT_MONTH_NAMES = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
-
-  /**
-   * getShortMonthName()
-   * @param uint month: 0 < month < 11
-   */
-  this.getShortMonthName = function(month) {
-    return this.SHORT_MONTH_NAMES[month];
-  };
-
-  // Private state
-  this.year = year;
-
-  console.assert(month >= 0 && month < 12);
-  this.month = month;
-
-  console.assert(date >= 0 && date < 31);
-  this.date = date;
-};
-
-SerializeableDate.prototype.serialize = function() {
-  return this.getShortMonthName(this.month) + ' ' + this.date
-    + this.DATE_DELIMITER + ' ' + this.year;
-};
-
-function SerializeableTime(
-  hours,    // military time
-  minutes,
-  seconds
-) {
-
-  this.TIME_DELIMITER = ':';
-  this.AM_TOKEN = 'am';
-  this.PM_TOKEN = 'pm';
-
-  this.convertHourToNonMilitaryTime = function(military_hours) {
-    return (military_hours > 12)
-      ? military_hours - 12
-      : military_hours;
-  };
-
-  this.getMeridianToken = function(military_hours) {
-    return (military_hours >= 12 && military_hours !== 24)
-      ? this.PM_TOKEN
-      : this.AM_TOKEN;
-  };
-
-  this.hours = hours;
-  this.minutes = minutes;
-  this.seconds = seconds;
-};
-
-SerializeableTime.prototype.serialize = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
-};
-
-SerializeableTime.prototype.serializeWithoutSeconds = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
-    " " + meridian_token;
-};
-
-function ShortCode(
-  id,
-  code,
-  alias
-) {
-  this.id = id;
-  this.code = code;
-  this.alias = alias;
-};
-
-ShortCode.prototype.getId = function() {
-  return this.id;
-};
-
-ShortCode.prototype.getCode = function() {
-  return this.code;
-};
-
-ShortCode.prototype.getAlias = function() {
-  return this.alias;
-};
-
-var UpdateConfirmedOrderRequestBuilder = function() {
-
-  this.orderId = null;
-  this.title = null;
-  this.removeTitle = false;
-  this.description = null;
-  this.removeDescription = false;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
-  this.orderId = id;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
-  this.title = title;
-  this.removeTitle = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
-  this.title = null;
-  this.removeTitle = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
-  this.description = description;
-  this.removeDescription = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
-  this.description = null;
-  this.removeDescription = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
-  // Check: id must be set!
-  console.assert(this.orderId != null);
-
-  // Check: at least one other field must be set 
-  console.assert(
-      this.title != null ||
-      this.isTitleRemoved != null ||
-      this.description != null ||
-      this.isDescriptionRemoved != null
-  );
-
-  return new UpdateConfirmedOrderRequest(
-    this.orderId,
-    this.title,
-    this.isTitleRemoved,
-    this.description,
-    this.isDescriptionRemoved
-  );
-};
-
 var Utils = (function() {
 
   var CLASS_NAME_PROPERTY = "className";
@@ -3420,16 +3420,16 @@ var GetStartupDataApiController = function() {
     console.log("WARNING: Logically failed api response!");
     console.log(api_response); 
     
-    for (var i = 0; i < logicallyFailedApiCallbackListeners.length; ++i) {
+    for (var i = 0; i < logicalFailureListeners.length; ++i) {
       logicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
 
   var nonLogicallyFailedApiCallback = function(api_response) {
-    console.nonLog("WARNING: Logically failed api response!");
-    console.nonLog(api_response); 
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
     
-    for (var i = 0; i < nonLogicallyFailedApiCallbackListeners.length; ++i) {
+    for (var i = 0; i < nonLogicalFailureListeners.length; ++i) {
       nonLogicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
