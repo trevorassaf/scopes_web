@@ -39,3 +39,11 @@ var Time = function(
     return current_time;
   };
 };
+
+Time.prototype.fromDate = function(date) {
+  return new Time(
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds()
+  );
+};

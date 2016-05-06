@@ -19,3 +19,11 @@ ShortCode.prototype.getCode = function() {
 ShortCode.prototype.getAlias = function() {
   return this.alias;
 };
+
+ShortCode.prototype.deepCopy = function() {
+  return new ShortCode(
+    this.id,
+    this.code,
+    this.alias
+  );
+};

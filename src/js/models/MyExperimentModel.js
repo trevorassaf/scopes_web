@@ -7,7 +7,8 @@ var MyExperimentModel = function(
   start_time,
   short_code,
   experiment_status,
-  payment_status
+  payment_status,
+  is_persisted
 ) {
 
   /**
@@ -22,6 +23,7 @@ var MyExperimentModel = function(
   this.shortCode = short_code;
   this.experimentStatus = experiment_status;
   this.paymentStatus = payment_status;
+  this.isPersisted = is_persisted
 
   // Callbacks
   this.titleCallbacks = [];
@@ -32,6 +34,7 @@ var MyExperimentModel = function(
   this.experimentStatusCallbacks = [];
   this.paymentStatusCallbacks = [];
   this.shortCodeCallbacks = [];
+  this.isPersistedCallbacks = [];
 };
 
 // Setters
@@ -99,6 +102,14 @@ MyExperimentModel.prototype.setPaymentStatus = function(paymentStatus) {
   return this;
 };
 
+MyExperimentModel.prototype.setIsPersisted = function(is_persisted) {
+  this.isPersisted = is_persisted;
+  this.isPersistedCallbacks.forEach(function(callback) {
+    callback(this.isPersisted);
+  }, this);
+  return this;
+};
+
 // Bind callbacks
 MyExperimentModel.prototype.bindTitle = function(callback) {
   this.titleCallbacks.push(callback);
@@ -148,6 +159,11 @@ MyExperimentModel.prototype.bindPaymentStatus = function(callback) {
   return this;
 };
 
+MyExperimentModel.prototype.bindIsPersisted = function(callback) {
+  this.isPersistedCallbacks.push(callback);
+  return this;
+};
+
 // Getters
 MyExperimentModel.prototype.getId = function() {
   return this.id;
@@ -179,4 +195,8 @@ MyExperimentModel.prototype.getExperimentStatus = function() {
 
 MyExperimentModel.prototype.getPaymentStatus = function() {
   return this.paymentStatus;
+};
+
+MyExperimentModel.prototype.getIsPerisisted = function() {
+  return this.isPersisted;
 };

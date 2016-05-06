@@ -37,10 +37,57 @@ var CenterPageController = function() {
     );
   };
 
+  var createShadowMyExperimentModel = function(
+    scopes_count,
+    experiment_duration,
+    start_time,
+    short_code
+  ) {
+    // Make deep copy of the complex parameters!
+    var start_time_copy = new Date(start_time.getTime());
+    var short_code_copy = short_code.deepCopy();
+
+    // Create new my experiment shadow
+    var new_my_experiment_shadow_model = new NewMyExperimentModelBuilder()
+      .setScopesCount(scopes_count)
+      .setExperimentDuration(experiment_duration)
+      .setStartTime(start_time_copy)
+      .setShortCode(short_code_copy)
+      .build();
+
+    return new_my_experiment_shadow_model;
+  };
+
+  var persistNewExperiment = function(
+    scopes_count,
+    experiment_duration,
+    start_time,
+    short_code,
+    new_my_experiment_shadow_model 
+  ) {
+
+    var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);
+    confirm_order_api
+      .setScopesCount(scopes_count)
+      .setExperimentDuration(experiment_duration)
+      .setStartTimestamp()
+      .setShortCodeId(short_code.getId());
+
+
+             
+  };
+
   var handleConfirmOrder = function() {
     var new_experiment_model = newExperimentPageController.getModel();  
-    
-    // Time input
+
+    // Extract data from new-experiment model
+    // Scopes count data
+    var scopes_count = new_experiment_model.getScopesCountModel().getCurrentValue();
+
+    // Experiment duration data
+    var experiment_duration = new_experiment_model.getExperimentDurationModel().getCurrentValue();
+
+    // Time data
     var start_date_model = new_experiment_model.getExperimentDatePickerModel();
     var start_time_model = new_experiment_model.getExperimentTimePickerModel();
     var selected_time_model = start_time_model.getSelectedItem();
@@ -53,24 +100,44 @@ var CenterPageController = function() {
       selected_time_model.getData().minute
     );
 
-    // Short code
+    // Short code data
     var short_code_model = new_experiment_model.getShortCodePickerModel(); 
-    var selected_short_code_model = short_code_model.getSelectedItem();
-    
-    var experiment_model = new MyExperimentModel(
-      0,
-      null,
-      null,
-      new_experiment_model.getScopesCountModel().getCurrentValue(),
-      new_experiment_model.getExperimentDurationModel().getCurrentValue(),
+    var short_code = short_code_model.getSelectedItem();
+
+
+    var new_my_experiment_shadow_model = createShadowMyExperimentModel(
+      scopes_count,
+      experiment_duration,
       start_time,
-      selected_short_code_model.getLabel(),
-      "Pending",
-      "Pending"
+      short_code
     );
 
-    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
-    my_experiments_page_model.addExperiment(experiment_model);
+    // Update ui and navigate user to my-experiments page
+    // TODO...
+    
+    // Send new experiment request to server
+    persistNewExperiment(
+      scopes_count,
+      experiment_duration,
+      start_time,
+      short_code,
+      new_my_experiment_shadow_model
+    );
+
+    // var experiment_model = new MyExperimentModel(
+    //   0,
+    //   null,
+    //   null,
+    //   new_experiment_model.getScopesCountModel().getCurrentValue(),
+    //   new_experiment_model.getExperimentDurationModel().getCurrentValue(),
+    //   start_time,
+    //   selected_short_code_model.getLabel(),
+    //   "Pending",
+    //   "Pending"
+    // );
+    //
+    // var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    // my_experiments_page_model.addExperiment(experiment_model);
   };
 
   var initMyExperimentsPageController = function() {
