@@ -49,6 +49,8 @@ class MethodInjector {
   private ?GetUsersConfirmedOrdersAndCellLabelsMethod $getUsersConfirmedOrdersAndCellLabelsMethod;
   private ?GetUsersConfirmedOrdersMethod $getUsersConfirmedOrdersMethod;
   private ?IsConflictingConfirmedOrderMethod $isConflictingConfirmedOrderMethod;
+  private ?GetAllConfirmedOrdersMethod $getAllConfirmedOrdersMethod;
+  private ?GetConfirmedOrderDatesMethod $getConfirmedOrderDatesMethod;
 
   // Cell label methods
   private ?UpdateCellLabelMethod $updateCellLabelMethod;
@@ -88,6 +90,9 @@ class MethodInjector {
   private ?CreateGen0OrderPricePolicyMethod $createGen0OrderPricePolicyMethod; 
   private ?GetGen0OrderPricePolicyByTimeMethod $getGen0OrderPricePolicyByTimeMethod;
   private ?ApplyGen0OrderPricePolicyMethod $applyGen0OrderPricePolicyMethod;
+
+  // Chronos
+  private ?GetDisallowedWeekDaysMethod $getDisallowedWeekDaysMethod;
 
   public function __construct(
     private QueryInjector $queryInjector,
@@ -350,6 +355,25 @@ class MethodInjector {
       );
     }
     return $this->isConflictingConfirmedOrderMethod;
+  }
+
+  public function getGetAllConfirmedOrdersMethod(): GetAllConfirmedOrdersMethod {
+    if ($this->getAllConfirmedOrdersMethod === null) {
+      $this->getAllConfirmedOrdersMethod = new GetAllConfirmedOrdersMethod(
+        $this->queryInjector->getFetchConfirmedOrdersByTimeQuery(),
+        $this->queryInjector->getFetchConfirmedOrderQuery()
+      );
+    }
+    return $this->getAllConfirmedOrdersMethod;
+  }
+
+  public function getGetConfirmedOrdersDatesMethod(): GetConfirmedOrderDatesMethod {
+    if ($this->getConfirmedOrderDatesMethod === null) {
+      $this->getConfirmedOrderDatesMethod = new GetConfirmedOrderDatesMethod(
+        $this->getGetAllConfirmedOrdersMethod()
+      );
+    }
+    return $this->getConfirmedOrderDatesMethod;
   }
 
   public function getGetUsersConfirmedOrdersMethod(): GetUsersConfirmedOrdersMethod {
@@ -708,7 +732,20 @@ class MethodInjector {
     return $this->createOrderConfigurationMethod;
   }
 
+  public function getGetDisallowedWeekDaysMethod(): GetDisallowedWeekDaysMethod {
+    if ($this->getDisallowedWeekDaysMethod === null) {
+      $this->getDisallowedWeekDaysMethod = new GetDisallowedWeekDaysMethod(
+        $this->queryInjector->getFetchAllRegularWeekDaysQuery()
+      ); 
+    }
+    return $this->getDisallowedWeekDaysMethod;
+  }
+
   public function getTimeSerializer(): TimeSerializer {
     return $this->timeSerializerLoader->load();
+  }
+
+  public function getTimestampOperator(): TimestampOperator {
+    return $this->timestampOperatorLoader->load();
   }
 }

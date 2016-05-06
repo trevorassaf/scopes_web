@@ -309,6 +309,11 @@ class ApiInjector {
         $this->methodInjector->getGetGen0OrderPricePolicyMethod(),
         $this->methodInjector->getGetUsersShortCodesMethod(),
         $this->methodInjector->getGetOrderConfigurationMethod(),
+        $this->methodInjector->getGetDisallowedWeekDaysMethod(),
+        $this->methodInjector->getGetConfirmedOrdersDatesMethod(),
+        $this->timestampBuilderLoader->load(),
+        $this->methodInjector->getTimestampOperator(),
+        $this->timestampSegmentFactoryLoader->load(), 
         $this->logger 
       );
     }

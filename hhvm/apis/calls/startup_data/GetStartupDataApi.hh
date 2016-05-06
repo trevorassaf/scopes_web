@@ -7,6 +7,11 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
     private GetGen0OrderPricePolicyByTimeMethod $getGen0OrderPricePolicyByTimeMethod,
     private GetUsersShortCodesMethod $getUsersShortCodesMethod,
     private GetOrderConfigurationMethod $getOrderConfigurationMethod,
+    private GetDisallowedWeekDaysMethod $getDisallowedWeekDaysMethod,
+    private GetConfirmedOrderDatesMethod $getConfirmedOrderDatesMethod,
+    private TimestampBuilder $timestampBuilder,
+    private TimestampOperator $timestampOperator,
+    private TimestampSegmentFactory $timestampSegmentFactory,
     private Logger $logger
   ) {
     parent::__construct(
@@ -44,6 +49,26 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
       );
     }
 
+    // Fetch disallowed dates
+    $current_time = $this->timestampBuilder->now(); 
+    $end_time = $this->timestampOperator->addMonths(
+      $current_time,
+      $order_configuration->getMaxMonthsInAdvance()
+    );
+
+    $disallowed_dates = $this->getConfirmedOrderDatesMethod->get(
+      $this->timestampSegmentFactory->make($current_time, $end_time)
+    );
+
+    $disallowed_date_api_objs = Vector{};
+
+    foreach ($disallowed_dates as $date) {
+      $disallowed_date_api_objs[] = new DateApiObject($date);
+    }
+
+    // Fetch disallowed days of the week
+    $disallowed_week_days = $this->getDisallowedWeekDaysMethod->get();
+
     return new GetStartupDataApiResult(
       $user->getFirstName(),
       $user->getLastName(),
@@ -56,7 +81,9 @@ class GetStartupDataApi extends Api<GetStartupDataApiRequest> {
       new TimeApiObject($order_configuration->getEndTime()),
       $order_configuration->getStartTimeInterval(),
       $order_configuration->getMinDaysInAdvance(),
-      $order_configuration->getMaxMonthsInAdvance()
+      $order_configuration->getMaxMonthsInAdvance(),
+      $disallowed_date_api_objs->toImmVector(),
+      $disallowed_week_days
     );
   }
 

@@ -14,6 +14,8 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
   const string START_TIME_INTERVAL_KEY = 'start-time-interval';
   const string MIN_DAYS_IN_ADVANCE_KEY = 'min-days-in-advance';
   const string MAX_MONTHS_IN_ADVANCE_KEY = 'max-months-in-advance';
+  const string DISALLOWED_DATES_KEY = 'disallowed-dates';
+  const string DISALLOWED_WEEK_DAYS_KEY = 'disallowed-week-days';
 
   public function __construct(
     private string $firstName,
@@ -27,7 +29,9 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
     private TimeApiObject $endTime,
     private UnsignedInt $startTimeInterval,
     private UnsignedInt $minDaysInAdvance,
-    private UnsignedInt $maxMonthsInAdvance
+    private UnsignedInt $maxMonthsInAdvance,
+    private ImmVector<DateApiObject> $disallowedDates,
+    private ImmVector<UnsignedInt> $disallowedWeekDays
   ) {
     parent::__construct(ApiType::GET_STARTUP_DATA);
   }
@@ -37,6 +41,18 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
     $short_code_data = Vector{};
     foreach ($this->shortCodes as $short_code) {
       $short_code_data[] = $short_code->getResultFields();
+    }
+
+    // Package disallowed dates for transport
+    $disallowed_dates_data = Vector{};
+    foreach ($this->disallowedDates as $date) {
+      $disallowed_dates_data[] = $date->getResultFields();
+    }
+
+    // Package disallowed days of the week for transport
+    $disallowed_week_days_data = Vector{};
+    foreach ($this->disallowedWeekDays as $day) {
+      $disallowed_week_days_data[] = $day->getNumber();
     }
 
     return ImmMap{
@@ -52,6 +68,8 @@ class GetStartupDataApiResult extends SuccessfulApiResult {
       self::START_TIME_INTERVAL_KEY => $this->startTimeInterval->getNumber(),
       self::MIN_DAYS_IN_ADVANCE_KEY => $this->minDaysInAdvance->getNumber(),
       self::MAX_MONTHS_IN_ADVANCE_KEY => $this->maxMonthsInAdvance->getNumber(),
+      self::DISALLOWED_DATES_KEY => $disallowed_dates_data->toImmVector(),
+      self::DISALLOWED_WEEK_DAYS_KEY => $disallowed_week_days_data->toImmVector(),
     };
   }
 }

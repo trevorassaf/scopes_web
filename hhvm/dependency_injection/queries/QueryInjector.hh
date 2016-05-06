@@ -30,6 +30,7 @@ class QueryInjector {
   private ?FetchByIdQuery<RegularWeekDay> $fetchRegularWeekDayByIdQuery;
   private ?FetchByUniqueKeyQuery<RegularWeekDay> $fetchRegularWeekDayByUniqueKeyQuery;
   private ?FetchQuery<RegularWeekDay> $fetchRegularWeekDayQuery;
+  private ?FetchAllRegularWeekDaysQuery $fetchAllRegularWeekDaysQuery;
 
   // Regular Time Queries
   private ?InsertQuery<RegularTime> $insertRegularTimeQuery;
@@ -438,6 +439,16 @@ class QueryInjector {
       );
     }
     return $this->fetchRegularWeekDayQuery;
+  }
+
+  public function getFetchAllRegularWeekDaysQuery(): FetchAllRegularWeekDaysQuery {
+    if ($this->fetchAllRegularWeekDaysQuery === null) {
+      $this->fetchAllRegularWeekDaysQuery = new FetchAllRegularWeekDaysQuery(
+        $this->getFetchRegularWeekDayQuery(),
+        $this->regularWeekDaysTableLazyLoader->load()
+      );
+    }
+    return $this->fetchAllRegularWeekDaysQuery;
   }
 
   public function getFetchRegularWeekDayByUniqueKeyQuery(): FetchByUniqueKeyQuery<RegularWeekDay> {
