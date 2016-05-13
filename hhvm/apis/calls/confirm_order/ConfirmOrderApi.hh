@@ -22,13 +22,17 @@ class ConfirmOrderApi extends Api<ConfirmOrderApiRequest> {
     $this->logger->info("Confirm order api call...");
 
     try {
+      $start_time = $this->timestampBuilder->fromUnserializedApiTimestamp(
+        $request->getStartTime()
+      );
+
       $confirmed_order = $this->confirmOrderMethod->confirm(
         $user_agent->getUser()->getId(),
         $request->getScopesCount()->get(),
-        $request->getStartTimestamp()->get(),
         $request->getExperimentDuration()->get(),
         $request->getShortCodeId()->get(),
-        $request->getPrice()->get()
+        $request->getPrice()->get(),
+        $start_time
       );
 
       return new ConfirmOrderApiResult($confirmed_order->getId());

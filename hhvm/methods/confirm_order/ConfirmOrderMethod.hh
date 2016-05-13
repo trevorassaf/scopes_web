@@ -15,10 +15,10 @@ class ConfirmOrderMethod {
   public function confirm(
     UnsignedInt $user_id,
     UnsignedInt $scopes_count,
-    Timestamp $start_timestamp,
     UnsignedInt $experiment_duration,
     UnsignedInt $short_code_id,
-    UnsignedFloat $client_price
+    UnsignedFloat $client_price,
+    Timestamp $start_timestamp
   ): ConfirmedOrder {
     
     // Fail if short code does not belong to this user
