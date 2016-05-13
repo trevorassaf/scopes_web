@@ -38,4 +38,17 @@ var TimeApiObjectBuilder = function() {
     time = _time;
     return this;
   };
+
+  /**
+   * setTimeWithDate()
+   * @param Date date
+   */
+  this.setTimeWithDate = function(date) {
+    time = new Time(
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds()
+    );
+    return this;
+  };
 };

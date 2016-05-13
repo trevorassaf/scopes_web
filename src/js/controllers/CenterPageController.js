@@ -67,14 +67,17 @@ var CenterPageController = function() {
   ) {
 
     // Assemble api request
+    var start_time_api_obj = new TimestampApiObjectBuilder()
+      .setTimestampWithDate(start_time)
+      .build();
+
     var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);
     confirm_order_api
       .setScopesCount(scopes_count)
       .setExperimentDuration(experiment_duration)
-      .setStartTimestamp()
-      .setShortCodeId(short_code.getId());
-
-    // Fire api request
+      .setStartTimestamp(start_time_api_obj)
+      .setShortCodeId(short_code.getId())
+      .send();
   };
 
   var handleConfirmOrder = function() {

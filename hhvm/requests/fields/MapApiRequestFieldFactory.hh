@@ -4,7 +4,7 @@ class MapApiRequestFieldFactory<Tkey, Tvalue> implements RequestFieldTypeConvert
 
   public function __construct(
     private RequestFieldFactory<Tkey> $keyFieldFactory,
-    private RequestFactory<Tvalue> $valueFieldFactory
+    private RequestFieldFactory<Tvalue> $valueFieldFactory
   ) {}
 
   public function convert(string $map_key, mixed $map_payload): MapApiRequestField<Tkey, Tvalue> {
@@ -31,9 +31,8 @@ class MapApiRequestFieldFactory<Tkey, Tvalue> implements RequestFieldTypeConvert
         );
       }
 
-      $field_value_map = new ImmMap($field_value);
-      $processed_value = $this->valueFieldFactory->make($field_value_map);
-      $map_result[$processed_key->get()] = $processed_value;
+      $processed_value = $this->valueFieldFactory->make($field_key, $field_value);
+      $map_result[$processed_key->get()] = $processed_value->get();
     }
 
     // Convert to map

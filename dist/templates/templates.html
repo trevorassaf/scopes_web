@@ -353,26 +353,6 @@
   </div>
 </template>
 
-<template id='short-code-picker-template'>
-  <div class='short-code-picker-wrapper'>
-    <div class='input-field-wrapper'>
-      <div class='input-field'><span class='input-field-label'></span></div>
-      <div class='icon-wrapper'>
-        <iron-icon icon='payment'></iron-icon>
-      </div>
-    </div>
-    <div class='short-code-dropdown-wrapper'>
-      <div class='short-code-dropdown'></div>
-    </div>
-  </div>
-</template>
-
-<template id='short-code-picker-option-template'>
-  <div class='short-code-picker-option' local-idx='' tooltip=''>
-    <span class='short-code-label'></span>
-  </div>
-</template>
-
 <template id='side-panel-template'>
   <div class='side-panel-wrapper'>
     <!-- User name -->
@@ -400,6 +380,35 @@
   </div>
 </template>
 
+<template id='short-code-picker-template'>
+  <div class='short-code-picker-wrapper'>
+    <div class='input-field-wrapper'>
+      <div class='input-field'><span class='input-field-label'></span></div>
+      <div class='icon-wrapper'>
+        <iron-icon icon='payment'></iron-icon>
+      </div>
+    </div>
+    <div class='short-code-dropdown-wrapper'>
+      <div class='short-code-dropdown'></div>
+    </div>
+  </div>
+</template>
+
+<template id='short-code-picker-option-template'>
+  <div class='short-code-picker-option' local-idx='' tooltip=''>
+    <span class='short-code-label'></span>
+  </div>
+</template>
+
+<!-- specify icon type with 'icon' attribute in iron-icon element -->
+<!-- Add tab label in innerHTML of 'nav-btn-label '-->
+<template id='side-panel-tab-template'>
+  <div class='dash-nav-panel-btn'>
+    <iron-icon class='nav-btn-icon'></iron-icon>
+    <span class='nav-btn-label'></span>
+  </div>
+</template>
+
 <template id='technician-page-template'>
   <div hidden class='technician-page-wrapper'>
     <div class='existing-questions'></div> 
@@ -422,15 +431,6 @@
     <div class='delete-question-button'>
       <iron-icon icon='cancel'></iron-icon>
     </div>
-  </div>
-</template>
-
-<!-- specify icon type with 'icon' attribute in iron-icon element -->
-<!-- Add tab label in innerHTML of 'nav-btn-label '-->
-<template id='side-panel-tab-template'>
-  <div class='dash-nav-panel-btn'>
-    <iron-icon class='nav-btn-icon'></iron-icon>
-    <span class='nav-btn-label'></span>
   </div>
 </template>
 

@@ -27,10 +27,23 @@ var DateApiObjectBuilder = function() {
 
   /**
    * setDateObject()
-   * @param DateObject date 
+   * @param DateObject _date 
    */
   this.setDateObject = function(_date) {
     date = _date; 
+    return this;
+  };
+
+  /**
+   * setDate()
+   * @param Date _date 
+   */
+  this.setDate = function(_date) {
+    date = new DateObject(
+      _date.getFullYear(),
+      _date.getMonth(),
+      _date.getDate()
+    );
     return this;
   };
 };

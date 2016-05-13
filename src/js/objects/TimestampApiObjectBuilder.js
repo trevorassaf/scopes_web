@@ -16,14 +16,18 @@ var TimestampApiObjectBuilder = function() {
    * Privileged functions
    */
   this.setTimestamp = function(timestamp) {
-    dateBuilder.setDate(timestamp.getDate());
+    dateBuilder.setDateObject(timestamp.getDate());
     timeBuilder.setTime(timestamp.getTime());
     return this;
   };
 
-  this.build = function() {
-    console.assert(timestamp != null);
+  this.setTimestampWithDate = function(date) {
+    dateBuilder.setDate(date);
+    timeBuilder.setTimeWithDate(date);
+    return this;
+  };
 
+  this.build = function() {
     return {
       DATE_KEY : dateBuilder.build(),
       TIME_KEY : timeBuilder.build()
