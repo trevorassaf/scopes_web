@@ -199,10 +199,54 @@ var CenterPageController = function() {
     );
   };
 
+  var createShadowMyExperimentModel = function(
+    scopes_count,
+    experiment_duration,
+    start_time,
+    short_code
+  ) {
+    // Make deep copy of the complex parameters!
+    var start_time_copy = new Date(start_time.getTime());
+    var short_code_copy = short_code.deepCopy();
+
+    // Create new my experiment shadow
+    var new_my_experiment_shadow_model = new NewMyExperimentModelBuilder()
+      .setScopesCount(scopes_count)
+      .setExperimentDuration(experiment_duration)
+      .setStartTime(start_time_copy)
+      .setShortCode(short_code_copy)
+      .build();
+
+    return new_my_experiment_shadow_model;
+  };
+
+  var persistNewExperiment = function(
+    scopes_count,
+    experiment_duration,
+    start_time,
+    short_code,
+    new_my_experiment_shadow_model 
+  ) {
+
+    var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);
+    confirm_order_api
+      .setScopesCount(scopes_count)
+      .setExperimentDuration(experiment_duration)
+      .setStartTimestamp()
+      .setShortCodeId(short_code.getId());
+  };
+
   var handleConfirmOrder = function() {
     var new_experiment_model = newExperimentPageController.getModel();  
-    
-    // Time input
+
+    // Extract data from new-experiment model
+    // Scopes count data
+    var scopes_count = new_experiment_model.getScopesCountModel().getCurrentValue();
+
+    // Experiment duration data
+    var experiment_duration = new_experiment_model.getExperimentDurationModel().getCurrentValue();
+
+    // Time data
     var start_date_model = new_experiment_model.getExperimentDatePickerModel();
     var start_time_model = new_experiment_model.getExperimentTimePickerModel();
     var selected_time_model = start_time_model.getSelectedItem();
@@ -215,24 +259,44 @@ var CenterPageController = function() {
       selected_time_model.getData().minute
     );
 
-    // Short code
-    var short_code_model = new_experiment_model.getShortCodePickerModel(); 
-    var selected_short_code_model = short_code_model.getSelectedItem();
-    
-    var experiment_model = new MyExperimentModel(
-      0,
-      null,
-      null,
-      new_experiment_model.getScopesCountModel().getCurrentValue(),
-      new_experiment_model.getExperimentDurationModel().getCurrentValue(),
+    // Short code data
+    var short_code_picker_model = new_experiment_model.getShortCodePickerModel(); 
+    var short_code_model = short_code_picker_model.getSelectedItem();
+    var short_code = short_code_model.getData();
+
+    var new_my_experiment_shadow_model = createShadowMyExperimentModel(
+      scopes_count,
+      experiment_duration,
       start_time,
-      selected_short_code_model.getLabel(),
-      "Pending",
-      "Pending"
+      short_code
     );
 
-    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
-    my_experiments_page_model.addExperiment(experiment_model);
+    // Update ui and navigate user to my-experiments page
+    // TODO...
+    
+    // Send new experiment request to server
+    persistNewExperiment(
+      scopes_count,
+      experiment_duration,
+      start_time,
+      short_code,
+      new_my_experiment_shadow_model
+    );
+
+    // var experiment_model = new MyExperimentModel(
+    //   0,
+    //   null,
+    //   null,
+    //   new_experiment_model.getScopesCountModel().getCurrentValue(),
+    //   new_experiment_model.getExperimentDurationModel().getCurrentValue(),
+    //   start_time,
+    //   selected_short_code_model.getLabel(),
+    //   "Pending",
+    //   "Pending"
+    // );
+    //
+    // var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    // my_experiments_page_model.addExperiment(experiment_model);
   };
 
   var initMyExperimentsPageController = function() {
@@ -822,194 +886,6 @@ var MyExperimentsPageController = function() {
 
     configureCallbacks();
   };
-};
-
-var MyExperimentsPageControllerBackup = function() {
-
-  /**
-   * Private state
-   */
-  var isActive = false;
-  var templateStore = null;
-  var parentNode = null;
-  var getConfirmedOrdersApiWrapper = null;
-  var myExperimentControllers = []; // unordered_map keyed on experiment-id
-  var myExperimentsPageView = null;
-
-  /**
-   * Private functions
-   */
-  var update = function(experiment_controller) {};
-
-  var updateLocalExperiment = function(fresh_experiment, stale_experiment_controller) {
-    var stale_model = stale_experiment_controller.getModel();
-
-    // Check: must be same experiment!
-    console.assert(fresh_experiment.getId() == stale_model.getId());
-
-    // Diff fields and update accordingly
-    if (fresh_experiment.getTitle() != stale_model.getTitle()) {
-      stale_model.setTitle(fresh_experiment.getTitle());    
-    }
-    
-    if (fresh_experiment.getDescription() != stale_model.getDescription()) {
-      stale_model.setDescription(fresh_experiment.getDescription());    
-    }
-
-    if (fresh_experiment.getPrice() != stale_model.getPrice()) {
-      stale_model.setPrice(fresh_experiment.getPrice());    
-    }
-
-    if (fresh_experiment.getScopesCount() != stale_model.getScopesCount()) {
-      stale_model.setScopesCount(fresh_experiment.getScopesCount());    
-    }
-
-    if (fresh_experiment.getExperimentDuration() != stale_model.getExperimentDuration()) {
-      stale_model.setExperimentDuration(fresh_experiment.getExperimentDuration());    
-    }
-
-    if (fresh_experiment.getStartTime() != stale_model.getStartTime()) {
-      stale_model.setStartTime(fresh_experiment.getStartTime());    
-    }
-
-    if (fresh_experiment.getStartDate() != stale_model.getStartDate()) {
-      stale_model.setStartDate(fresh_experiment.getStartDate());    
-    }
-    
-    if (fresh_experiment.getPaymentStatus() != stale_model.getPaymentStatus()) {
-      stale_model.setPaymentStatus(fresh_experiment.getPaymentStatus());    
-    }
-  };
-
-  var createNewLocalExperiment = function(fresh_experiment) {
-    // Check: can't have order with this id!
-    console.assert(!myExperimentController.has(fresh_experiment.getId()));
-
-    // Initialize new model
-    var model = (new MyExperimentModel())
-      .setId(fresh_experiment.getId())
-      .setTitle(fresh_experiment.getTitle())
-      .setDescription(fresh_experiment.getDescription())
-      .setPrice(fresh_experiment.getPrice())
-      .setScopesCount(fresh_experiment.getScopesCount())
-      .setExperimentDuration(fresh_experiment.getExperimentDuration())
-      .setStartTime(fresh_experiment.getStartTime())
-      .setStartDate(fresh_experiment.getStartDate())
-      .setPaymentStatus(fresh_experiment.getPaymentStatus())
-      .setShortCode(fresh_experiment.getShortCode());
-
-    // Create controller, initialize it, add it to local list
-    var controller = new MyExperimentController();
-    
-    controller.init(
-      templateStore,
-      parentNode,
-      model
-    );
-
-    myExperimentControllers.set(model.getId(), controller);
-  };
-
-  var fetchExperimentsCallback = function(experiments) {
-    for (var i = 0; i < experiments.length; ++i) {
-      var fresh_experiment = experiments[i];
-      if (myExperimentControllers.has(fresh_experiment.getId())) {
-        updateLocalExperiment(fresh_experiment, myExperimentControllers[fresh_experiment.getId()]);   
-      } else {
-      createNewLocalExperiment(fresh_experiment); 
-      }
-    }
-  };
-
-  var initApi = function() {
-    console.assert(getConfirmedOrdersApiWrapper === null); 
-
-    // Initialize get-confirmed-order api
-    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
-    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
-
-    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
-      // Deserialize orders
-      var orders = json_response[response_keys.orders];
-      var order_response_keys = response_keys.confirmed_order;
-      var short_code_response_keys = response_keys.short_code;
-     
-      var confirmed_orders = [];
-
-      for (var i = 0; i < orders.length; ++i) {
-        var order = orders[i];
-        var short_code = order[order_response_keys.short_code];
-
-        var short_code = new ShortCode(
-          short_code[short_code_response_keys.id],
-          short_code[short_code_response_keys.code],
-          short_code[short_code_response_keys.alias]
-        );
-
-        var confirmed_order = new ConfirmedOrder(
-          order[order_response_keys.id],
-          order[order_response_keys.scopes_count],
-          order[order_response_keys.start_time],
-          order[order_response_keys.end_time],
-          order[order_response_keys.title],
-          order[order_response_keys.description],
-          order[order_response_keys.time_ordered],
-          order[order_response_keys.price],
-          short_code
-        );
-        
-        confirmed_orders.push(confirmed_order);
-      }
-
-      fetchExperimentsCallback(confirmed_orders);
-    });
-
-    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders'); 
-    });
-
-    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders due to network error'); 
-    });
-
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.refresh = function() {
-    var successful_callback = function(experiments) {
-      // TODO...
-    };
-
-    // Make api call
-    fetchExperiments(successful_callback);
-  };
-
-  this.init = function(
-    template_store,
-    parent_node,
-    is_displayed_initially
-  ) {
-    // Check: view must be inactive to initialize!
-    console.assert(!isActive);
-    isActive = true;
-
-    templateStore = template_store;
-    parentNode = parent_node;
-
-    // Initialize view
-    myExperimentsPageView = new MyExperimentsPageView(
-      template_store,
-      parent_node,
-      is_displayed_initially
-    );
-  };
-
-  this.show = function() {};
-  this.hide = function() {};
 };
 
 var NewExperimentPageController = function() {
@@ -2158,7 +2034,8 @@ var MyExperimentModel = function(
   start_time,
   short_code,
   experiment_status,
-  payment_status
+  payment_status,
+  is_persisted
 ) {
 
   /**
@@ -2173,6 +2050,7 @@ var MyExperimentModel = function(
   this.shortCode = short_code;
   this.experimentStatus = experiment_status;
   this.paymentStatus = payment_status;
+  this.isPersisted = is_persisted
 
   // Callbacks
   this.titleCallbacks = [];
@@ -2183,6 +2061,7 @@ var MyExperimentModel = function(
   this.experimentStatusCallbacks = [];
   this.paymentStatusCallbacks = [];
   this.shortCodeCallbacks = [];
+  this.isPersistedCallbacks = [];
 };
 
 // Setters
@@ -2250,6 +2129,14 @@ MyExperimentModel.prototype.setPaymentStatus = function(paymentStatus) {
   return this;
 };
 
+MyExperimentModel.prototype.setIsPersisted = function(is_persisted) {
+  this.isPersisted = is_persisted;
+  this.isPersistedCallbacks.forEach(function(callback) {
+    callback(this.isPersisted);
+  }, this);
+  return this;
+};
+
 // Bind callbacks
 MyExperimentModel.prototype.bindTitle = function(callback) {
   this.titleCallbacks.push(callback);
@@ -2299,6 +2186,11 @@ MyExperimentModel.prototype.bindPaymentStatus = function(callback) {
   return this;
 };
 
+MyExperimentModel.prototype.bindIsPersisted = function(callback) {
+  this.isPersistedCallbacks.push(callback);
+  return this;
+};
+
 // Getters
 MyExperimentModel.prototype.getId = function() {
   return this.id;
@@ -2330,6 +2222,95 @@ MyExperimentModel.prototype.getExperimentStatus = function() {
 
 MyExperimentModel.prototype.getPaymentStatus = function() {
   return this.paymentStatus;
+};
+
+MyExperimentModel.prototype.getIsPerisisted = function() {
+  return this.isPersisted;
+};
+
+var MyExperimentModelBuilder = function() {
+
+  /**
+   * Private state
+   */
+  var id = null;
+  var title = null;
+  var description = null;
+  var scopesCount = null;
+  var experimentDuration = null;
+  var startTime = null;
+  var shortCode = null;
+  var experimentStatus = null;
+  var paymentStatus = null;
+  var isPersisted = null;
+
+  /**
+   * Privileged functions
+   */
+  this.build = function() {
+    return new MyExperimentModel(
+      id,
+      title,
+      description,
+      scopesCount,
+      experimentDuration,
+      startTime,
+      shortCode,
+      experimentStatus,
+      paymentStatus,
+      isPersisted
+    );
+  };
+
+  this.setId = function(_id) {
+    id = _id;
+    return this;
+  };
+
+  this.setTitle = function(_title) {
+    title = _title;
+    return this;
+  };
+
+  this.setDescription = function(_description) {
+    description = _description;
+    return this;
+  };
+
+  this.setScopesCount = function(scopes_count) {
+    scopesCount = scopes_count;
+    return this;
+  };
+
+  this.setExperimentDuration = function(experiment_duration) {
+    experimentDuration = experiment_duration;
+    return this;
+  };
+  
+  this.setStartTime = function(start_time) {
+    startTime = start_time;
+    return this;
+  };
+
+  this.setShortCode = function(short_code) {
+    shortCode = short_code;
+    return this;
+  };
+
+  this.setExperimentStatus = function(experiment_status) {
+    experimentStatus = experiment_status;
+    return this;
+  };
+
+  this.setPaymentStatus = function(payment_status) {
+    paymentStatus = payment_status;
+    return this;
+  };
+
+  this.setIsPersisted = function(is_persisted) {
+    isPersisted = is_persisted;
+    return this;
+  };
 };
 
 var MyExperimentsPageModel = function() {
@@ -2508,6 +2489,58 @@ var NewExperimentPageModel = function() {
 
   this.getPricingModel = function() {
     return pricingModel;
+  };
+};
+
+var NewMyExperimentModelBuilder = function() {
+
+  /**
+   * Default constants
+   */
+  var INITIAL_TITLE = '';
+  var INITIAL_DESCRIPTION = '';
+  var INITIAL_EXPERIMENT_STATUS = ExperimentStatus.PENDING;
+  var INITIAL_PAYMENT_STATUS = PaymentStatus.PENDING;
+  var INITIAL_IS_PERSISTED = false;
+
+  /**
+   * Private state
+   */
+  var builder = new MyExperimentModelBuilder();
+
+  // Initialize builder with default data
+  builder
+    .setTitle(INITIAL_TITLE)
+    .setDescription(INITIAL_DESCRIPTION)
+    .setExperimentStatus(INITIAL_EXPERIMENT_STATUS)
+    .setPaymentStatus(INITIAL_PAYMENT_STATUS)
+    .setIsPersisted(INITIAL_IS_PERSISTED);
+
+  /**
+   * Privileged functions
+   */
+  this.build = function() {
+    return builder.build(); 
+  };
+
+  this.setScopesCount = function(scopes_count) {
+    builder.setScopesCount(scopes_count);
+    return this;
+  };
+
+  this.setExperimentDuration = function(experiment_duration) {
+    builder.setExperimentDuration(experiment_duration);
+    return this;
+  };
+  
+  this.setStartTime = function(start_time) {
+    builder.setStartTime(start_time);
+    return this;
+  };
+
+  this.setShortCode = function(short_code) {
+    builder.setShortCode(short_code);
+    return this;
   };
 };
 
@@ -2894,6 +2927,84 @@ ConfirmedOrder.prototype.getShortCode = function() {
   return this.shortCode;
 };
 
+var DateApiObjectBuilder = function() {
+
+  /**
+   * Api object field keys
+   */
+  var YEAR_KEY = 'year';
+  var MONTH_KEY = 'month';
+  var DAY_KEY = 'day';
+
+  /**
+   * Private vars
+   */
+  var date = null;
+
+  /**
+   * Privileged functions
+   */
+  this.build = function() {
+    console.assert(date != null);
+
+    return {
+      YEAR_KEY : date.getYear(),
+      MONTH_KEY : date.getMonth(),
+      DAY_KEY : date.getDay() 
+    };
+  };
+
+  /**
+   * setDateObject()
+   * @param DateObject date 
+   */
+  this.setDateObject = function(_date) {
+    date = _date; 
+    return this;
+  };
+};
+
+var DateObject = function(
+  _year,
+  _month,
+  _day
+) {
+  
+  /**
+   * Private vars
+   */
+  var year = _year;
+  var month = _month;
+  var day = _day;
+
+  // Validate input
+  console.assert(month > 0 && month <= 12);
+  console.assert(day > 0 && day <= 31);
+
+  /**
+   * Privileged functions
+   */
+  this.getYear = function() {
+    return year;
+  };
+
+  this.getMonth = function() {
+    return month;
+  };
+
+  this.getDay = function() {
+    return day;
+  };
+};
+
+DateObject.prototype.fromDate = function(date) {
+  return new DateObject(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    date.getDate()
+  );
+};
+
 var DateOperator = (function() {
 
   // Date constants
@@ -2915,6 +3026,18 @@ var DateOperator = (function() {
   };
 
 })();
+
+var ExperimentStatus = {
+  PENDING : 0,
+  APPROVED : 1,
+  COMPLETED : 2
+};
+
+var PaymentStatus = {
+  PENDING : 0,
+  APPROVED : 1,
+  COMPLETED : 2
+};
 
 function SerializeableDate(
   year,
@@ -3030,6 +3153,14 @@ ShortCode.prototype.getAlias = function() {
   return this.alias;
 };
 
+ShortCode.prototype.deepCopy = function() {
+  return new ShortCode(
+    this.id,
+    this.code,
+    this.alias
+  );
+};
+
 var Time = function(
   _hours,
   _minutes,
@@ -3069,6 +3200,123 @@ var Time = function(
     current_time.setMinutes(minutes);
     current_time.setSeconds(seconds);
     return current_time;
+  };
+};
+
+Time.prototype.fromDate = function(date) {
+  return new Time(
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds()
+  );
+};
+
+var TimeApiObjectBuilder = function() {
+
+  /**
+   * Api object field keys
+   */
+  var HOUR_KEY = 'hour';
+  var MINUTE_KEY = 'minute';
+  var SECOND_KEY = 'second';
+
+  /**
+   * Initial values
+   */
+  var INITIAL_HOUR = 0;
+  var INITIAL_MINUTE = 0;
+  var INITIAL_SECOND = 0;
+
+  /**
+   * Private vars
+   */
+  var time = new Time(
+    INITIAL_HOUR,
+    INITIAL_MINUTE,
+    INITIAL_SECOND
+  );
+
+  /**
+   * Privileged functions
+   */
+  this.build = function() {
+    return {
+      HOUR_KEY : time.getHours(),
+      MINUTE_KEY : time.getMinutes(),
+      SECOND_KEY : time.getSeconds() 
+    };
+  };
+
+  this.setTime = function(_time) {
+    time = _time;
+    return this;
+  };
+};
+
+var Timestamp = function(
+  _date,
+  _time
+) {
+
+  /**
+   * Private state
+   */
+  var date = _date;
+  var time = _time;
+
+  /**
+   * Privileged functions
+   */
+  this.getDate = function() {
+    return date;
+  };
+
+  this.getTime = function() {
+    return time;
+  };
+};
+
+/**
+ * fromDate()
+ * @param Date date
+ */
+Timestamp.prototype.fromDate = function(date) {
+  return new Timestamp(
+    DateObject.fromDate(date),
+    Time.fromDate(date)
+  );
+};
+
+var TimestampApiObjectBuilder = function() {
+
+  /**
+   * Api keys
+   */
+  var DATE_KEY = 'date';
+  var TIME_KEY = 'time';
+
+  /**
+   * Private state
+   */
+  var dateBuilder = new DateApiObjectBuilder();
+  var timeBuilder = new TimeApiObjectBuilder();
+
+  /**
+   * Privileged functions
+   */
+  this.setTimestamp = function(timestamp) {
+    dateBuilder.setDate(timestamp.getDate());
+    timeBuilder.setTime(timestamp.getTime());
+    return this;
+  };
+
+  this.build = function() {
+    console.assert(timestamp != null);
+
+    return {
+      DATE_KEY : dateBuilder.build(),
+      TIME_KEY : timeBuilder.build()
+    }; 
   };
 };
 
@@ -3530,35 +3778,60 @@ function ApiControllerWrapper(api_object) {
    * Private state
    */
   var apiObject = api_object;
-  var successfulApiCallbackListeners = [];
-  var failedLogicalApiCallbackListeners = [];
-  var failedNonLogicalApiCallbackListeners = [];
 
+  var successListeners = [];
+  var logicalFailureListeners = [];
+  var nonLogicalFailureListeners = [];
+  
+  /**
+   * Private functions
+   */
   var successfulApiCallback = function(api_response) {
-    for (var i = 0; i < successfulApiCallbackListeners.length; ++i) {
-      successfulApiCallbackListeners[i](api_response, apiObject.getApiKeys());
+    for (var i = 0; i < successListeners.length; ++i) {
+      successListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
-
+  
   var logicallyFailedApiCallback = function(api_response) {
-    for (var i = 0; i < failedLogicalApiCallbackListeners.length; ++i) {
-      failedLogicalApiCallbackListeners[i](api_response, apiObject.getApiKeys());
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
+    
+    for (var i = 0; i < logicalFailureListeners.length; ++i) {
+      logicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
 
   var nonLogicallyFailedApiCallback = function(api_response) {
-    for (var i = 0; i < failedNonLogicalApiCallbackListeners.length; ++i) {
-      failedNonLogicalApiCallbackListeners[i](api_response, apiObject.getApiKeys());
+    console.log("WARNING: Logically failed api response!");
+    console.log(api_response); 
+    
+    for (var i = 0; i < nonLogicalFailureListeners.length; ++i) {
+      nonLogicalFailureListeners[i](api_response, getStartupDataApi.getApiKeys());
     }
   };
-  
+
+  /**
+   * Privileged functions
+   */
+  this.send = function() {
+    console.assert(apiObject != null);
+
+    // Bind api listeners
+    apiObject.setSuccessfulApiCallback(successfulApiCallback); 
+    apiObject.setLogicalApiFailureCallback(logicallyFailedApiCallback);
+    apiObject.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
+
+    // Execute api call
+    apiObject.send();
+  };
+
   /**
    * registerSuccessfulApiCallback()
    * - add callback for successful api call
    * @param FuncPtr callback: function(json_response, api_keys) {...}
    */
-  this.registerSuccessfulApiCallback = function(callback) {
-    successfulApiCallbackListeners.push(callback);
+  this.bindSuccess = function(callback) {
+    successListeners.push(callback);
     return this;
   };
 
@@ -3567,8 +3840,8 @@ function ApiControllerWrapper(api_object) {
    * - add callback for logical failed api call (i.e. api error error rather than network error)
    * @param FuncPtr callback: function(json_response, api_keys) {...}
    */
-  this.registerLogicalFailedApiCallback = function(callback) {
-    failedLogicalApiCallbackListeners.push(callback);
+  this.bindLogicalFailure = function(callback) {
+    logicalFailureListeners.push(callback);
     return this;
   };
 
@@ -3577,24 +3850,22 @@ function ApiControllerWrapper(api_object) {
    * - add callback for non-logical failed api call (i.e. network error rather than api error)
    * @param FuncPtr callback: function(xhttp_response) {...}
    */
-  this.registerNonLogicalFailedApiCallback = function(callback) {
-    failedNonLogicalApiCallbackListeners.push(callback);
+  this.bindNonLogicalFailure = function(callback) {
+    nonLogicalFailureListeners.push(callback);
     return this;
   };
-  
-  /**
-   * fetch()
-   * - fetches startup data
-   */
-  this.fetch = function() {
-    // Bind event listeners
-    apiObject.setSuccessfulApiCallback(successfulApiCallback);
-    apiObject.setLogicalApiFailureCallback(logicallyFailedApiCallback);
-    apiObject.setNonLogicalApiFailureCallback(nonLogicallyFailedApiCallback);
+};
 
-    // Fire api request
-    apiObject.send();
-  };
+var ConfirmOrderApiController = function() {
+
+  /**
+   * Private state
+   */
+  var confirmOrderApi = null;
+  var successListeners = [];
+  var logicalFailureListeners = [];
+  var nonLogicalFailureListeners = [];
+
 };
 
 var GetStartupDataApiController = function() {
@@ -3803,110 +4074,6 @@ UpdateConfirmedOrderRequest.prototype.isDescriptionRemoved = function() {
 UpdateConfirmedOrderRequest.prototype.getDescription = function() {
   return this.description;
 };
-
-var MyExperimentsLogicController = (function() {
-
-  /**
-   * Private state
-   */
-  var myExperiments = [];
-  var getConfirmedOrdersApiWrapper = null;
-  var myExperimentsView = null;
-
-  /**
-   * Private functions
-   */
-  var initApi = function() {
-    console.assert(getConfirmedOrdersApiWrapper === null); 
-
-    // Initialize get-confirmed-order api
-    var get_confirmed_order_api = new GetConfirmedOrdersApi(ScopesNetwork);
-    getConfirmedOrdersApiWrapper = new ApiControllerWrapper(get_confirmed_order_api);
-
-    // Bind event listeners to get-confirmed-orders api
-    getConfirmedOrdersApiWrapper.registerSuccessfulApiCallback(function(json_response, response_keys) {
-      clearConfirmedOrders();
-      var orders = json_response[response_keys.orders];
-      var order_response_keys = response_keys.confirmed_order;
-      var short_code_response_keys = response_keys.short_code;
-      
-      for (var i = 0; i < orders.length; ++i) {
-        var order = orders[i];
-        var short_code = order[order_response_keys.short_code];
-
-        var short_code = new ShortCode(
-          short_code[short_code_response_keys.id],
-          short_code[short_code_response_keys.code],
-          short_code[short_code_response_keys.alias]
-        );
-
-        var confirmed_order = new ConfirmedOrder(
-          order[order_response_keys.id],
-          order[order_response_keys.scopes_count],
-          order[order_response_keys.start_time],
-          order[order_response_keys.end_time],
-          order[order_response_keys.title],
-          order[order_response_keys.description],
-          order[order_response_keys.time_ordered],
-          order[order_response_keys.price],
-          short_code
-        );
-
-        addConfirmedOrder(confirmed_order); 
-      }
-    });
-
-    getConfirmedOrdersApiWrapper.registerLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders'); 
-    });
-
-    getConfirmedOrdersApiWrapper.registerNonLogicalFailedApiCallback(function(response) {
-      console.log(response);
-      console.log('ERROR: failed to get confirmed orders due to network error'); 
-    });
-  };
-
-  var addConfirmedOrder = function(confirm_order) {
-    // Store in local cache
-    myExperiments.push(confirm_order);  
-
-    // Update MyExperiments view
-    myExperimentsView.pushPendingOrder(confirm_order);
-  };
-
-  var clearConfirmedOrders = function() {
-    // Clear local cache
-    myExperiments = [];
-
-    // Clear MyExperiments view
-    // TODO...   
-  };
-
-  var init = function(my_experiments_view) {
-    myExperimentsView = my_experiments_view;
-
-    // Initialize api module
-    initApi();
-
-    refreshData(); 
-  };
-
-  var refreshData = function() {
-    myExperimentsView.clearPendingOrders();
-    getConfirmedOrdersApiWrapper.fetch(); 
-  };
-
-  var getMyExperiments = function() {
-    return myExperiments;
-  };
-
-  return {
-    init: init,
-    refreshData: refreshData,
-    getMyExperiments: getMyExperiments
-  };
-})();
 
 var ConfirmOrderUiController = (function() {
   
@@ -10608,6 +10775,82 @@ var NewExperimentPageView = function(
   };
 };
 
+var ShortCodeFormView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'short-code-form-template';
+
+  /**
+   * Root wrapper class
+   */
+  var ROOT_CLASS = 'short-code-form-wrapper';
+
+  /**
+   * Short code drop-down icon
+   */
+  var ICON_NAME = 'payment';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  var shortCodePickerView = null;
+
+  /**
+   * DOM nodes
+   */
+  var shortCodePickerNode = {
+    className: 'short-code-picker',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var initFormElements = function() {
+    // Bind short-code drop-down node
+    Utils.bindNodeInfo(rootNode, shortCodePickerNode);  
+
+    // Initialize drop-down view
+    shortCodePickerView = new DropDownView(
+      templateStore,
+      shortCodePickerNode.node
+    );
+
+    shortCodePickerView.init(ICON_NAME);
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize template into document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS
+    ); 
+
+    // Initialize form elements
+    initFormElements();
+  };
+
+  this.getDropDownView = function() {
+    return shortCodePickerView;
+  };
+
+};
+
 var ExperimentTimeFormView = function(
   template_store,
   parent_node
@@ -10704,82 +10947,6 @@ var ExperimentTimeFormView = function(
   this.getDatePickerView = function() {
     return datePickerView;
   };
-};
-
-var ShortCodeFormView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID = 'short-code-form-template';
-
-  /**
-   * Root wrapper class
-   */
-  var ROOT_CLASS = 'short-code-form-wrapper';
-
-  /**
-   * Short code drop-down icon
-   */
-  var ICON_NAME = 'payment';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-
-  var rootNode = null;
-
-  var shortCodePickerView = null;
-
-  /**
-   * DOM nodes
-   */
-  var shortCodePickerNode = {
-    className: 'short-code-picker',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-  var initFormElements = function() {
-    // Bind short-code drop-down node
-    Utils.bindNodeInfo(rootNode, shortCodePickerNode);  
-
-    // Initialize drop-down view
-    shortCodePickerView = new DropDownView(
-      templateStore,
-      shortCodePickerNode.node
-    );
-
-    shortCodePickerView.init(ICON_NAME);
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Synthesize template into document
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_CLASS
-    ); 
-
-    // Initialize form elements
-    initFormElements();
-  };
-
-  this.getDropDownView = function() {
-    return shortCodePickerView;
-  };
-
 };
 
 var SliderFormView = function(

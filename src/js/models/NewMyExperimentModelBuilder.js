@@ -25,7 +25,7 @@ var NewMyExperimentModelBuilder = function() {
   /**
    * Privileged functions
    */
-  this.init = function() {
+  this.build = function() {
     return builder.build(); 
   };
 

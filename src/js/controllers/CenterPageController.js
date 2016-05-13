@@ -72,9 +72,6 @@ var CenterPageController = function() {
       .setExperimentDuration(experiment_duration)
       .setStartTimestamp()
       .setShortCodeId(short_code.getId());
-
-
-             
   };
 
   var handleConfirmOrder = function() {
@@ -101,9 +98,9 @@ var CenterPageController = function() {
     );
 
     // Short code data
-    var short_code_model = new_experiment_model.getShortCodePickerModel(); 
-    var short_code = short_code_model.getSelectedItem();
-
+    var short_code_picker_model = new_experiment_model.getShortCodePickerModel(); 
+    var short_code_model = short_code_picker_model.getSelectedItem();
+    var short_code = short_code_model.getData();
 
     var new_my_experiment_shadow_model = createShadowMyExperimentModel(
       scopes_count,

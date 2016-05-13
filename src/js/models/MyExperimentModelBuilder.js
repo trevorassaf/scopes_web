@@ -72,12 +72,12 @@ var MyExperimentModelBuilder = function() {
     return this;
   };
 
-  this.paymentStatus = function(payment_status) {
+  this.setPaymentStatus = function(payment_status) {
     paymentStatus = payment_status;
     return this;
   };
 
-  this.isPersisted = function(is_persisted) {
+  this.setIsPersisted = function(is_persisted) {
     isPersisted = is_persisted;
     return this;
   };
