@@ -400,15 +400,6 @@
   </div>
 </template>
 
-<!-- specify icon type with 'icon' attribute in iron-icon element -->
-<!-- Add tab label in innerHTML of 'nav-btn-label '-->
-<template id='side-panel-tab-template'>
-  <div class='dash-nav-panel-btn'>
-    <iron-icon class='nav-btn-icon'></iron-icon>
-    <span class='nav-btn-label'></span>
-  </div>
-</template>
-
 <template id='technician-page-template'>
   <div hidden class='technician-page-wrapper'>
     <div class='existing-questions'></div> 
@@ -431,6 +422,15 @@
     <div class='delete-question-button'>
       <iron-icon icon='cancel'></iron-icon>
     </div>
+  </div>
+</template>
+
+<!-- specify icon type with 'icon' attribute in iron-icon element -->
+<!-- Add tab label in innerHTML of 'nav-btn-label '-->
+<template id='side-panel-tab-template'>
+  <div class='dash-nav-panel-btn'>
+    <iron-icon class='nav-btn-icon'></iron-icon>
+    <span class='nav-btn-label'></span>
   </div>
 </template>
 
@@ -513,22 +513,6 @@
   </div>
 </template>
 
-<template id='short-code-form-template'>
-  <div class='short-code-form-wrapper new-exp-input-form'>
-    
-    <!-- Form title -->
-    <div class='form-title'>
-      <span class='form-title-label'>Select short-code</span>
-    </div>
-
-    <div class='input-container'>
-      <!-- Select short codes -->
-      <div class='short-code-picker'></div>
-    </div>
-
-  </div>
-</template>
-
 <template id='experiment-time-form-template'>
   <div class='experiment-time-form-wrapper new-exp-input-form'>
     
@@ -545,6 +529,22 @@
       <!-- Experiment date picker -->
       <div class='exp-date-picker'></div>    
     </div>
+  </div>
+</template>
+
+<template id='short-code-form-template'>
+  <div class='short-code-form-wrapper new-exp-input-form'>
+    
+    <!-- Form title -->
+    <div class='form-title'>
+      <span class='form-title-label'>Select short-code</span>
+    </div>
+
+    <div class='input-container'>
+      <!-- Select short codes -->
+      <div class='short-code-picker'></div>
+    </div>
+
   </div>
 </template>
 

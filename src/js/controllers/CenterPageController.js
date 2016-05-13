@@ -66,12 +66,15 @@ var CenterPageController = function() {
     new_my_experiment_shadow_model 
   ) {
 
+    // Assemble api request
     var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);
     confirm_order_api
       .setScopesCount(scopes_count)
       .setExperimentDuration(experiment_duration)
       .setStartTimestamp()
       .setShortCodeId(short_code.getId());
+
+    // Fire api request
   };
 
   var handleConfirmOrder = function() {
@@ -93,8 +96,8 @@ var CenterPageController = function() {
       start_date_model.getSelectedYear(),
       start_date_model.getSelectedMonth(),
       start_date_model.getSelectedDate(),
-      selected_time_model.getData().hour,
-      selected_time_model.getData().minute
+      selected_time_model.getData().getHours(),
+      selected_time_model.getData().getMinutes()
     );
 
     // Short code data
