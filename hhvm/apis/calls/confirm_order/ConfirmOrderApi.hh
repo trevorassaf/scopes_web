@@ -31,7 +31,6 @@ class ConfirmOrderApi extends Api<ConfirmOrderApiRequest> {
         $request->getScopesCount()->get(),
         $request->getExperimentDuration()->get(),
         $request->getShortCodeId()->get(),
-        $request->getPrice()->get(),
         $start_time
       );
 
@@ -47,12 +46,7 @@ class ConfirmOrderApi extends Api<ConfirmOrderApiRequest> {
       return new FailedConfirmOrderApiResult(
         FailedConfirmOrderApiResultType::CONFLICTING_ORDER
       );
-    } catch (ConfirmedOrderPriceMismatchPolicyException $ex) {
-      $this->logger->info("Confirmed order rejected due to invalid price provided by client");
-      return new FailedConfirmOrderApiResult(
-        FailedConfirmOrderApiResultType::INVALID_PRICE
-      );
-    }
+    } 
   }
 
   public function getApiType(): ApiType {

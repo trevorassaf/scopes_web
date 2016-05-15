@@ -28,9 +28,10 @@ var TimestampApiObjectBuilder = function() {
   };
 
   this.build = function() {
-    return {
-      DATE_KEY : dateBuilder.build(),
-      TIME_KEY : timeBuilder.build()
-    }; 
+    var timestamp_obj = {};
+    timestamp_obj[DATE_KEY] = dateBuilder.build();
+    timestamp_obj[TIME_KEY] = timeBuilder.build();
+
+    return timestamp_obj;
   };
 };

@@ -6,7 +6,7 @@ class UnserializedDateApiRequest {
 
   const string YEAR_KEY = 'year';
   const string MONTH_KEY = 'month';
-  const string DATE_KEY = 'date';
+  const string DATE_KEY = 'day';
 
   public function __construct(
     private RequestField<UnsignedInt> $year,

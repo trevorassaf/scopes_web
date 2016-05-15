@@ -17,7 +17,6 @@ class ConfirmOrderMethod {
     UnsignedInt $scopes_count,
     UnsignedInt $experiment_duration,
     UnsignedInt $short_code_id,
-    UnsignedFloat $client_price,
     Timestamp $start_timestamp
   ): ConfirmedOrder {
     
@@ -62,11 +61,6 @@ class ConfirmOrderMethod {
       $experiment_duration,
       $current_timestamp
     );
-
-    // Fail if these prices don't match
-    if (!$server_price->equals($client_price)) {
-      throw new ConfirmedOrderPriceMismatchPolicyException();
-    }
 
     // Insert confirmed order into db
     $insert_confirmed_order_query_handle = $this->confirmedOrderInsertQuery->insert(

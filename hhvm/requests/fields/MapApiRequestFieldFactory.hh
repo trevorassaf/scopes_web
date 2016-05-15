@@ -19,18 +19,9 @@ class MapApiRequestFieldFactory<Tkey, Tvalue> implements RequestFieldTypeConvert
 
     // Convert "value" to ImmMap<Tkey, Tvalue>, and validate of course
     $map_result = Map{};
-    
+
     foreach ($map_payload as $field_key => $field_value) {
       $processed_key = $this->keyFieldFactory->make($map_key, $field_key);
-      
-      if (!is_array($field_value)) {
-        throw new RequestFieldTypeConversionException(
-          RequestFieldType::MAP,
-          $map_key,
-          $field_value
-        );
-      }
-
       $processed_value = $this->valueFieldFactory->make($field_key, $field_value);
       $map_result[$processed_key->get()] = $processed_value->get();
     }

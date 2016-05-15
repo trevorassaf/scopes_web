@@ -61,11 +61,6 @@ class ConfirmOrderApiRequestFactory implements RequestFactory<ConfirmOrderApiReq
             $this->shortCodeIdFieldFactory->make($key, $value)
           );
           break;
-        case ConfirmOrderApiRequest::PRICE_KEY:
-          $confirmed_order_request_builder->setPrice(
-            $this->priceFieldFactory->make($key, $value)
-          );
-          break;
         default:
           throw new UnexpectedRequestFieldKeyException(__CLASS__, $key);
           break;

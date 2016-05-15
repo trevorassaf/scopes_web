@@ -9,7 +9,7 @@ function ConfirmOrderApi(network_module) {
   this.apiKeys = {
     scopes_count: "scopes-count",
     experiment_duration: "duration",
-    start_timestamp: "start-timestamp",
+    start_timestamp: "start-time",
     short_code_id: "short-code-id",
     price: "price"
   };

@@ -18,11 +18,12 @@ var DateApiObjectBuilder = function() {
   this.build = function() {
     console.assert(date != null);
 
-    return {
-      YEAR_KEY : date.getYear(),
-      MONTH_KEY : date.getMonth(),
-      DAY_KEY : date.getDay() 
-    };
+    var date_obj = {};
+    date_obj[YEAR_KEY] = date.getYear();
+    date_obj[MONTH_KEY] = date.getMonth();
+    date_obj[DAY_KEY] = date.getDay();
+
+    return date_obj;
   };
 
   /**
@@ -41,7 +42,7 @@ var DateApiObjectBuilder = function() {
   this.setDate = function(_date) {
     date = new DateObject(
       _date.getFullYear(),
-      _date.getMonth(),
+      _date.getMonth() + 1, // Date.month is 0 indexed
       _date.getDate()
     );
     return this;

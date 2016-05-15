@@ -40,7 +40,7 @@ class FetchConfirmedOrdersByTimeQuery {
       )
       ->build()
     );
-    
+
     return await $this->fetchQuery->fetch(
       $fetch_params_builder
         ->setTable($this->confirmedOrdersTable)

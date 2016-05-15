@@ -233,12 +233,17 @@ var CenterPageController = function() {
       .setTimestampWithDate(start_time)
       .build();
 
+console.log(start_time_api_obj);
+
     var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);
     confirm_order_api
       .setScopesCount(scopes_count)
       .setExperimentDuration(experiment_duration)
       .setStartTimestamp(start_time_api_obj)
       .setShortCodeId(short_code.getId())
+      .setSuccessfulApiCallback(function(response) {
+        console.log(response);
+      })
       .send();
   };
 
@@ -2953,11 +2958,12 @@ var DateApiObjectBuilder = function() {
   this.build = function() {
     console.assert(date != null);
 
-    return {
-      YEAR_KEY : date.getYear(),
-      MONTH_KEY : date.getMonth(),
-      DAY_KEY : date.getDay() 
-    };
+    var date_obj = {};
+    date_obj[YEAR_KEY] = date.getYear();
+    date_obj[MONTH_KEY] = date.getMonth();
+    date_obj[DAY_KEY] = date.getDay();
+
+    return date_obj;
   };
 
   /**
@@ -2976,7 +2982,7 @@ var DateApiObjectBuilder = function() {
   this.setDate = function(_date) {
     date = new DateObject(
       _date.getFullYear(),
-      _date.getMonth(),
+      _date.getMonth() + 1, // Date.month is 0 indexed
       _date.getDate()
     );
     return this;
@@ -3235,9 +3241,9 @@ var TimeApiObjectBuilder = function() {
   /**
    * Api object field keys
    */
-  var HOUR_KEY = 'hour';
-  var MINUTE_KEY = 'minute';
-  var SECOND_KEY = 'second';
+  var HOUR_KEY = 'hours';
+  var MINUTE_KEY = 'minutes';
+  var SECOND_KEY = 'seconds';
 
   /**
    * Initial values
@@ -3250,20 +3256,21 @@ var TimeApiObjectBuilder = function() {
    * Private vars
    */
   var time = new Time(
-    INITIAL_HOUR,
-    INITIAL_MINUTE,
-    INITIAL_SECOND
+    this.INITIAL_HOUR,
+    this.INITIAL_MINUTE,
+    this.INITIAL_SECOND
   );
 
   /**
    * Privileged functions
    */
   this.build = function() {
-    return {
-      HOUR_KEY : time.getHours(),
-      MINUTE_KEY : time.getMinutes(),
-      SECOND_KEY : time.getSeconds() 
-    };
+    var time_obj = {};
+    time_obj[HOUR_KEY] = time.getHours();
+    time_obj[MINUTE_KEY] = time.getMinutes();
+    time_obj[SECOND_KEY] = time.getSeconds();
+
+    return time_obj;
   };
 
   this.setTime = function(_time) {
@@ -3349,10 +3356,11 @@ var TimestampApiObjectBuilder = function() {
   };
 
   this.build = function() {
-    return {
-      DATE_KEY : dateBuilder.build(),
-      TIME_KEY : timeBuilder.build()
-    }; 
+    var timestamp_obj = {};
+    timestamp_obj[DATE_KEY] = dateBuilder.build();
+    timestamp_obj[TIME_KEY] = timeBuilder.build();
+
+    return timestamp_obj;
   };
 };
 
@@ -5108,7 +5116,7 @@ function ConfirmOrderApi(network_module) {
   this.apiKeys = {
     scopes_count: "scopes-count",
     experiment_duration: "duration",
-    start_timestamp: "start-timestamp",
+    start_timestamp: "start-time",
     short_code_id: "short-code-id",
     price: "price"
   };
@@ -9126,225 +9134,19 @@ function PendingExperimentView(
   };
 };
 
-var SidePanelView = function(
-  template_store,
-  parent_node
-) {
+var ScopesCountFormView = function(template_store) {
 
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'side-panel-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'side-panel-wrapper';
-  
-  /**
-   * Ui attributes
-   */
-  var START_HIDDEN_ATTR = "start-hidden";
-  
   /**
    * Private state
    */
   var templateStore = template_store;
   var parentNode = parent_node;
 
-  var currentlySelectedTabAndPageInfo = null;
-  var centerPageTitleLabel = null;
-  var centerPanelPageContainer = null;
-  
-  var currentlySelectedTab = null;
-  var tabParentNode = null;
-
-  /**
-   * Tab infos
-   */
-  var tabContainerRootInfo = {
-    className: 'nav-btns-container',
-    node: null
-  };
-
-  var homeButtonNode = {
-    className: 'home-nav-container',
-    node: null
-  };
-
-  var userNameNode = {
-    className: 'side-panel-user-label',
-    node: null
-  };
-
-  var newExperimentInfo = {
-    button_title: 'Add Experiment',
-    icon_type: 'add-circle-outline',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var myExperimentsInfo = {
-    button_title: 'My Experiments',
-    icon_type: 'group-work',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var feedbackInfo = {
-    button_title: 'Feedback',
-    icon_type: 'question-answer',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var technicianInfo = {
-    button_title: 'Technician',
-    icon_type: 'build',
-    tab: null,
-    callback_listeners: []
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * initTabInfo()
-   * - initialize SidePanelTab view
-   * - bind event listeners
-   * @param TabInfo (see above)
-   */
-  var initTabInfo = function(tab_info) {
-    // Initialize tab view 
-    tab_info.tab = new SidePanelTab(
-      templateStore,
-      tabContainerRootInfo.node,
-      tab_info.button_title,
-      tab_info.icon_type
-    );    
-
-    // Register 'onclick' callback
-    tab_info.tab.registerOnClickListener(function() {
-      // // Unselect previous tab
-      // currentlySelectedTab.deselect();
-      //
-      // // Select new tab
-      // currentlySelectedTab = tab_info.tab;
-      // currentlySelectedTab.select();
-
-      // Invoke callback listeners
-      for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
-        tab_info.callback_listeners[i]();
-      }
-    });
-
-    // Initialize tab ui
-    tab_info.tab.init();
-  };
-
-  /**
-   * initTabInfos()
-   * - initialize all tabs (bind nodes and event listeners)
-   */
-  var initTabInfos = function() {
-    // Initialize tab parent node
-    tabContainerRootInfo.node = Utils.bindNode(
-      rootNode,
-      tabContainerRootInfo.className
-    ); 
-
-    // Initialize tab views
-    initTabInfo(newExperimentInfo);
-    initTabInfo(myExperimentsInfo);
-    initTabInfo(technicianInfo);
-    initTabInfo(feedbackInfo);
-  };
-
-  var selectTab = function(tab) {
-    if (currentlySelectedTab != null) {
-      currentlySelectedTab.deselect();
-    }
-    tab.select();
-    currentlySelectedTab = tab;
-  };
-
-  var bindNodes = function() {
-    // Initialize user-name ui node
-    userNameNode.node = Utils.bindNode(
-      rootNode,
-      userNameNode.className
-    );
-
-    // Initialize home burron ui node
-    homeButtonNode.node = Utils.bindNode(
-      rootNode,
-      homeButtonNode.className
-    );
-
-    // Initialize tabs
-    initTabInfos();
-  };
-
   /**
    * Privileged functions
    */
-  this.init = function() {
-    // Synthesize html template and insert into main document
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );    
-
-    bindNodes();
-  
-    return this;
-  };
-
-  /**
-   * Onclick event listeners for tabs
-   */
-  this.bindNewExperimentTabClick = function(callback) {
-    newExperimentInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindMyExperimentsTabClick = function(callback) {
-    myExperimentsInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindFeedbackTabClick = function(callback) {
-    feedbackInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindTechnicianTabClick = function(callback) {
-    technicianInfo.callback_listeners.push(callback); 
-  };
-
-  /**
-   * Select tab
-   */
-  this.selectNewExperimentTab = function() {
-    selectTab(newExperimentInfo.tab);
-  };
-
-  this.selectMyExperimentsTab = function() {
-    selectTab(myExperimentsInfo.tab);
-  };
-
-  this.selectFeedbackTab = function() {
-    selectTab(feedbackInfo.tab);
-  };
-
-  this.selectTechnicianTab = function() {
-    selectTab(technicianInfo.tab);
-  };
-
-  this.setUserName = function(first_name, last_name) {
-    var name = first_name + ' ' + last_name;
-    userNameNode.node.innerHTML = name;
-    // TODO check the length and curtail name if char count exceeds max
-    return this;
+  this.init = function(parent_node) {
+    parentNode = parent_node;
   };
 };
 
@@ -9702,19 +9504,225 @@ function ShortCodePicker(
   };
 };
 
-var ScopesCountFormView = function(template_store) {
+var SidePanelView = function(
+  template_store,
+  parent_node
+) {
 
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'side-panel-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'side-panel-wrapper';
+  
+  /**
+   * Ui attributes
+   */
+  var START_HIDDEN_ATTR = "start-hidden";
+  
   /**
    * Private state
    */
   var templateStore = template_store;
   var parentNode = parent_node;
 
+  var currentlySelectedTabAndPageInfo = null;
+  var centerPageTitleLabel = null;
+  var centerPanelPageContainer = null;
+  
+  var currentlySelectedTab = null;
+  var tabParentNode = null;
+
+  /**
+   * Tab infos
+   */
+  var tabContainerRootInfo = {
+    className: 'nav-btns-container',
+    node: null
+  };
+
+  var homeButtonNode = {
+    className: 'home-nav-container',
+    node: null
+  };
+
+  var userNameNode = {
+    className: 'side-panel-user-label',
+    node: null
+  };
+
+  var newExperimentInfo = {
+    button_title: 'Add Experiment',
+    icon_type: 'add-circle-outline',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var myExperimentsInfo = {
+    button_title: 'My Experiments',
+    icon_type: 'group-work',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var feedbackInfo = {
+    button_title: 'Feedback',
+    icon_type: 'question-answer',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var technicianInfo = {
+    button_title: 'Technician',
+    icon_type: 'build',
+    tab: null,
+    callback_listeners: []
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * initTabInfo()
+   * - initialize SidePanelTab view
+   * - bind event listeners
+   * @param TabInfo (see above)
+   */
+  var initTabInfo = function(tab_info) {
+    // Initialize tab view 
+    tab_info.tab = new SidePanelTab(
+      templateStore,
+      tabContainerRootInfo.node,
+      tab_info.button_title,
+      tab_info.icon_type
+    );    
+
+    // Register 'onclick' callback
+    tab_info.tab.registerOnClickListener(function() {
+      // // Unselect previous tab
+      // currentlySelectedTab.deselect();
+      //
+      // // Select new tab
+      // currentlySelectedTab = tab_info.tab;
+      // currentlySelectedTab.select();
+
+      // Invoke callback listeners
+      for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
+        tab_info.callback_listeners[i]();
+      }
+    });
+
+    // Initialize tab ui
+    tab_info.tab.init();
+  };
+
+  /**
+   * initTabInfos()
+   * - initialize all tabs (bind nodes and event listeners)
+   */
+  var initTabInfos = function() {
+    // Initialize tab parent node
+    tabContainerRootInfo.node = Utils.bindNode(
+      rootNode,
+      tabContainerRootInfo.className
+    ); 
+
+    // Initialize tab views
+    initTabInfo(newExperimentInfo);
+    initTabInfo(myExperimentsInfo);
+    initTabInfo(technicianInfo);
+    initTabInfo(feedbackInfo);
+  };
+
+  var selectTab = function(tab) {
+    if (currentlySelectedTab != null) {
+      currentlySelectedTab.deselect();
+    }
+    tab.select();
+    currentlySelectedTab = tab;
+  };
+
+  var bindNodes = function() {
+    // Initialize user-name ui node
+    userNameNode.node = Utils.bindNode(
+      rootNode,
+      userNameNode.className
+    );
+
+    // Initialize home burron ui node
+    homeButtonNode.node = Utils.bindNode(
+      rootNode,
+      homeButtonNode.className
+    );
+
+    // Initialize tabs
+    initTabInfos();
+  };
+
   /**
    * Privileged functions
    */
-  this.init = function(parent_node) {
-    parentNode = parent_node;
+  this.init = function() {
+    // Synthesize html template and insert into main document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );    
+
+    bindNodes();
+  
+    return this;
+  };
+
+  /**
+   * Onclick event listeners for tabs
+   */
+  this.bindNewExperimentTabClick = function(callback) {
+    newExperimentInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindMyExperimentsTabClick = function(callback) {
+    myExperimentsInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindFeedbackTabClick = function(callback) {
+    feedbackInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindTechnicianTabClick = function(callback) {
+    technicianInfo.callback_listeners.push(callback); 
+  };
+
+  /**
+   * Select tab
+   */
+  this.selectNewExperimentTab = function() {
+    selectTab(newExperimentInfo.tab);
+  };
+
+  this.selectMyExperimentsTab = function() {
+    selectTab(myExperimentsInfo.tab);
+  };
+
+  this.selectFeedbackTab = function() {
+    selectTab(feedbackInfo.tab);
+  };
+
+  this.selectTechnicianTab = function() {
+    selectTab(technicianInfo.tab);
+  };
+
+  this.setUserName = function(first_name, last_name) {
+    var name = first_name + ' ' + last_name;
+    userNameNode.node.innerHTML = name;
+    // TODO check the length and curtail name if char count exceeds max
+    return this;
   };
 };
 

@@ -71,12 +71,17 @@ var CenterPageController = function() {
       .setTimestampWithDate(start_time)
       .build();
 
+console.log(start_time_api_obj);
+
     var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);
     confirm_order_api
       .setScopesCount(scopes_count)
       .setExperimentDuration(experiment_duration)
       .setStartTimestamp(start_time_api_obj)
       .setShortCodeId(short_code.getId())
+      .setSuccessfulApiCallback(function(response) {
+        console.log(response);
+      })
       .send();
   };
 

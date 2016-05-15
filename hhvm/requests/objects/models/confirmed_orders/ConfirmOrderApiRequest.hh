@@ -7,14 +7,12 @@ class ConfirmOrderApiRequest {
   const string SCOPES_COUNT_KEY = "scopes-count";
   const string DURATION_KEY = "duration";
   const string SHORT_CODE_KEY = 'short-code-id';
-  const string PRICE_KEY = "price";
   const string START_TIME_KEY = "start-time";
 
   public function __construct(
     private RequestField<UnsignedInt> $scopesCount,
     private RequestField<UnsignedInt> $experimentDuration,
     private RequestField<UnsignedInt> $shortCodeId,
-    private RequestField<UnsignedFloat> $price,
     private UnserializedTimestampApiRequest $startTime
   ) {}
 
@@ -33,10 +31,6 @@ class ConfirmOrderApiRequest {
   public function getShortCodeId(): RequestField<UnsignedInt> {
     return $this->shortCodeId;
   }
-
-  public function getPrice(): RequestField<UnsignedFloat> {
-    return $this->price;
-  }
 }
 
 class ConfirmOrderApiRequestBuilder {
@@ -44,7 +38,6 @@ class ConfirmOrderApiRequestBuilder {
   private ?RequestField<UnsignedInt> $scopesCount;
   private ?RequestField<UnsignedInt> $experimentDuration;
   private ?RequestField<UnsignedInt> $shortCodeId;
-  private ?RequestField<UnsignedFloat> $price;
   private ?UnserializedTimestampApiRequest $startTime;
 
   public function setScopesCount(RequestField<UnsignedInt> $scopes_count): this {
@@ -67,11 +60,6 @@ class ConfirmOrderApiRequestBuilder {
     return $this;
   }
 
-  public function setPrice(RequestField<UnsignedFloat> $price): this {
-    $this->price = $price;
-    return $this;
-  }
-
   private function checkNotNull<T>(?T $field, string $key): T {
     if ($field === null) {
       throw new UnsetRequestFieldException(
@@ -88,7 +76,6 @@ class ConfirmOrderApiRequestBuilder {
       $this->checkNotNull($this->scopesCount, ConfirmOrderApiRequest::SCOPES_COUNT_KEY),
       $this->checkNotNull($this->experimentDuration, ConfirmOrderApiRequest::DURATION_KEY),
       $this->checkNotNull($this->shortCodeId, ConfirmOrderApiRequest::SHORT_CODE_KEY),
-      $this->checkNotNull($this->price, ConfirmOrderApiRequest::PRICE_KEY),
       $this->checkNotNull($this->startTime, ConfirmOrderApiRequest::START_TIME_KEY)
     );
   }
