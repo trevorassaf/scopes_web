@@ -39,6 +39,10 @@ drop table ReservedOrderScopeMappings;
 drop table RsvdOrders;
 drop table ReservedOrderPolicy;
 
+-- Order statuses
+drop table OrderStatuses;
+drop table PaymentStatuses;
+
 -- Order Payment Policies
 drop table Gen0OrderPricePolicies;
 

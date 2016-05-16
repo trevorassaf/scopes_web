@@ -11,6 +11,10 @@ source create_tables/short_codes/short_code_validation_checks.sql
 -- Order Payment Policies
 source create_tables/payments/gen0/gen0_order_price_policies.sql
 
+-- Order statuses
+source create_tables/orders/order_statuses.sql
+source create_tables/orders/payment_statuses.sql
+
 -- Reserved orders
 source create_tables/orders/rsvd_order_policy.sql
 source create_tables/orders/rsvd_orders.sql
