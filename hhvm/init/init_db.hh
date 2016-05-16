@@ -51,6 +51,7 @@ function initDbMain($argv, $argc): void {
 }
 
 function initOrderConfiguration(MethodInjector $method_injector): void {
+  // Initialize order configuration
   $create_order_configuration_method = $method_injector->getCreateOrderConfigurationMethod();
 
   $max_scopes_count = new UnsignedInt(16);
@@ -77,6 +78,17 @@ function initOrderConfiguration(MethodInjector $method_injector): void {
     $min_days_in_advance,
     $max_months_in_advance
   );
+
+  // Initialize order/payment status
+  $create_order_status_method = $method_injector->getCreateOrderStatusMethod();  
+  $create_order_status_method->create("Pending");
+  $create_order_status_method->create("Approved");
+  $create_order_status_method->create("Completed");
+
+  $create_payment_status_method = $method_injector->getCreatePaymentStatusMethod();
+  $create_payment_status_method->create("Pending");
+  $create_payment_status_method->create("Approved");
+  $create_payment_status_method->create("Completed");
 }
 
 function initVideoMimeTypes(MethodInjector $method_injector): void {
