@@ -83,6 +83,14 @@ class QueryInjector {
   private ?FetchScopeMappingsByConfirmedOrderQuery $fetchScopeMappingsByConfirmedOrderQuery;
   private ?InsertQuery<ConfirmedOrderScopeMapping> $insertConfirmedOrderScopeMappingQuery;
   private ?InsertConfirmedOrderScopeMappingQuery $concreteInsertConfirmedOrderScopeMappingsQuery;
+  private ?FetchQuery<OrderStatus> $fetchOrderStatusQuery;
+  private ?FetchByUniqueKeyQuery<OrderStatus> $fetchOrderStatusByUniqueKeyQuery;
+  private ?FetchByIdQuery<OrderStatus> $fetchOrderStatusByIdQuery;
+  private ?InsertQuery<OrderStatus> $insertOrderStatusQuery;
+  private ?FetchQuery<PaymentStatus> $fetchPaymentStatusQuery;
+  private ?FetchByUniqueKeyQuery<PaymentStatus> $fetchPaymentStatusByUniqueKeyQuery;
+  private ?FetchByIdQuery<PaymentStatus> $fetchPaymentStatusByIdQuery;
+  private ?InsertQuery<PaymentStatus> $insertPaymentStatusQuery;
 
   // Edited video order queries
   private ?InsertQuery<EditedVideoOrder> $insertEditedVideoOrderQuery;
@@ -246,7 +254,11 @@ class QueryInjector {
     private LazyLoader<Gen0OrderPricePoliciesTable> $gen0OrderPricePoliciesTableLazyLoader,
     private LazyLoader<ConcreteModelFactory<Gen0OrderPricePolicy>> $gen0OrderPricePolicyModelFactoryLazyLoader,
     private LazyLoader<OrderConfigurationTable> $orderConfigurationTableLazyLoader,
-    private LazyLoader<ConcreteModelFactory<OrderConfiguration>> $orderConfigurationModelFactoryLazyLoader
+    private LazyLoader<ConcreteModelFactory<OrderConfiguration>> $orderConfigurationModelFactoryLazyLoader,
+    private LazyLoader<OrderStatusTable> $orderStatusTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<OrderStatus>> $orderStatusModelFactoryLazyLoader,
+    private LazyLoader<PaymentStatusTable> $paymentStatusTableLazyLoader,
+    private LazyLoader<ConcreteModelFactory<PaymentStatus>> $paymentStatusModelFactoryLazyLoader
   ) {}
 
   public function getUpdateQuery(): UpdateQuery {
@@ -1811,7 +1823,96 @@ class QueryInjector {
     }
     return $this->concreteInsertOrderConfigurationQuery;
   }
-  
+
+  public function getFetchOrderStatusQuery(): FetchQuery<OrderStatus> {
+    if ($this->fetchOrderStatusQuery === null) {
+      $this->fetchOrderStatusQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->orderStatusModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->fetchOrderStatusQuery;
+  }
+
+  public function getFetchOrderStatusByUniqueKeyQuery(): FetchByUniqueKeyQuery<OrderStatus> {
+    if ($this->fetchOrderStatusByUniqueKeyQuery === null) {
+      $this->fetchOrderStatusByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchOrderStatusQuery(),
+        $this->orderStatusTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchOrderStatusByUniqueKeyQuery;
+  }
+
+  public function getFetchOrderStatusByIdQuery(): FetchByIdQuery<OrderStatus> {
+    if ($this->fetchOrderStatusByIdQuery === null) {
+      $this->fetchOrderStatusByIdQuery = new FetchByIdQuery(
+        $this->getFetchOrderStatusByUniqueKeyQuery(),
+        $this->orderStatusTableLazyLoader->load()
+      );
+    }
+    return $this->fetchOrderStatusByIdQuery;
+  }
+
+  public function getInsertOrderStatusQuery(): InsertQuery<OrderStatus> {
+    if ($this->insertOrderStatusQuery === null) {
+      $this->insertOrderStatusQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->orderStatusTableLazyLoader->load(),
+        $this->orderStatusModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertOrderStatusQuery;
+  }
+
+  public function getFetchPaymentStatusQuery(): FetchQuery<PaymentStatus> {
+    if ($this->fetchPaymentStatusQuery === null) {
+      $this->fetchPaymentStatusQuery = new FetchQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->paymentStatusModelFactoryLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      );
+    }
+    return $this->fetchPaymentStatusQuery;
+  }
+
+  public function getFetchPaymentStatusByUniqueKeyQuery(): FetchByUniqueKeyQuery<PaymentStatus> {
+    if ($this->fetchPaymentStatusByUniqueKeyQuery === null) {
+      $this->fetchPaymentStatusByUniqueKeyQuery = new FetchByUniqueKeyQuery(
+        $this->getFetchPaymentStatusQuery(),
+        $this->paymentStatusTableLazyLoader->load(),
+        $this->constraintMapToConjunctiveWhereClauseTranslatorLazyLoader->load()
+      ); 
+    }
+    return $this->fetchPaymentStatusByUniqueKeyQuery;
+  }
+
+  public function getFetchPaymentStatusByIdQuery(): FetchByIdQuery<PaymentStatus> {
+    if ($this->fetchPaymentStatusByIdQuery === null) {
+      $this->fetchPaymentStatusByIdQuery = new FetchByIdQuery(
+        $this->getFetchPaymentStatusByUniqueKeyQuery(),
+        $this->paymentStatusTableLazyLoader->load()
+      );
+    }
+    return $this->fetchPaymentStatusByIdQuery;
+  }
+
+  public function getInsertPaymentStatusQuery(): InsertQuery<PaymentStatus> {
+    if ($this->insertPaymentStatusQuery === null) {
+      $this->insertPaymentStatusQuery = new InsertQuery(
+        $this->asyncMysqlConnectionLazyLoader->load(),
+        $this->paymentStatusTableLazyLoader->load(),
+        $this->paymentStatusModelFactoryLazyLoader->load(),
+        $this->insertQueryCreaterLazyLoader->load(),
+        $this->queryExceptionFactoryLazyLoader->load()
+      ); 
+    }
+    return $this->insertPaymentStatusQuery;
+  }
 
   public function getCompositeVideosTable(): CompositeVideoTable {
     return $this->compositeVideoTableLazyLoader->load();
@@ -1835,5 +1936,13 @@ class QueryInjector {
 
   public function getReservedOrderScopeMappingsTable(): ReservedOrderScopeMappingsTable {
     return $this->reservedOrderScopeMappingsTableLazyLoader->load();
+  }
+
+  public function getOrderStatusTable(): OrderStatusTable {
+    return $this->orderStatusTableLazyLoader->load();
+  }
+  
+  public function getPaymentStatusTable(): PaymentStatusTable {
+    return $this->paymentStatusTableLazyLoader->load();
   }
 }

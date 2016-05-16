@@ -46,6 +46,8 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
     $confirmed_order_scope_mappings_table_loader = new ConfirmedOrderScopeMappingsTableLazyLoader();
     $gen0_order_price_policies_table_loader = new Gen0OrderPricePoliciesTableLazyLoader();
     $order_configuration_table_loader = new OrderConfigurationTableLazyLoader();
+    $order_status_table_loader = new OrderStatusTableLazyLoader();
+    $payment_status_table_loader = new PaymentStatusTableLazyLoader();
 
     return new QueryInjector(
       new AsyncMysqlConnectionLazyLoader(
@@ -189,6 +191,14 @@ class ProductionQueryInjectorFactory extends SingletonQueryInjectorFactory {
         $order_configuration_table_loader,
         $timestamp_serializer_loader,
         $time_serializer_loader
+      ),
+      $order_status_table_loader,
+      new OrderStatusModelFactoryLazyLoader(
+        $order_status_table_loader
+      ),
+      $payment_status_table_loader,
+      new PaymentStatusModelFactoryLazyLoader(
+        $payment_status_table_loader
       )
     );
   }

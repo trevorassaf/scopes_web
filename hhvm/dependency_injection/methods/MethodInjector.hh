@@ -51,6 +51,8 @@ class MethodInjector {
   private ?IsConflictingConfirmedOrderMethod $isConflictingConfirmedOrderMethod;
   private ?GetAllConfirmedOrdersMethod $getAllConfirmedOrdersMethod;
   private ?GetConfirmedOrderDatesMethod $getConfirmedOrderDatesMethod;
+  private ?CreateOrderStatusMethod $createOrderStatusMethod;
+  private ?CreatePaymentStatusMethod $createPaymentStatusMethod;
 
   // Cell label methods
   private ?UpdateCellLabelMethod $updateCellLabelMethod;
@@ -739,6 +741,26 @@ class MethodInjector {
       ); 
     }
     return $this->getDisallowedWeekDaysMethod;
+  }
+
+  public function getCreateOrderStatusMethod(): CreateOrderStatusMethod {
+    if ($this->createOrderStatusMethod === null) {
+      $this->createOrderStatusMethod = new CreateOrderStatusMethod(
+        $this->queryInjector->getInsertOrderStatusQuery(),
+        $this->queryInjector->getOrderStatusTable()
+      ); 
+    }
+    return $this->createOrderStatusMethod;
+  }
+
+  public function getCreatePaymentStatusMethod(): CreatePaymentStatusMethod {
+    if ($this->createPaymentStatusMethod === null) {
+      $this->createPaymentStatusMethod = new CreatePaymentStatusMethod(
+        $this->queryInjector->getInsertPaymentStatusQuery(),
+        $this->queryInjector->getPaymentStatusTable()
+      ); 
+    }
+    return $this->createPaymentStatusMethod;
   }
 
   public function getTimeSerializer(): TimeSerializer {
