@@ -17,7 +17,7 @@ class ConfirmOrderMethod {
     UnsignedInt $scopes_count,
     UnsignedInt $experiment_duration,
     UnsignedInt $short_code_id,
-    Timestamp $start_timestamp
+    Timestamp $start_timestamp,
   ): ConfirmedOrder {
     
     // Fail if short code does not belong to this user
@@ -62,6 +62,13 @@ class ConfirmOrderMethod {
       $current_timestamp
     );
 
+    // Initialize order/payment statuses
+    $pending_order_status_type = OrderStatusType::PENDING;
+    $pending_order_status_id = new UnsignedInt((int)$pending_order_status_type);
+
+    $pending_payment_status_type = PaymentStatusType::PENDING;
+    $pending_payment_status_id = new UnsignedInt((int)$pending_payment_status_type);
+
     // Insert confirmed order into db
     $insert_confirmed_order_query_handle = $this->confirmedOrderInsertQuery->insert(
       $user_id,
@@ -70,7 +77,9 @@ class ConfirmOrderMethod {
       $end_timestamp,
       $short_code_id,
       $server_price,
-      $current_timestamp
+      $current_timestamp,
+      $pending_order_status_id,
+      $pending_payment_status_id
     );
 
     return $insert_confirmed_order_query_handle

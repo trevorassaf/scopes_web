@@ -19,5 +19,7 @@ CREATE TABLE ConfirmedOrders (
   shortCodeId INT UNSIGNED NOT NULL,
   FOREIGN KEY(shortCodeId) REFERENCES ShortCodes(id),
   price DECIMAL(6,2) UNSIGNED NOT NULL,
-  timeOrdered TIMESTAMP NOT NULL
+  timeOrdered TIMESTAMP NOT NULL,
+  orderStatusId INT UNSIGNED NOT NULL,
+  paymentStatusId INT UNSIGNED NOT NULL
 );

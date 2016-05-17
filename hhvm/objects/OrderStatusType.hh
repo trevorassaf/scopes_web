@@ -2,7 +2,7 @@
 
 enum OrderStatusType : int {
 
-  PENDING     = 0x0;
-  APPROVED    = 0x1;
-  COMPLETED   = 0x2;
+  PENDING     = 0x1;
+  APPROVED    = 0x2;
+  COMPLETED   = 0x3;
 }

@@ -12,6 +12,8 @@ class ConfirmedOrdersTable extends Table {
   const string SHORT_CODE_ID_KEY = "shortCodeId";
   const string PRICE_KEY = "price";
   const string TIME_ORDERED_KEY = "timeOrdered";
+  const string ORDER_STATUS_ID_KEY = 'orderStatusId';
+  const string PAYMENT_STATUS_ID_KEY = 'paymentStatusId';
 
   public function getName(): string {
     return self::TABLE_NAME;
@@ -51,5 +53,13 @@ class ConfirmedOrdersTable extends Table {
 
   public function getTimeOrderedKey(): string {
     return self::TIME_ORDERED_KEY;
+  }
+
+  public function getOrderStatusIdKey(): string {
+    return self::ORDER_STATUS_ID_KEY;
+  }
+
+  public function getPaymentStatusIdKey(): string {
+    return self::PAYMENT_STATUS_ID_KEY;
   }
 }

@@ -11,7 +11,9 @@ class ConfirmedOrder implements Model {
     private ?string $description,
     private UnsignedInt $shortCodeId,
     private UnsignedFloat $price,
-    private Timestamp $timeOrdered
+    private Timestamp $timeOrdered,
+    private UnsignedInt $orderStatusId,
+    private UnsignedInt $paymentStatusId
   ) {}
 
   public function getId(): UnsignedInt {
@@ -48,5 +50,13 @@ class ConfirmedOrder implements Model {
 
   public function getTimeOrdered(): Timestamp {
     return $this->timeOrdered;
+  }
+
+  public function getOrderStatusId(): UnsignedInt {
+    return $this->orderStatusId;
+  }
+
+  public function getPaymentStatusId(): UnsignedInt {
+    return $this->paymentStatusId;
   }
 }
