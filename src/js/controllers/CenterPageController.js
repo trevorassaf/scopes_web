@@ -3,6 +3,8 @@ var CenterPageController = function() {
   /**
    * Private state
    */
+  var _this = this;
+
   // Child controllers
   var newExperimentPageController = null;
   var myExperimentsPageController = null;
@@ -14,6 +16,9 @@ var CenterPageController = function() {
 
   // Views
   var centerPageView = null;
+
+  // Event listeners
+  var newExperimentListeners = [];
 
   /**
    * Private functions
@@ -37,7 +42,7 @@ var CenterPageController = function() {
     );
   };
 
-  var createShadowMyExperimentModel = function(
+  var createNewExperimentModel = function(
     scopes_count,
     experiment_duration,
     start_time,
@@ -48,14 +53,12 @@ var CenterPageController = function() {
     var short_code_copy = short_code.deepCopy();
 
     // Create new my experiment shadow
-    var new_my_experiment_shadow_model = new NewMyExperimentModelBuilder()
+    return new NewMyExperimentModelBuilder()
       .setScopesCount(scopes_count)
       .setExperimentDuration(experiment_duration)
       .setStartTime(start_time_copy)
       .setShortCode(short_code_copy)
       .build();
-
-    return new_my_experiment_shadow_model;
   };
 
   var persistNewExperiment = function(
@@ -63,15 +66,13 @@ var CenterPageController = function() {
     experiment_duration,
     start_time,
     short_code,
-    new_my_experiment_shadow_model 
+    new_my_experiment_shadow_model,
+    successful_callback
   ) {
-
     // Assemble api request
     var start_time_api_obj = new TimestampApiObjectBuilder()
       .setTimestampWithDate(start_time)
       .build();
-
-console.log(start_time_api_obj);
 
     var confirm_order_api = new ConfirmOrderApi(ScopesNetwork);
     confirm_order_api
@@ -79,8 +80,11 @@ console.log(start_time_api_obj);
       .setExperimentDuration(experiment_duration)
       .setStartTimestamp(start_time_api_obj)
       .setShortCodeId(short_code.getId())
-      .setSuccessfulApiCallback(function(response) {
-        console.log(response);
+      .setSuccessfulApiCallback(function(json_response) {
+        successful_callback(
+          new_my_experiment_shadow_model,
+          json_response
+        );
       })
       .send();
   };
@@ -113,39 +117,42 @@ console.log(start_time_api_obj);
     var short_code_model = short_code_picker_model.getSelectedItem();
     var short_code = short_code_model.getData();
 
-    var new_my_experiment_shadow_model = createShadowMyExperimentModel(
+    var new_experiment_model = createNewExperimentModel(
       scopes_count,
       experiment_duration,
       start_time,
       short_code
     );
 
-    // Update ui and navigate user to my-experiments page
-    // TODO...
-    
-    // Send new experiment request to server
+    // Send new experiment request to server and navigate to MyExperiment page
     persistNewExperiment(
       scopes_count,
       experiment_duration,
       start_time,
       short_code,
-      new_my_experiment_shadow_model
+      new_experiment_model,
+      handleSuccessfulNewExperimentPersist
     );
+  };
 
-    // var experiment_model = new MyExperimentModel(
-    //   0,
-    //   null,
-    //   null,
-    //   new_experiment_model.getScopesCountModel().getCurrentValue(),
-    //   new_experiment_model.getExperimentDurationModel().getCurrentValue(),
-    //   start_time,
-    //   selected_short_code_model.getLabel(),
-    //   "Pending",
-    //   "Pending"
-    // );
-    //
-    // var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
-    // my_experiments_page_model.addExperiment(experiment_model);
+  var handleSuccessfulNewExperimentPersist = function(
+    new_experiment_model,
+    json_response,
+    api_keys
+  ) {
+    // Update model with new id
+    new_experiment_model.setId(json_response.id);   
+
+    // Add to my-experiment page model 
+    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    my_experiments_page_model.addExperiment(new_experiment_model);
+
+    console.log(my_experiments_page_model);
+
+    // Navigate to my-experiments page
+    newExperimentListeners.forEach(function(callback) {
+      callback();
+    });
   };
 
   var initMyExperimentsPageController = function() {
@@ -155,22 +162,22 @@ console.log(start_time_api_obj);
       centerPageModel.getMyExperimentsPageModel()
     );
 
-    var start_time = new Date(2016, 2, 29, 10);
-
-    var preloaded_experiment_model = new MyExperimentModel(
-      1,
-      "Angiogenesis Exp. #5",
-      null,
-      4,
-      3,
-      start_time,
-      "SHORT",
-      "Complete",
-      "Complete"
-    );
-    
-    var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
-    my_experiments_page_model.addExperiment(preloaded_experiment_model);
+    // var start_time = new Date(2016, 2, 29, 10);
+    //
+    // var preloaded_experiment_model = new MyExperimentModel(
+    //   1,
+    //   "Angiogenesis Exp. #5",
+    //   null,
+    //   4,
+    //   3,
+    //   start_time,
+    //   "SHORT",
+    //   "Complete",
+    //   "Complete"
+    // );
+    //
+    // var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
+    // my_experiments_page_model.addExperiment(preloaded_experiment_model);
   };
 
   /**
@@ -208,5 +215,10 @@ console.log(start_time_api_obj);
 
   this.showTechnicianPage = function() {
     centerPageView.showTechnicianPage();
+  };
+
+  this.bindNewExperiment = function(callback) {
+    newExperimentListeners.push(callback); 
+    return this;
   };
 };

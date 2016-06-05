@@ -38,6 +38,11 @@ var MyExperimentModel = function(
 };
 
 // Setters
+MyExperimentModel.prototype.setId = function(id) {
+  this.id = id;
+  return this;
+};
+
 MyExperimentModel.prototype.setTitle = function(title) {
   this.title = title;
   this.titleCallbacks.forEach(function(callback) {

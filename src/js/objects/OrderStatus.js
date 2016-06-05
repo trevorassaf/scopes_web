@@ -1,6 +1,6 @@
-var PaymentStatus = function(_value = this.PENDING) {
+var OrderStatus = function(_value = this.PENDING) {
 
-  // Payment statuses
+  // Order statuses
   this.PENDING = 1;
   this.APPROVED = 2;
   this.COMPLETED = 3;
@@ -24,7 +24,7 @@ var PaymentStatus = function(_value = this.PENDING) {
     return value; 
   };
 
-  this.compare = function(payment_status) {
-    return value == payment_status.getValue();
+  this.compare = function(order_status) {
+    return value == order_status.getValue();
   };
 };

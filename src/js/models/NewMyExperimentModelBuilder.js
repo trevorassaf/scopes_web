@@ -5,8 +5,8 @@ var NewMyExperimentModelBuilder = function() {
    */
   var INITIAL_TITLE = '';
   var INITIAL_DESCRIPTION = '';
-  var INITIAL_EXPERIMENT_STATUS = ExperimentStatus.PENDING;
-  var INITIAL_PAYMENT_STATUS = PaymentStatus.PENDING;
+  var INITIAL_EXPERIMENT_STATUS = new OrderStatus();
+  var INITIAL_PAYMENT_STATUS = new PaymentStatus();
   var INITIAL_IS_PERSISTED = false;
 
   /**

@@ -60,10 +60,20 @@ var ApplicationController = function(template_store) {
     apiController.init();
   };
 
+  var configureControllers = function() {
+    centerPageController.bindNewExperiment(function() {
+      sidePanelController.showMyExperimentsPage(); 
+    });
+  };
+
   var initControllers = function() {
+    // Init individual controllers
     initApiController();
     initCenterPageController();
     initSidePanelController();
+
+    // Configure controllers with mutual responsibilities
+    configureControllers(); 
   };
 
   var initUi = function() {
