@@ -161,23 +161,6 @@ var CenterPageController = function() {
       centerPageView.getMyExperimentsPageView(),
       centerPageModel.getMyExperimentsPageModel()
     );
-
-    // var start_time = new Date(2016, 2, 29, 10);
-    //
-    // var preloaded_experiment_model = new MyExperimentModel(
-    //   1,
-    //   "Angiogenesis Exp. #5",
-    //   null,
-    //   4,
-    //   3,
-    //   start_time,
-    //   "SHORT",
-    //   "Complete",
-    //   "Complete"
-    // );
-    //
-    // var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
-    // my_experiments_page_model.addExperiment(preloaded_experiment_model);
   };
 
   /**
