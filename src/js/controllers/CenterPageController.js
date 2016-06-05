@@ -147,8 +147,6 @@ var CenterPageController = function() {
     var my_experiments_page_model = centerPageModel.getMyExperimentsPageModel();
     my_experiments_page_model.addExperiment(new_experiment_model);
 
-    console.log(my_experiments_page_model);
-
     // Navigate to my-experiments page
     newExperimentListeners.forEach(function(callback) {
       callback();

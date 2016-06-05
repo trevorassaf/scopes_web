@@ -59,8 +59,6 @@ var ScopesNetwork = (function() {
         is_async
       );
 
-      console.log(ENDPOINT_PATH);
-
       // Assemble payload
       var serialized_payload = JSON.stringify(payload_fields);
 

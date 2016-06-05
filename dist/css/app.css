@@ -1236,6 +1236,10 @@ hidden {
   background-image: -webkit-linear-gradient(top, #FF3B45, #FF0E1A);
 }
 
+.experiment-time-form-wrapper .input-container > div {
+  vertical-align: top; 
+}
+
 .new-experiment-page-wrapper[hidden-page] {
   display: none; 
 }
@@ -1272,10 +1276,6 @@ hidden {
   margin-right: 40px;
 }
 
-.experiment-time-form-wrapper .input-container > div {
-  vertical-align: top; 
-}
-
 .slider-input-form-wrapper .slider-input {
   position: absolute;
   left: 80px;
@@ -1284,6 +1284,12 @@ hidden {
   /* width: 400px; */
   width: 80%;
   max-width: 400px;
+}
+
+.my-experiment-monitor-page-wrapper {
+  color: #424242;
+  margin: auto;
+  padding-top: 120px;
 }
 
 .my-experiment-front-page-wrapper {
@@ -1303,12 +1309,6 @@ hidden {
 
 .my-experiment-front-page-wrapper > div > div {
   margin-bottom: 40px;
-}
-
-.my-experiment-monitor-page-wrapper {
-  color: #424242;
-  margin: auto;
-  padding-top: 120px;
 }
 
 .my-experiment-recording-page-wrapper .experiment-recording {

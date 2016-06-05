@@ -24,11 +24,6 @@ var SidePanelController = function() {
 
     // Update user model startup data response
     get_startup_data_api_controller.bindSuccess(function(json_response, api_keys) {
-
-// Debug
-console.log(json_response);
-console.log(api_keys);
-
       // Update first and last name
       userModel.setName(
         json_response[api_keys.first_name],
