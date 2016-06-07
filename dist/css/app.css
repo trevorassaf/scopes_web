@@ -1286,12 +1286,6 @@ hidden {
   max-width: 400px;
 }
 
-.my-experiment-monitor-page-wrapper {
-  color: #424242;
-  margin: auto;
-  padding-top: 120px;
-}
-
 .my-experiment-front-page-wrapper {
   padding-left: 20px;
   padding-right: 20px;
@@ -1309,6 +1303,12 @@ hidden {
 
 .my-experiment-front-page-wrapper > div > div {
   margin-bottom: 40px;
+}
+
+.my-experiment-monitor-page-wrapper {
+  color: #424242;
+  margin: auto;
+  padding-top: 120px;
 }
 
 .my-experiment-recording-page-wrapper .experiment-recording {

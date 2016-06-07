@@ -1,3 +1,31 @@
+<template id='center-page-template'>
+  <div class='center-page-wrapper'>
+
+    <!-- Upper-most row of center page. Container page title and admin btns -->
+    <div class='title-and-admin-btn-row'>
+      
+      <!-- Title for the center page -->
+      <div class='title-container'>
+        <span class='title-label'></span> 
+      </div> 
+
+      <!-- Admin icon buttons -->
+      <div class='admin-btn-container'>
+        <div class='user-profile-admin-btn-container'>
+          <iron-icon class='user-circle-icon' icon='account-circle'></iron-icon>
+        </div>
+        <div class='settings-admin-btn-container'>
+          <iron-icon class='settings-icon' icon='settings'></iron-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center panel container: contains all main pages -->
+    <div class='page-container'></div>
+
+  </div>
+</template>
+
 <template id='calendar-template'>
   <div class='calendar-wrapper'>
     <!-- Collapsed banner -->
@@ -70,34 +98,6 @@
       <!-- Days of the month container -->
       <div class='dom-container'></div>
     </div>
-  </div>
-</template>
-
-<template id='center-page-template'>
-  <div class='center-page-wrapper'>
-
-    <!-- Upper-most row of center page. Container page title and admin btns -->
-    <div class='title-and-admin-btn-row'>
-      
-      <!-- Title for the center page -->
-      <div class='title-container'>
-        <span class='title-label'></span> 
-      </div> 
-
-      <!-- Admin icon buttons -->
-      <div class='admin-btn-container'>
-        <div class='user-profile-admin-btn-container'>
-          <iron-icon class='user-circle-icon' icon='account-circle'></iron-icon>
-        </div>
-        <div class='settings-admin-btn-container'>
-          <iron-icon class='settings-icon' icon='settings'></iron-icon>
-        </div>
-      </div>
-    </div>
-
-    <!-- Center panel container: contains all main pages -->
-    <div class='page-container'></div>
-
   </div>
 </template>
 
@@ -353,6 +353,26 @@
   </div>
 </template>
 
+<template id='short-code-picker-template'>
+  <div class='short-code-picker-wrapper'>
+    <div class='input-field-wrapper'>
+      <div class='input-field'><span class='input-field-label'></span></div>
+      <div class='icon-wrapper'>
+        <iron-icon icon='payment'></iron-icon>
+      </div>
+    </div>
+    <div class='short-code-dropdown-wrapper'>
+      <div class='short-code-dropdown'></div>
+    </div>
+  </div>
+</template>
+
+<template id='short-code-picker-option-template'>
+  <div class='short-code-picker-option' local-idx='' tooltip=''>
+    <span class='short-code-label'></span>
+  </div>
+</template>
+
 <template id='side-panel-template'>
   <div class='side-panel-wrapper'>
     <!-- User name -->
@@ -377,26 +397,6 @@
 
     <!-- Page navigation buttons -->
     <div class='nav-btns-container'></div>
-  </div>
-</template>
-
-<template id='short-code-picker-template'>
-  <div class='short-code-picker-wrapper'>
-    <div class='input-field-wrapper'>
-      <div class='input-field'><span class='input-field-label'></span></div>
-      <div class='icon-wrapper'>
-        <iron-icon icon='payment'></iron-icon>
-      </div>
-    </div>
-    <div class='short-code-dropdown-wrapper'>
-      <div class='short-code-dropdown'></div>
-    </div>
-  </div>
-</template>
-
-<template id='short-code-picker-option-template'>
-  <div class='short-code-picker-option' local-idx='' tooltip=''>
-    <span class='short-code-label'></span>
   </div>
 </template>
 
@@ -494,25 +494,6 @@
   </div>
 </template>
 
-<template id='experiment-time-form-template'>
-  <div class='experiment-time-form-wrapper new-exp-input-form'>
-    
-    <!-- Form title -->
-    <div class='form-title'>
-      <span class='form-title-label'>When would you like to start?</span>
-    </div>
-
-    <!-- Date and time input fields -->
-    <div class='input-container'>
-      <!-- Experiment time picker -->
-      <div class='exp-time-picker'></div> 
-      
-      <!-- Experiment date picker -->
-      <div class='exp-date-picker'></div>    
-    </div>
-  </div>
-</template>
-
 <template id='new-experiment-page-template'>
   <div class='new-experiment-page-wrapper' hidden>
     <!-- Scopes count input form input -->
@@ -529,6 +510,25 @@
 
     <!-- Confirm payment input -->
     <div class='confirm-order-form'></div>
+  </div>
+</template>
+
+<template id='experiment-time-form-template'>
+  <div class='experiment-time-form-wrapper new-exp-input-form'>
+    
+    <!-- Form title -->
+    <div class='form-title'>
+      <span class='form-title-label'>When would you like to start?</span>
+    </div>
+
+    <!-- Date and time input fields -->
+    <div class='input-container'>
+      <!-- Experiment time picker -->
+      <div class='exp-time-picker'></div> 
+      
+      <!-- Experiment date picker -->
+      <div class='exp-date-picker'></div>    
+    </div>
   </div>
 </template>
 

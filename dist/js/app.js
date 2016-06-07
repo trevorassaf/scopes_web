@@ -77,6 +77,8 @@ var ApplicationController = function(template_store) {
    */
   var templateStore = template_store;
 
+  var _this = this;
+
   // Controllers
   var centerPageController = null;
   var sidePanelController = null;
@@ -121,7 +123,6 @@ var ApplicationController = function(template_store) {
     sidePanelController = new SidePanelController();
     sidePanelController.init(
       side_panel_view,
-      centerPageController,
       applicationModel.getUserModel(),
       apiController
     );
@@ -133,9 +134,14 @@ var ApplicationController = function(template_store) {
   };
 
   var configureControllers = function() {
-    centerPageController.bindNewExperiment(function() {
-      sidePanelController.showMyExperimentsPage(); 
-    });
+    // Navigate to proper page when side panel tab is clicked
+    sidePanelController.bindNewExperimentTabSelection(_this.showNewExperimentPage);
+    sidePanelController.bindMyExperimentsTabSelection(_this.showMyExperimentsPage);
+    sidePanelController.bindTechnicianTabSelection(_this.showTechnicianPage);
+    sidePanelController.bindFeedbackTabSelection(_this.showFeedbackPage);
+    
+    // Navigate to 'MyExperiments' page on new experiment
+    centerPageController.bindNewExperiment(_this.showMyExperimentsPage);
   };
 
   var initControllers = function() {
@@ -167,6 +173,29 @@ var ApplicationController = function(template_store) {
 
     // Fetch startup data
     apiController.getGetStartupDataApiController().fetch();
+
+    // Configure initial ui
+    _this.showNewExperimentPage();
+  };
+
+  this.showNewExperimentPage = function() {
+    sidePanelController.selectNewExperimentTab();
+    centerPageController.showNewExperimentPage();
+  };
+
+  this.showMyExperimentsPage = function() {
+    sidePanelController.selectMyExperimentsTab();
+    centerPageController.showMyExperimentsPage();
+  };
+
+  this.showTechnicianPage = function() {
+    sidePanelController.selectTechnicianTab();
+    centerPageController.showTechnicianPage();
+  };
+
+  this.showFeedbackPage = function() {
+    sidePanelController.selectFeedbackTab();
+    centerPageController.showFeedbackPage();
   };
 };
 
@@ -1274,11 +1303,16 @@ var SidePanelController = function() {
   var sidePanelView = null;
 
   // Controllers
-  var centerPageController = null;
   var apiController = null;
 
   // Models
   var userModel = null;
+
+  // Tab selection callbacks
+  var selectNewExperimentTabCallbacks = [];
+  var selectMyExperimentsTabCallbacks = [];
+  var selectTechnicianTabCallbacks = [];
+  var selectFeedbackTabCallbacks = [];
 
   /**
    * Private functions
@@ -1308,10 +1342,34 @@ var SidePanelController = function() {
     configureGetStartupDataApi();
 
     // Register tab-selection callbacks
-    sidePanelView.bindNewExperimentTabClick(_this.selectNewExperimentTab);
-    sidePanelView.bindMyExperimentsTabClick(_this.selectMyExperimentsTab);
-    sidePanelView.bindFeedbackTabClick(_this.selectFeedbackTab);
-    sidePanelView.bindTechnicianTabClick(_this.selectTechnicianTab);
+    sidePanelView.bindNewExperimentTabClick(handleNewExperimentTabClick);
+    sidePanelView.bindMyExperimentsTabClick(handleMyExperimentsTabClick);
+    sidePanelView.bindFeedbackTabClick(handleTechnicianTabClick);
+    sidePanelView.bindTechnicianTabClick(handleFeedbackTabClick);
+  };
+
+  var handleNewExperimentTabClick = function() {
+    selectNewExperimentTabCallbacks.forEach(function(callback) {
+      callback();
+    });
+  };
+
+  var handleMyExperimentsTabClick = function() {
+    selectMyExperimentsTabCallbacks.forEach(function(callback) {
+      callback();
+    });
+  };
+
+  var handleTechnicianTabClick = function() {
+    selectTechnicianTabCallbacks.forEach(function(callback) {
+      callback();
+    });
+  };
+
+  var handleFeedbackTabClick = function() {
+    selectFeedbackTabCallbacks.forEach(function(callback) {
+      callback();
+    });
   };
 
   /**
@@ -1319,12 +1377,10 @@ var SidePanelController = function() {
    */
   this.init = function(
     side_panel_view,
-    center_page_controller,
     user_model,
     api_controller
   ) {
     sidePanelView = side_panel_view;
-    centerPageController = center_page_controller;
     userModel = user_model;
     apiController = api_controller;
 
@@ -1335,25 +1391,40 @@ var SidePanelController = function() {
 
   this.selectNewExperimentTab = function() {
     sidePanelView.selectNewExperimentTab();
-    centerPageController.showNewExperimentPage();
-    return this;
   };
   
   this.selectMyExperimentsTab = function() {
     sidePanelView.selectMyExperimentsTab();
-    centerPageController.showMyExperimentsPage();
-    return this;
   };
 
   this.selectFeedbackTab = function() {
     sidePanelView.selectFeedbackTab();
-    centerPageController.showFeedbackPage();
-    return this;
   };
 
   this.selectTechnicianTab = function() {
     sidePanelView.selectTechnicianTab();
-    centerPageController.showTechnicianPage();
+  };
+
+  /**
+   * Register tab selection callbacks
+   */
+  this.bindNewExperimentTabSelection = function(callback) {
+    selectNewExperimentTabCallbacks.push(callback);
+    return this;
+  };
+  
+  this.bindMyExperimentsTabSelection = function(callback) {
+    selectMyExperimentsTabCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindTechnicianTabSelection = function(callback) {
+    selectTechnicianTabCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindFeedbackTabSelection = function(callback) {
+    selectFeedbackTabCallbacks.push(callback);
     return this;
   };
 };
@@ -1469,6 +1540,605 @@ var TechnicianPageController = function() {
     
     initUi();
   };
+};
+
+function ConfirmedOrder(
+  id,
+  num_scopes,
+  start_timestamp,
+  end_timestamp,
+  title,
+  description,
+  time_ordered,
+  price,
+  short_code
+) {
+  this.id = id;
+  this.scopesCount = num_scopes;
+  this.startTimestamp = start_timestamp;
+  this.endTimestamp = end_timestamp;
+  this.title = title;
+  this.description = description;
+  this.timeOrdered = time_ordered;
+  this.price = price;
+  this.shortCode = short_code;
+};
+
+ConfirmedOrder.prototype.getId = function() {
+  return this.id;
+};
+
+ConfirmedOrder.prototype.getScopesCount = function() {
+  return this.scopesCount;
+};
+
+ConfirmedOrder.prototype.getStartTimestamp = function() {
+  return this.startTimestamp;
+};
+
+ConfirmedOrder.prototype.getEndTimestamp = function() {
+  return this.endTimestamp;
+};
+
+ConfirmedOrder.prototype.getTitle = function() {
+  return this.title;
+};
+
+ConfirmedOrder.prototype.getDescription = function() {
+  return this.description;
+};
+
+ConfirmedOrder.prototype.getTimeOrdered = function() {
+  return this.timeOrdered;
+};
+
+ConfirmedOrder.prototype.getPrice = function() {
+  return this.price;
+};
+
+ConfirmedOrder.prototype.getShortCode = function() {
+  return this.shortCode;
+};
+
+var DateApiObjectBuilder = function() {
+
+  /**
+   * Api object field keys
+   */
+  var YEAR_KEY = 'year';
+  var MONTH_KEY = 'month';
+  var DAY_KEY = 'day';
+
+  /**
+   * Private vars
+   */
+  var date = null;
+
+  /**
+   * Privileged functions
+   */
+  this.build = function() {
+    console.assert(date != null);
+
+    var date_obj = {};
+    date_obj[YEAR_KEY] = date.getYear();
+    date_obj[MONTH_KEY] = date.getMonth();
+    date_obj[DAY_KEY] = date.getDay();
+
+    return date_obj;
+  };
+
+  /**
+   * setDateObject()
+   * @param DateObject _date 
+   */
+  this.setDateObject = function(_date) {
+    date = _date; 
+    return this;
+  };
+
+  /**
+   * setDate()
+   * @param Date _date 
+   */
+  this.setDate = function(_date) {
+    date = new DateObject(
+      _date.getFullYear(),
+      _date.getMonth() + 1, // Date.month is 0 indexed
+      _date.getDate()
+    );
+    return this;
+  };
+};
+
+var DateObject = function(
+  _year,
+  _month,
+  _day
+) {
+  
+  /**
+   * Private vars
+   */
+  var year = _year;
+  var month = _month;
+  var day = _day;
+
+  // Validate input
+  console.assert(month > 0 && month <= 12);
+  console.assert(day > 0 && day <= 31);
+
+  /**
+   * Privileged functions
+   */
+  this.getYear = function() {
+    return year;
+  };
+
+  this.getMonth = function() {
+    return month;
+  };
+
+  this.getDay = function() {
+    return day;
+  };
+};
+
+DateObject.prototype.fromDate = function(date) {
+  return new DateObject(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    date.getDate()
+  );
+};
+
+var DateOperator = (function() {
+
+  // Date constants
+  var HOURS_IN_MICROSECONDS = 3.6e6;
+
+  /**
+   * Privileged methods
+   */
+
+  this.getDifferenceInHours = function(
+    date_a,
+    date_b
+  ) {
+    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
+  };
+
+  return {
+    getDifferenceInHours: getDifferenceInHours
+  };
+
+})();
+
+var ExperimentStatus = {
+  PENDING : 0,
+  APPROVED : 1,
+  COMPLETED : 2
+};
+
+var OrderStatus = function(_value = this.PENDING) {
+
+  // Order statuses
+  this.PENDING = 1;
+  this.APPROVED = 2;
+  this.COMPLETED = 3;
+
+  // Private state 
+  var value = _value;
+
+  this.isPending = function() {
+    return value == this.PENDING;
+  };
+
+  this.isApproved = function() {
+    return value == this.APPROVED;
+  };
+
+  this.isCompleted = function() {
+    return value == this.COMPLETED;
+  };
+
+  this.getValue = function() {
+    return value; 
+  };
+
+  this.compare = function(order_status) {
+    return value == order_status.getValue();
+  };
+};
+
+var PaymentStatus = function(_value = this.PENDING) {
+
+  // Payment statuses
+  this.PENDING = 1;
+  this.APPROVED = 2;
+  this.COMPLETED = 3;
+
+  // Private state 
+  var value = _value;
+
+  this.isPending = function() {
+    return value == this.PENDING;
+  };
+
+  this.isApproved = function() {
+    return value == this.APPROVED;
+  };
+
+  this.isCompleted = function() {
+    return value == this.COMPLETED;
+  };
+
+  this.getValue = function() {
+    return value; 
+  };
+
+  this.compare = function(payment_status) {
+    return value == payment_status.getValue();
+  };
+};
+
+function SerializeableDate(
+  year,
+  month,
+  date
+) {
+
+  // Ui constants
+  this.DATE_DELIMITER = ',';
+
+  this.SHORT_MONTH_NAMES = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  /**
+   * getShortMonthName()
+   * @param uint month: 0 < month < 11
+   */
+  this.getShortMonthName = function(month) {
+    return this.SHORT_MONTH_NAMES[month];
+  };
+
+  // Private state
+  this.year = year;
+
+  console.assert(month >= 0 && month < 12);
+  this.month = month;
+
+  console.assert(date >= 0 && date < 31);
+  this.date = date;
+};
+
+SerializeableDate.prototype.serialize = function() {
+  return this.getShortMonthName(this.month) + ' ' + this.date
+    + this.DATE_DELIMITER + ' ' + this.year;
+};
+
+function SerializeableTime(
+  hours,    // military time
+  minutes,
+  seconds
+) {
+
+  this.TIME_DELIMITER = ':';
+  this.AM_TOKEN = 'am';
+  this.PM_TOKEN = 'pm';
+
+  this.convertHourToNonMilitaryTime = function(military_hours) {
+    return (military_hours > 12)
+      ? military_hours - 12
+      : military_hours;
+  };
+
+  this.getMeridianToken = function(military_hours) {
+    return (military_hours >= 12 && military_hours !== 24)
+      ? this.PM_TOKEN
+      : this.AM_TOKEN;
+  };
+
+  this.hours = hours;
+  this.minutes = minutes;
+  this.seconds = seconds;
+};
+
+SerializeableTime.prototype.serialize = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
+};
+
+SerializeableTime.prototype.serializeWithoutSeconds = function() {
+  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
+  var meridian_token = this.getMeridianToken(this.hours);
+  
+  return non_military_hours.toString() + this.TIME_DELIMITER +
+    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
+    " " + meridian_token;
+};
+
+function ShortCode(
+  id,
+  code,
+  alias
+) {
+  this.id = id;
+  this.code = code;
+  this.alias = alias;
+};
+
+ShortCode.prototype.getId = function() {
+  return this.id;
+};
+
+ShortCode.prototype.getCode = function() {
+  return this.code;
+};
+
+ShortCode.prototype.getAlias = function() {
+  return this.alias;
+};
+
+ShortCode.prototype.deepCopy = function() {
+  return new ShortCode(
+    this.id,
+    this.code,
+    this.alias
+  );
+};
+
+var Time = function(
+  _hours,
+  _minutes,
+  _seconds
+) {
+ 
+  /**
+   * Private vars
+   */
+  var hours = (_hours == null) ? 0 : _hours;
+  var minutes = (_minutes == null) ? 0 : _minutes;
+  var seconds = (_seconds == null) ? 0 : _seconds;
+
+  // Validate input
+  console.assert(hours >= 0 && hours < 24);
+  console.assert(minutes >= 0 && minutes < 60);
+  console.assert(seconds >= 0 && seconds < 60);
+
+  /**
+   * Public functions
+   */
+  this.getHours = function() {
+    return hours;
+  };
+
+  this.getMinutes = function() {
+    return minutes;
+  };
+
+  this.getSeconds = function() {
+    return seconds;
+  };
+
+  this.toDate = function() {
+    var current_time = new Date(0, 0, 0);
+    current_time.setHours(hours);
+    current_time.setMinutes(minutes);
+    current_time.setSeconds(seconds);
+    return current_time;
+  };
+};
+
+Time.prototype.fromDate = function(date) {
+  return new Time(
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds()
+  );
+};
+
+var TimeApiObjectBuilder = function() {
+
+  /**
+   * Api object field keys
+   */
+  var HOUR_KEY = 'hours';
+  var MINUTE_KEY = 'minutes';
+  var SECOND_KEY = 'seconds';
+
+  /**
+   * Initial values
+   */
+  var INITIAL_HOUR = 0;
+  var INITIAL_MINUTE = 0;
+  var INITIAL_SECOND = 0;
+
+  /**
+   * Private vars
+   */
+  var time = new Time(
+    this.INITIAL_HOUR,
+    this.INITIAL_MINUTE,
+    this.INITIAL_SECOND
+  );
+
+  /**
+   * Privileged functions
+   */
+  this.build = function() {
+    var time_obj = {};
+    time_obj[HOUR_KEY] = time.getHours();
+    time_obj[MINUTE_KEY] = time.getMinutes();
+    time_obj[SECOND_KEY] = time.getSeconds();
+
+    return time_obj;
+  };
+
+  this.setTime = function(_time) {
+    time = _time;
+    return this;
+  };
+
+  /**
+   * setTimeWithDate()
+   * @param Date date
+   */
+  this.setTimeWithDate = function(date) {
+    time = new Time(
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds()
+    );
+    return this;
+  };
+};
+
+var Timestamp = function(
+  _date,
+  _time
+) {
+
+  /**
+   * Private state
+   */
+  var date = _date;
+  var time = _time;
+
+  /**
+   * Privileged functions
+   */
+  this.getDate = function() {
+    return date;
+  };
+
+  this.getTime = function() {
+    return time;
+  };
+};
+
+/**
+ * fromDate()
+ * @param Date date
+ */
+Timestamp.prototype.fromDate = function(date) {
+  return new Timestamp(
+    DateObject.fromDate(date),
+    Time.fromDate(date)
+  );
+};
+
+var TimestampApiObjectBuilder = function() {
+
+  /**
+   * Api keys
+   */
+  var DATE_KEY = 'date';
+  var TIME_KEY = 'time';
+
+  /**
+   * Private state
+   */
+  var dateBuilder = new DateApiObjectBuilder();
+  var timeBuilder = new TimeApiObjectBuilder();
+
+  /**
+   * Privileged functions
+   */
+  this.setTimestamp = function(timestamp) {
+    dateBuilder.setDateObject(timestamp.getDate());
+    timeBuilder.setTime(timestamp.getTime());
+    return this;
+  };
+
+  this.setTimestampWithDate = function(date) {
+    dateBuilder.setDate(date);
+    timeBuilder.setTimeWithDate(date);
+    return this;
+  };
+
+  this.build = function() {
+    var timestamp_obj = {};
+    timestamp_obj[DATE_KEY] = dateBuilder.build();
+    timestamp_obj[TIME_KEY] = timeBuilder.build();
+
+    return timestamp_obj;
+  };
+};
+
+var UpdateConfirmedOrderRequestBuilder = function() {
+
+  this.orderId = null;
+  this.title = null;
+  this.removeTitle = false;
+  this.description = null;
+  this.removeDescription = false;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
+  this.orderId = id;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
+  this.title = title;
+  this.removeTitle = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
+  this.title = null;
+  this.removeTitle = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
+  this.description = description;
+  this.removeDescription = false;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
+  this.description = null;
+  this.removeDescription = true;
+  return;
+};
+
+UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
+  // Check: id must be set!
+  console.assert(this.orderId != null);
+
+  // Check: at least one other field must be set 
+  console.assert(
+      this.title != null ||
+      this.isTitleRemoved != null ||
+      this.description != null ||
+      this.isDescriptionRemoved != null
+  );
+
+  return new UpdateConfirmedOrderRequest(
+    this.orderId,
+    this.title,
+    this.isTitleRemoved,
+    this.description,
+    this.isDescriptionRemoved
+  );
 };
 
 var ApplicationModel = function() {
@@ -2881,605 +3551,6 @@ UserModel.prototype.bindChangeName = function(callback) {
 UserModel.prototype.bindChangeEmail = function(callback) {
   this.emailChangeListeners.push(callback); 
   return this;
-};
-
-function ConfirmedOrder(
-  id,
-  num_scopes,
-  start_timestamp,
-  end_timestamp,
-  title,
-  description,
-  time_ordered,
-  price,
-  short_code
-) {
-  this.id = id;
-  this.scopesCount = num_scopes;
-  this.startTimestamp = start_timestamp;
-  this.endTimestamp = end_timestamp;
-  this.title = title;
-  this.description = description;
-  this.timeOrdered = time_ordered;
-  this.price = price;
-  this.shortCode = short_code;
-};
-
-ConfirmedOrder.prototype.getId = function() {
-  return this.id;
-};
-
-ConfirmedOrder.prototype.getScopesCount = function() {
-  return this.scopesCount;
-};
-
-ConfirmedOrder.prototype.getStartTimestamp = function() {
-  return this.startTimestamp;
-};
-
-ConfirmedOrder.prototype.getEndTimestamp = function() {
-  return this.endTimestamp;
-};
-
-ConfirmedOrder.prototype.getTitle = function() {
-  return this.title;
-};
-
-ConfirmedOrder.prototype.getDescription = function() {
-  return this.description;
-};
-
-ConfirmedOrder.prototype.getTimeOrdered = function() {
-  return this.timeOrdered;
-};
-
-ConfirmedOrder.prototype.getPrice = function() {
-  return this.price;
-};
-
-ConfirmedOrder.prototype.getShortCode = function() {
-  return this.shortCode;
-};
-
-var DateApiObjectBuilder = function() {
-
-  /**
-   * Api object field keys
-   */
-  var YEAR_KEY = 'year';
-  var MONTH_KEY = 'month';
-  var DAY_KEY = 'day';
-
-  /**
-   * Private vars
-   */
-  var date = null;
-
-  /**
-   * Privileged functions
-   */
-  this.build = function() {
-    console.assert(date != null);
-
-    var date_obj = {};
-    date_obj[YEAR_KEY] = date.getYear();
-    date_obj[MONTH_KEY] = date.getMonth();
-    date_obj[DAY_KEY] = date.getDay();
-
-    return date_obj;
-  };
-
-  /**
-   * setDateObject()
-   * @param DateObject _date 
-   */
-  this.setDateObject = function(_date) {
-    date = _date; 
-    return this;
-  };
-
-  /**
-   * setDate()
-   * @param Date _date 
-   */
-  this.setDate = function(_date) {
-    date = new DateObject(
-      _date.getFullYear(),
-      _date.getMonth() + 1, // Date.month is 0 indexed
-      _date.getDate()
-    );
-    return this;
-  };
-};
-
-var DateObject = function(
-  _year,
-  _month,
-  _day
-) {
-  
-  /**
-   * Private vars
-   */
-  var year = _year;
-  var month = _month;
-  var day = _day;
-
-  // Validate input
-  console.assert(month > 0 && month <= 12);
-  console.assert(day > 0 && day <= 31);
-
-  /**
-   * Privileged functions
-   */
-  this.getYear = function() {
-    return year;
-  };
-
-  this.getMonth = function() {
-    return month;
-  };
-
-  this.getDay = function() {
-    return day;
-  };
-};
-
-DateObject.prototype.fromDate = function(date) {
-  return new DateObject(
-    date.getFullYear(),
-    date.getMonth() + 1,
-    date.getDate()
-  );
-};
-
-var DateOperator = (function() {
-
-  // Date constants
-  var HOURS_IN_MICROSECONDS = 3.6e6;
-
-  /**
-   * Privileged methods
-   */
-
-  this.getDifferenceInHours = function(
-    date_a,
-    date_b
-  ) {
-    return Math.abs(date_a - date_b) / HOURS_IN_MICROSECONDS; 
-  };
-
-  return {
-    getDifferenceInHours: getDifferenceInHours
-  };
-
-})();
-
-var ExperimentStatus = {
-  PENDING : 0,
-  APPROVED : 1,
-  COMPLETED : 2
-};
-
-var OrderStatus = function(_value = this.PENDING) {
-
-  // Order statuses
-  this.PENDING = 1;
-  this.APPROVED = 2;
-  this.COMPLETED = 3;
-
-  // Private state 
-  var value = _value;
-
-  this.isPending = function() {
-    return value == this.PENDING;
-  };
-
-  this.isApproved = function() {
-    return value == this.APPROVED;
-  };
-
-  this.isCompleted = function() {
-    return value == this.COMPLETED;
-  };
-
-  this.getValue = function() {
-    return value; 
-  };
-
-  this.compare = function(order_status) {
-    return value == order_status.getValue();
-  };
-};
-
-var PaymentStatus = function(_value = this.PENDING) {
-
-  // Payment statuses
-  this.PENDING = 1;
-  this.APPROVED = 2;
-  this.COMPLETED = 3;
-
-  // Private state 
-  var value = _value;
-
-  this.isPending = function() {
-    return value == this.PENDING;
-  };
-
-  this.isApproved = function() {
-    return value == this.APPROVED;
-  };
-
-  this.isCompleted = function() {
-    return value == this.COMPLETED;
-  };
-
-  this.getValue = function() {
-    return value; 
-  };
-
-  this.compare = function(payment_status) {
-    return value == payment_status.getValue();
-  };
-};
-
-function SerializeableDate(
-  year,
-  month,
-  date
-) {
-
-  // Ui constants
-  this.DATE_DELIMITER = ',';
-
-  this.SHORT_MONTH_NAMES = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
-
-  /**
-   * getShortMonthName()
-   * @param uint month: 0 < month < 11
-   */
-  this.getShortMonthName = function(month) {
-    return this.SHORT_MONTH_NAMES[month];
-  };
-
-  // Private state
-  this.year = year;
-
-  console.assert(month >= 0 && month < 12);
-  this.month = month;
-
-  console.assert(date >= 0 && date < 31);
-  this.date = date;
-};
-
-SerializeableDate.prototype.serialize = function() {
-  return this.getShortMonthName(this.month) + ' ' + this.date
-    + this.DATE_DELIMITER + ' ' + this.year;
-};
-
-function SerializeableTime(
-  hours,    // military time
-  minutes,
-  seconds
-) {
-
-  this.TIME_DELIMITER = ':';
-  this.AM_TOKEN = 'am';
-  this.PM_TOKEN = 'pm';
-
-  this.convertHourToNonMilitaryTime = function(military_hours) {
-    return (military_hours > 12)
-      ? military_hours - 12
-      : military_hours;
-  };
-
-  this.getMeridianToken = function(military_hours) {
-    return (military_hours >= 12 && military_hours !== 24)
-      ? this.PM_TOKEN
-      : this.AM_TOKEN;
-  };
-
-  this.hours = hours;
-  this.minutes = minutes;
-  this.seconds = seconds;
-};
-
-SerializeableTime.prototype.serialize = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.seconds, 2) + " " + meridian_token;
-};
-
-SerializeableTime.prototype.serializeWithoutSeconds = function() {
-  var non_military_hours = this.convertHourToNonMilitaryTime(this.hours);
-  var meridian_token = this.getMeridianToken(this.hours);
-  
-  return non_military_hours.toString() + this.TIME_DELIMITER +
-    Utils.stringifyNumberWithEnforcedDigitCount(this.minutes, 2) +
-    " " + meridian_token;
-};
-
-function ShortCode(
-  id,
-  code,
-  alias
-) {
-  this.id = id;
-  this.code = code;
-  this.alias = alias;
-};
-
-ShortCode.prototype.getId = function() {
-  return this.id;
-};
-
-ShortCode.prototype.getCode = function() {
-  return this.code;
-};
-
-ShortCode.prototype.getAlias = function() {
-  return this.alias;
-};
-
-ShortCode.prototype.deepCopy = function() {
-  return new ShortCode(
-    this.id,
-    this.code,
-    this.alias
-  );
-};
-
-var Time = function(
-  _hours,
-  _minutes,
-  _seconds
-) {
- 
-  /**
-   * Private vars
-   */
-  var hours = (_hours == null) ? 0 : _hours;
-  var minutes = (_minutes == null) ? 0 : _minutes;
-  var seconds = (_seconds == null) ? 0 : _seconds;
-
-  // Validate input
-  console.assert(hours >= 0 && hours < 24);
-  console.assert(minutes >= 0 && minutes < 60);
-  console.assert(seconds >= 0 && seconds < 60);
-
-  /**
-   * Public functions
-   */
-  this.getHours = function() {
-    return hours;
-  };
-
-  this.getMinutes = function() {
-    return minutes;
-  };
-
-  this.getSeconds = function() {
-    return seconds;
-  };
-
-  this.toDate = function() {
-    var current_time = new Date(0, 0, 0);
-    current_time.setHours(hours);
-    current_time.setMinutes(minutes);
-    current_time.setSeconds(seconds);
-    return current_time;
-  };
-};
-
-Time.prototype.fromDate = function(date) {
-  return new Time(
-    date.getHours(),
-    date.getMinutes(),
-    date.getSeconds()
-  );
-};
-
-var TimeApiObjectBuilder = function() {
-
-  /**
-   * Api object field keys
-   */
-  var HOUR_KEY = 'hours';
-  var MINUTE_KEY = 'minutes';
-  var SECOND_KEY = 'seconds';
-
-  /**
-   * Initial values
-   */
-  var INITIAL_HOUR = 0;
-  var INITIAL_MINUTE = 0;
-  var INITIAL_SECOND = 0;
-
-  /**
-   * Private vars
-   */
-  var time = new Time(
-    this.INITIAL_HOUR,
-    this.INITIAL_MINUTE,
-    this.INITIAL_SECOND
-  );
-
-  /**
-   * Privileged functions
-   */
-  this.build = function() {
-    var time_obj = {};
-    time_obj[HOUR_KEY] = time.getHours();
-    time_obj[MINUTE_KEY] = time.getMinutes();
-    time_obj[SECOND_KEY] = time.getSeconds();
-
-    return time_obj;
-  };
-
-  this.setTime = function(_time) {
-    time = _time;
-    return this;
-  };
-
-  /**
-   * setTimeWithDate()
-   * @param Date date
-   */
-  this.setTimeWithDate = function(date) {
-    time = new Time(
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds()
-    );
-    return this;
-  };
-};
-
-var Timestamp = function(
-  _date,
-  _time
-) {
-
-  /**
-   * Private state
-   */
-  var date = _date;
-  var time = _time;
-
-  /**
-   * Privileged functions
-   */
-  this.getDate = function() {
-    return date;
-  };
-
-  this.getTime = function() {
-    return time;
-  };
-};
-
-/**
- * fromDate()
- * @param Date date
- */
-Timestamp.prototype.fromDate = function(date) {
-  return new Timestamp(
-    DateObject.fromDate(date),
-    Time.fromDate(date)
-  );
-};
-
-var TimestampApiObjectBuilder = function() {
-
-  /**
-   * Api keys
-   */
-  var DATE_KEY = 'date';
-  var TIME_KEY = 'time';
-
-  /**
-   * Private state
-   */
-  var dateBuilder = new DateApiObjectBuilder();
-  var timeBuilder = new TimeApiObjectBuilder();
-
-  /**
-   * Privileged functions
-   */
-  this.setTimestamp = function(timestamp) {
-    dateBuilder.setDateObject(timestamp.getDate());
-    timeBuilder.setTime(timestamp.getTime());
-    return this;
-  };
-
-  this.setTimestampWithDate = function(date) {
-    dateBuilder.setDate(date);
-    timeBuilder.setTimeWithDate(date);
-    return this;
-  };
-
-  this.build = function() {
-    var timestamp_obj = {};
-    timestamp_obj[DATE_KEY] = dateBuilder.build();
-    timestamp_obj[TIME_KEY] = timeBuilder.build();
-
-    return timestamp_obj;
-  };
-};
-
-var UpdateConfirmedOrderRequestBuilder = function() {
-
-  this.orderId = null;
-  this.title = null;
-  this.removeTitle = false;
-  this.description = null;
-  this.removeDescription = false;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setId = function(id) {
-  this.orderId = id;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setTitle = function(title) {
-  this.title = title;
-  this.removeTitle = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeTitle = function() {
-  this.title = null;
-  this.removeTitle = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.setDescription = function(description) {
-  this.description = description;
-  this.removeDescription = false;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.removeDescription = function() {
-  this.description = null;
-  this.removeDescription = true;
-  return;
-};
-
-UpdateConfirmedOrderRequestBuilder.prototype.build = function() {
-  // Check: id must be set!
-  console.assert(this.orderId != null);
-
-  // Check: at least one other field must be set 
-  console.assert(
-      this.title != null ||
-      this.isTitleRemoved != null ||
-      this.description != null ||
-      this.isDescriptionRemoved != null
-  );
-
-  return new UpdateConfirmedOrderRequest(
-    this.orderId,
-    this.title,
-    this.isTitleRemoved,
-    this.description,
-    this.isDescriptionRemoved
-  );
 };
 
 var Utils = (function() {
@@ -5877,6 +5948,176 @@ var MyExperimentRecordingPageView = function(
   };
 };
 
+var CenterPageView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'center-page-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'center-page-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+  var rootNode = null;
+
+  var currentPageView = null;
+
+  var newExperimentPageView = null;
+  var myExperimentsPageView = null;
+  var feedbackPageView = null;
+  var technicianPageView = null;
+
+  /**
+   * Dom nodes
+   */
+  var pageTitleNode = {
+    className: 'title-label',
+    node: null
+  };
+
+  var centerPanelPageContainerNode = {
+    className: 'page-container',
+    node: null
+  };
+
+  var adminButtonContainerNode = {
+    className: 'admin-btn-container',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+
+  var initNewExperimentPageView = function() {
+    newExperimentPageView = new NewExperimentPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    ); 
+    newExperimentPageView.init();
+  };
+
+  var initMyExperimentsPageView = function() {
+    myExperimentsPageView = new MyExperimentsPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    myExperimentsPageView.init();
+  };
+
+  var initFeedbackPageView = function() {
+    feedbackPageView = new FeedbackPage(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    feedbackPageView.init();
+  };
+
+  var initTechnicianPageView = function() {
+    technicianPageView = new TechnicianPageView(
+      templateStore,
+      centerPanelPageContainerNode.node
+    );
+    technicianPageView.init();
+  };
+
+  var initPages = function() {
+    initNewExperimentPageView(); 
+    initMyExperimentsPageView();
+    initFeedbackPageView();
+    initTechnicianPageView();
+  };
+
+  var bindNodes = function() {
+    // Bind page nodes
+    Utils.bindNodeInfo(rootNode, pageTitleNode);
+    Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
+    Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
+
+  };
+
+  var changePage = function(next_page_view) {
+    console.assert(next_page_view != null);
+
+    // Hide current page
+    if (currentPageView != null) {
+      currentPageView.hide();
+    }
+
+    // Show next page and update title
+    currentPageView = next_page_view;
+    pageTitleNode.node.innerHTML = currentPageView.getTitle();
+    currentPageView.show();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize template into document and initialize
+    // root DOM element
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );
+
+    // Bind ui elements and attach event listeners
+    bindNodes();
+    
+    // Initialize pages
+    initPages();
+
+    return this;
+  };
+
+  /**
+   * Functions for showing main pages
+   */
+  this.showNewExperimentPage = function() {
+    changePage(newExperimentPageView);       
+  };
+
+  this.showMyExperimentsPage = function() {
+    changePage(myExperimentsPageView);       
+  };
+
+  this.showFeedbackPage = function() {
+    changePage(feedbackPageView);       
+  };
+
+  this.showTechnicianPage = function() {
+    changePage(technicianPageView);       
+  };
+
+  this.getNewExperimentPageView = function() {
+    return newExperimentPageView;
+  };
+
+  this.getMyExperimentsPageView = function() {
+    return myExperimentsPageView;
+  };
+
+  this.getTechnicianPageView = function() {
+    return technicianPageView;
+  };
+
+  this.getFeedbackPageView = function() {
+    return feedbackPageView;
+  };
+};
+
 function Calendar(
   template_store,
   calendar_id,
@@ -7180,176 +7421,6 @@ function StaticCalendar(
     synthesizeTemplate();
     bindInternalNodes();
     initUi();
-  };
-};
-
-var CenterPageView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'center-page-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'center-page-wrapper';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-  var rootNode = null;
-
-  var currentPageView = null;
-
-  var newExperimentPageView = null;
-  var myExperimentsPageView = null;
-  var feedbackPageView = null;
-  var technicianPageView = null;
-
-  /**
-   * Dom nodes
-   */
-  var pageTitleNode = {
-    className: 'title-label',
-    node: null
-  };
-
-  var centerPanelPageContainerNode = {
-    className: 'page-container',
-    node: null
-  };
-
-  var adminButtonContainerNode = {
-    className: 'admin-btn-container',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-
-  var initNewExperimentPageView = function() {
-    newExperimentPageView = new NewExperimentPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    ); 
-    newExperimentPageView.init();
-  };
-
-  var initMyExperimentsPageView = function() {
-    myExperimentsPageView = new MyExperimentsPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );
-    myExperimentsPageView.init();
-  };
-
-  var initFeedbackPageView = function() {
-    feedbackPageView = new FeedbackPage(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );
-    feedbackPageView.init();
-  };
-
-  var initTechnicianPageView = function() {
-    technicianPageView = new TechnicianPageView(
-      templateStore,
-      centerPanelPageContainerNode.node
-    );
-    technicianPageView.init();
-  };
-
-  var initPages = function() {
-    initNewExperimentPageView(); 
-    initMyExperimentsPageView();
-    initFeedbackPageView();
-    initTechnicianPageView();
-  };
-
-  var bindNodes = function() {
-    // Bind page nodes
-    Utils.bindNodeInfo(rootNode, pageTitleNode);
-    Utils.bindNodeInfo(rootNode, adminButtonContainerNode);
-    Utils.bindNodeInfo(rootNode, centerPanelPageContainerNode);
-
-  };
-
-  var changePage = function(next_page_view) {
-    console.assert(next_page_view != null);
-
-    // Hide current page
-    if (currentPageView != null) {
-      currentPageView.hide();
-    }
-
-    // Show next page and update title
-    currentPageView = next_page_view;
-    pageTitleNode.node.innerHTML = currentPageView.getTitle();
-    currentPageView.show();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Synthesize template into document and initialize
-    // root DOM element
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );
-
-    // Bind ui elements and attach event listeners
-    bindNodes();
-    
-    // Initialize pages
-    initPages();
-
-    return this;
-  };
-
-  /**
-   * Functions for showing main pages
-   */
-  this.showNewExperimentPage = function() {
-    changePage(newExperimentPageView);       
-  };
-
-  this.showMyExperimentsPage = function() {
-    changePage(myExperimentsPageView);       
-  };
-
-  this.showFeedbackPage = function() {
-    changePage(feedbackPageView);       
-  };
-
-  this.showTechnicianPage = function() {
-    changePage(technicianPageView);       
-  };
-
-  this.getNewExperimentPageView = function() {
-    return newExperimentPageView;
-  };
-
-  this.getMyExperimentsPageView = function() {
-    return myExperimentsPageView;
-  };
-
-  this.getTechnicianPageView = function() {
-    return technicianPageView;
-  };
-
-  this.getFeedbackPageView = function() {
-    return feedbackPageView;
   };
 };
 
@@ -9216,228 +9287,6 @@ var ScopesCountFormView = function(template_store) {
   };
 };
 
-var SidePanelView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template node id
-   */
-  var TEMPLATE_ID = 'side-panel-template';
-
-  /**
-   * Root node class name
-   */
-  var ROOT_NODE_CLASS = 'side-panel-wrapper';
-  
-  /**
-   * Ui attributes
-   */
-  var START_HIDDEN_ATTR = "start-hidden";
-  
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-
-  var currentlySelectedTabAndPageInfo = null;
-  var centerPageTitleLabel = null;
-  var centerPanelPageContainer = null;
-  
-  var currentlySelectedTab = null;
-  var tabParentNode = null;
-
-  /**
-   * Tab infos
-   */
-  var tabContainerRootInfo = {
-    className: 'nav-btns-container',
-    node: null
-  };
-
-  var homeButtonNode = {
-    className: 'home-nav-container',
-    node: null
-  };
-
-  var userNameNode = {
-    className: 'side-panel-user-label',
-    node: null
-  };
-
-  var newExperimentInfo = {
-    button_title: 'Add Experiment',
-    icon_type: 'add-circle-outline',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var myExperimentsInfo = {
-    button_title: 'My Experiments',
-    icon_type: 'group-work',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var feedbackInfo = {
-    button_title: 'Feedback',
-    icon_type: 'question-answer',
-    tab: null,
-    callback_listeners: []
-  };
-
-  var technicianInfo = {
-    button_title: 'Technician',
-    icon_type: 'build',
-    tab: null,
-    callback_listeners: []
-  };
-
-  /**
-   * Private functions
-   */
-  /**
-   * initTabInfo()
-   * - initialize SidePanelTab view
-   * - bind event listeners
-   * @param TabInfo (see above)
-   */
-  var initTabInfo = function(tab_info) {
-    // Initialize tab view 
-    tab_info.tab = new SidePanelTab(
-      templateStore,
-      tabContainerRootInfo.node,
-      tab_info.button_title,
-      tab_info.icon_type
-    );    
-
-    // Register 'onclick' callback
-    tab_info.tab.registerOnClickListener(function() {
-      // // Unselect previous tab
-      // currentlySelectedTab.deselect();
-      //
-      // // Select new tab
-      // currentlySelectedTab = tab_info.tab;
-      // currentlySelectedTab.select();
-
-      // Invoke callback listeners
-      for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
-        tab_info.callback_listeners[i]();
-      }
-    });
-
-    // Initialize tab ui
-    tab_info.tab.init();
-  };
-
-  /**
-   * initTabInfos()
-   * - initialize all tabs (bind nodes and event listeners)
-   */
-  var initTabInfos = function() {
-    // Initialize tab parent node
-    tabContainerRootInfo.node = Utils.bindNode(
-      rootNode,
-      tabContainerRootInfo.className
-    ); 
-
-    // Initialize tab views
-    initTabInfo(newExperimentInfo);
-    initTabInfo(myExperimentsInfo);
-    initTabInfo(technicianInfo);
-    initTabInfo(feedbackInfo);
-  };
-
-  var selectTab = function(tab) {
-    if (currentlySelectedTab != null) {
-      currentlySelectedTab.deselect();
-    }
-    tab.select();
-    currentlySelectedTab = tab;
-  };
-
-  var bindNodes = function() {
-    // Initialize user-name ui node
-    userNameNode.node = Utils.bindNode(
-      rootNode,
-      userNameNode.className
-    );
-
-    // Initialize home burron ui node
-    homeButtonNode.node = Utils.bindNode(
-      rootNode,
-      homeButtonNode.className
-    );
-
-    // Initialize tabs
-    initTabInfos();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Synthesize html template and insert into main document
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_NODE_CLASS
-    );    
-
-    bindNodes();
-  
-    return this;
-  };
-
-  /**
-   * Onclick event listeners for tabs
-   */
-  this.bindNewExperimentTabClick = function(callback) {
-    newExperimentInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindMyExperimentsTabClick = function(callback) {
-    myExperimentsInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindFeedbackTabClick = function(callback) {
-    feedbackInfo.callback_listeners.push(callback); 
-  };
-
-  this.bindTechnicianTabClick = function(callback) {
-    technicianInfo.callback_listeners.push(callback); 
-  };
-
-  /**
-   * Select tab
-   */
-  this.selectNewExperimentTab = function() {
-    selectTab(newExperimentInfo.tab);
-  };
-
-  this.selectMyExperimentsTab = function() {
-    selectTab(myExperimentsInfo.tab);
-  };
-
-  this.selectFeedbackTab = function() {
-    selectTab(feedbackInfo.tab);
-  };
-
-  this.selectTechnicianTab = function() {
-    selectTab(technicianInfo.tab);
-  };
-
-  this.setUserName = function(first_name, last_name) {
-    var name = first_name + ' ' + last_name;
-    userNameNode.node.innerHTML = name;
-    // TODO check the length and curtail name if char count exceeds max
-    return this;
-  };
-};
-
 function ShortCodePicker(
   template_store,
   id,
@@ -9789,6 +9638,228 @@ function ShortCodePicker(
 
   this.setInitialState = function() {
     setInitialStateInternal();
+  };
+};
+
+var SidePanelView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template node id
+   */
+  var TEMPLATE_ID = 'side-panel-template';
+
+  /**
+   * Root node class name
+   */
+  var ROOT_NODE_CLASS = 'side-panel-wrapper';
+  
+  /**
+   * Ui attributes
+   */
+  var START_HIDDEN_ATTR = "start-hidden";
+  
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var currentlySelectedTabAndPageInfo = null;
+  var centerPageTitleLabel = null;
+  var centerPanelPageContainer = null;
+  
+  var currentlySelectedTab = null;
+  var tabParentNode = null;
+
+  /**
+   * Tab infos
+   */
+  var tabContainerRootInfo = {
+    className: 'nav-btns-container',
+    node: null
+  };
+
+  var homeButtonNode = {
+    className: 'home-nav-container',
+    node: null
+  };
+
+  var userNameNode = {
+    className: 'side-panel-user-label',
+    node: null
+  };
+
+  var newExperimentInfo = {
+    button_title: 'Add Experiment',
+    icon_type: 'add-circle-outline',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var myExperimentsInfo = {
+    button_title: 'My Experiments',
+    icon_type: 'group-work',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var feedbackInfo = {
+    button_title: 'Feedback',
+    icon_type: 'question-answer',
+    tab: null,
+    callback_listeners: []
+  };
+
+  var technicianInfo = {
+    button_title: 'Technician',
+    icon_type: 'build',
+    tab: null,
+    callback_listeners: []
+  };
+
+  /**
+   * Private functions
+   */
+  /**
+   * initTabInfo()
+   * - initialize SidePanelTab view
+   * - bind event listeners
+   * @param TabInfo (see above)
+   */
+  var initTabInfo = function(tab_info) {
+    // Initialize tab view 
+    tab_info.tab = new SidePanelTab(
+      templateStore,
+      tabContainerRootInfo.node,
+      tab_info.button_title,
+      tab_info.icon_type
+    );    
+
+    // Register 'onclick' callback
+    tab_info.tab.registerOnClickListener(function() {
+      // // Unselect previous tab
+      // currentlySelectedTab.deselect();
+      //
+      // // Select new tab
+      // currentlySelectedTab = tab_info.tab;
+      // currentlySelectedTab.select();
+
+      // Invoke callback listeners
+      for (var i = 0; i < tab_info.callback_listeners.length; ++i) {
+        tab_info.callback_listeners[i]();
+      }
+    });
+
+    // Initialize tab ui
+    tab_info.tab.init();
+  };
+
+  /**
+   * initTabInfos()
+   * - initialize all tabs (bind nodes and event listeners)
+   */
+  var initTabInfos = function() {
+    // Initialize tab parent node
+    tabContainerRootInfo.node = Utils.bindNode(
+      rootNode,
+      tabContainerRootInfo.className
+    ); 
+
+    // Initialize tab views
+    initTabInfo(newExperimentInfo);
+    initTabInfo(myExperimentsInfo);
+    initTabInfo(technicianInfo);
+    initTabInfo(feedbackInfo);
+  };
+
+  var selectTab = function(tab) {
+    if (currentlySelectedTab != null) {
+      currentlySelectedTab.deselect();
+    }
+    tab.select();
+    currentlySelectedTab = tab;
+  };
+
+  var bindNodes = function() {
+    // Initialize user-name ui node
+    userNameNode.node = Utils.bindNode(
+      rootNode,
+      userNameNode.className
+    );
+
+    // Initialize home burron ui node
+    homeButtonNode.node = Utils.bindNode(
+      rootNode,
+      homeButtonNode.className
+    );
+
+    // Initialize tabs
+    initTabInfos();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize html template and insert into main document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_NODE_CLASS
+    );    
+
+    bindNodes();
+  
+    return this;
+  };
+
+  /**
+   * Onclick event listeners for tabs
+   */
+  this.bindNewExperimentTabClick = function(callback) {
+    newExperimentInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindMyExperimentsTabClick = function(callback) {
+    myExperimentsInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindFeedbackTabClick = function(callback) {
+    feedbackInfo.callback_listeners.push(callback); 
+  };
+
+  this.bindTechnicianTabClick = function(callback) {
+    technicianInfo.callback_listeners.push(callback); 
+  };
+
+  /**
+   * Select tab
+   */
+  this.selectNewExperimentTab = function() {
+    selectTab(newExperimentInfo.tab);
+  };
+
+  this.selectMyExperimentsTab = function() {
+    selectTab(myExperimentsInfo.tab);
+  };
+
+  this.selectFeedbackTab = function() {
+    selectTab(feedbackInfo.tab);
+  };
+
+  this.selectTechnicianTab = function() {
+    selectTab(technicianInfo.tab);
+  };
+
+  this.setUserName = function(first_name, last_name) {
+    var name = first_name + ' ' + last_name;
+    userNameNode.node.innerHTML = name;
+    // TODO check the length and curtail name if char count exceeds max
+    return this;
   };
 };
 
@@ -10660,104 +10731,6 @@ var ConfirmOrderFormView = function(
   };
 };
 
-var ExperimentTimeFormView = function(
-  template_store,
-  parent_node
-) {
-
-  /**
-   * Template id
-   */
-  var TEMPLATE_ID = 'experiment-time-form-template';
-
-  /**
-   * Root class
-   */
-  var ROOT_CLASS = 'experiment-time-form-wrapper';
-
-  /**
-   * Private state
-   */
-  var templateStore = template_store;
-  var parentNode = parent_node;
-
-  var rootNode = null;
-
-  var timePickerView = null;
-  var datePickerView = null;
-
-  /**
-   * Dom nodes
-   */
-  var experimentTimePickerNode = {
-    className: 'exp-time-picker',
-    node: null
-  };
-  
-  var experimentDatePickerNode = {
-    className: 'exp-date-picker',
-    node: null
-  };
-
-  /**
-   * Private functions
-   */
-  var initExperimentTimePickerView = function() {
-    // Bind nodes
-    Utils.bindNodeInfo(rootNode, experimentTimePickerNode);
-
-    // Create view
-    timePickerView = new DropDownView(
-      templateStore,
-      experimentTimePickerNode.node
-    );
-
-    timePickerView.init('device:access-time');
-  };
-
-  var initExperimentDatePickerView = function() {
-    // Bind nodes
-    Utils.bindNodeInfo(rootNode, experimentDatePickerNode);
-
-    // Create view
-    datePickerView = new DatePickerView(
-      templateStore,
-      experimentDatePickerNode.node
-    );
-
-    datePickerView.init();
-  };
-
-  var initFormElements = function() {
-    initExperimentTimePickerView();
-    initExperimentDatePickerView();
-  };
-
-  /**
-   * Privileged functions
-   */
-  this.init = function() {
-    // Synthesize template into document
-    rootNode = Utils.synthesizeTemplate(
-      templateStore,
-      TEMPLATE_ID,
-      parentNode,
-      ROOT_CLASS
-    ); 
-
-    // Initialize form elements 
-    initFormElements();
-  };
-
-  this.getTimePickerView = function() {
-    return timePickerView;
-  };
-
-  this.getDatePickerView = function() {
-    return datePickerView;
-  };
-};
-
 var NewExperimentPageView = function(
   template_store,
   parent_node
@@ -10980,6 +10953,104 @@ var NewExperimentPageView = function(
 
   this.getConfirmExperimentFormView = function() {
     return confirmExperimentFormView;
+  };
+};
+
+var ExperimentTimeFormView = function(
+  template_store,
+  parent_node
+) {
+
+  /**
+   * Template id
+   */
+  var TEMPLATE_ID = 'experiment-time-form-template';
+
+  /**
+   * Root class
+   */
+  var ROOT_CLASS = 'experiment-time-form-wrapper';
+
+  /**
+   * Private state
+   */
+  var templateStore = template_store;
+  var parentNode = parent_node;
+
+  var rootNode = null;
+
+  var timePickerView = null;
+  var datePickerView = null;
+
+  /**
+   * Dom nodes
+   */
+  var experimentTimePickerNode = {
+    className: 'exp-time-picker',
+    node: null
+  };
+  
+  var experimentDatePickerNode = {
+    className: 'exp-date-picker',
+    node: null
+  };
+
+  /**
+   * Private functions
+   */
+  var initExperimentTimePickerView = function() {
+    // Bind nodes
+    Utils.bindNodeInfo(rootNode, experimentTimePickerNode);
+
+    // Create view
+    timePickerView = new DropDownView(
+      templateStore,
+      experimentTimePickerNode.node
+    );
+
+    timePickerView.init('device:access-time');
+  };
+
+  var initExperimentDatePickerView = function() {
+    // Bind nodes
+    Utils.bindNodeInfo(rootNode, experimentDatePickerNode);
+
+    // Create view
+    datePickerView = new DatePickerView(
+      templateStore,
+      experimentDatePickerNode.node
+    );
+
+    datePickerView.init();
+  };
+
+  var initFormElements = function() {
+    initExperimentTimePickerView();
+    initExperimentDatePickerView();
+  };
+
+  /**
+   * Privileged functions
+   */
+  this.init = function() {
+    // Synthesize template into document
+    rootNode = Utils.synthesizeTemplate(
+      templateStore,
+      TEMPLATE_ID,
+      parentNode,
+      ROOT_CLASS
+    ); 
+
+    // Initialize form elements 
+    initFormElements();
+  };
+
+  this.getTimePickerView = function() {
+    return timePickerView;
+  };
+
+  this.getDatePickerView = function() {
+    return datePickerView;
   };
 };
 

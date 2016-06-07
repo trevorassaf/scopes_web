@@ -9,11 +9,16 @@ var SidePanelController = function() {
   var sidePanelView = null;
 
   // Controllers
-  var centerPageController = null;
   var apiController = null;
 
   // Models
   var userModel = null;
+
+  // Tab selection callbacks
+  var selectNewExperimentTabCallbacks = [];
+  var selectMyExperimentsTabCallbacks = [];
+  var selectTechnicianTabCallbacks = [];
+  var selectFeedbackTabCallbacks = [];
 
   /**
    * Private functions
@@ -43,10 +48,34 @@ var SidePanelController = function() {
     configureGetStartupDataApi();
 
     // Register tab-selection callbacks
-    sidePanelView.bindNewExperimentTabClick(_this.selectNewExperimentTab);
-    sidePanelView.bindMyExperimentsTabClick(_this.selectMyExperimentsTab);
-    sidePanelView.bindFeedbackTabClick(_this.selectFeedbackTab);
-    sidePanelView.bindTechnicianTabClick(_this.selectTechnicianTab);
+    sidePanelView.bindNewExperimentTabClick(handleNewExperimentTabClick);
+    sidePanelView.bindMyExperimentsTabClick(handleMyExperimentsTabClick);
+    sidePanelView.bindFeedbackTabClick(handleTechnicianTabClick);
+    sidePanelView.bindTechnicianTabClick(handleFeedbackTabClick);
+  };
+
+  var handleNewExperimentTabClick = function() {
+    selectNewExperimentTabCallbacks.forEach(function(callback) {
+      callback();
+    });
+  };
+
+  var handleMyExperimentsTabClick = function() {
+    selectMyExperimentsTabCallbacks.forEach(function(callback) {
+      callback();
+    });
+  };
+
+  var handleTechnicianTabClick = function() {
+    selectTechnicianTabCallbacks.forEach(function(callback) {
+      callback();
+    });
+  };
+
+  var handleFeedbackTabClick = function() {
+    selectFeedbackTabCallbacks.forEach(function(callback) {
+      callback();
+    });
   };
 
   /**
@@ -54,12 +83,10 @@ var SidePanelController = function() {
    */
   this.init = function(
     side_panel_view,
-    center_page_controller,
     user_model,
     api_controller
   ) {
     sidePanelView = side_panel_view;
-    centerPageController = center_page_controller;
     userModel = user_model;
     apiController = api_controller;
 
@@ -70,25 +97,40 @@ var SidePanelController = function() {
 
   this.selectNewExperimentTab = function() {
     sidePanelView.selectNewExperimentTab();
-    centerPageController.showNewExperimentPage();
-    return this;
   };
   
   this.selectMyExperimentsTab = function() {
     sidePanelView.selectMyExperimentsTab();
-    centerPageController.showMyExperimentsPage();
-    return this;
   };
 
   this.selectFeedbackTab = function() {
     sidePanelView.selectFeedbackTab();
-    centerPageController.showFeedbackPage();
-    return this;
   };
 
   this.selectTechnicianTab = function() {
     sidePanelView.selectTechnicianTab();
-    centerPageController.showTechnicianPage();
+  };
+
+  /**
+   * Register tab selection callbacks
+   */
+  this.bindNewExperimentTabSelection = function(callback) {
+    selectNewExperimentTabCallbacks.push(callback);
+    return this;
+  };
+  
+  this.bindMyExperimentsTabSelection = function(callback) {
+    selectMyExperimentsTabCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindTechnicianTabSelection = function(callback) {
+    selectTechnicianTabCallbacks.push(callback);
+    return this;
+  };
+
+  this.bindFeedbackTabSelection = function(callback) {
+    selectFeedbackTabCallbacks.push(callback);
     return this;
   };
 };

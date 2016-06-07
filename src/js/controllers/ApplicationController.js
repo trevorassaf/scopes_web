@@ -5,6 +5,8 @@ var ApplicationController = function(template_store) {
    */
   var templateStore = template_store;
 
+  var _this = this;
+
   // Controllers
   var centerPageController = null;
   var sidePanelController = null;
@@ -49,7 +51,6 @@ var ApplicationController = function(template_store) {
     sidePanelController = new SidePanelController();
     sidePanelController.init(
       side_panel_view,
-      centerPageController,
       applicationModel.getUserModel(),
       apiController
     );
@@ -61,9 +62,14 @@ var ApplicationController = function(template_store) {
   };
 
   var configureControllers = function() {
-    centerPageController.bindNewExperiment(function() {
-      sidePanelController.showMyExperimentsPage(); 
-    });
+    // Navigate to proper page when side panel tab is clicked
+    sidePanelController.bindNewExperimentTabSelection(_this.showNewExperimentPage);
+    sidePanelController.bindMyExperimentsTabSelection(_this.showMyExperimentsPage);
+    sidePanelController.bindTechnicianTabSelection(_this.showTechnicianPage);
+    sidePanelController.bindFeedbackTabSelection(_this.showFeedbackPage);
+    
+    // Navigate to 'MyExperiments' page on new experiment
+    centerPageController.bindNewExperiment(_this.showMyExperimentsPage);
   };
 
   var initControllers = function() {
@@ -95,5 +101,28 @@ var ApplicationController = function(template_store) {
 
     // Fetch startup data
     apiController.getGetStartupDataApiController().fetch();
+
+    // Configure initial ui
+    _this.showNewExperimentPage();
+  };
+
+  this.showNewExperimentPage = function() {
+    sidePanelController.selectNewExperimentTab();
+    centerPageController.showNewExperimentPage();
+  };
+
+  this.showMyExperimentsPage = function() {
+    sidePanelController.selectMyExperimentsTab();
+    centerPageController.showMyExperimentsPage();
+  };
+
+  this.showTechnicianPage = function() {
+    sidePanelController.selectTechnicianTab();
+    centerPageController.showTechnicianPage();
+  };
+
+  this.showFeedbackPage = function() {
+    sidePanelController.selectFeedbackTab();
+    centerPageController.showFeedbackPage();
   };
 };
