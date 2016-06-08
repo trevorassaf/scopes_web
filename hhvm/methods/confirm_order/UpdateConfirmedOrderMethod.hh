@@ -8,7 +8,7 @@ class UpdateConfirmedOrderMethod {
   ) {}
 
   public function update(
-    UpdateConfirmedOrderRequest $request
+    UpdateConfirmedOrderApiRequest $request
   ): void {
     // Put update fields in map
     $update_field_map = Map{};

@@ -1,8 +1,8 @@
 <?hh // strict
 
-class UpdateConfirmedOrderRequest {
+class UpdateConfirmedOrderApiRequest {
 
-  const string REQUEST_OBJECT_NAME = "UpdateConfirmedOrderRequest";
+  const string REQUEST_OBJECT_NAME = "UpdateConfirmedOrderApiRequest";
 
   const string CONFIRMED_ORDER_ID_KEY = 'cid';
   const string TITLE_KEY = 'title';
@@ -40,7 +40,7 @@ class UpdateConfirmedOrderRequest {
   }
 }
 
-class UpdateConfirmedOrderRequestBuilder {
+class UpdateConfirmedOrderApiRequestBuilder {
   
   private ?RequestField<UnsignedInt> $confirmedOrderId;
   private ?RequestField<string> $title;
@@ -73,17 +73,17 @@ class UpdateConfirmedOrderRequestBuilder {
     return $this;
   }  
 
-  public function build(): UpdateConfirmedOrderRequest {
+  public function build(): UpdateConfirmedOrderApiRequest {
     // Confirmed order request must be provided!
     if ($this->confirmedOrderId === null) {
       throw new UnsetRequestFieldException(
-        UpdateConfirmedOrderRequest::REQUEST_OBJECT_NAME,
-        UpdateConfirmedOrderRequest::CONFIRMED_ORDER_ID_KEY
+        UpdateConfirmedOrderApiRequest::REQUEST_OBJECT_NAME,
+        UpdateConfirmedOrderApiRequest::CONFIRMED_ORDER_ID_KEY
       );
     }
 
     // Extrude request object
-    return new UpdateConfirmedOrderRequest(
+    return new UpdateConfirmedOrderApiRequest(
       $this->confirmedOrderId,
       $this->title,
       $this->description,

@@ -56,7 +56,7 @@ class ProductionApiInjectorFactory implements ApiInjectorFactory {
           $hr_timestamp_serializer
         ),
         new ConfirmOrderApiRequestFactoryLazyLoader(),
-        new UpdateConfirmedOrderRequestFactoryLazyLoader(),
+        new UpdateConfirmedOrderApiRequestFactoryLazyLoader(),
         new UpdateCellLabelRequestFactoryLazyLoader(),
         new DeleteCellLabelRequestFactoryLazyLoader(),
         new DeleteReservedOrderRequestFactoryLazyLoader(),

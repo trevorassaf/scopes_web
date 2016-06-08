@@ -1,8 +1,8 @@
 <?hh // strict
 
-class UpdateConfirmedOrderRequestFactoryLazyLoader extends LazyLoader<RequestFactory<UpdateConfirmedOrderRequest>> {
+class UpdateConfirmedOrderApiRequestFactoryLazyLoader extends LazyLoader<RequestFactory<UpdateConfirmedOrderApiRequest>> {
 
-  protected function make(): UpdateConfirmedOrderRequestFactory {
-    return new UpdateConfirmedOrderRequestFactory();
+  protected function make(): UpdateConfirmedOrderApiRequestFactory {
+    return new UpdateConfirmedOrderApiRequestFactory();
   }
 }

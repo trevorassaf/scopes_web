@@ -1,6 +1,6 @@
 <?hh // strict
 
-class UpdateConfirmedOrderRequestFactory implements RequestFactory<UpdateConfirmedOrderRequest> {
+class UpdateConfirmedOrderApiRequestFactory implements RequestFactory<UpdateConfirmedOrderApiRequest> {
 
   private RequestFieldFactory<UnsignedInt> $confirmedOrderIdFieldFactory;
   private RequestFieldFactory<string> $titleFieldFactory;
@@ -28,27 +28,27 @@ class UpdateConfirmedOrderRequestFactory implements RequestFactory<UpdateConfirm
     $this->shortCodeFieldFactory = $string_field_factory_builder->build();
   }
 
-  public function make(ImmMap<string, mixed> $raw_field_map): UpdateConfirmedOrderRequest {
-    $update_confirmed_order_request_builder = new UpdateConfirmedOrderRequestBuilder();
+  public function make(ImmMap<string, mixed> $raw_field_map): UpdateConfirmedOrderApiRequest {
+    $update_confirmed_order_request_builder = new UpdateConfirmedOrderApiRequestBuilder();
   
     foreach ($raw_field_map as $key => $value) {
       switch ($key) {
-        case UpdateConfirmedOrderRequest::CONFIRMED_ORDER_ID_KEY:
+        case UpdateConfirmedOrderApiRequest::CONFIRMED_ORDER_ID_KEY:
           $update_confirmed_order_request_builder->setConfirmedOrderId(
             $this->confirmedOrderIdFieldFactory->make($key, $value)
           );
           break;
-        case UpdateConfirmedOrderRequest::TITLE_KEY:
+        case UpdateConfirmedOrderApiRequest::TITLE_KEY:
           $update_confirmed_order_request_builder->setTitle(
             $this->titleFieldFactory->make($key, $value)
           );
           break;
-        case UpdateConfirmedOrderRequest::DESCRIPTION_KEY:
+        case UpdateConfirmedOrderApiRequest::DESCRIPTION_KEY:
           $update_confirmed_order_request_builder->setDescription(
             $this->descriptionFieldFactory->make($key, $value)
           );
           break;
-        case UpdateConfirmedOrderRequest::SHORT_CODE_KEY:
+        case UpdateConfirmedOrderApiRequest::SHORT_CODE_KEY:
           $update_confirmed_order_request_builder->setShortCode(
             $this->shortCodeFieldFactory->make($key, $value)
           );

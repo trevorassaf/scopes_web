@@ -1,9 +1,9 @@
 <?hh // strict
 
-class UpdateConfirmedOrderApi extends Api<UpdateConfirmedOrderRequest> {
+class UpdateConfirmedOrderApi extends Api<UpdateConfirmedOrderApiRequest> {
 
   public function __construct(
-    RequestFactory<UpdateConfirmedOrderRequest> $request_factory,
+    RequestFactory<UpdateConfirmedOrderApiRequest> $request_factory,
     private UpdateConfirmedOrderMethod $updateMethod,
     private Logger $logger
   ) {
@@ -15,7 +15,7 @@ class UpdateConfirmedOrderApi extends Api<UpdateConfirmedOrderRequest> {
 
   protected function processRequestObject(
     UserAgent $user_agent,
-    UpdateConfirmedOrderRequest $request
+    UpdateConfirmedOrderApiRequest $request
   ): ApiResult {
     $this->updateMethod->update($request);
     return new SuccessfulApiResult(ApiType::UPDATE_CONFIRMED_ORDER);
