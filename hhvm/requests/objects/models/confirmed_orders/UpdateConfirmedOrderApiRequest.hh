@@ -7,7 +7,7 @@ class UpdateConfirmedOrderApiRequest {
   const string CONFIRMED_ORDER_ID_KEY = 'cid';
   const string TITLE_KEY = 'title';
   const string DESCRIPTION_KEY = 'desc';
-  const string SHORT_CODE_KEY = 'code';
+  const string SHORT_CODE_ID_KEY = 'sid';
   const string RECORDING_DURATION_KEY = 'duration';
   const string CELL_LABEL_REQUESTS_KEY = 'labels';
 
@@ -15,8 +15,7 @@ class UpdateConfirmedOrderApiRequest {
     private RequestField<UnsignedInt> $confirmedOrderId,
     private ?RequestField<string> $title,
     private ?RequestField<string> $description,
-    private ?RequestField<string> $shortCode,
-    private ?RequestField<UnsignedInt> $recordingDuration
+    private ?RequestField<UnsignedInt> $shortCodeId
   ) {}
 
   public function getConfirmedOrderId(): RequestField<UnsignedInt> {
@@ -31,12 +30,8 @@ class UpdateConfirmedOrderApiRequest {
     return $this->description;
   }
 
-  public function getShortCode(): ?RequestField<string> {
-    return $this->shortCode;
-  }
-
-  public function getRecordingDuration(): ?RequestField<UnsignedInt> {
-    return $this->recordingDuration;
+  public function getShortCodeId(): ?RequestField<UnsignedInt> {
+    return $this->shortCodeId;
   }
 }
 
@@ -45,8 +40,7 @@ class UpdateConfirmedOrderApiRequestBuilder {
   private ?RequestField<UnsignedInt> $confirmedOrderId;
   private ?RequestField<string> $title;
   private ?RequestField<string> $description;
-  private ?RequestField<string> $shortCode;
-  private ?RequestField<UnsignedInt> $recordingDuration;
+  private ?RequestField<UnsignedInt> $shortCodeId;
 
   public function setConfirmedOrderId(?RequestField<UnsignedInt> $confirmed_order_id): this {
     $this->confirmedOrderId = $confirmed_order_id;
@@ -63,15 +57,10 @@ class UpdateConfirmedOrderApiRequestBuilder {
     return $this;
   }
   
-  public function setShortCode(?RequestField<string> $short_code): this {
-    $this->shortCode = $short_code;
+  public function setShortCodeId(?RequestField<UnsignedInt> $short_code): this {
+    $this->shortCodeId = $short_code;
     return $this;
   }
-
-  public function setRecordingDuration(?RequestField<UnsignedInt> $recording_duration): this {
-    $this->recordingDuration = $recording_duration;
-    return $this;
-  }  
 
   public function build(): UpdateConfirmedOrderApiRequest {
     // Confirmed order request must be provided!
@@ -87,8 +76,7 @@ class UpdateConfirmedOrderApiRequestBuilder {
       $this->confirmedOrderId,
       $this->title,
       $this->description,
-      $this->shortCode,
-      $this->recordingDuration
+      $this->shortCodeId
     );
   }
 }

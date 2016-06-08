@@ -8,24 +8,26 @@ class UpdateConfirmedOrderMethod {
   ) {}
 
   public function update(
-    UpdateConfirmedOrderApiRequest $request
+    UpdateConfirmedOrderRequest $request
   ): void {
+    // TODO Check validity of fields 
+    $title = $request->getTitle();
+    $description = $request->getDescription();
+    $short_code_id = $request->getShortCodeId();
+
     // Put update fields in map
     $update_field_map = Map{};
 
-    $title_field = $request->getTitle();
-    if ($title_field !== null) {
-      $update_field_map[$this->table->getTitleKey()] = $title_field->get();
+    if ($title !== null) {
+      $update_field_map[$this->table->getTitleKey()] = $title;
     }
 
-    $description_field = $request->getDescription();
-    if ($description_field !== null) {
-      $update_field_map[$this->table->getDescriptionKey()] = $description_field->get();
+    if ($description !== null) {
+      $update_field_map[$this->table->getDescriptionKey()] = $description;
     }
 
-    $short_code_field = $request->getShortCode();
-    if ($short_code_field !== null) {
-      $update_field_map[$this->table->getShortCodeIdKey()] = $short_code_field->get();
+    if ($short_code_id !== null) {
+      $update_field_map[$this->table->getShortCodeIdKey()] = $short_code_id;
     }
 
     // Update confirmed order object with provided fields
@@ -34,7 +36,7 @@ class UpdateConfirmedOrderMethod {
         ->update(
           $this->table,
           $update_field_map->toImmMap(),
-          $request->getConfirmedOrderId()->get()
+          $request->getConfirmedOrderId()
         )
         ->getWaitHandle()
         ->join();

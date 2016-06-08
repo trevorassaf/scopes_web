@@ -5,7 +5,7 @@ class UpdateConfirmedOrderApiRequestFactory implements RequestFactory<UpdateConf
   private RequestFieldFactory<UnsignedInt> $confirmedOrderIdFieldFactory;
   private RequestFieldFactory<string> $titleFieldFactory;
   private RequestFieldFactory<string> $descriptionFieldFactory;
-  private RequestFieldFactory<string> $shortCodeFieldFactory;
+  private RequestFieldFactory<UnsignedInt> $shortCodeIdFieldFactory;
   private RequestFieldFactory<UnsignedInt> $recordingDurationFieldFactory;
 
   public function __construct() {
@@ -25,7 +25,7 @@ class UpdateConfirmedOrderApiRequestFactory implements RequestFactory<UpdateConf
     $this->descriptionFieldFactory = $string_field_factory_builder->build();
        
     // Create short code field factory
-    $this->shortCodeFieldFactory = $string_field_factory_builder->build();
+    $this->shortCodeIdFieldFactory = $uint_field_factory_builder->build();
   }
 
   public function make(ImmMap<string, mixed> $raw_field_map): UpdateConfirmedOrderApiRequest {
@@ -48,9 +48,9 @@ class UpdateConfirmedOrderApiRequestFactory implements RequestFactory<UpdateConf
             $this->descriptionFieldFactory->make($key, $value)
           );
           break;
-        case UpdateConfirmedOrderApiRequest::SHORT_CODE_KEY:
-          $update_confirmed_order_request_builder->setShortCode(
-            $this->shortCodeFieldFactory->make($key, $value)
+        case UpdateConfirmedOrderApiRequest::SHORT_CODE_ID_KEY:
+          $update_confirmed_order_request_builder->setShortCodeId(
+            $this->shortCodeIdFieldFactory->make($key, $value)
           );
           break;
         default:

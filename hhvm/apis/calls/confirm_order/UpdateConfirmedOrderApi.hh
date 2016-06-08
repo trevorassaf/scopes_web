@@ -5,6 +5,7 @@ class UpdateConfirmedOrderApi extends Api<UpdateConfirmedOrderApiRequest> {
   public function __construct(
     RequestFactory<UpdateConfirmedOrderApiRequest> $request_factory,
     private UpdateConfirmedOrderMethod $updateMethod,
+    private UpdateConfirmedOrderRequestApiToInternalConverter $apiToInternalRequestConverter,
     private Logger $logger
   ) {
     parent::__construct(
@@ -17,7 +18,8 @@ class UpdateConfirmedOrderApi extends Api<UpdateConfirmedOrderApiRequest> {
     UserAgent $user_agent,
     UpdateConfirmedOrderApiRequest $request
   ): ApiResult {
-    $this->updateMethod->update($request);
+    $internal_request = $this->apiToInternalRequestConverter->convert($request);
+    $this->updateMethod->update($internal_request);
     return new SuccessfulApiResult(ApiType::UPDATE_CONFIRMED_ORDER);
   }
 

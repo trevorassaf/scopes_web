@@ -70,7 +70,8 @@ class ApiInjector {
     private LazyLoader<RequestFactory<DeleteBasicVideoApiRequest>> $deleteBasicVideoApiRequestLoader,
     private LazyLoader<RequestFactory<GetSessionInfoApiRequest>> $getSessionInfoApiRequestFactoryLoader,
     private LazyLoader<RequestFactory<GetOrderPricePolicyApiRequest>> $getOrderPricePolicyApiRequestFactoryLoader,
-    private LazyLoader<RequestFactory<GetStartupDataApiRequest>> $getStartupDataApiRequestFactoryLoader
+    private LazyLoader<RequestFactory<GetStartupDataApiRequest>> $getStartupDataApiRequestFactoryLoader,
+    private LazyLoader<UpdateConfirmedOrderRequestApiToInternalConverter> $updateConfirmedOrderRequestApiToInternalConverterLoader
   ) {}
 
   public function getCreateUserApi(): CreateUserApi {
@@ -124,6 +125,7 @@ class ApiInjector {
       $this->updateConfirmedOrderApi = new UpdateConfirmedOrderApi(
         $this->updateConfirmedOrderRequestLoader->load(),
         $this->methodInjector->getUpdateConfirmedOrderMethod(),
+        $this->updateConfirmedOrderRequestApiToInternalConverterLoader->load(),
         $this->logger
       ); 
     }
